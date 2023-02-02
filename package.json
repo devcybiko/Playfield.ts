@@ -1,5 +1,30 @@
 {
   "devDependencies": {
     "typescript": "^4.9.5"
+  },
+  "name": "playfield.ts",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-ts": "tsc -w",
+    "build-ts": "tsc; pwd; ./scripts/copyAssets.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devcybiko/Playfield.ts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devcybiko/Playfield.ts/issues"
+  },
+  "homepage": "https://github.com/devcybiko/Playfield.ts#readme",
+  "dependencies": {
+    "source-map-loader": "^4.0.1",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1"
   }
 }

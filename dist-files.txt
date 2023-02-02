@@ -1,0 +1,11 @@
+./dist/Utils.js
+./dist/Logger.js
+./dist/Graphics.js
+./dist/Playfield.js
+./dist/Meander.js
+./dist/Actor.js
+./dist/Shape.js
+./dist/Box.js
+./dist/Circle.js
+./dist/Jed/Item.js
+./dist/Jed/TextItem.js
