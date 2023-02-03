@@ -14,7 +14,7 @@ class GraphicsParms {
         this.textAlign = "left";
         this.textBaseline = "top";
         this.fontSize = 24;
-        this.fontFace = "san-serif"
+        this.fontFace = "san serif"
     }
     public clone(): GraphicsParms {
         return { ...this } as GraphicsParms;
