@@ -1,103 +1,99 @@
 class Graphics {
-  private ctx: CanvasRenderingContext2D;
+    private ctx: CanvasRenderingContext2D;
+    private gparms: GraphicsParms;
 
-  private fontSize = 12;
-  private fontFace = "sans-serif";
-  private textColor = "black";
-  private borderColor = "black";
-  private fillColor = "white";
-
-  constructor(ctx: CanvasRenderingContext2D) {
-    this.ctx = ctx;
-    this.configContext();
-  }
-  private configContext() {
-    let ctx = this.ctx;
-    ctx.font = this.fontSize + "px " + this.fontFace;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-  }
-
-  rect(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    borderColor = this.borderColor,
-    fillColor = this.fillColor
-  ) {
-    if (fillColor) {
-      this.ctx.fillStyle = fillColor;
-      this.ctx.fillRect(x, y, w, h);
+    constructor(ctx: CanvasRenderingContext2D) {
+        this.ctx = ctx;
+        this.gparms = new GraphicsParms();
     }
-    if (borderColor) {
-      this.ctx.strokeStyle = borderColor;
-      this.ctx.strokeRect(x, y, w, h);
-    }
-  }
 
-  ellipse(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    borderColor = this.borderColor,
-    fillColor = this.fillColor
-  ) {
-    if (fillColor) {
-      this.ctx.beginPath();
-      this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-      this.ctx.fillStyle = fillColor;
-      this.ctx.fill();
+    rect(
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        gparms = this.gparms
+    ) {
+        if (gparms.fillColor) {
+            this.ctx.fillStyle = gparms.fillColor;
+            this.ctx.fillRect(x, y, w, h);
+        }
+        if (gparms.borderColor) {
+            this.ctx.strokeStyle = gparms.borderColor;
+            this.ctx.strokeRect(x, y, w, h);
+        }
     }
-    if (borderColor) {
-      this.ctx.beginPath();
-      this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-      this.ctx.strokeStyle = borderColor;
-      this.ctx.stroke();
+
+    ellipse(
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        gparms = this.gparms
+    ) {
+        if (gparms.fillColor) {
+            this.ctx.beginPath();
+            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.fillStyle = gparms.fillColor;
+            this.ctx.fill();
+        }
+        if (gparms.borderColor) {
+            this.ctx.beginPath();
+            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.strokeStyle = gparms.borderColor;
+            this.ctx.stroke();
+        }
     }
-  }
 
-  circle(
-    x: number,
-    y: number,
-    r: number,
-    borderColor = this.borderColor,
-    fillColor = this.fillColor
-  ) {
-    this.ellipse(x-r, y-r, r, r, borderColor, fillColor);
-  }
+    circle(
+        x: number,
+        y: number,
+        r: number,
+        gparms = this.gparms
+    ) {
+        this.ellipse(x - r, y - r, r, r, gparms);
+    }
 
-  line(
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    color = this.borderColor
-  ) {
-    this.ctx.beginPath();
-    this.ctx.strokeStyle = color;
-    this.ctx.moveTo(x0, y0);
-    this.ctx.lineTo(x1, y1);
-    this.ctx.stroke();
-  }
-  text(msg: string, x = 0, y = 0, color = this.textColor, opts?: any) {
-    this.ctx.fillStyle = color;
-    if (opts && opts.textAlign) this.ctx.textAlign = opts.textAlign;
-    if (opts && opts.textBaseline) this.ctx.textBaseline = opts.textBaseline;
-    this.ctx.fillText(msg, x, y);
-  }
-  textRect(
-    msg: string,
-    x = 0,
-    y = 0,
-    w = (msg.length * this.fontSize) / 2.0,
-    h = this.fontSize,
-    textColor = this.textColor,
-    borderColor = this.borderColor,
-    fillColor = this.fillColor
-  ) {
-    this.rect(x, y, w, h, borderColor, fillColor);
-    this.text(msg, x + w / 2, y + h / 2, textColor);
-  }
+    line(
+        x0: number,
+        y0: number,
+        x1: number,
+        y1: number,
+        gparms = this.gparms
+    ) {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = gparms.color;
+        this.ctx.moveTo(x0, y0);
+        this.ctx.lineTo(x1, y1);
+        this.ctx.stroke();
+    }
+    text(msg: string, x = 0, y = 0, gparms = this.gparms) {
+        this.ctx.fillStyle = gparms.color;
+        this.ctx.font = gparms.font;
+        this.ctx.textAlign = gparms.textAlign;
+        this.ctx.textBaseline = gparms.textBaseline;
+        x += gparms.xOffset;
+        y += gparms.yOffset;
+        this.ctx.fillText(msg, x, y);
+    }
+    textRect(
+        msg: string,
+        x = 0,
+        y = 0,
+        w?: number,
+        h?: number,
+        gparms = this.gparms
+    ) {
+        this.ctx.font = gparms.font;
+        let boundingBox = this.boundingBox(msg, gparms);
+        if (!w) w = boundingBox.w;
+        if (!h) h = boundingBox.h;
+        this.rect(x, y, w, h, gparms);
+        this.text(msg, x + w / 2, y + h / 2 + 1, gparms);
+    }
+    boundingBox(msg: string, gparms = this.gparms): any {
+        this.ctx.font = gparms.font;
+        let boundingBox = this.ctx.measureText(msg) as any;
+        return {w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize};
+    }
 }

@@ -18,9 +18,7 @@ class Box extends Shape {
         this.y,
         this.w,
         this.h,
-        "black",
-        this.borderColor,
-        this.color
+        this.selectedGparms
       );  
     } else {
       this.playfield.gfx.textRect(
@@ -29,9 +27,7 @@ class Box extends Shape {
         this.y,
         this.w,
         this.h,
-        "black",
-        null,
-        this.color
+        this.gparms
       );
   
     }

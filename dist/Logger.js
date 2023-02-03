@@ -7,12 +7,12 @@ class Logger {
     setLogLevel(level) {
         this.level = level;
     }
-    log(msg) {
+    log(...args) {
         if (this.level === "log")
-            console.log(this.module + ": ", msg);
+            console.log(this.module + ": ", ...args);
     }
-    error(msg) {
-        console.log(this.module + ": ", msg);
+    error(...args) {
+        console.log(this.module + ": ", ...args);
     }
 }
 //# sourceMappingURL=Logger.js.map

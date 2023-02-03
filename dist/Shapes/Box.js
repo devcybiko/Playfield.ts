@@ -5,10 +5,10 @@ class Box extends Shape {
     }
     draw() {
         if (this.isSelected) {
-            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, "black", this.borderColor, this.color);
+            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, this.selectedGparms);
         }
         else {
-            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, "black", null, this.color);
+            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, this.gparms);
         }
     }
 }

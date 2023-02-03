@@ -8,11 +8,11 @@ class Main {
         let x = 0;
         let y = 0;
         playfield.gfx.textRect("Hello Greg", x, (y += 24), undefined, undefined, gparms);
-        playfield.gfx.textRect("  Two  ", x, (y += 24), undefined, undefined, gparms);
+        playfield.gfx.textRect("  Two  ",x,(y += 24),undefined,undefined,gparms);
         playfield.gfx.textRect("Three", x, (y += 24), 100, 24, gparms);
         gparms.borderColor = "yellow";
         gparms.fillColor = "green";
-        playfield.gfx.textRect("Four", x, (y += 24), 50, 48, gparms);
+        playfield.gfx.textRect("Four",x,(y += 24),50,48,gparms);
         playfield.gfx.circle(100, (y += 100), 25);
         playfield.gfx.circle(100, (y += 100), 25, gparms);
         playfield.gfx.circle(100, (y += 100), 25, gparms);
@@ -20,4 +20,3 @@ class Main {
     }
 }
 let main = new Main();
-//# sourceMappingURL=Main.js.map

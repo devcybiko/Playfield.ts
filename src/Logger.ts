@@ -8,10 +8,10 @@ class Logger {
   setLogLevel(level: string) {
     this.level = level;
   }
-  log(msg: string) {
-    if (this.level === "log") console.log(this.module + ": ", msg);
+  log(...args: string[]) {
+    if (this.level === "log") console.log(this.module + ": ", ...args);
   }
-  error(msg: string) {
-    console.log(this.module +": ", msg);
+  error(...args: string[]) {
+    console.log(this.module +": ", ...args);
   }
 }

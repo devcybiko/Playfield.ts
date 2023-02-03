@@ -3,12 +3,15 @@ class Actor {
         this.borderColor = "black";
         this.fillColor = "white";
         this.color = "black";
+        this.isDraggable = true;
         this.name = name;
         this.logger = new Logger("Actor");
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+    }
+    addMeToPlayfield(playfield) {
     }
     move(x, y, w = this.w, h = this.h) {
         this.x = x;

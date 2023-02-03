@@ -5,21 +5,22 @@ class Playfield {
         this.logger = new Logger("Playfield");
         this.gfx = new Graphics(this.ctx);
         this.objs = [];
-        this.canvas.playfield = this;
         this.selectedObj = null;
-        this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-        this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-        this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+        this.eventHandler = new PlayfieldEventHandler(this, this.canvas);
+        // this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
+        // this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
+        // this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+        // document.addEventListener("keydown", this.handleKeyDown.bind(this));
         this.dragObj = null;
         this.grabDX = null;
         this.grabDY = null;
         this.body = document.querySelector('body');
         this.body.playfield = this;
-        document.addEventListener("keydown", this.handleKeyDown.bind(this));
     }
     add(obj) {
         obj.playfield = this;
         this.objs.push(obj);
+        obj.addMeToPlayfield(this);
     }
     redraw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -33,47 +34,6 @@ class Playfield {
                 return obj;
         }
         return null;
-    }
-    handleMouseDown(event) {
-        let playfield = event.srcElement.playfield;
-        if (!playfield)
-            return this.logger.error("ERROR: mousedown not associated with a playfield");
-        let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-        if (obj)
-            obj.click(event.offsetX, event.offsetY);
-        if (playfield.selectedObj)
-            playfield.selectedObj.deselect();
-        playfield.selectedObj = obj;
-        if (obj) {
-            if (event.shiftKey)
-                playfield.toBack(obj);
-            else
-                playfield.toFront(obj);
-            obj.select();
-            obj.click(event.offsetX, event.offsetY);
-            this.logger.log("grabbing");
-            playfield.dragObj = obj;
-            playfield.grabDX = event.offsetX - obj.x;
-            playfield.grabDY = event.offsetY - obj.y;
-        }
-        playfield.redraw();
-    }
-    handleMouseUp(event) {
-        let playfield = event.srcElement.playfield;
-        if (!playfield)
-            return this.logger.error("ERROR: mouseup not associated with a playfield");
-        this.logger.log("handleMouseUp");
-        playfield.dragObj = null;
-    }
-    handleMouseMove(event) {
-        let playfield = event.srcElement.playfield;
-        if (!playfield)
-            return this.logger.error("ERROR: mousedown not associated with a playfield");
-        if (playfield.dragObj) {
-            this.logger.log("handleMouseMove");
-            playfield.dragObj.drag(event.offsetX - playfield.grabDX, event.offsetY - playfield.grabDY);
-            playfield.redraw();
-        }
     }
     toFront(obj) {
         let i = this.objs.indexOf(obj);
