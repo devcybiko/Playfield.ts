@@ -37,7 +37,7 @@ class GraphicsParms {
         this.textAlign = "left";
         this.textBaseline = "top";
         this.fontSize = 24;
-        this.fontFace = "san-serif";
+        this.fontFace = "sans-serif";
     }
     clone() {
         return Object.assign({}, this);
@@ -522,8 +522,10 @@ class TextItem extends Item {
         super(name, label, value, x, y, w, h);
         this.cursorOn = true;
         this.gparms = new GraphicsParms();
+        this.labelGparms = new GraphicsParms();
         this.rectWidth = w;
         this.timerId = setInterval(this.blink.bind(this), 500);
+        this.labelGparms.fontFace = "serif";
     }
     blink() {
         this.cursorOn = !this.cursorOn;
@@ -546,10 +548,10 @@ class TextItem extends Item {
     }
     drawLabel() {
         if (!this.label())
-            return { w: 0, h: this.gparms.fontSize };
+            return { w: 0, h: this.labelGparms.fontSize };
         let gfx = this.playfield.gfx;
-        let bb = gfx.boundingBox(this.label(), this.gparms);
-        gfx.text(this.label(), this.x, this.y, this.gparms);
+        let bb = gfx.boundingBox(this.label(), this.labelGparms);
+        gfx.text(this.label(), this.x, this.y, this.labelGparms);
         return bb;
     }
     drawValue(labelBB) {

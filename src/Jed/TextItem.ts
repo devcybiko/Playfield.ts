@@ -3,6 +3,7 @@ class TextItem extends Item {
     public cursor: number;
     public cursorOn = true;
     public gparms = new GraphicsParms();
+    public labelGparms = new GraphicsParms();
     public rectWidth: number;
     public timerId: number;
 
@@ -10,6 +11,7 @@ class TextItem extends Item {
         super(name, label, value, x, y, w, h);
         this.rectWidth = w;
         this.timerId = setInterval(this.blink.bind(this), 500);
+        this.labelGparms.fontFace = "serif";
     }
     blink() {
         this.cursorOn = !this.cursorOn;
@@ -29,10 +31,10 @@ class TextItem extends Item {
         gfx.line(x0, y0, x1, y1, this.gparms);
     }
     drawLabel() {
-        if (!this.label()) return {w: 0, h: this.gparms.fontSize};
+        if (!this.label()) return {w: 0, h: this.labelGparms.fontSize};
         let gfx = this.playfield.gfx;
-        let bb = gfx.boundingBox(this.label(), this.gparms);
-        gfx.text(this.label(), this.x, this.y, this.gparms);
+        let bb = gfx.boundingBox(this.label(), this.labelGparms);
+        gfx.text(this.label(), this.x, this.y, this.labelGparms);
         return bb;
     }
     drawValue(labelBB: any) {

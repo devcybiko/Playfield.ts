@@ -8,7 +8,7 @@ class GraphicsParms {
         this.textAlign = "left";
         this.textBaseline = "top";
         this.fontSize = 24;
-        this.fontFace = "san-serif";
+        this.fontFace = "sans-serif";
     }
     clone() {
         return Object.assign({}, this);
