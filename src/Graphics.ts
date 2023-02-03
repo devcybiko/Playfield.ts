@@ -16,11 +16,11 @@ class Graphics {
     ) {
         if (gparms.fillColor) {
             this.ctx.fillStyle = gparms.fillColor;
-            this.ctx.fillRect(x, y, w, h);
+            this.ctx.fillRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
         }
         if (gparms.borderColor) {
             this.ctx.strokeStyle = gparms.borderColor;
-            this.ctx.strokeRect(x, y, w, h);
+            this.ctx.strokeRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
         }
     }
 
@@ -33,13 +33,13 @@ class Graphics {
     ) {
         if (gparms.fillColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.fillStyle = gparms.fillColor;
             this.ctx.fill();
         }
         if (gparms.borderColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.strokeStyle = gparms.borderColor;
             this.ctx.stroke();
         }
@@ -63,8 +63,8 @@ class Graphics {
     ) {
         this.ctx.beginPath();
         this.ctx.strokeStyle = gparms.color;
-        this.ctx.moveTo(x0, y0);
-        this.ctx.lineTo(x1, y1);
+        this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
+        this.ctx.lineTo(gparms.xOffset + x1, gparms.yOffset + y1);
         this.ctx.stroke();
     }
     text(msg: string, x = 0, y = 0, gparms = this.gparms) {
@@ -72,9 +72,7 @@ class Graphics {
         this.ctx.font = gparms.font;
         this.ctx.textAlign = gparms.textAlign;
         this.ctx.textBaseline = gparms.textBaseline;
-        x += gparms.xOffset;
-        y += gparms.yOffset;
-        this.ctx.fillText(msg, x, y);
+        this.ctx.fillText(msg, gparms.xOffset + x, gparms.yOffset + y);
     }
     textRect(
         msg: string,

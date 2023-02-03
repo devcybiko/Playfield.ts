@@ -90,23 +90,23 @@ class Graphics {
     rect(x, y, w, h, gparms = this.gparms) {
         if (gparms.fillColor) {
             this.ctx.fillStyle = gparms.fillColor;
-            this.ctx.fillRect(x, y, w, h);
+            this.ctx.fillRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
         }
         if (gparms.borderColor) {
             this.ctx.strokeStyle = gparms.borderColor;
-            this.ctx.strokeRect(x, y, w, h);
+            this.ctx.strokeRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
         }
     }
     ellipse(x, y, w, h, gparms = this.gparms) {
         if (gparms.fillColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.fillStyle = gparms.fillColor;
             this.ctx.fill();
         }
         if (gparms.borderColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.strokeStyle = gparms.borderColor;
             this.ctx.stroke();
         }
@@ -117,8 +117,8 @@ class Graphics {
     line(x0, y0, x1, y1, gparms = this.gparms) {
         this.ctx.beginPath();
         this.ctx.strokeStyle = gparms.color;
-        this.ctx.moveTo(x0, y0);
-        this.ctx.lineTo(x1, y1);
+        this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
+        this.ctx.lineTo(gparms.xOffset + x1, gparms.yOffset + y1);
         this.ctx.stroke();
     }
     text(msg, x = 0, y = 0, gparms = this.gparms) {
@@ -126,9 +126,7 @@ class Graphics {
         this.ctx.font = gparms.font;
         this.ctx.textAlign = gparms.textAlign;
         this.ctx.textBaseline = gparms.textBaseline;
-        x += gparms.xOffset;
-        y += gparms.yOffset;
-        this.ctx.fillText(msg, x, y);
+        this.ctx.fillText(msg, gparms.xOffset + x, gparms.yOffset + y);
     }
     textRect(msg, x = 0, y = 0, w, h, gparms = this.gparms) {
         this.ctx.font = gparms.font;
@@ -152,11 +150,6 @@ class EventHandler {
         this.playfield = playfield;
         this.obj = obj;
         this.logger = new Logger("EventHandler", "info");
-        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
-        document.addEventListener("keydown", this.handleEvent.bind(this));
     }
     handleEvent(event) {
         if (event.button !== undefined)
@@ -209,7 +202,6 @@ class EventHandler {
         if (!playfield)
             return this.logger.error('ERROR: mousemove not associated with a playfield');
         let key = event.key;
-        let code = event.code;
         if (event.type === "keydown") {
             if (key.length > 1)
                 return this.SpecialKey(event, this.playfield, this.obj);
@@ -350,15 +342,6 @@ class EventHandler {
     defaultKey(event, playfield, obj) {
         this.logger.log("unknown keypress:", event.key, event);
     }
-    mouseUp(event, playfield, obj) {
-        this.logger.log("mouseUp:", event);
-    }
-    mouseDown(event, playfield, obj) {
-        this.logger.log("mouseDown:", event);
-    }
-    mouseMove(event, playfield, obj) {
-        this.logger.log("mouseMove:", event);
-    }
 }
 //# sourceMappingURL=EventHandler.js.map
 class PlayfieldEventHandler extends EventHandler {
@@ -366,33 +349,37 @@ class PlayfieldEventHandler extends EventHandler {
         super(playfield, canvas);
         this.SNAP = 10;
         this.logger = new Logger("PlayfieldEventHandler", "info");
+        this._registerEventHandlers(playfield);
     }
-    MouseMove(event, playfield, canvas) {
-        if (playfield.dragObj) {
-            playfield.dragObj.drag(Utils.snapTo(event.offsetX - playfield.grabDX, this.SNAP), Utils.snapTo(event.offsetY - playfield.grabDY, this.SNAP));
-            playfield.redraw();
+    _registerEventHandlers(playfield) {
+        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
+        document.addEventListener("keydown", this.handleEvent.bind(this));
+    }
+    handleKeyboardEvent(event) {
+        if (this.playfield.focusedObj && this.playfield.focusedObj.eventHandler) {
+            this.playfield.focusedObj.eventHandler.handleEvent(event);
         }
     }
+    MouseMove(event, playfield, canvas) {
+        playfield.dragObj(event.offsetX, event.offsetY);
+    }
     MouseUp(event, playfield, canvas) {
-        playfield.dragObj = null;
+        playfield.dropObj();
     }
     MouseDown(event, playfield, convas) {
         let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-        if (obj)
-            obj.click(event.offsetX, event.offsetY);
-        if (playfield.selectedObj)
-            playfield.selectedObj.deselect();
-        playfield.selectedObj = obj;
+        playfield.selectObj(obj);
         if (obj) {
+            obj.click(event.offsetX, event.offsetY);
             if (event.shiftKey)
                 playfield.toBack(obj);
             else
                 playfield.toFront(obj);
-            obj.select();
             if (obj.isDraggable) {
-                playfield.dragObj = obj;
-                playfield.grabDX = Utils.snapTo(event.offsetX - obj.x, this.SNAP);
-                playfield.grabDY = Utils.snapTo(event.offsetY - obj.y, this.SNAP);
+                this.playfield.grabObj(obj, Utils.snapTo(event.offsetX - obj.x, this.SNAP), Utils.snapTo(event.offsetY - obj.y, this.SNAP));
             }
         }
     }
@@ -400,38 +387,75 @@ class PlayfieldEventHandler extends EventHandler {
 //# sourceMappingURL=PlayfieldEventHandler.js.map
 class Playfield {
     constructor(canvasId) {
+        this.SNAP = 10;
+        this.x = 0;
+        this.y = 0;
+        this.X = 0;
+        this.Y = 0;
+        this.gparms = null;
         this.canvas = document.querySelector(canvasId);
         this.ctx = this.canvas.getContext("2d");
-        this.logger = new Logger("Playfield");
+        this.logger = new Logger("Playfield", "warn");
         this.gfx = new Graphics(this.ctx);
         this.objs = [];
-        this.selectedObj = null;
+        this.selectedObj = null; // mouse object
+        this.focusedObj = null; // keyboard object
         this.eventHandler = new PlayfieldEventHandler(this, this.canvas);
-        // this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-        // this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-        // this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
-        // document.addEventListener("keydown", this.handleKeyDown.bind(this));
-        this.dragObj = null;
-        this.grabDX = null;
-        this.grabDY = null;
+        this._dragObj = null;
         this.body = document.querySelector('body');
         this.body.playfield = this;
+        // Actor compatibility
+        this.parent = this;
+        this.playfield = this;
+    }
+    selectObj(obj) {
+        if (this.selectedObj)
+            this.selectedObj.deselect();
+        this.selectedObj = obj;
+        if (obj !== null)
+            obj.select();
+    }
+    focusObj(obj) {
+        if (this.focusedObj)
+            this.focusedObj.defocus();
+        this.focusedObj = obj;
+        if (obj !== null)
+            obj.focus();
     }
     add(obj) {
-        obj.playfield = this;
         this.objs.push(obj);
-        obj.addMeToPlayfield(this);
+        obj.parent = this;
+        obj.playfield = this;
     }
-    redraw() {
+    grabObj(obj, dx, dy) {
+        this.dropObj();
+        this._dragObj = obj;
+        if (obj)
+            obj.grab(dx, dy);
+    }
+    dragObj(x, y) {
+        if (this._dragObj) {
+            let dx = Utils.snapTo(x - this._dragObj.grabDX, this.SNAP);
+            let dy = Utils.snapTo(y - this._dragObj.grabDY, this.SNAP);
+            this._dragObj.drag(dx, dy);
+        }
+    }
+    dropObj() {
+        if (this._dragObj)
+            this._dragObj.drop();
+        this._dragObj = null;
+    }
+    drawAll() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs)
-            obj.draw(this.ctx);
+            obj.drawAll();
     }
     findObjInBounds(x, y) {
         for (let i = this.objs.length - 1; i >= 0; i--) {
             let obj = this.objs[i];
-            if (obj.inBounds(x, y))
-                return obj;
+            let found = obj.inBounds(x, y);
+            if (found)
+                return found;
         }
         return null;
     }
@@ -456,13 +480,13 @@ class Playfield {
         if (playfield.selectedObj)
             playfield.selectedObj.keydown(event.key);
     }
-    timer(playfield) {
-        playfield.goAll();
-        playfield.redraw();
+    timer() {
+        this.goAll();
+        this.drawAll();
     }
     start() {
-        this.redraw();
-        setInterval(this.timer, 125, this);
+        this.drawAll();
+        setInterval(this.timer.bind(this), 125, this);
     }
     goAll() {
         for (let obj of this.objs)
@@ -484,19 +508,35 @@ class Playfield {
 }
 //# sourceMappingURL=Playfield.js.map
 class Actor {
-    constructor(name, x, y, w, h) {
+    constructor(parent, name, x, y, w, h) {
         this.borderColor = "black";
         this.fillColor = "white";
         this.color = "black";
         this.isDraggable = true;
+        this.grabDX = 0;
+        this.grabDY = 0;
+        this.gparms = new GraphicsParms();
         this.name = name;
-        this.logger = new Logger("Actor");
+        this.logger = new Logger("Actor", "warn");
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.objs = [];
+        this.eventHandler = null;
+        this.parent = parent;
+        this.parent.add(this);
     }
-    addMeToPlayfield(playfield) {
+    get X() {
+        return this.x + this.gparms.xOffset;
+    }
+    get Y() {
+        return this.y + this.gparms.yOffset;
+    }
+    add(obj) {
+        this.objs.push(obj);
+        obj.parent = this;
+        obj.playfield = this.playfield;
     }
     move(x, y, w = this.w, h = this.h) {
         this.x = x;
@@ -516,16 +556,37 @@ class Actor {
     deselect() {
         this.isSelected = false;
     }
+    focus() {
+        this.hasFocus = true;
+    }
+    defocus() {
+        this.hasFocus = false;
+    }
     inBounds(x, y) {
-        let result = Utils.between(this.x, x, this.x + this.w) &&
-            Utils.between(this.y, y, this.y + this.h);
-        return result;
+        let result = Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
+            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
+        if (result)
+            return this;
+        for (let i = this.objs.length - 1; i >= 0; i--) {
+            let obj = this.objs[i];
+            let found = obj.inBounds(x, y);
+            if (found)
+                return this;
+        }
+        return null;
     }
     click(x, y) {
         this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
     }
     drag(x, y) {
         this.move(x, y);
+    }
+    grab(dx, dy) {
+        this.grabDX = dx;
+        this.grabDY = dy;
+    }
+    drop() {
+        // playfield is dropping me from dragging
     }
     keydown(key) {
         if (key === "ArrowUp")
@@ -536,142 +597,49 @@ class Actor {
             this.x -= 10;
         if (key === "ArrowRight")
             this.x += 10;
-        this.playfield.redraw();
     }
     go() {
+    }
+    recompute() {
+        let parentGparms = this.parent.gparms;
+        if (parentGparms) {
+            this.gparms.xOffset = this.parent.x + parentGparms.xOffset;
+            this.gparms.yOffset = this.parent.y + parentGparms.yOffset;
+        }
+    }
+    drawAll() {
+        this.recompute();
+        this.draw();
+        if (this.objs.length) {
+            for (let obj of this.objs) {
+                obj.drawAll();
+            }
+        }
+    }
+    draw() {
     }
 }
 //# sourceMappingURL=Actor.js.map
-class Meander {
-    constructor(obj) {
-        this.obj = obj;
-        this.orig_dx = Utils.random(-10, 10);
-        this.orig_dy = Utils.random(-10, 10);
-        this.dx = this.orig_dx;
-        this.dy = this.orig_dy;
-    }
-    go() {
-        if (this.obj.isSelected)
-            return;
-        this.obj.rmove(this.dx, this.dy);
-        let collisions = this.obj.playfield.collisions(this.obj);
-        if (collisions.length) {
-            this.dx = Utils.random(-10, 10);
-            this.dy = Utils.random(-10, 10);
-        }
-        if (this.obj.x < 0) {
-            this.obj.x = 0;
-            this.dx = -this.dx;
-        }
-        if (this.obj.x + this.obj.w > this.obj.playfield.canvas.width) {
-            this.obj.x = this.obj.playfield.canvas.width - this.obj.w;
-            this.dx = -this.dx;
-        }
-        if (this.obj.y < 0) {
-            this.obj.y = 0;
-            this.dy = -this.dy;
-        }
-        if (this.obj.y + this.obj.h > this.obj.playfield.canvas.height) {
-            this.obj.y = this.obj.playfield.canvas.height - this.obj.h;
-            this.dy = -this.dy;
-        }
-    }
-}
-//# sourceMappingURL=Meander.js.map
-class Shape extends Actor {
-    constructor(name, x, y, w, h, color = "black", borderColor = "black", fillColor = "white") {
-        super(name, x, y, w, h);
-        this.gparms = new GraphicsParms();
-        this.selectedGparms = new GraphicsParms();
-        this.gparms.color = "black";
-        this.gparms.borderColor = borderColor;
-        this.gparms.fillColor = color;
-        this.gparms.textAlign = "center";
-        this.gparms.textBaseline = "middle";
-        this.selectedGparms.color = color;
-        this.selectedGparms.borderColor = "black";
-        this.selectedGparms.fillColor = color;
-        this.selectedGparms.textAlign = "center";
-        this.selectedGparms.textBaseline = "middle";
-        this.meander = new Meander(this);
-    }
-    go() {
-        this.meander.go();
-    }
-}
-//# sourceMappingURL=Shape.js.map
-class Box extends Shape {
-    constructor(name, x, y, w, h, color, borderColor, fillColor) {
-        super(name, x, y, w, h, color, borderColor, fillColor);
-        this.logger = new Logger("Box");
-    }
-    draw() {
-        if (this.isSelected) {
-            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, this.selectedGparms);
-        }
-        else {
-            this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, this.gparms);
-        }
-    }
-}
-//# sourceMappingURL=Box.js.map
-class Circle extends Shape {
-    constructor(name, x, y, r, color, borderColor, fillColor) {
-        super(name, x - r, y - r, r, r, color, borderColor, fillColor);
-        this.logger = new Logger("Circle");
-        this.r = r;
-    }
-    draw() {
-        if (this.isSelected) {
-            this.playfield.gfx.circle(this.x + this.r, this.y + this.r, this.r, this.selectedGparms);
-        }
-        else {
-            this.playfield.gfx.circle(this.x + this.r, this.y + this.r, this.r, this.gparms);
-        }
-        let gparm2 = this.gparms.clone();
-        gparm2.borderColor = null;
-        gparm2.fillColor = null;
-        this.playfield.gfx.textRect(this.name, this.x, this.y, this.w, this.h, gparm2);
-    }
-}
-//# sourceMappingURL=Circle.js.map
 class Item extends Actor {
-    constructor(name, label, value, x, y, w, h) {
-        super(name, x, y, w, h);
-        this.hasFocus = false;
-        this._label = label;
+    constructor(parent, name, value, x, y, w, h) {
+        super(parent, name, x, y, w, h);
         this._value = value;
-    }
-    label(newLabel) {
-        if (newLabel)
-            this._label = newLabel;
-        return this._label;
+        this.isDraggable = true;
     }
     value(newValue) {
         if (newValue)
             this._value = newValue;
         return this._value;
     }
-    loseFocus() {
-        this.hasFocus = false;
-        Actor.focusItem = null;
-    }
-    takeFocus() {
-        if (Actor.focusItem) {
-            Actor.focusItem.loseFocus();
-        }
-        Actor.focusItem = this;
-        this.hasFocus = true;
-    }
 }
 //# sourceMappingURL=Item.js.map
-class TextItemEventHandler extends EventHandler {
+class EditItemEventHandler extends EventHandler {
     constructor(textItem) {
         super(textItem.playfield, textItem);
     }
     MouseDown(event, playfield, textItem) {
         if (textItem.inBounds(event.x, event.y)) {
-            textItem.takeFocus();
+            textItem.playfield.focusObj(textItem);
             textItem.gparms.color = "red";
             textItem.gparms.borderColor = "red";
         }
@@ -681,55 +649,73 @@ class TextItemEventHandler extends EventHandler {
         textItem.gparms.borderColor = "black";
     }
 }
-//# sourceMappingURL=TextItemEventHandler.js.map
-class TextItem extends Item {
-    constructor(name, label, value, x, y, w = 100, h = 24) {
-        super(name, label, value, x, y, w, h);
+//# sourceMappingURL=EditItemEventHandler.js.map
+class EditItem extends Item {
+    constructor(parent, name, value, x, y, w = 100, h = 24) {
+        super(parent, name, value, x, y, w, h);
         this.cursorOn = true;
-        this.gparms = new GraphicsParms();
-        this.labelGparms = new GraphicsParms();
-        this.rectWidth = w;
         this.timerId = setInterval(this.blink.bind(this), 500);
-        this.labelGparms.fontFace = "serif";
+        this.eventHandler = new EditItemEventHandler(this);
     }
     blink() {
         this.cursorOn = !this.cursorOn;
     }
-    addMeToPlayfield(playfield) {
-        this.eventHandler = new TextItemEventHandler(this);
+    click(x, y) {
+        this.playfield.focusObj(this);
     }
-    drawCursor(labelBB) {
-        if (!this.cursorOn)
-            return;
+    drawCursor() {
         if (!this.hasFocus)
+            return;
+        if (!this.cursorOn)
             return;
         let gfx = this.playfield.gfx;
         let valueBB = gfx.boundingBox(this.value(), this.gparms);
-        let x0 = this.x + labelBB.w + valueBB.w + 4;
+        let x0 = this.x + valueBB.w + 4;
         let x1 = x0;
         let y0 = this.y + 2;
         let y1 = y0 + valueBB.h - 4;
         gfx.line(x0, y0, x1, y1, this.gparms);
     }
-    drawLabel() {
-        if (!this.label())
-            return { w: 0, h: this.labelGparms.fontSize };
+    draw() {
         let gfx = this.playfield.gfx;
-        let bb = gfx.boundingBox(this.label(), this.labelGparms);
-        gfx.text(this.label(), this.x, this.y, this.labelGparms);
-        return bb;
+        if (this.hasFocus)
+            this.gparms.color = "red";
+        else
+            this.gparms.color = "black";
+        gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        gfx.text(this.value(), this.x + 2, this.y + 1, this.gparms);
+        this.drawCursor();
     }
-    drawValue(labelBB) {
-        let gfx = this.playfield.gfx;
-        gfx.rect(this.x + labelBB.w, this.y, this.rectWidth, this.h, this.gparms);
-        gfx.text(this.value(), this.x + labelBB.w + 2, this.y + 1, this.gparms);
+}
+//# sourceMappingURL=EditItem.js.map
+class LabelItem extends Item {
+    constructor(parent, name, value, x, y, w = 0, h = 0) {
+        super(parent, name, value, x, y, w, h);
+        this.gparms.fontFace = "serif";
+        this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
+        if (!w)
+            this.w = this.bb.w;
+        if (!h)
+            this.h = this.bb.h;
     }
     draw() {
         let gfx = this.playfield.gfx;
-        let labelBB = this.drawLabel();
-        this.drawValue(labelBB);
-        this.drawCursor(labelBB);
-        this.w = labelBB.w + this.rectWidth + 4;
+        // this.bb = gfx.boundingBox(this.value(), this.gparms);
+        // this.w = this.bb.w;
+        // this.h = this.bb.h;
+        gfx.text(this.value(), this.x, this.y, this.gparms);
+    }
+}
+//# sourceMappingURL=LabelItem.js.map
+class TextItem extends Item {
+    constructor(parent, name, label, value, x, y, w = 0, h = 0, ww = 0, hh = 0) {
+        super(parent, name, value, x, y, w, h);
+        this.cursorOn = true;
+        this.label = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
+        this.editor = new EditItem(this, name + "-editor", value, this.label.w + 2, 0, w, h);
+    }
+    click(x, y) {
+        this.playfield.focusObj(this.editor);
     }
 }
 //# sourceMappingURL=TextItem.js.map

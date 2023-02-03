@@ -3,29 +3,38 @@ class PlayfieldEventHandler extends EventHandler {
     constructor(playfield: Playfield, canvas: any) {
         super(playfield, canvas);
         this.logger = new Logger("PlayfieldEventHandler", "info");
+        this._registerEventHandlers(playfield);
     }
-    MouseMove(event: any, playfield: Playfield, canvas: any) {
-        if (playfield.dragObj) {
-            playfield.dragObj.drag(Utils.snapTo(event.offsetX - playfield.grabDX, this.SNAP), Utils.snapTo(event.offsetY - playfield.grabDY, this.SNAP));
-            playfield.redraw();
+    private _registerEventHandlers(playfield: Playfield) {
+        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
+        document.addEventListener("keydown", this.handleEvent.bind(this));
+    }
+    handleKeyboardEvent(event: any) {
+        if (this.playfield.focusedObj && this.playfield.focusedObj.eventHandler) {
+            this.playfield.focusedObj.eventHandler.handleEvent(event);
         }
     }
+    MouseMove(event: any, playfield: Playfield, canvas: any) {
+        playfield.dragObj(event.offsetX, event.offsetY);
+    }
     MouseUp(event: any, playfield: Playfield, canvas: any) {
-        playfield.dragObj = null;
+        playfield.dropObj();
     }
     MouseDown(event: any, playfield: Playfield, convas: any) {
         let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-        if (obj) obj.click(event.offsetX, event.offsetY);
-        if (playfield.selectedObj) playfield.selectedObj.deselect();
-        playfield.selectedObj = obj;
+        playfield.selectObj(obj);
         if (obj) {
+            obj.click(event.offsetX, event.offsetY);
             if (event.shiftKey) playfield.toBack(obj);
             else playfield.toFront(obj);
-            obj.select();
             if (obj.isDraggable) {
-                playfield.dragObj = obj;
-                playfield.grabDX = Utils.snapTo(event.offsetX - obj.x, this.SNAP);
-                playfield.grabDY = Utils.snapTo(event.offsetY - obj.y, this.SNAP);
+                this.playfield.grabObj(
+                    obj,
+                    Utils.snapTo(event.offsetX - obj.x, this.SNAP),
+                    Utils.snapTo(event.offsetY - obj.y, this.SNAP));
             }
         }
     }

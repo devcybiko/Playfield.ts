@@ -1,12 +1,9 @@
 class JedTest {
     constructor() {
         let playfield = new Playfield("#my_canvas");
-        let textItem1 = new TextItem("first_name", "First Name: ", "Gregory", 10, 10);
-        let textItem2 = new TextItem("last_name", "Last Name: ", "Smith", 10, 40);
-        let textItem3 = new TextItem("last_name", undefined, "Smith", 10, 70);
-        playfield.add(textItem1);
-        playfield.add(textItem2);
-        playfield.add(textItem3);
+        let TextItem1 = new TextItem(playfield, "first_name", "First Name:", "Gregory", 10, 10);
+        let TextItem2 = new TextItem(playfield, "mi", "M.I.:", "Smith", 10, 40, 100, 0, 150, 0);
+        let TextItem3 = new TextItem(playfield, "last_name", "Last Name:", "Smith", 10, 70, 100, 0, 150, 0);
         playfield.start();
     }
 }

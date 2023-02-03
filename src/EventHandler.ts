@@ -40,28 +40,23 @@ class EventHandler {
         - handleUnknownEvent
      * 
      */
-    private playfield: Playfield;
-    private obj: any;
+    public playfield: Playfield;
+    public obj: any;
     public logger: Logger;
     constructor(playfield: Playfield, obj: any) {
         this.playfield = playfield;
         this.obj = obj;
         this.logger = new Logger("EventHandler", "info");
-        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
-        document.addEventListener("keydown", this.handleEvent.bind(this));
     }
-    private handleEvent(event: any) {
+    handleEvent(event: any) {
         if (event.button !== undefined) return this.handleMouseEvent(event);
         else if (event.key !== undefined) return this.handleKeyboardEvent(event);
         else return this.handleUnknownEvent(event);
     }
-    private handleUnknownEvent(event: any) {
+    handleUnknownEvent(event: any) {
         this.logger.error("handleUnknownEvent:", event);
     }
-    private handleMouseEvent(event: any) {
+    handleMouseEvent(event: any) {
         this.logger.log("handleMouseEvent:", event);
         let playfield = this.playfield;
         if (!playfield) return this.logger.error('ERROR: mousemove not associated with a playfield');
@@ -82,12 +77,11 @@ class EventHandler {
             return this.handleUnknownEvent(event);
         }
     }
-    private handleKeyboardEvent(event: any) {
+    handleKeyboardEvent(event: any) {
         this.logger.log("handleKeyboardEvent:", event);
         let playfield = this.playfield;
         if (!playfield) return this.logger.error('ERROR: mousemove not associated with a playfield');
         let key = event.key;
-        let code = event.code;
         if (event.type === "keydown") {
             if (key.length > 1) return this.SpecialKey(event, this.playfield, this.obj);
             else if (key.length === 1 && event.ctrlKey) return this.ControlKey(event, this.playfield, this.obj);
@@ -204,14 +198,4 @@ class EventHandler {
     defaultKey(event: any, playfield: Playfield, obj: any) {
         this.logger.log("unknown keypress:", event.key, event);
     }
-    mouseUp(event: any, playfield: Playfield, obj: any) {
-        this.logger.log("mouseUp:", event);
-    }
-    mouseDown(event: any, playfield: Playfield, obj: any) {
-        this.logger.log("mouseDown:", event);
-    }
-    mouseMove(event: any, playfield: Playfield, obj: any) {
-        this.logger.log("mouseMove:", event);
-    }
-
 }

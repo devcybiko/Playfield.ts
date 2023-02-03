@@ -6,10 +6,8 @@
 ./dist/PlayfieldEventHandler.js
 ./dist/Playfield.js
 ./dist/Actor.js
-./dist/Shapes/Meander.js
-./dist/Shapes/Shape.js
-./dist/Shapes/Box.js
-./dist/Shapes/Circle.js
 ./dist/Jed/Item.js
-./dist/Jed/TextItemEventHandler.js
+./dist/Jed/EditItemEventHandler.js
+./dist/Jed/EditItem.js
+./dist/Jed/LabelItem.js
 ./dist/Jed/TextItem.js

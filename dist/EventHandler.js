@@ -3,11 +3,6 @@ class EventHandler {
         this.playfield = playfield;
         this.obj = obj;
         this.logger = new Logger("EventHandler", "info");
-        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
-        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
-        document.addEventListener("keydown", this.handleEvent.bind(this));
     }
     handleEvent(event) {
         if (event.button !== undefined)
@@ -60,7 +55,6 @@ class EventHandler {
         if (!playfield)
             return this.logger.error('ERROR: mousemove not associated with a playfield');
         let key = event.key;
-        let code = event.code;
         if (event.type === "keydown") {
             if (key.length > 1)
                 return this.SpecialKey(event, this.playfield, this.obj);
@@ -200,15 +194,6 @@ class EventHandler {
     }
     defaultKey(event, playfield, obj) {
         this.logger.log("unknown keypress:", event.key, event);
-    }
-    mouseUp(event, playfield, obj) {
-        this.logger.log("mouseUp:", event);
-    }
-    mouseDown(event, playfield, obj) {
-        this.logger.log("mouseDown:", event);
-    }
-    mouseMove(event, playfield, obj) {
-        this.logger.log("mouseMove:", event);
     }
 }
 //# sourceMappingURL=EventHandler.js.map

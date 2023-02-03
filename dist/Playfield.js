@@ -1,37 +1,74 @@
 class Playfield {
     constructor(canvasId) {
+        this.SNAP = 10;
+        this.x = 0;
+        this.y = 0;
+        this.X = 0;
+        this.Y = 0;
+        this.gparms = null;
         this.canvas = document.querySelector(canvasId);
         this.ctx = this.canvas.getContext("2d");
-        this.logger = new Logger("Playfield");
+        this.logger = new Logger("Playfield", "warn");
         this.gfx = new Graphics(this.ctx);
         this.objs = [];
-        this.selectedObj = null;
+        this.selectedObj = null; // mouse object
+        this.focusedObj = null; // keyboard object
         this.eventHandler = new PlayfieldEventHandler(this, this.canvas);
-        // this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-        // this.canvas.addEventListener("mousemove", this.handleMouseMove.bind(this));
-        // this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
-        // document.addEventListener("keydown", this.handleKeyDown.bind(this));
-        this.dragObj = null;
-        this.grabDX = null;
-        this.grabDY = null;
+        this._dragObj = null;
         this.body = document.querySelector('body');
         this.body.playfield = this;
+        // Actor compatibility
+        this.parent = this;
+        this.playfield = this;
+    }
+    selectObj(obj) {
+        if (this.selectedObj)
+            this.selectedObj.deselect();
+        this.selectedObj = obj;
+        if (obj !== null)
+            obj.select();
+    }
+    focusObj(obj) {
+        if (this.focusedObj)
+            this.focusedObj.defocus();
+        this.focusedObj = obj;
+        if (obj !== null)
+            obj.focus();
     }
     add(obj) {
-        obj.playfield = this;
         this.objs.push(obj);
-        obj.addMeToPlayfield(this);
+        obj.parent = this;
+        obj.playfield = this;
     }
-    redraw() {
+    grabObj(obj, dx, dy) {
+        this.dropObj();
+        this._dragObj = obj;
+        if (obj)
+            obj.grab(dx, dy);
+    }
+    dragObj(x, y) {
+        if (this._dragObj) {
+            let dx = Utils.snapTo(x - this._dragObj.grabDX, this.SNAP);
+            let dy = Utils.snapTo(y - this._dragObj.grabDY, this.SNAP);
+            this._dragObj.drag(dx, dy);
+        }
+    }
+    dropObj() {
+        if (this._dragObj)
+            this._dragObj.drop();
+        this._dragObj = null;
+    }
+    drawAll() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs)
-            obj.draw(this.ctx);
+            obj.drawAll();
     }
     findObjInBounds(x, y) {
         for (let i = this.objs.length - 1; i >= 0; i--) {
             let obj = this.objs[i];
-            if (obj.inBounds(x, y))
-                return obj;
+            let found = obj.inBounds(x, y);
+            if (found)
+                return found;
         }
         return null;
     }
@@ -56,13 +93,13 @@ class Playfield {
         if (playfield.selectedObj)
             playfield.selectedObj.keydown(event.key);
     }
-    timer(playfield) {
-        playfield.goAll();
-        playfield.redraw();
+    timer() {
+        this.goAll();
+        this.drawAll();
     }
     start() {
-        this.redraw();
-        setInterval(this.timer, 125, this);
+        this.drawAll();
+        setInterval(this.timer.bind(this), 125, this);
     }
     goAll() {
         for (let obj of this.objs)
