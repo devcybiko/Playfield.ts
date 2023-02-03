@@ -2,11 +2,11 @@
 ./dist/Logger.js
 ./dist/GraphicsParms.js
 ./dist/Graphics.js
-./dist/Eventhandler.js
-./dist/PlayfieldEventhandler.js
+./dist/EventHandler.js
+./dist/PlayfieldEventHandler.js
 ./dist/Playfield.js
 ./dist/Actor.js
-./dist/shapes/Meander.js
+./dist/Shapes/Meander.js
 ./dist/Shapes/Shape.js
 ./dist/Shapes/Box.js
 ./dist/Shapes/Circle.js

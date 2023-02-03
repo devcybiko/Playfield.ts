@@ -5,7 +5,7 @@ class TextItem extends Item {
     public gparms = new GraphicsParms();
     public labelGparms = new GraphicsParms();
     public rectWidth: number;
-    public timerId: number;
+    public timerId: any;
 
     constructor(name: string, label: string, value: string, x: number, y: number, w = 100, h = 24) {
         super(name, label, value, x, y, w, h);

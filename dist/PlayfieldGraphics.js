@@ -7,23 +7,41 @@ class Utils {
         let result = Math.random() * (high - low) + low;
         return result;
     }
+    static snapTo(n, snap) {
+        let x = n % snap;
+        if (x === 0)
+            return n;
+        return Math.floor(n / snap) * snap;
+    }
 }
 //# sourceMappingURL=Utils.js.map
 class Logger {
-    constructor(module) {
+    constructor(module, logLevel = "error") {
         this.level = "log";
         this.module = module;
-        this.level = "log";
+        this.level = logLevel;
     }
     setLogLevel(level) {
         this.level = level;
     }
+    info(...args) {
+        // most verbose
+        if (["warn", "log", "info"].includes(this.level))
+            console.log("INFO:", this.module + ": ", ...args);
+    }
     log(...args) {
-        if (this.level === "log")
-            console.log(this.module + ": ", ...args);
+        // less verbose
+        if (["warn", "log"].includes(this.level))
+            console.log("LOG:", this.module + ": ", ...args);
+    }
+    warn(...args) {
+        // less verbose
+        if (["warn"].includes(this.level))
+            console.log("WARN:", this.module + ": ", ...args);
     }
     error(...args) {
-        console.log(this.module + ": ", ...args);
+        // always show errors
+        console.error("ERROR:", this.module + ": ", ...args);
     }
 }
 //# sourceMappingURL=Logger.js.map
@@ -133,85 +151,232 @@ class EventHandler {
     constructor(playfield, obj) {
         this.playfield = playfield;
         this.obj = obj;
-        this.logger = new Logger("EventHandler");
-        playfield.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        playfield.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        playfield.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        document.addEventListener("keydown", this.handleKeyDown.bind(this));
+        this.logger = new Logger("EventHandler", "info");
+        playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
+        playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
+        document.addEventListener("keydown", this.handleEvent.bind(this));
     }
-    handleMouseDown(event) {
+    handleEvent(event) {
+        if (event.button !== undefined)
+            return this.handleMouseEvent(event);
+        else if (event.key !== undefined)
+            return this.handleKeyboardEvent(event);
+        else
+            return this.handleUnknownEvent(event);
+    }
+    handleUnknownEvent(event) {
+        this.logger.error("handleUnknownEvent:", event);
+    }
+    handleMouseEvent(event) {
+        this.logger.log("handleMouseEvent:", event);
         let playfield = this.playfield;
         if (!playfield)
-            return this.logger.error('GREG: mousedown not associated with a playfield');
-        this.mouseDown(event, playfield, this.obj);
-    }
-    handleMouseUp(event) {
-        let handler = this;
-        let playfield = handler.playfield;
-        if (!playfield)
-            return this.logger.error('ERROR: mouseup not associated with a playfield');
-        this.mouseUp(event, playfield, this.obj);
-    }
-    handleMouseMove(event) {
-        let handler = this;
-        let playfield = handler.playfield;
-        if (!playfield)
             return this.logger.error('ERROR: mousemove not associated with a playfield');
-        this.mouseMove(event, playfield, this.obj);
+        if (event.type === "mousedown") {
+            if (event.button === 0)
+                return this.MouseDown(event, playfield, this.obj);
+            if (event.button === 1)
+                return this.MiddleDown(event, playfield, this.obj);
+            if (event.button === 2)
+                return this.MenuDown(event, playfield, this.obj);
+        }
+        else if (event.type === "mouseup") {
+            if (event.button === 0)
+                return this.MouseUp(event, playfield, this.obj);
+            if (event.button === 1)
+                return this.MiddleUp(event, playfield, this.obj);
+            if (event.button === 2)
+                return this.MenuUp(event, playfield, this.obj);
+        }
+        else if (event.type === "mousemove") {
+            return this.MouseMove(event, playfield, this.obj);
+        }
+        else if (event.type === "wheel") {
+            if (event.wheelDelta >= 0)
+                return this.WheelDown(event, playfield, this.obj, event.wheelDelta);
+            if (event.wheelDelta < 0)
+                return this.WheelUp(event, playfield, this.obj, -event.wheelDelta);
+        }
+        else {
+            return this.handleUnknownEvent(event);
+        }
     }
-    handleKeyDown(event) {
+    handleKeyboardEvent(event) {
+        this.logger.log("handleKeyboardEvent:", event);
         let playfield = this.playfield;
         if (!playfield)
             return this.logger.error('ERROR: mousemove not associated with a playfield');
         let key = event.key;
-        switch (key) {
-            case "ArrowUp": return this.ArrowUp(event, this.playfield, this.obj);
-            case "ArrowDown": return this.ArrowDown(event, this.playfield, this.obj);
-            case "ArrowLeft": return this.ArrowLeft(event, this.playfield, this.obj);
-            case "ArrowRight": return this.ArrowRight(event, this.playfield, this.obj);
-            default: return this.defaultKey(event, this.playfield, this.obj);
+        let code = event.code;
+        if (event.type === "keydown") {
+            if (key.length > 1)
+                return this.SpecialKey(event, this.playfield, this.obj);
+            else if (key.length === 1 && event.ctrlKey)
+                return this.ControlKey(event, this.playfield, this.obj);
+            else if (key.length === 1 && event.metaKey)
+                return this.MetaKey(event, this.playfield, this.obj);
+            else if (key.length === 1 && event.altKey)
+                return this.AltKey(event, this.playfield, this.obj);
+            else if (key.length === 1)
+                return this.OrdinaryKey(event, this.playfield, this.obj);
+            else
+                return this.defaultKey(event, this.playfield, this.obj);
         }
+        else
+            return this.defaultKey(event, this.playfield, this.obj);
     }
-    mouseUp(event, playfield, obj) {
-        this.logger.log("mouseUp: ", event);
+    MouseUp(event, playfield, obj) {
+        this.logger.log("MouseUp:", event);
     }
-    mouseDown(event, playfield, obj) {
-        this.logger.log("mouseDown: ", event);
+    MouseDown(event, playfield, obj) {
+        this.logger.log("MouseDown:", event);
     }
-    mouseMove(event, playfield, obj) {
-        this.logger.log("mouseMove: ", event);
+    MenuUp(event, playfield, obj) {
+        this.logger.log("MenuUp:", event);
     }
-    defaultKey(event, playfield, obj) {
-        this.logger.log("unknown keypress: ", event.key, event);
+    MenuDown(event, playfield, obj) {
+        this.logger.log("MenuDown:", event);
+    }
+    MiddleUp(event, playfield, obj) {
+        this.logger.log("MiddleUp:", event);
+    }
+    MiddleDown(event, playfield, obj) {
+        this.logger.log("MiddleDown:", event);
+    }
+    WheelUp(event, playfield, obj, delta) {
+        this.logger.log("WheelUp:", delta, event);
+    }
+    WheelDown(event, playfield, obj, delta) {
+        this.logger.log("WheelDown:", delta, event);
+    }
+    MouseMove(event, playfield, obj) {
+        this.logger.log("MouseMove:", event);
+    }
+    OrdinaryKey(event, playfield, obj) {
+        this.logger.log("OrdinaryKey:", event);
+        let key = event.key;
+        if (Utils.between("A", key, "Z"))
+            return this.UpperCase(event, this.playfield, this.obj);
+        else if (Utils.between("a", key, "z"))
+            return this.LowerCase(event, this.playfield, this.obj);
+        else if (Utils.between("0", key, "9"))
+            return this.Digit(event, this.playfield, this.obj);
+        else if ("!@#$%^&*()-_+={}[]|\:;\"'<>,.?/".includes(key))
+            return this.Punctuation(event, this.playfield, this.obj);
+        else
+            return this.defaultKey(event, this.playfield, this.obj);
+    }
+    SpecialKey(event, playfield, obj) {
+        this.logger.warn("SpecialKey:", event);
+        let key = event.key;
+        if (key === "ArrowUp")
+            return this.ArrowUp(event, this.playfield, this.obj);
+        else if (key === "ArrowDown")
+            return this.ArrowDown(event, this.playfield, this.obj);
+        else if (key === "ArrowLeft")
+            return this.ArrowLeft(event, this.playfield, this.obj);
+        else if (key === "ArrowRight")
+            return this.ArrowRight(event, this.playfield, this.obj);
+        else if (key === "ArrowLeft")
+            return this.ArrowLeft(event, this.playfield, this.obj);
+        else if (key === "Shift")
+            return this.Shift(event, this.playfield, this.obj);
+        else if (key === "Meta")
+            return this.Meta(event, this.playfield, this.obj);
+        else if (key === "Alt")
+            return this.Alt(event, this.playfield, this.obj);
+        else if (key === "Control")
+            return this.Control(event, this.playfield, this.obj);
+        else if (key === "Backspace")
+            return this.Backspace(event, this.playfield, this.obj);
+        else if (key[0] === "F")
+            return this.FunctionKey(event, this.playfield, this.obj);
+        else
+            return this.defaultKey(event, this.playfield, this.obj);
+    }
+    Shift(event, playfield, obj) {
+        this.logger.log("Shift:", event);
+    }
+    Meta(event, playfield, obj) {
+        this.logger.log("Meta:", event);
+    }
+    MetaKey(event, playfield, obj) {
+        this.logger.log("MetaKey:", event);
+    }
+    Alt(event, playfield, obj) {
+        this.logger.log("Alt:", event);
+    }
+    AltKey(event, playfield, obj) {
+        this.logger.log("AltKey:", event);
+    }
+    Control(event, playfield, obj) {
+        this.logger.log("Control:", event);
+    }
+    ControlKey(event, playfield, obj) {
+        this.logger.log("ControlKey:", event);
+    }
+    Backspace(event, playfield, obj) {
+        this.logger.log("Backspace:", event);
+    }
+    UpperCase(event, playfield, obj) {
+        this.logger.log("UpperCase:", event);
+    }
+    LowerCase(event, playfield, obj) {
+        this.logger.log("LowerCase:", event);
+    }
+    Digit(event, playfield, obj) {
+        this.logger.log("Digit:", event);
+    }
+    Punctuation(event, playfield, obj) {
+        this.logger.log("Punctuation:", event);
+    }
+    FunctionKey(event, playfield, obj) {
+        this.logger.log("FunctionKey:", event);
     }
     ArrowUp(event, playfield, obj) {
-        this.logger.log("ArrowUp: ", event);
+        this.logger.log("ArrowUp:", event);
     }
     ArrowDown(event, playfield, obj) {
-        this.logger.log("ArrowDown: ", event);
+        this.logger.log("ArrowDown:", event);
     }
     ArrowLeft(event, playfield, obj) {
-        this.logger.log("ArrowLeft: ", event);
+        this.logger.log("ArrowLeft:", event);
     }
     ArrowRight(event, playfield, obj) {
-        this.logger.log("ArrowRight: ", event);
+        this.logger.log("ArrowRight:", event);
+    }
+    defaultKey(event, playfield, obj) {
+        this.logger.log("unknown keypress:", event.key, event);
+    }
+    mouseUp(event, playfield, obj) {
+        this.logger.log("mouseUp:", event);
+    }
+    mouseDown(event, playfield, obj) {
+        this.logger.log("mouseDown:", event);
+    }
+    mouseMove(event, playfield, obj) {
+        this.logger.log("mouseMove:", event);
     }
 }
 //# sourceMappingURL=EventHandler.js.map
 class PlayfieldEventHandler extends EventHandler {
     constructor(playfield, canvas) {
         super(playfield, canvas);
+        this.SNAP = 10;
+        this.logger = new Logger("PlayfieldEventHandler", "info");
     }
-    mouseMove(event, playfield, canvas) {
+    MouseMove(event, playfield, canvas) {
         if (playfield.dragObj) {
-            playfield.dragObj.drag(event.offsetX - playfield.grabDX, event.offsetY - playfield.grabDY);
+            playfield.dragObj.drag(Utils.snapTo(event.offsetX - playfield.grabDX, this.SNAP), Utils.snapTo(event.offsetY - playfield.grabDY, this.SNAP));
             playfield.redraw();
         }
     }
-    mouseUp(event, playfield, canvas) {
+    MouseUp(event, playfield, canvas) {
         playfield.dragObj = null;
     }
-    mouseDown(event, playfield, convas) {
+    MouseDown(event, playfield, convas) {
         let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
         if (obj)
             obj.click(event.offsetX, event.offsetY);
@@ -226,8 +391,8 @@ class PlayfieldEventHandler extends EventHandler {
             obj.select();
             if (obj.isDraggable) {
                 playfield.dragObj = obj;
-                playfield.grabDX = event.offsetX - obj.x;
-                playfield.grabDY = event.offsetY - obj.y;
+                playfield.grabDX = Utils.snapTo(event.offsetX - obj.x, this.SNAP);
+                playfield.grabDY = Utils.snapTo(event.offsetY - obj.y, this.SNAP);
             }
         }
     }
@@ -504,14 +669,14 @@ class TextItemEventHandler extends EventHandler {
     constructor(textItem) {
         super(textItem.playfield, textItem);
     }
-    mouseDown(event, playfield, textItem) {
+    MouseDown(event, playfield, textItem) {
         if (textItem.inBounds(event.x, event.y)) {
             textItem.takeFocus();
             textItem.gparms.color = "red";
             textItem.gparms.borderColor = "red";
         }
     }
-    mouseUp(event, playfield, textItem) {
+    MouseUp(event, playfield, textItem) {
         textItem.gparms.color = "black";
         textItem.gparms.borderColor = "black";
     }

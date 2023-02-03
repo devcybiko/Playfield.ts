@@ -7,5 +7,11 @@ class Utils {
         let result = Math.random() * (high - low) + low;
         return result;
     }
+    static snapTo(n, snap) {
+        let x = n % snap;
+        if (x === 0)
+            return n;
+        return Math.floor(n / snap) * snap;
+    }
 }
 //# sourceMappingURL=Utils.js.map

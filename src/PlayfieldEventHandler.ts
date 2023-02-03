@@ -1,17 +1,19 @@
 class PlayfieldEventHandler extends EventHandler {
+    readonly SNAP = 10;
     constructor(playfield: Playfield, canvas: any) {
         super(playfield, canvas);
+        this.logger = new Logger("PlayfieldEventHandler", "info");
     }
-    mouseMove(event: any, playfield: Playfield, canvas: any) {
+    MouseMove(event: any, playfield: Playfield, canvas: any) {
         if (playfield.dragObj) {
-            playfield.dragObj.drag(event.offsetX - playfield.grabDX, event.offsetY - playfield.grabDY);
+            playfield.dragObj.drag(Utils.snapTo(event.offsetX - playfield.grabDX, this.SNAP), Utils.snapTo(event.offsetY - playfield.grabDY, this.SNAP));
             playfield.redraw();
         }
     }
-    mouseUp(event: any, playfield: Playfield, canvas: any) {
+    MouseUp(event: any, playfield: Playfield, canvas: any) {
         playfield.dragObj = null;
     }
-    mouseDown(event: any, playfield: Playfield, convas: any) {
+    MouseDown(event: any, playfield: Playfield, convas: any) {
         let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
         if (obj) obj.click(event.offsetX, event.offsetY);
         if (playfield.selectedObj) playfield.selectedObj.deselect();
@@ -22,8 +24,8 @@ class PlayfieldEventHandler extends EventHandler {
             obj.select();
             if (obj.isDraggable) {
                 playfield.dragObj = obj;
-                playfield.grabDX = event.offsetX - obj.x;
-                playfield.grabDY = event.offsetY - obj.y;
+                playfield.grabDX = Utils.snapTo(event.offsetX - obj.x, this.SNAP);
+                playfield.grabDY = Utils.snapTo(event.offsetY - obj.y, this.SNAP);
             }
         }
     }

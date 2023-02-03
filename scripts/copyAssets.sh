@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e 
 mkdir -p ./dist
 outfile="./dist/PlayfieldGraphics.js"
 cat /dev/null > "$outfile"
