@@ -1,17 +1,24 @@
 class EditItemEventHandler extends EventHandler {
-    constructor(textItem) {
-        super(textItem.playfield, textItem);
+    constructor(editItem) {
+        super(editItem.playfield, editItem);
     }
-    MouseDown(event, playfield, textItem) {
-        if (textItem.inBounds(event.x, event.y)) {
-            textItem.playfield.focusObj(textItem);
-            textItem.gparms.color = "red";
-            textItem.gparms.borderColor = "red";
+    ArrowLeft(event, playfield, obj) {
+        obj.cursorInc(-1);
+    }
+    ArrowRight(event, playfield, obj) {
+        obj.cursorInc(+1);
+    }
+    Backspace(event, playfield, obj) {
+        if (obj.cursor > 0) {
+            let c = obj.cursor;
+            obj.value(obj._value.substring(0, c - 1) + obj._value.substring(c));
+            obj.cursorInc(-1);
         }
     }
-    MouseUp(event, playfield, textItem) {
-        textItem.gparms.color = "black";
-        textItem.gparms.borderColor = "black";
+    OrdinaryKey(event, playfield, obj) {
+        let c = obj.cursor;
+        obj.value(obj._value.substring(0, c) + event.key + obj._value.substring(c));
+        obj.cursorInc(+1);
     }
 }
 //# sourceMappingURL=EditItemEventHandler.js.map

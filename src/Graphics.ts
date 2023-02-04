@@ -1,10 +1,14 @@
 class Graphics {
-    private ctx: CanvasRenderingContext2D;
-    private gparms: GraphicsParms;
+    public ctx: CanvasRenderingContext2D;
+    public gparms: GraphicsParms;
+    private logger = new Logger("Graphics", "info");
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
         this.gparms = new GraphicsParms();
+        this.ctx.fontKerning = "none";
+        (this.ctx as any).letterSpacing = "1px";
+        (this.ctx as any).textRendering = "geometricPrecision";
     }
 
     rect(
@@ -87,11 +91,23 @@ class Graphics {
         if (!w) w = boundingBox.w;
         if (!h) h = boundingBox.h;
         this.rect(x, y, w, h, gparms);
-        this.text(msg, x + w / 2, y + h / 2 + 1, gparms);
+        this.text(msg, x, y, gparms);
     }
     boundingBox(msg: string, gparms = this.gparms): any {
         this.ctx.font = gparms.font;
         let boundingBox = this.ctx.measureText(msg) as any;
         return {w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize};
+    }
+    clipRect(x=0, y=0, w=this.ctx.canvas.width, h=this.ctx.canvas.height, gparms = this.gparms) {
+        this.save();
+        let region = new Path2D();
+        region.rect(x+gparms.xOffset, y+gparms.yOffset, w, h);
+        this.ctx.clip(region);
+    }
+    save() {
+        this.ctx.save();
+    }
+    restore() {
+        this.ctx.restore();
     }
 }

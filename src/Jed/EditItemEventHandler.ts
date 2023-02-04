@@ -1,17 +1,24 @@
 class EditItemEventHandler extends EventHandler {
-    private textItem : EditItem;
-    constructor(textItem: EditItem) {
-        super(textItem.playfield, textItem);
+    constructor(editItem: EditItem) {
+        super(editItem.playfield, editItem);
     }
-    MouseDown(event:any, playfield: Playfield, textItem: EditItem) {
-        if (textItem.inBounds(event.x, event.y)) {
-            textItem.playfield.focusObj(textItem);
-            textItem.gparms.color = "red";
-            textItem.gparms.borderColor = "red";
+    ArrowLeft(event: any, playfield: Playfield, obj: EditItem) {
+        obj.cursorInc(-1);
+    }
+    ArrowRight(event: any, playfield: Playfield, obj: EditItem) {
+        obj.cursorInc(+1);
+    }
+    Backspace(event: any, playfield: Playfield, obj: EditItem) {
+        if (obj.cursor > 0) {
+            let c = obj.cursor;
+            obj.value(obj._value.substring(0, c-1) + obj._value.substring(c));
+            obj.cursorInc(-1);
         }
     }
-    MouseUp(event:any, playfield: Playfield, textItem: EditItem) {
-        textItem.gparms.color = "black";
-        textItem.gparms.borderColor = "black";
+    OrdinaryKey(event: any, playfield: Playfield, obj: EditItem) {
+        let c = obj.cursor;
+        obj.value(obj._value.substring(0, c) + event.key + obj._value.substring(c));
+        obj.cursorInc(+1);
     }
+
 }

@@ -84,8 +84,12 @@ class GraphicsParms {
 //# sourceMappingURL=GraphicsParms.js.map
 class Graphics {
     constructor(ctx) {
+        this.logger = new Logger("Graphics", "info");
         this.ctx = ctx;
         this.gparms = new GraphicsParms();
+        this.ctx.fontKerning = "none";
+        this.ctx.letterSpacing = "1px";
+        this.ctx.textRendering = "geometricPrecision";
     }
     rect(x, y, w, h, gparms = this.gparms) {
         if (gparms.fillColor) {
@@ -136,12 +140,24 @@ class Graphics {
         if (!h)
             h = boundingBox.h;
         this.rect(x, y, w, h, gparms);
-        this.text(msg, x + w / 2, y + h / 2 + 1, gparms);
+        this.text(msg, x, y, gparms);
     }
     boundingBox(msg, gparms = this.gparms) {
         this.ctx.font = gparms.font;
         let boundingBox = this.ctx.measureText(msg);
         return { w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize };
+    }
+    clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
+        this.save();
+        let region = new Path2D();
+        region.rect(x + gparms.xOffset, y + gparms.yOffset, w, h);
+        this.ctx.clip(region);
+    }
+    save() {
+        this.ctx.save();
+    }
+    restore() {
+        this.ctx.restore();
     }
 }
 //# sourceMappingURL=Graphics.js.map
@@ -623,7 +639,7 @@ class Actor {
 class Item extends Actor {
     constructor(parent, name, value, x, y, w, h) {
         super(parent, name, x, y, w, h);
-        this._value = value;
+        this.value(value);
         this.isDraggable = true;
     }
     value(newValue) {
@@ -634,28 +650,51 @@ class Item extends Actor {
 }
 //# sourceMappingURL=Item.js.map
 class EditItemEventHandler extends EventHandler {
-    constructor(textItem) {
-        super(textItem.playfield, textItem);
+    constructor(editItem) {
+        super(editItem.playfield, editItem);
     }
-    MouseDown(event, playfield, textItem) {
-        if (textItem.inBounds(event.x, event.y)) {
-            textItem.playfield.focusObj(textItem);
-            textItem.gparms.color = "red";
-            textItem.gparms.borderColor = "red";
+    ArrowLeft(event, playfield, obj) {
+        obj.cursorInc(-1);
+    }
+    ArrowRight(event, playfield, obj) {
+        obj.cursorInc(+1);
+    }
+    Backspace(event, playfield, obj) {
+        if (obj.cursor > 0) {
+            let c = obj.cursor;
+            obj.value(obj._value.substring(0, c - 1) + obj._value.substring(c));
+            obj.cursorInc(-1);
         }
     }
-    MouseUp(event, playfield, textItem) {
-        textItem.gparms.color = "black";
-        textItem.gparms.borderColor = "black";
+    OrdinaryKey(event, playfield, obj) {
+        let c = obj.cursor;
+        obj.value(obj._value.substring(0, c) + event.key + obj._value.substring(c));
+        obj.cursorInc(+1);
     }
 }
 //# sourceMappingURL=EditItemEventHandler.js.map
 class EditItem extends Item {
     constructor(parent, name, value, x, y, w = 100, h = 24) {
         super(parent, name, value, x, y, w, h);
+        this.cursor = 0;
+        this.left = 0;
+        this.right = 0;
         this.cursorOn = true;
-        this.timerId = setInterval(this.blink.bind(this), 500);
+        this.cursorBlinkRate = 500;
+        this.nchars2 = 0;
+        this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
+        this.nchars2 = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w / 2);
+        this.left = 0;
+        this.right = this.computeRight();
+        this._setIntervalTimer();
+        this.logger = new Logger("EditItem", "log");
+    }
+    _setIntervalTimer() {
+        this.cursorOn = true;
+        if (this.timerId)
+            clearInterval(this.timerId);
+        this.timerId = setInterval(this.blink.bind(this), this.cursorBlinkRate);
     }
     blink() {
         this.cursorOn = !this.cursorOn;
@@ -669,12 +708,20 @@ class EditItem extends Item {
         if (!this.cursorOn)
             return;
         let gfx = this.playfield.gfx;
-        let valueBB = gfx.boundingBox(this.value(), this.gparms);
-        let x0 = this.x + valueBB.w + 4;
+        let valueBB = gfx.boundingBox(this.value().substring(this.left, this.cursor), this.gparms);
+        let dw = valueBB.w;
+        if (dw <= 0)
+            dw = 1;
+        else if (dw >= this.w)
+            dw = this.w - 1;
+        let x0 = this.x + dw;
+        if (x0 <= this.x)
+            x0 = this.x + 1;
         let x1 = x0;
-        let y0 = this.y + 2;
-        let y1 = y0 + valueBB.h - 4;
+        let y0 = this.y;
+        let y1 = y0 + valueBB.h;
         gfx.line(x0, y0, x1, y1, this.gparms);
+        gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
     }
     draw() {
         let gfx = this.playfield.gfx;
@@ -682,9 +729,69 @@ class EditItem extends Item {
             this.gparms.color = "red";
         else
             this.gparms.color = "black";
-        gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
-        gfx.text(this.value(), this.x + 2, this.y + 1, this.gparms);
+        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
+        gfx.textRect(this.value().substring(this.left), this.x, this.y, this.w, this.h, this.gparms);
         this.drawCursor();
+        gfx.restore();
+    }
+    computeRight() {
+        // let gfx = this.playfield.gfx;
+        // let right = this.left;
+        // for(let i=this.left; i<=this._value.length; i++) {
+        //     let bb = gfx.boundingBox(this._value.substring(this.left, i));
+        //     right = i;
+        //     if (bb.w > this.w) break;
+        // }
+        let right = this.left + this.nchars2 * 2;
+        if (right >= this._value.length)
+            right = this._value.length - 1;
+        return right;
+    }
+    computeLeft() {
+        // let gfx = this.playfield.gfx;
+        // let left = this.right;
+        // for(let i=this.right; i>=0; i--) {
+        //     let bb = gfx.boundingBox(this._value.substring(i, this.right));
+        //     if (bb.w > this.w) break;
+        //     left = i;
+        // }
+        let left = this.right - this.nchars2 * 2 + 1;
+        if (left < 0)
+            left = 0;
+        return left;
+    }
+    cursorInc(delta) {
+        this.cursor += delta;
+        this._setIntervalTimer();
+        this.cursorOn = true;
+        if (this.cursor < 0) {
+            this.cursor = 0;
+            this.left = 0;
+            this.right = this.computeRight();
+        }
+        else if (this.cursor > this._value.length) {
+            this.cursor = this._value.length;
+            this.left = this.cursor - this.nchars2;
+            if (this.left < 0)
+                this.left = 0;
+            this.right = this.computeRight();
+        }
+        else if (this.cursor - this.left >= this.nchars2) {
+            this.left = this.cursor - this.nchars2;
+            if (this.left < 0)
+                this.left = 0;
+            this.right = this.computeRight();
+        }
+        else if (this.cursor - this.left < this.nchars2) {
+            this.left = this.cursor - this.nchars2;
+            if (this.left < 0)
+                this.left = 0;
+            this.right = this.computeRight();
+        }
+        if (this.right === this._value.length - 1 && this.left !== 0) {
+            this.left = this.computeLeft();
+        }
+        this.logger.log(this.left, this.cursor, this.right);
     }
 }
 //# sourceMappingURL=EditItem.js.map
@@ -709,13 +816,16 @@ class LabelItem extends Item {
 //# sourceMappingURL=LabelItem.js.map
 class TextItem extends Item {
     constructor(parent, name, label, value, x, y, w = 0, h = 0, ww = 0, hh = 0) {
-        super(parent, name, value, x, y, w, h);
+        super(parent, name, value, x, y, 0, 0);
         this.cursorOn = true;
-        this.label = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
-        this.editor = new EditItem(this, name + "-editor", value, this.label.w + 2, 0, w, h);
+        this.labelItem = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
+        this.editItem = new EditItem(this, name + "-editor", value, this.labelItem.w + 2, 0, w, h);
     }
     click(x, y) {
-        this.playfield.focusObj(this.editor);
+        this.playfield.focusObj(this.editItem);
+    }
+    labelBB() {
+        return this.labelItem.bb;
     }
 }
 //# sourceMappingURL=TextItem.js.map

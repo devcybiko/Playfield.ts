@@ -1,7 +1,11 @@
 class Graphics {
     constructor(ctx) {
+        this.logger = new Logger("Graphics", "info");
         this.ctx = ctx;
         this.gparms = new GraphicsParms();
+        this.ctx.fontKerning = "none";
+        this.ctx.letterSpacing = "1px";
+        this.ctx.textRendering = "geometricPrecision";
     }
     rect(x, y, w, h, gparms = this.gparms) {
         if (gparms.fillColor) {
@@ -52,12 +56,24 @@ class Graphics {
         if (!h)
             h = boundingBox.h;
         this.rect(x, y, w, h, gparms);
-        this.text(msg, x + w / 2, y + h / 2 + 1, gparms);
+        this.text(msg, x, y, gparms);
     }
     boundingBox(msg, gparms = this.gparms) {
         this.ctx.font = gparms.font;
         let boundingBox = this.ctx.measureText(msg);
         return { w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize };
+    }
+    clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
+        this.save();
+        let region = new Path2D();
+        region.rect(x + gparms.xOffset, y + gparms.yOffset, w, h);
+        this.ctx.clip(region);
+    }
+    save() {
+        this.ctx.save();
+    }
+    restore() {
+        this.ctx.restore();
     }
 }
 //# sourceMappingURL=Graphics.js.map
