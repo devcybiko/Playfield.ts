@@ -5,12 +5,14 @@ class EditItem extends Item {
     public cursorOn = true;
     public timerId: any;
     public cursorBlinkRate = 500;
+    public nchars = 0;
     public nchars2 = 0;
 
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w = 100, h = 24) {
         super(parent, name, value, x, y, w, h);
         this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
+        this.nchars = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w);
         this.nchars2 = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w / 2);
         this.left = 0;
         this.right = this.computeRight();
@@ -81,30 +83,11 @@ class EditItem extends Item {
         this.cursor += delta;
         this._setIntervalTimer();
         this.cursorOn = true;
-        if (this.cursor < 0) {
-            this.cursor = 0;
-            this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor > this._value.length) {
-            this.cursor = this._value.length;
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0) this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor - this.left >= this.nchars2) {
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0) this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor - this.left < this.nchars2) {
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0) this.left = 0;
-            this.right = this.computeRight();
-        }
-        if (this.right === this._value.length - 1 && this.left !== 0) {
-            this.left = this.computeLeft();
-        }
-        this.logger.log(this.left, this.cursor, this.right)
+        if (this.cursor < 0) this.cursor = 0;
+        if (this.cursor > this._value.length) this.cursor = this._value.length;
+        this.left = this.cursor - this.nchars2;
+        if (this.left < 0) this.left = 0;
+        this.right = this.left + this.nchars;
+        if (this.right > this._value.length) this.right = this._value.length;
     }
 }
