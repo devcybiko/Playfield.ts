@@ -1,6 +1,7 @@
 class EditItemEventHandler extends EventHandler {
     constructor(editItem) {
         super(editItem.playfield, editItem);
+        this.logger = new Logger("EditItemEventHandler", "info");
     }
     ArrowLeft(event, playfield, obj) {
         obj.cursorInc(-1);
@@ -9,10 +10,14 @@ class EditItemEventHandler extends EventHandler {
         obj.cursorInc(+1);
     }
     Backspace(event, playfield, obj) {
+        this.logger.log(obj.cursor, obj._value);
         if (obj.cursor > 0) {
             let c = obj.cursor;
-            obj.value(obj._value.substring(0, c - 1) + obj._value.substring(c));
+            let left = obj._value.substring(0, c - 1);
+            let right = obj._value.substring(c);
+            obj.value(left + right);
             obj.cursorInc(-1);
+            this.logger.log(left, right, obj.cursor, obj._value);
         }
     }
     OrdinaryKey(event, playfield, obj) {

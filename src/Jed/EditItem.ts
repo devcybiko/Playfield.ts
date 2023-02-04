@@ -12,12 +12,12 @@ class EditItem extends Item {
         super(parent, name, value, x, y, w, h);
         this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
-        this.nchars = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w);
-        this.nchars2 = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w / 2);
+        this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+        this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
-        this.logger = new Logger("EditItem", "log");
+        this.logger = new Logger("EditItem", "none");
     }
     _setIntervalTimer() {
         this.cursorOn = true;
@@ -89,5 +89,7 @@ class EditItem extends Item {
         if (this.left < 0) this.left = 0;
         this.right = this.left + this.nchars;
         if (this.right > this._value.length) this.right = this._value.length;
+        if (this.right === this._value.length) this.left = Math.max(this.right - this.nchars + 1, 0);
+        this.logger.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
     }
 }

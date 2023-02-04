@@ -5,7 +5,7 @@ class Item extends Actor {
         this.isDraggable = true;
     }
     value(newValue) {
-        if (newValue)
+        if (newValue !== undefined)
             this._value = newValue;
         return this._value;
     }

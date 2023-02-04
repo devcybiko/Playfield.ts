@@ -643,7 +643,7 @@ class Item extends Actor {
         this.isDraggable = true;
     }
     value(newValue) {
-        if (newValue)
+        if (newValue !== undefined)
             this._value = newValue;
         return this._value;
     }
@@ -652,6 +652,7 @@ class Item extends Actor {
 class EditItemEventHandler extends EventHandler {
     constructor(editItem) {
         super(editItem.playfield, editItem);
+        this.logger = new Logger("EditItemEventHandler", "info");
     }
     ArrowLeft(event, playfield, obj) {
         obj.cursorInc(-1);
@@ -660,10 +661,14 @@ class EditItemEventHandler extends EventHandler {
         obj.cursorInc(+1);
     }
     Backspace(event, playfield, obj) {
+        this.logger.log(obj.cursor, obj._value);
         if (obj.cursor > 0) {
             let c = obj.cursor;
-            obj.value(obj._value.substring(0, c - 1) + obj._value.substring(c));
+            let left = obj._value.substring(0, c - 1);
+            let right = obj._value.substring(c);
+            obj.value(left + right);
             obj.cursorInc(-1);
+            this.logger.log(left, right, obj.cursor, obj._value);
         }
     }
     OrdinaryKey(event, playfield, obj) {
@@ -681,14 +686,16 @@ class EditItem extends Item {
         this.right = 0;
         this.cursorOn = true;
         this.cursorBlinkRate = 500;
+        this.nchars = 0;
         this.nchars2 = 0;
         this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
-        this.nchars2 = Math.floor(this.w / this.playfield.gfx.boundingBox(" ", this.gparms).w / 2);
+        this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+        this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
-        this.logger = new Logger("EditItem", "log");
+        this.logger = new Logger("EditItem", "none");
     }
     _setIntervalTimer() {
         this.cursorOn = true;
@@ -764,34 +771,19 @@ class EditItem extends Item {
         this.cursor += delta;
         this._setIntervalTimer();
         this.cursorOn = true;
-        if (this.cursor < 0) {
+        if (this.cursor < 0)
             this.cursor = 0;
-            this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor > this._value.length) {
+        if (this.cursor > this._value.length)
             this.cursor = this._value.length;
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0)
-                this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor - this.left >= this.nchars2) {
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0)
-                this.left = 0;
-            this.right = this.computeRight();
-        }
-        else if (this.cursor - this.left < this.nchars2) {
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0)
-                this.left = 0;
-            this.right = this.computeRight();
-        }
-        if (this.right === this._value.length - 1 && this.left !== 0) {
-            this.left = this.computeLeft();
-        }
-        this.logger.log(this.left, this.cursor, this.right);
+        this.left = this.cursor - this.nchars2;
+        if (this.left < 0)
+            this.left = 0;
+        this.right = this.left + this.nchars;
+        if (this.right > this._value.length)
+            this.right = this._value.length;
+        if (this.right === this._value.length)
+            this.left = Math.max(this.right - this.nchars + 1, 0);
+        this.logger.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
     }
 }
 //# sourceMappingURL=EditItem.js.map
