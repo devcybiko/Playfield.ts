@@ -1,14 +1,14 @@
 class Playfield {
     constructor(canvasId) {
         this.SNAP = 10;
-        this.x = 0;
-        this.y = 0;
-        this.X = 0;
-        this.Y = 0;
+        this.grabX = 0;
+        this.grabY = 0;
         this.gparms = null;
         this.canvas = document.querySelector(canvasId);
         this.ctx = this.canvas.getContext("2d");
-        this.logger = new Logger("Playfield", "warn");
+        this.node = new JedNode(null, "_playfield");
+        this.rect = new JedRect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
+        this.logger = new Logger("Playfield", "info");
         this.gfx = new Graphics(this.ctx);
         this.objs = [];
         this.selectedObj = null; // mouse object
@@ -40,22 +40,30 @@ class Playfield {
         obj.parent = this;
         obj.playfield = this;
     }
-    grabObj(obj, dx, dy) {
-        this.dropObj();
-        this._dragObj = obj;
-        if (obj)
-            obj.grab(dx, dy);
+    grabObj(obj, x, y, toFront) {
+        if (obj && obj.draggable) {
+            this.dropObj();
+            if (toFront)
+                this.toFront(obj);
+            else
+                this.toBack(obj);
+            this._dragObj = obj;
+            this.grabX = x;
+            this.grabY = y;
+            obj.draggable.grab();
+        }
     }
     dragObj(x, y) {
         if (this._dragObj) {
-            let dx = Utils.snapTo(x - this._dragObj.grabDX, this.SNAP);
-            let dy = Utils.snapTo(y - this._dragObj.grabDY, this.SNAP);
-            this._dragObj.drag(dx, dy);
+            let dx = x - this.grabX;
+            let dy = y - this.grabY;
+            this.logger.log(dx, dy);
+            this._dragObj.draggable.drag(dx, dy);
         }
     }
     dropObj() {
         if (this._dragObj)
-            this._dragObj.drop();
+            this._dragObj.draggable.drop();
         this._dragObj = null;
     }
     drawAll() {
@@ -110,10 +118,10 @@ class Playfield {
         for (let obj of this.objs) {
             if (theObj === obj)
                 continue;
-            if (obj.inBounds(theObj.x, theObj.y) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y) ||
-                obj.inBounds(theObj.x, theObj.y + theObj.h) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y + theObj.h))
+            if (obj.inBounds(theObj.rect.x, theObj.rect.y) ||
+                obj.inBounds(theObj.rect.x + theObj.rect.w, theObj.rect.y) ||
+                obj.inBounds(theObj.rect.x, theObj.rect.y + theObj.rect.h) ||
+                obj.inBounds(theObj.rect.x + theObj.rect.w, theObj.rect.y + theObj.rect.h))
                 results.push(obj);
         }
         return results;

@@ -3,7 +3,7 @@ class TextItem extends Item {
         super(parent, name, value, x, y, 0, 0);
         this.cursorOn = true;
         this.labelItem = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
-        this.editItem = new EditItem(this, name + "-editor", value, this.labelItem.w + 2, 0, w, h);
+        this.editItem = new EditItem(this, name + "-editor", value, this.labelItem.rect.w + 2, 0, w, h);
     }
     click(x, y) {
         this.playfield.focusObj(this.editItem);

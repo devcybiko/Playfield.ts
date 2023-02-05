@@ -4,7 +4,7 @@ abstract class Item extends Actor {
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w: number, h: number) {
         super(parent, name, x, y, w, h);
         this.value(value);
-        this.isDraggable = true;
+        this.draggable = new Draggable(this);
     }
     value(newValue?: string) {
         if (newValue !== undefined) this._value = newValue;

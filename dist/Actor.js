@@ -3,43 +3,37 @@ class Actor {
         this.borderColor = "black";
         this.fillColor = "white";
         this.color = "black";
-        this.isDraggable = true;
-        this.grabDX = 0;
-        this.grabDY = 0;
         this.gparms = new GraphicsParms();
-        this.name = name;
+        this.node = new JedNode(parent.node, name);
+        this.rect = new JedRect(x, y, w, h);
         this.logger = new Logger("Actor", "warn");
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
         this.objs = [];
         this.eventHandler = null;
         this.parent = parent;
         this.parent.add(this);
     }
     get X() {
-        return this.x + this.gparms.xOffset;
+        return this.rect.x + this.gparms.xOffset;
     }
     get Y() {
-        return this.y + this.gparms.yOffset;
+        return this.rect.y + this.gparms.yOffset;
     }
     add(obj) {
         this.objs.push(obj);
         obj.parent = this;
         obj.playfield = this.playfield;
     }
-    move(x, y, w = this.w, h = this.h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+    move(x, y, w = this.rect.w, h = this.rect.h) {
+        this.rect.x = x;
+        this.rect.y = y;
+        this.rect.w = w;
+        this.rect.h = h;
     }
     rmove(dx, dy, dw = 0, dh = 0) {
-        this.x += dx;
-        this.y += dy;
-        this.w += dw;
-        this.h += dh;
+        this.rect.x += dx;
+        this.rect.y += dy;
+        this.rect.w += dw;
+        this.rect.h += dh;
     }
     select() {
         this.isSelected = true;
@@ -54,8 +48,8 @@ class Actor {
         this.hasFocus = false;
     }
     inBounds(x, y) {
-        let result = Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
-            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
+        let result = Utils.between(this.gparms.xOffset + this.rect.x, x, this.gparms.xOffset + this.rect.x + this.rect.w) &&
+            Utils.between(this.gparms.yOffset + this.rect.y, y, this.gparms.yOffset + this.rect.y + this.rect.h);
         if (result)
             return this;
         for (let i = this.objs.length - 1; i >= 0; i--) {
@@ -67,35 +61,25 @@ class Actor {
         return null;
     }
     click(x, y) {
-        this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
-    }
-    drag(x, y) {
-        this.move(x, y);
-    }
-    grab(dx, dy) {
-        this.grabDX = dx;
-        this.grabDY = dy;
-    }
-    drop() {
-        // playfield is dropping me from dragging
+        this.logger.log("CLICK! " + this.node.name + ": " + x + "," + y);
     }
     keydown(key) {
         if (key === "ArrowUp")
-            this.y -= 10;
+            this.rect.y -= 10;
         if (key === "ArrowDown")
-            this.y += 10;
+            this.rect.y += 10;
         if (key === "ArrowLeft")
-            this.x -= 10;
+            this.rect.x -= 10;
         if (key === "ArrowRight")
-            this.x += 10;
+            this.rect.x += 10;
     }
     go() {
     }
     recompute() {
         let parentGparms = this.parent.gparms;
         if (parentGparms) {
-            this.gparms.xOffset = this.parent.x + parentGparms.xOffset;
-            this.gparms.yOffset = this.parent.y + parentGparms.yOffset;
+            this.gparms.xOffset = this.parent.rect.x + parentGparms.xOffset;
+            this.gparms.yOffset = this.parent.rect.y + parentGparms.yOffset;
         }
     }
     drawAll() {

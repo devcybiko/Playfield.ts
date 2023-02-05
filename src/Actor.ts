@@ -1,9 +1,6 @@
 class Actor {
-    public name: string;
-    public x: number;
-    public y: number;
-    public w: number;
-    public h: number;
+    public node: JedNode;
+    public rect: JedRect;
     public borderColor = "black";
     public fillColor = "white";
     public color = "black";
@@ -12,47 +9,42 @@ class Actor {
     public logger: Logger;
     public playfield: Playfield;
     public parent: Playfield | Actor;
-    public isDraggable = true;
+    public draggable: Draggable;
     public eventHandler: EventHandler;
-    public grabDX = 0;
-    public grabDY = 0;
     public objs: Actor[];
     public gparms = new GraphicsParms();
 
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w: number, h: number) {
-        this.name = name;
+        this.node = new JedNode(parent.node, name);
+        this.rect = new JedRect(x, y, w, h);
         this.logger = new Logger("Actor", "warn");
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
         this.objs = [];
         this.eventHandler = null;
         this.parent = parent;
         this.parent.add(this);
     }
     get X(): number {
-        return this.x + this.gparms.xOffset;
+        return this.rect.x + this.gparms.xOffset;
     }
     get Y(): number {
-        return this.y + this.gparms.yOffset;
+        return this.rect.y + this.gparms.yOffset;
     }
     add(obj: Actor) {
         this.objs.push(obj);
         obj.parent = this;
         obj.playfield = this.playfield;
     }
-    move(x: number, y: number, w = this.w, h = this.h): void {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+    move(x: number, y: number, w = this.rect.w, h = this.rect.h): void {
+        this.rect.x = x;
+        this.rect.y = y;
+        this.rect.w = w;
+        this.rect.h = h;
     }
     rmove(dx: number, dy: number, dw = 0, dh = 0): void {
-        this.x += dx;
-        this.y += dy;
-        this.w += dw;
-        this.h += dh;
+        this.rect.x += dx;
+        this.rect.y += dy;
+        this.rect.w += dw;
+        this.rect.h += dh;
     }
     select() {
         this.isSelected = true;
@@ -68,8 +60,8 @@ class Actor {
     }
     inBounds(x: number, y: number): Actor {
         let result =
-            Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
-            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
+            Utils.between(this.gparms.xOffset + this.rect.x, x, this.gparms.xOffset + this.rect.x + this.rect.w) &&
+            Utils.between(this.gparms.yOffset + this.rect.y, y, this.gparms.yOffset + this.rect.y + this.rect.h);
         if (result) return this;
         for (let i = this.objs.length - 1; i >= 0; i--) {
             let obj = this.objs[i];
@@ -79,31 +71,21 @@ class Actor {
         return null;
     }
     click(x: number, y: number) {
-        this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
-    }
-    drag(x: number, y: number) {
-        this.move(x, y);
-    }
-    grab(dx: number, dy: number) {
-        this.grabDX = dx;
-        this.grabDY = dy;
-    }
-    drop() {
-        // playfield is dropping me from dragging
+        this.logger.log("CLICK! " + this.node.name + ": " + x + "," + y);
     }
     keydown(key: string) {
-        if (key === "ArrowUp") this.y -= 10;
-        if (key === "ArrowDown") this.y += 10;
-        if (key === "ArrowLeft") this.x -= 10;
-        if (key === "ArrowRight") this.x += 10;
+        if (key === "ArrowUp") this.rect.y -= 10;
+        if (key === "ArrowDown") this.rect.y += 10;
+        if (key === "ArrowLeft") this.rect.x -= 10;
+        if (key === "ArrowRight") this.rect.x += 10;
     }
     go(): void {
     }
     recompute() {
         let parentGparms = this.parent.gparms;
         if (parentGparms) {
-            this.gparms.xOffset = this.parent.x + parentGparms.xOffset;
-            this.gparms.yOffset = this.parent.y + parentGparms.yOffset;
+            this.gparms.xOffset = this.parent.rect.x + parentGparms.xOffset;
+            this.gparms.yOffset = this.parent.rect.y + parentGparms.yOffset;
         }
     }
     drawAll(): void {

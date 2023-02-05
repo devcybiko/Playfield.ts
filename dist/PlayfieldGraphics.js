@@ -45,6 +45,47 @@ class Logger {
     }
 }
 //# sourceMappingURL=Logger.js.map
+class JedNode {
+    constructor(parent, name) {
+        this.name = name;
+        this.parent = parent;
+        this.objs = [];
+    }
+}
+//# sourceMappingURL=JedNode.js.map
+class JedRect {
+    constructor(x, y, w, h) {
+        this.x = 0;
+        this.y = 0;
+        this.w = 0;
+        this.h = 0;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+}
+//# sourceMappingURL=JedRect.js.map
+class Draggable {
+    constructor(actor) {
+        this.origX = 0; // original x
+        this.origY = 0; // original y
+        this.snap = 10;
+        this.obj = actor;
+    }
+    drag(dx, dy) {
+        let newX = Utils.snapTo(this.origX + dx, this.snap);
+        let newY = Utils.snapTo(this.origY + dy, this.snap);
+        this.obj.move(newX, newY);
+    }
+    grab() {
+        this.origX = this.obj.rect.x;
+        this.origY = this.obj.rect.y;
+    }
+    drop() {
+    }
+}
+//# sourceMappingURL=Draggable.js.map
 class GraphicsParms {
     constructor() {
         this.color = "black";
@@ -390,13 +431,7 @@ class PlayfieldEventHandler extends EventHandler {
         playfield.selectObj(obj);
         if (obj) {
             obj.click(event.offsetX, event.offsetY);
-            if (event.shiftKey)
-                playfield.toBack(obj);
-            else
-                playfield.toFront(obj);
-            if (obj.isDraggable) {
-                this.playfield.grabObj(obj, Utils.snapTo(event.offsetX - obj.x, this.SNAP), Utils.snapTo(event.offsetY - obj.y, this.SNAP));
-            }
+            playfield.grabObj(obj, event.offsetX, event.offsetY, event.shiftKey);
         }
     }
 }
@@ -404,14 +439,14 @@ class PlayfieldEventHandler extends EventHandler {
 class Playfield {
     constructor(canvasId) {
         this.SNAP = 10;
-        this.x = 0;
-        this.y = 0;
-        this.X = 0;
-        this.Y = 0;
+        this.grabX = 0;
+        this.grabY = 0;
         this.gparms = null;
         this.canvas = document.querySelector(canvasId);
         this.ctx = this.canvas.getContext("2d");
-        this.logger = new Logger("Playfield", "warn");
+        this.node = new JedNode(null, "_playfield");
+        this.rect = new JedRect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
+        this.logger = new Logger("Playfield", "info");
         this.gfx = new Graphics(this.ctx);
         this.objs = [];
         this.selectedObj = null; // mouse object
@@ -443,22 +478,30 @@ class Playfield {
         obj.parent = this;
         obj.playfield = this;
     }
-    grabObj(obj, dx, dy) {
-        this.dropObj();
-        this._dragObj = obj;
-        if (obj)
-            obj.grab(dx, dy);
+    grabObj(obj, x, y, toFront) {
+        if (obj && obj.draggable) {
+            this.dropObj();
+            if (toFront)
+                this.toFront(obj);
+            else
+                this.toBack(obj);
+            this._dragObj = obj;
+            this.grabX = x;
+            this.grabY = y;
+            obj.draggable.grab();
+        }
     }
     dragObj(x, y) {
         if (this._dragObj) {
-            let dx = Utils.snapTo(x - this._dragObj.grabDX, this.SNAP);
-            let dy = Utils.snapTo(y - this._dragObj.grabDY, this.SNAP);
-            this._dragObj.drag(dx, dy);
+            let dx = x - this.grabX;
+            let dy = y - this.grabY;
+            this.logger.log(dx, dy);
+            this._dragObj.draggable.drag(dx, dy);
         }
     }
     dropObj() {
         if (this._dragObj)
-            this._dragObj.drop();
+            this._dragObj.draggable.drop();
         this._dragObj = null;
     }
     drawAll() {
@@ -513,10 +556,10 @@ class Playfield {
         for (let obj of this.objs) {
             if (theObj === obj)
                 continue;
-            if (obj.inBounds(theObj.x, theObj.y) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y) ||
-                obj.inBounds(theObj.x, theObj.y + theObj.h) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y + theObj.h))
+            if (obj.inBounds(theObj.rect.x, theObj.rect.y) ||
+                obj.inBounds(theObj.rect.x + theObj.rect.w, theObj.rect.y) ||
+                obj.inBounds(theObj.rect.x, theObj.rect.y + theObj.rect.h) ||
+                obj.inBounds(theObj.rect.x + theObj.rect.w, theObj.rect.y + theObj.rect.h))
                 results.push(obj);
         }
         return results;
@@ -528,43 +571,37 @@ class Actor {
         this.borderColor = "black";
         this.fillColor = "white";
         this.color = "black";
-        this.isDraggable = true;
-        this.grabDX = 0;
-        this.grabDY = 0;
         this.gparms = new GraphicsParms();
-        this.name = name;
+        this.node = new JedNode(parent.node, name);
+        this.rect = new JedRect(x, y, w, h);
         this.logger = new Logger("Actor", "warn");
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
         this.objs = [];
         this.eventHandler = null;
         this.parent = parent;
         this.parent.add(this);
     }
     get X() {
-        return this.x + this.gparms.xOffset;
+        return this.rect.x + this.gparms.xOffset;
     }
     get Y() {
-        return this.y + this.gparms.yOffset;
+        return this.rect.y + this.gparms.yOffset;
     }
     add(obj) {
         this.objs.push(obj);
         obj.parent = this;
         obj.playfield = this.playfield;
     }
-    move(x, y, w = this.w, h = this.h) {
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
+    move(x, y, w = this.rect.w, h = this.rect.h) {
+        this.rect.x = x;
+        this.rect.y = y;
+        this.rect.w = w;
+        this.rect.h = h;
     }
     rmove(dx, dy, dw = 0, dh = 0) {
-        this.x += dx;
-        this.y += dy;
-        this.w += dw;
-        this.h += dh;
+        this.rect.x += dx;
+        this.rect.y += dy;
+        this.rect.w += dw;
+        this.rect.h += dh;
     }
     select() {
         this.isSelected = true;
@@ -579,8 +616,8 @@ class Actor {
         this.hasFocus = false;
     }
     inBounds(x, y) {
-        let result = Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
-            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
+        let result = Utils.between(this.gparms.xOffset + this.rect.x, x, this.gparms.xOffset + this.rect.x + this.rect.w) &&
+            Utils.between(this.gparms.yOffset + this.rect.y, y, this.gparms.yOffset + this.rect.y + this.rect.h);
         if (result)
             return this;
         for (let i = this.objs.length - 1; i >= 0; i--) {
@@ -592,35 +629,25 @@ class Actor {
         return null;
     }
     click(x, y) {
-        this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
-    }
-    drag(x, y) {
-        this.move(x, y);
-    }
-    grab(dx, dy) {
-        this.grabDX = dx;
-        this.grabDY = dy;
-    }
-    drop() {
-        // playfield is dropping me from dragging
+        this.logger.log("CLICK! " + this.node.name + ": " + x + "," + y);
     }
     keydown(key) {
         if (key === "ArrowUp")
-            this.y -= 10;
+            this.rect.y -= 10;
         if (key === "ArrowDown")
-            this.y += 10;
+            this.rect.y += 10;
         if (key === "ArrowLeft")
-            this.x -= 10;
+            this.rect.x -= 10;
         if (key === "ArrowRight")
-            this.x += 10;
+            this.rect.x += 10;
     }
     go() {
     }
     recompute() {
         let parentGparms = this.parent.gparms;
         if (parentGparms) {
-            this.gparms.xOffset = this.parent.x + parentGparms.xOffset;
-            this.gparms.yOffset = this.parent.y + parentGparms.yOffset;
+            this.gparms.xOffset = this.parent.rect.x + parentGparms.xOffset;
+            this.gparms.yOffset = this.parent.rect.y + parentGparms.yOffset;
         }
     }
     drawAll() {
@@ -640,7 +667,7 @@ class Item extends Actor {
     constructor(parent, name, value, x, y, w, h) {
         super(parent, name, x, y, w, h);
         this.value(value);
-        this.isDraggable = true;
+        this.draggable = new Draggable(this);
     }
     value(newValue) {
         if (newValue !== undefined)
@@ -690,8 +717,8 @@ class EditItem extends Item {
         this.nchars2 = 0;
         this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
-        this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
-        this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
+        this.nchars = Math.ceil(this.rect.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+        this.nchars2 = Math.ceil(this.rect.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
@@ -719,13 +746,13 @@ class EditItem extends Item {
         let dw = valueBB.w;
         if (dw <= 0)
             dw = 1;
-        else if (dw >= this.w)
-            dw = this.w - 1;
-        let x0 = this.x + dw;
-        if (x0 <= this.x)
-            x0 = this.x + 1;
+        else if (dw >= this.rect.w)
+            dw = this.rect.w - 1;
+        let x0 = this.rect.x + dw;
+        if (x0 <= this.rect.x)
+            x0 = this.rect.x + 1;
         let x1 = x0;
-        let y0 = this.y;
+        let y0 = this.rect.y;
         let y1 = y0 + valueBB.h;
         gfx.line(x0, y0, x1, y1, this.gparms);
         gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
@@ -736,8 +763,8 @@ class EditItem extends Item {
             this.gparms.color = "red";
         else
             this.gparms.color = "black";
-        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-        gfx.textRect(this.value().substring(this.left), this.x, this.y, this.w, this.h, this.gparms);
+        gfx.clipRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, this.gparms);
+        gfx.textRect(this.value().substring(this.left), this.rect.x, this.rect.y, this.rect.w, this.rect.h, this.gparms);
         this.drawCursor();
         gfx.restore();
     }
@@ -747,7 +774,7 @@ class EditItem extends Item {
         // for(let i=this.left; i<=this._value.length; i++) {
         //     let bb = gfx.boundingBox(this._value.substring(this.left, i));
         //     right = i;
-        //     if (bb.w > this.w) break;
+        //     if (bb.w > this.rect.w) break;
         // }
         let right = this.left + this.nchars2 * 2;
         if (right >= this._value.length)
@@ -759,7 +786,7 @@ class EditItem extends Item {
         // let left = this.right;
         // for(let i=this.right; i>=0; i--) {
         //     let bb = gfx.boundingBox(this._value.substring(i, this.right));
-        //     if (bb.w > this.w) break;
+        //     if (bb.w > this.rect.w) break;
         //     left = i;
         // }
         let left = this.right - this.nchars2 * 2 + 1;
@@ -793,16 +820,16 @@ class LabelItem extends Item {
         this.gparms.fontFace = "serif";
         this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
         if (!w)
-            this.w = this.bb.w;
+            this.rect.w = this.bb.w;
         if (!h)
-            this.h = this.bb.h;
+            this.rect.h = this.bb.h;
     }
     draw() {
         let gfx = this.playfield.gfx;
         // this.bb = gfx.boundingBox(this.value(), this.gparms);
         // this.w = this.bb.w;
         // this.h = this.bb.h;
-        gfx.text(this.value(), this.x, this.y, this.gparms);
+        gfx.text(this.value(), this.rect.x, this.rect.y, this.gparms);
     }
 }
 //# sourceMappingURL=LabelItem.js.map
@@ -811,7 +838,7 @@ class TextItem extends Item {
         super(parent, name, value, x, y, 0, 0);
         this.cursorOn = true;
         this.labelItem = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
-        this.editItem = new EditItem(this, name + "-editor", value, this.labelItem.w + 2, 0, w, h);
+        this.editItem = new EditItem(this, name + "-editor", value, this.labelItem.rect.w + 2, 0, w, h);
     }
     click(x, y) {
         this.playfield.focusObj(this.editItem);

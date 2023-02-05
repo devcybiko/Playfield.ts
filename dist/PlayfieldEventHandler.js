@@ -28,13 +28,7 @@ class PlayfieldEventHandler extends EventHandler {
         playfield.selectObj(obj);
         if (obj) {
             obj.click(event.offsetX, event.offsetY);
-            if (event.shiftKey)
-                playfield.toBack(obj);
-            else
-                playfield.toFront(obj);
-            if (obj.isDraggable) {
-                this.playfield.grabObj(obj, Utils.snapTo(event.offsetX - obj.x, this.SNAP), Utils.snapTo(event.offsetY - obj.y, this.SNAP));
-            }
+            playfield.grabObj(obj, event.offsetX, event.offsetY, event.shiftKey);
         }
     }
 }

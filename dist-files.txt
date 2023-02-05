@@ -1,5 +1,8 @@
 ./dist/Utils.js
 ./dist/Logger.js
+./dist/JedNode.js
+./dist/JedRect.js
+./dist/Draggable.js
 ./dist/GraphicsParms.js
 ./dist/Graphics.js
 ./dist/EventHandler.js
