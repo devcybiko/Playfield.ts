@@ -1,4 +1,10 @@
-class JedEditItem extends JedItem {
+import {Playfield, Actor} from "../Playfield";
+import * as Utils from "../Utils";
+
+import {JedItem} from "./JedItem";
+import {JedEditItemEventHandler} from "./JedEditItemEventHandler";
+
+export class JedEditItem extends JedItem {
     public cursor = 0;
     public left = 0;
     public right = 0;
@@ -17,7 +23,7 @@ class JedEditItem extends JedItem {
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
-        this.logger = new Logger("EditItem", "none");
+        this.logger = new Utils.Logger("EditItem", "none");
     }
     _setIntervalTimer() {
         this.cursorOn = true;

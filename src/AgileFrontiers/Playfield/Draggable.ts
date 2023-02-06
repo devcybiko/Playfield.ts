@@ -1,4 +1,7 @@
-class Draggable {
+import * as Utils from "../Utils";
+import {Actor} from "./Actor";
+
+export class Draggable {
     public obj: Actor;
     public origX = 0; // original x
     public origY = 0; // original y

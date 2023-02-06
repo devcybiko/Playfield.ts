@@ -1,4 +1,7 @@
-class JedLabelItem extends JedItem {
+import {JedItem}  from "./JedItem";
+import {Playfield, Actor} from "../Playfield";
+
+export class JedLabelItem extends JedItem {
     public bb: any;
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w = 0, h = 0) {
         super(parent, name, value, x, y, w, h);

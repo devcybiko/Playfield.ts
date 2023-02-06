@@ -1,7 +1,10 @@
-class Gfx {
+import {GfxParms} from "./GfxParms";
+import * as Utils from "../Utils";
+
+export class Gfx {
     public ctx: CanvasRenderingContext2D;
     public gparms: GfxParms;
-    private logger = new Logger("Gfx", "info");
+    private logger = new Utils.Logger("Gfx", "info");
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;

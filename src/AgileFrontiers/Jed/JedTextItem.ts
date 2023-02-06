@@ -1,4 +1,9 @@
-class JedTextItem extends JedItem {
+import {JedItem} from "./JedItem";
+import {JedLabelItem} from "./JedLabelItem";
+import {JedEditItem} from "./JedEditItem";
+import {Playfield, Actor} from "../Playfield";
+
+export class JedTextItem extends JedItem {
     public cursor: number;
     public cursorOn = true;
     public timerId: any;

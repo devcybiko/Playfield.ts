@@ -1,4 +1,7 @@
-class EventHandler {
+import * as Utils from "../Utils";
+import {Playfield} from "./Playfield";
+
+export class EventHandler {
     /**
      * Event Hierarchy
       - handleEvent
@@ -42,11 +45,11 @@ class EventHandler {
      */
     public playfield: Playfield;
     public obj: any;
-    public logger: Logger;
+    public logger: Utils.Logger;
     constructor(playfield: Playfield, obj: any) {
         this.playfield = playfield;
         this.obj = obj;
-        this.logger = new Logger("EventHandler", "info");
+        this.logger = new Utils.Logger("EventHandler", "info");
     }
     handleEvent(event: any) {
         if (event.button !== undefined) return this.handleMouseEvent(event);

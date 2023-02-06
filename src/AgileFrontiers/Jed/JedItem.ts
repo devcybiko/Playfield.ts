@@ -1,4 +1,6 @@
-class JedItem extends Actor {
+import {Playfield, Actor, Draggable} from "../Playfield";
+
+export class JedItem extends Actor {
     public _value: string;
 
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w: number, h: number) {

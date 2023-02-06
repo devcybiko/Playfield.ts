@@ -1,7 +1,11 @@
-class JedEditItemEventHandler extends EventHandler {
+import * as Utils from "../Utils";
+import {JedEditItem} from "./JedEditItem";
+import {Playfield, EventHandler} from "../Playfield";
+
+export class JedEditItemEventHandler extends EventHandler {
     constructor(editItem: JedEditItem) {
         super(editItem.playfield, editItem);
-        this.logger = new Logger("EditItemEventHandler", "info");
+        this.logger = new Utils.Logger("EditItemEventHandler", "info");
     }
     ArrowLeft(event: any, playfield: Playfield, obj: JedEditItem) {
         obj.cursorInc(-1);

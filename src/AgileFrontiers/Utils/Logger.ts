@@ -1,4 +1,4 @@
-class Logger {
+export class Logger {
     private module: string;
     private level = "log";
     constructor(module: string, logLevel = "error") {

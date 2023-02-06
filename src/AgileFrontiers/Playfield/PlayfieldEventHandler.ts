@@ -1,8 +1,13 @@
-class PlayfieldEventHandler extends EventHandler {
+import * as Utils from "../Utils";
+
+import {EventHandler} from "./EventHandler";
+import {Playfield} from "./Playfield";
+
+export class PlayfieldEventHandler extends EventHandler {
     readonly SNAP = 10;
     constructor(playfield: Playfield, canvas: any) {
         super(playfield, canvas);
-        this.logger = new Logger("PlayfieldEventHandler", "info");
+        this.logger = new Utils.Logger("PlayfieldEventHandler", "info");
         this._registerEventHandlers(playfield);
     }
     private _registerEventHandlers(playfield: Playfield) {

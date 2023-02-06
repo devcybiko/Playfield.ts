@@ -1,4 +1,4 @@
-class GfxParms {
+export class GfxParms {
     private _fontSize: number;
     private _fontFace: string;
     color = "black";

@@ -1,6 +1,6 @@
-type Constructor = new (...args: any[]) => {};
+import {Constructor} from "./Constructor";
 
-function Base<TBase extends Constructor>(_base: TBase) {
+export function Base<TBase extends Constructor>(_base: TBase) {
     return class extends _base {
         _name = null as string;
 

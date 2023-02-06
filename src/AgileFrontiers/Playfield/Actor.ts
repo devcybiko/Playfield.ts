@@ -1,9 +1,16 @@
-class Actor extends BaseRectTree {
+import * as Utils from "../Utils";
+import * as Mixins from "../Mixins";
+import {Gfx, GfxParms} from "../Graphics";
+import {Draggable} from "./Draggable";
+import {EventHandler} from "./EventHandler";
+import {Playfield} from "./Playfield";
+
+export class Actor extends Mixins.BaseRectTree {
     public draggable: Draggable;
     public eventHandler: EventHandler;
     public isSelected: boolean;
     public hasFocus: boolean;
-    public logger: Logger;
+    public logger: Utils.Logger;
     public playfield: Playfield;
     public gparms = new GfxParms();
 
@@ -14,7 +21,7 @@ class Actor extends BaseRectTree {
         this.Tree(null);
         parent.add(this);
         this.playfield = parent.playfield;
-        this.logger = new Logger("Actor", "warn");
+        this.logger = new Utils.Logger("Actor", "warn");
         this.eventHandler = null;
     }
     get X(): number {

@@ -1,4 +1,6 @@
-function Tree<TBase extends Constructor>(_base: TBase) {
+import {Constructor} from "./Constructor";
+
+export function Tree<TBase extends Constructor>(_base: TBase) {
     return class extends _base {
         _parent = null as any;
         _children = Array<any>();

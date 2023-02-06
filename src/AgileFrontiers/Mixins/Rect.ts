@@ -1,4 +1,6 @@
-function Rect<TBase extends Constructor>(_base: TBase) {
+import {Constructor} from "./Constructor";
+
+export function Rect<TBase extends Constructor>(_base: TBase) {
     return class extends _base {
         // Mixins may not declare private/protected properties
         // however, you can use ES2020 private fields

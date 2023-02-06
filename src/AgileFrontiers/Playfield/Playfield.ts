@@ -1,8 +1,16 @@
-class Playfield extends BaseRectTree {
+import * as Utils from "../Utils";
+import * as Mixins from "../Mixins";
+import {Gfx, GfxParms} from "../Graphics";
+
+import {Actor} from "./Actor";
+import {EventHandler} from "./EventHandler";
+import {PlayfieldEventHandler} from "./PlayfieldEventHandler";
+
+export class Playfield extends Mixins.BaseRectTree {
     readonly SNAP = 10;
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D;
-    public logger: Logger;
+    public logger: Utils.Logger;
     public gfx!: Gfx;
     public selectedObj: Actor; // mouse object
     public focusedObj: Actor; // keyboard object
@@ -23,7 +31,7 @@ class Playfield extends BaseRectTree {
         this.Base("_playfield");
         this.Rect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
         this.Tree(null);
-        this.logger = new Logger("Playfield", "info");
+        this.logger = new Utils.Logger("Playfield", "info");
         this.gfx = new Gfx(this.ctx);
         this.selectedObj = null; // mouse object
         this.focusedObj = null; // keyboard object
