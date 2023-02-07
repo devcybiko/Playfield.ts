@@ -1,6 +1,10 @@
 export {Logger} from "./Logger";
 
 export function between(a: any, b: any, c: any): boolean {
+    let result = a < b && b < c;
+    return result;
+}
+export function inclusive(a: any, b: any, c: any): boolean {
     let result = a <= b && b <= c;
     return result;
 }

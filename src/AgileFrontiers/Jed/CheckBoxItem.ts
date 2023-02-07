@@ -13,11 +13,18 @@ export class CheckBoxItem extends Item {
         this.labelItem = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
         this.xboxItem = new XBoxItem(this, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
         this.values(values);
+        this.logger.log(this.w(), this.h())
+        this.w(0);
+        this.h(0)
+    }
+    click(x: number, y: number) {
+        super.click(x, y);
+        this.xboxItem.click(x, y);
     }
     isChecked(checked?: boolean) {
-        return this.xboxItem.isChecked();
+        return this.xboxItem.isChecked(checked);
     }
-    values(values?: string | string[]): string[]{
+    values(values?: string | string[]): string[] {
         if (values === undefined) return this._values;
         if (typeof values === "string") this._values = [values, null];
         else this._values = values;

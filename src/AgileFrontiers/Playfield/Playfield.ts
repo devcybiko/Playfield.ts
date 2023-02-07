@@ -30,7 +30,7 @@ export class Playfield extends Mixins.BaseRectTree {
         this.Base("_playfield");
         this.Rect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
         this.Tree(null);
-        this.logger = new Utils.Logger("Playfield", "info");
+        this.logger = new Utils.Logger("info");
         this.gfx = new Gfx(this.ctx);
         this.selectedObj = null; // mouse object
         this.focusedObj = null; // keyboard object

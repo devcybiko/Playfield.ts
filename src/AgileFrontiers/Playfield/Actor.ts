@@ -22,7 +22,7 @@ export class Actor extends Mixins.BaseRectTree {
         this.Tree(null);
         parent.add(this);
         this.playfield = parent.playfield;
-        this.logger = new Utils.Logger("Actor", "warn");
+        this.logger = new Utils.Logger("log");
         this.eventHandler = null;
     }
     X(): number {
@@ -54,9 +54,11 @@ export class Actor extends Mixins.BaseRectTree {
     }
     select() {
         this.isSelected(true);
+        this.logger.warn("Selected", this.name(), this.isSelected());
     }
     deselect() {
         this.isSelected(false);
+        this.logger.warn("Selected", this.name(), this.isSelected());
     }
     focus() {
         this.hasFocus = true;
@@ -72,7 +74,7 @@ export class Actor extends Mixins.BaseRectTree {
         for (let i = this._children.length - 1; i >= 0; i--) {
             let obj = this._children[i];
             let found = obj.inBounds(x, y);
-            if (found) return this;
+            if (found) return found;
         }
         return null;
     }

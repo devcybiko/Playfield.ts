@@ -7,7 +7,7 @@ export class PlayfieldEventHandler extends EventHandler {
     readonly SNAP = 10;
     constructor(playfield: Playfield, canvas: any) {
         super(playfield, canvas);
-        this.logger = new Utils.Logger("PlayfieldEventHandler", "log");
+        this.logger = new Utils.Logger("log");
         this._registerEventHandlers(playfield);
     }
     private _registerEventHandlers(playfield: Playfield) {
@@ -30,6 +30,7 @@ export class PlayfieldEventHandler extends EventHandler {
     }
     MouseDown(event: any, playfield: Playfield, convas: any) {
         let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
+        this.logger.warn("MouseDown", obj);
         playfield.selectObj(obj);
         if (obj) {
             obj.click(event.offsetX, event.offsetY);

@@ -4,7 +4,7 @@ import * as Utils from "../Utils";
 export class Gfx {
     public ctx: CanvasRenderingContext2D;
     public gparms: GfxParms;
-    private logger = new Utils.Logger("Gfx", "log");
+    private logger = new Utils.Logger("log");
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;

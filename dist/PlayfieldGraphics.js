@@ -68,32 +68,64 @@ define("Utils/Logger", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Logger = void 0;
     class Logger {
-        constructor(module, logLevel = "error") {
-            this.level = "log";
-            this.module = module;
+        constructor(logLevel = "error", uselink = true) {
+            this.vscodeProject = "/Volumes/GregsGit/git/Playfield.ts/src/AgileFrontiers/Playfield";
             this.level = logLevel;
+            this.uselink = uselink;
+        }
+        source(depth = 0) {
+            let err = new Error("error");
+            let stack = err.stack.split("\n");
+            console.log(stack);
+            let source = stack[depth];
+            return source;
+        }
+        vscodeLink(lineno) {
+            let words = lineno.trim().split("/");
+            let link = words[words.length - 1];
+            words = link.split(":");
+            link = "vscode://file" + this.vscodeProject + "/" + words[0].replace(".js", ".ts") + ":" + words[1];
+            return link;
+        }
+        module() {
+            let source = this.source(4).trim();
+            let words = source.split(" ");
+            let module = words[1];
+            this.link = words[2];
+            if (module === "new") {
+                module = words[2] + ".new";
+                this.link = words[3];
+            }
+            else
+                return module;
         }
         setLogLevel(level) {
             this.level = level;
         }
+        format(level, module, ...args) {
+            let format = `${level}: ${module}: ${args.join(", ")}`;
+            if (this.uselink)
+                format += "\n" + " ".repeat(level.length + 2) + this.link;
+            return format;
+        }
         info(...args) {
             // most verbose
             if (["info"].includes(this.level))
-                console.log("INFO:", this.module + ": ", ...args);
+                console.log(this.format("INFO", this.module()), ...args);
         }
         log(...args) {
             // less verbose
             if (["info", "log"].includes(this.level))
-                console.log("LOG:", this.module + ": ", ...args);
+                console.log(this.format("LOG", this.module()), ...args);
         }
         warn(...args) {
             // less verbose
             if (["info", "log", "warn"].includes(this.level))
-                console.log("WARN:", this.module + ": ", ...args);
+                console.log(this.format("WARN", this.module()), ...args);
         }
         error(...args) {
             // always show errors
-            console.error("ERROR:", this.module + ": ", ...args);
+            console.error(this.format("ERROR", this.module(), ...args));
         }
     }
     exports.Logger = Logger;
@@ -101,13 +133,18 @@ define("Utils/Logger", ["require", "exports"], function (require, exports) {
 define("Utils/index", ["require", "exports", "Utils/Logger"], function (require, exports, Logger_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.snapTo = exports.random = exports.between = exports.Logger = void 0;
+    exports.snapTo = exports.random = exports.inclusive = exports.between = exports.Logger = void 0;
     Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return Logger_1.Logger; } });
     function between(a, b, c) {
-        let result = a <= b && b <= c;
+        let result = a < b && b < c;
         return result;
     }
     exports.between = between;
+    function inclusive(a, b, c) {
+        let result = a <= b && b <= c;
+        return result;
+    }
+    exports.inclusive = inclusive;
     function random(low, high) {
         let result = Math.random() * (high - low) + low;
         return result;
@@ -128,7 +165,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
     Utils = __importStar(Utils);
     class Gfx {
         constructor(ctx) {
-            this.logger = new Utils.Logger("Gfx", "log");
+            this.logger = new Utils.Logger("log");
             this.ctx = ctx;
             this.gparms = new GfxParms_1.GfxParms();
             this.ctx.fontKerning = "none";
@@ -389,7 +426,7 @@ define("Playfield/PlayfieldEventHandler", ["require", "exports", "Utils/index", 
         constructor(playfield, canvas) {
             super(playfield, canvas);
             this.SNAP = 10;
-            this.logger = new Utils.Logger("PlayfieldEventHandler", "log");
+            this.logger = new Utils.Logger("log");
             this._registerEventHandlers(playfield);
         }
         _registerEventHandlers(playfield) {
@@ -412,6 +449,7 @@ define("Playfield/PlayfieldEventHandler", ["require", "exports", "Utils/index", 
         }
         MouseDown(event, playfield, convas) {
             let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
+            this.logger.warn("MouseDown", obj);
             playfield.selectObj(obj);
             if (obj) {
                 obj.click(event.offsetX, event.offsetY);
@@ -439,7 +477,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/inde
             this.Base("_playfield");
             this.Rect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
             this.Tree(null);
-            this.logger = new Utils.Logger("Playfield", "info");
+            this.logger = new Utils.Logger("info");
             this.gfx = new Graphics_1.Gfx(this.ctx);
             this.selectedObj = null; // mouse object
             this.focusedObj = null; // keyboard object
@@ -562,7 +600,7 @@ define("Playfield/EventHandler", ["require", "exports", "Utils/index"], function
         constructor(playfield, obj) {
             this.playfield = playfield;
             this.obj = obj;
-            this.logger = new Utils.Logger("EventHandler", "info");
+            this.logger = new Utils.Logger("info");
         }
         handleEvent(event) {
             if (event.button !== undefined)
@@ -773,7 +811,7 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
             this.Tree(null);
             parent.add(this);
             this.playfield = parent.playfield;
-            this.logger = new Utils.Logger("Actor", "warn");
+            this.logger = new Utils.Logger("log");
             this.eventHandler = null;
         }
         X() {
@@ -806,9 +844,11 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
         }
         select() {
             this.isSelected(true);
+            this.logger.warn("Selected", this.name(), this.isSelected());
         }
         deselect() {
             this.isSelected(false);
+            this.logger.warn("Selected", this.name(), this.isSelected());
         }
         focus() {
             this.hasFocus = true;
@@ -825,7 +865,7 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
                 let obj = this._children[i];
                 let found = obj.inBounds(x, y);
                 if (found)
-                    return this;
+                    return found;
             }
             return null;
         }
@@ -937,8 +977,16 @@ define("Shapes/XBox", ["require", "exports", "Shapes/Box"], function (require, e
     exports.XBox = void 0;
     class XBox extends Box_1.Box {
         constructor(parent, name, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
-            super(parent, name, x, y, w, h, borderColor, fillColor);
+            super(parent, name, x, y, w, h);
             this.gparms.color = color;
+        }
+        select() {
+            super.select();
+            this.logger.log("selected", this.name(), this.isSelected());
+        }
+        deselect() {
+            super.deselect();
+            this.logger.log("deselected", this.name(), this.isSelected());
         }
         draw() {
             super.draw();
@@ -957,19 +1005,22 @@ define("Shapes/index", ["require", "exports", "Shapes/Box", "Shapes/XBox"], func
     Object.defineProperty(exports, "Box", { enumerable: true, get: function () { return Box_2.Box; } });
     Object.defineProperty(exports, "XBox", { enumerable: true, get: function () { return XBox_1.XBox; } });
 });
-define("Jed/XBoxItem", ["require", "exports", "Jed/Item", "Shapes/index"], function (require, exports, Item_2, Shapes_1) {
+define("Jed/XBoxItem", ["require", "exports", "Jed/Item", "Shapes/index", "Utils/index"], function (require, exports, Item_2, Shapes_1, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.XBoxItem = void 0;
+    Utils = __importStar(Utils);
     class XBoxItem extends Item_2.Item {
         constructor(parent, name, values, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
             super(parent, name, null, x, y, 0, 0);
             this._values = ["on", "off"];
             this.values(values);
             this.xbox = new Shapes_1.XBox(this, name + "-checkbox", x, y, w, h, borderColor, fillColor, color);
+            this.logger = new Utils.Logger("log");
         }
         click(x, y) {
             super.click(x, y);
+            this._isSelected = !this._isSelected;
             this.logger.log(this.value());
         }
         isChecked(checked) {
@@ -1002,9 +1053,16 @@ define("Jed/CheckBoxItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "
             this.labelItem = new LabelItem_1.LabelItem(this, name + "-label", label, 0, 0, ww, hh);
             this.xboxItem = new XBoxItem_1.XBoxItem(this, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
             this.values(values);
+            this.logger.log(this.w(), this.h());
+            this.w(0);
+            this.h(0);
+        }
+        click(x, y) {
+            super.click(x, y);
+            this.xboxItem.click(x, y);
         }
         isChecked(checked) {
-            return this.xboxItem.isChecked();
+            return this.xboxItem.isChecked(checked);
         }
         values(values) {
             if (values === undefined)
@@ -1028,7 +1086,7 @@ define("Jed/EditItemEventHandler", ["require", "exports", "Utils/index", "Playfi
     class EditItemEventHandler extends Playfield_4.EventHandler {
         constructor(editItem) {
             super(editItem.playfield, editItem);
-            this.logger = new Utils.Logger("EditItemEventHandler", "info");
+            this.logger = new Utils.Logger("info");
         }
         ArrowLeft(event, playfield, obj) {
             obj.cursorInc(-1);
@@ -1077,7 +1135,7 @@ define("Jed/EditItem", ["require", "exports", "Utils/index", "Jed/Item", "Jed/Ed
             this.left = 0;
             this.right = this.computeRight();
             this._setIntervalTimer();
-            this.logger = new Utils.Logger("EditItem", "none");
+            this.logger = new Utils.Logger("none");
         }
         _setIntervalTimer() {
             this.cursorOn = true;

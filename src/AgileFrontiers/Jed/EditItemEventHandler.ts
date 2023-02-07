@@ -5,7 +5,7 @@ import {Playfield, EventHandler} from "../Playfield";
 export class EditItemEventHandler extends EventHandler {
     constructor(editItem: EditItem) {
         super(editItem.playfield, editItem);
-        this.logger = new Utils.Logger("EditItemEventHandler", "info");
+        this.logger = new Utils.Logger("info");
     }
     ArrowLeft(event: any, playfield: Playfield, obj: EditItem) {
         obj.cursorInc(-1);

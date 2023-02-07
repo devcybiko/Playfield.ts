@@ -3,8 +3,16 @@ import { Box } from "./Box";
 
 export class XBox extends Box {
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
-        super(parent, name, x, y, w, h, borderColor, fillColor);
+        super(parent, name, x, y, w, h);
         this.gparms.color = color;
+    }
+    select() {
+        super.select();
+        this.logger.log("selected", this.name(), this.isSelected());
+    }
+    deselect() {
+        super.deselect();
+        this.logger.log("deselected", this.name(), this.isSelected());
     }
     draw() {
         super.draw();

@@ -23,7 +23,7 @@ export class EditItem extends Item {
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
-        this.logger = new Utils.Logger("EditItem", "none");
+        this.logger = new Utils.Logger("none");
     }
     _setIntervalTimer() {
         this.cursorOn = true;

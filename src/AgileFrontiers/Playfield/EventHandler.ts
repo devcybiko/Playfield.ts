@@ -49,7 +49,7 @@ export class EventHandler {
     constructor(playfield: Playfield, obj: any) {
         this.playfield = playfield;
         this.obj = obj;
-        this.logger = new Utils.Logger("EventHandler", "info");
+        this.logger = new Utils.Logger("info");
     }
     handleEvent(event: any) {
         if (event.button !== undefined) return this.handleMouseEvent(event);
