@@ -1,11 +1,11 @@
 import {Playfield, Actor, Draggable} from "../Playfield";
 
-export class JedItem extends Actor {
+export class Item extends Actor {
     public _value: string;
 
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w: number, h: number) {
         super(parent, name, x, y, w, h);
-        this.value(value);
+        this._value = value;
         this.draggable = new Draggable(this);
     }
     value(newValue?: string) {

@@ -1,7 +1,7 @@
-import {JedEditItem} from "./JedEditItem";
-import {JedEditItemEventHandler} from "./JedEditItemEventHandler";
-import {JedItem} from "./JedItem";
-import {JedLabelItem} from "./JedLabelItem";
-import {JedTextItem} from "./JedTextItem";
+export {CheckBoxItem} from "./CheckBoxItem";
+export {EditItem} from "./EditItem";
+export {EditItemEventHandler} from "./EditItemEventHandler";
+export {Item} from "./Item";
+export {LabelItem} from "./LabelItem";
+export {TextItem} from "./TextItem";
 
-export {JedEditItem, JedEditItemEventHandler, JedItem, JedLabelItem, JedTextItem}

@@ -78,17 +78,17 @@ define("Utils/Logger", ["require", "exports"], function (require, exports) {
         }
         info(...args) {
             // most verbose
-            if (["warn", "log", "info"].includes(this.level))
+            if (["info"].includes(this.level))
                 console.log("INFO:", this.module + ": ", ...args);
         }
         log(...args) {
             // less verbose
-            if (["warn", "log"].includes(this.level))
+            if (["info", "log"].includes(this.level))
                 console.log("LOG:", this.module + ": ", ...args);
         }
         warn(...args) {
             // less verbose
-            if (["warn"].includes(this.level))
+            if (["info", "log", "warn"].includes(this.level))
                 console.log("WARN:", this.module + ": ", ...args);
         }
         error(...args) {
@@ -128,7 +128,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
     Utils = __importStar(Utils);
     class Gfx {
         constructor(ctx) {
-            this.logger = new Utils.Logger("Gfx", "info");
+            this.logger = new Utils.Logger("Gfx", "log");
             this.ctx = ctx;
             this.gparms = new GfxParms_1.GfxParms();
             this.ctx.fontKerning = "none";
@@ -163,6 +163,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
             this.ellipse(x - r, y - r, r, r, gparms);
         }
         line(x0, y0, x1, y1, gparms = this.gparms) {
+            this.logger.info("line", x0, y0, x1, y1);
             this.ctx.beginPath();
             this.ctx.strokeStyle = gparms.color;
             this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
@@ -388,7 +389,7 @@ define("Playfield/PlayfieldEventHandler", ["require", "exports", "Utils/index", 
         constructor(playfield, canvas) {
             super(playfield, canvas);
             this.SNAP = 10;
-            this.logger = new Utils.Logger("PlayfieldEventHandler", "info");
+            this.logger = new Utils.Logger("PlayfieldEventHandler", "log");
             this._registerEventHandlers(playfield);
         }
         _registerEventHandlers(playfield) {
@@ -465,6 +466,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/inde
         add(obj) {
             super.add(obj);
             obj.playfield = this;
+            obj.gfx = this.gfx;
         }
         grabObj(obj, x, y, toFront) {
             if (obj && obj.draggable) {
@@ -574,7 +576,7 @@ define("Playfield/EventHandler", ["require", "exports", "Utils/index"], function
             this.logger.error("handleUnknownEvent:", event);
         }
         handleMouseEvent(event) {
-            this.logger.log("handleMouseEvent:", event);
+            this.logger.info("handleMouseEvent:", event);
             let playfield = this.playfield;
             if (!playfield)
                 return this.logger.error('ERROR: mousemove not associated with a playfield');
@@ -774,15 +776,21 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
             this.logger = new Utils.Logger("Actor", "warn");
             this.eventHandler = null;
         }
-        get X() {
+        X() {
             return this.x() + this.gparms.xOffset;
         }
-        get Y() {
+        Y() {
             return this.y() + this.gparms.yOffset;
+        }
+        isSelected(selected) {
+            if (selected !== undefined)
+                this._isSelected = selected;
+            return this._isSelected;
         }
         add(obj) {
             super.add(obj);
             obj.playfield = this.parent().playfield;
+            obj.gfx = this.parent().gfx;
         }
         move(x, y, w = this.w(), h = this.h()) {
             this.x(x);
@@ -797,10 +805,10 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
             this.h(this.h() + dh);
         }
         select() {
-            this.isSelected = true;
+            this.isSelected(true);
         }
         deselect() {
-            this.isSelected = false;
+            this.isSelected(false);
         }
         focus() {
             this.hasFocus = true;
@@ -822,7 +830,7 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
             return null;
         }
         click(x, y) {
-            this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
+            this.logger.log("CLICK! " + this.name() + ": " + x + "," + y);
         }
         keydown(key) {
             if (key === "ArrowUp")
@@ -853,66 +861,24 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
     }
     exports.Actor = Actor;
 });
-define("Playfield/RootEventHandler", ["require", "exports", "Utils/index", "Playfield/EventHandler"], function (require, exports, Utils, EventHandler_2) {
+define("Playfield/index", ["require", "exports", "Playfield/Actor", "Playfield/Draggable", "Playfield/EventHandler", "Playfield/Playfield", "Playfield/PlayfieldEventHandler"], function (require, exports, Actor_1, Draggable_1, EventHandler_2, Playfield_1, PlayfieldEventHandler_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.RootEventHandler = void 0;
-    Utils = __importStar(Utils);
-    class RootEventHandler extends EventHandler_2.EventHandler {
-        constructor(playfield, canvas) {
-            super(playfield, canvas);
-            this.SNAP = 10;
-            this.logger = new Utils.Logger("PlayfieldEventHandler", "info");
-            this._registerEventHandlers(playfield);
-        }
-        _registerEventHandlers(playfield) {
-            playfield.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
-            playfield.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
-            playfield.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
-            playfield.canvas.addEventListener('wheel', this.handleEvent.bind(this), false);
-            document.addEventListener("keydown", this.handleEvent.bind(this));
-        }
-        handleKeyboardEvent(event) {
-            if (this.playfield.focusedObj && this.playfield.focusedObj.eventHandler) {
-                this.playfield.focusedObj.eventHandler.handleEvent(event);
-            }
-        }
-        MouseMove(event, playfield, canvas) {
-            playfield.dragObj(event.offsetX, event.offsetY);
-        }
-        MouseUp(event, playfield, canvas) {
-            playfield.dropObj();
-        }
-        MouseDown(event, playfield, convas) {
-            let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-            playfield.selectObj(obj);
-            if (obj) {
-                obj.click(event.offsetX, event.offsetY);
-                playfield.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
-            }
-        }
-    }
-    exports.RootEventHandler = RootEventHandler;
-});
-define("Playfield/index", ["require", "exports", "Playfield/Actor", "Playfield/Draggable", "Playfield/EventHandler", "Playfield/Playfield", "Playfield/PlayfieldEventHandler", "Playfield/RootEventHandler"], function (require, exports, Actor_1, Draggable_1, EventHandler_3, Playfield_1, PlayfieldEventHandler_2, RootEventHandler_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.RootEventHandler = exports.PlayfieldEventHandler = exports.Playfield = exports.EventHandler = exports.Draggable = exports.Actor = void 0;
+    exports.PlayfieldEventHandler = exports.Playfield = exports.EventHandler = exports.Draggable = exports.Actor = void 0;
     Object.defineProperty(exports, "Actor", { enumerable: true, get: function () { return Actor_1.Actor; } });
     Object.defineProperty(exports, "Draggable", { enumerable: true, get: function () { return Draggable_1.Draggable; } });
-    Object.defineProperty(exports, "EventHandler", { enumerable: true, get: function () { return EventHandler_3.EventHandler; } });
+    Object.defineProperty(exports, "EventHandler", { enumerable: true, get: function () { return EventHandler_2.EventHandler; } });
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
     Object.defineProperty(exports, "PlayfieldEventHandler", { enumerable: true, get: function () { return PlayfieldEventHandler_2.PlayfieldEventHandler; } });
-    Object.defineProperty(exports, "RootEventHandler", { enumerable: true, get: function () { return RootEventHandler_1.RootEventHandler; } });
 });
-define("Jed/JedItem", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
+define("Jed/Item", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedItem = void 0;
-    class JedItem extends Playfield_2.Actor {
+    exports.Item = void 0;
+    class Item extends Playfield_2.Actor {
         constructor(parent, name, value, x, y, w, h) {
             super(parent, name, x, y, w, h);
-            this.value(value);
+            this._value = value;
             this.draggable = new Playfield_2.Draggable(this);
         }
         value(newValue) {
@@ -921,14 +887,145 @@ define("Jed/JedItem", ["require", "exports", "Playfield/index"], function (requi
             return this._value;
         }
     }
-    exports.JedItem = JedItem;
+    exports.Item = Item;
 });
-define("Jed/JedEditItemEventHandler", ["require", "exports", "Utils/index", "Playfield/index"], function (require, exports, Utils, Playfield_3) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item"], function (require, exports, Item_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedEditItemEventHandler = void 0;
+    exports.LabelItem = void 0;
+    class LabelItem extends Item_1.Item {
+        constructor(parent, name, value, x, y, w = 0, h = 0) {
+            super(parent, name, value, x, y, w, h);
+            this.gparms.fontFace = "serif";
+            this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
+            if (!w)
+                this.w(this.bb.w);
+            if (!h)
+                this.h(this.bb.h);
+        }
+        draw() {
+            let gfx = this.playfield.gfx;
+            // this.bb = gfx.boundingBox(this.value(), this.gparms);
+            // this.w = this.bb.w;
+            // this.h = this.bb.h;
+            gfx.text(this.value(), this.x(), this.y(), this.gparms);
+        }
+    }
+    exports.LabelItem = LabelItem;
+});
+define("Shapes/Box", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Box = void 0;
+    class Box extends Playfield_3.Actor {
+        constructor(parent, name, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white") {
+            super(parent, name, x, y, w, h);
+            this.gparms.borderColor = borderColor;
+            this.gparms.fillColor = fillColor;
+            this.draggable = new Playfield_3.Draggable(this);
+        }
+        draw() {
+            super.draw();
+            this.gfx.rect(this.x(), this.y(), this.w(), this.h(), this.gparms);
+        }
+    }
+    exports.Box = Box;
+});
+define("Shapes/XBox", ["require", "exports", "Shapes/Box"], function (require, exports, Box_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.XBox = void 0;
+    class XBox extends Box_1.Box {
+        constructor(parent, name, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
+            super(parent, name, x, y, w, h, borderColor, fillColor);
+            this.gparms.color = color;
+        }
+        draw() {
+            super.draw();
+            if (this.isSelected()) {
+                this.gfx.line(this.x(), this.y(), this.x() + this.w(), this.y() + this.h(), this.gparms);
+                this.gfx.line(this.x() + this.w(), this.y(), this.x(), this.y() + this.h(), this.gparms);
+            }
+        }
+    }
+    exports.XBox = XBox;
+});
+define("Shapes/index", ["require", "exports", "Shapes/Box", "Shapes/XBox"], function (require, exports, Box_2, XBox_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.XBox = exports.Box = void 0;
+    Object.defineProperty(exports, "Box", { enumerable: true, get: function () { return Box_2.Box; } });
+    Object.defineProperty(exports, "XBox", { enumerable: true, get: function () { return XBox_1.XBox; } });
+});
+define("Jed/XBoxItem", ["require", "exports", "Jed/Item", "Shapes/index"], function (require, exports, Item_2, Shapes_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.XBoxItem = void 0;
+    class XBoxItem extends Item_2.Item {
+        constructor(parent, name, values, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
+            super(parent, name, null, x, y, 0, 0);
+            this._values = ["on", "off"];
+            this.values(values);
+            this.xbox = new Shapes_1.XBox(this, name + "-checkbox", x, y, w, h, borderColor, fillColor, color);
+        }
+        click(x, y) {
+            super.click(x, y);
+            this.logger.log(this.value());
+        }
+        isChecked(checked) {
+            return this.isSelected();
+        }
+        values(values) {
+            if (values === undefined)
+                return this._values;
+            if (typeof values === "string")
+                this._values = [values, null];
+            else
+                this._values = values;
+        }
+        value(value) {
+            if (value !== undefined)
+                this._values = [value, null];
+            return this.isChecked() ? this._values[0] : this._values[1];
+        }
+    }
+    exports.XBoxItem = XBoxItem;
+});
+define("Jed/CheckBoxItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "Jed/XBoxItem"], function (require, exports, Item_3, LabelItem_1, XBoxItem_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CheckBoxItem = void 0;
+    class CheckBoxItem extends Item_3.Item {
+        constructor(parent, name, label, values, x, y, w = 0, h = 0, ww = 0, hh = 0, borderColor = "black", fillColor = "white", color = "black") {
+            super(parent, name, null, x, y, 0, 0);
+            this._values = ["on", "off"];
+            this.labelItem = new LabelItem_1.LabelItem(this, name + "-label", label, 0, 0, ww, hh);
+            this.xboxItem = new XBoxItem_1.XBoxItem(this, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
+            this.values(values);
+        }
+        isChecked(checked) {
+            return this.xboxItem.isChecked();
+        }
+        values(values) {
+            if (values === undefined)
+                return this._values;
+            if (typeof values === "string")
+                this._values = [values, null];
+            else
+                this._values = values;
+        }
+        value(value) {
+            return this.xboxItem.value(value);
+        }
+    }
+    exports.CheckBoxItem = CheckBoxItem;
+});
+define("Jed/EditItemEventHandler", ["require", "exports", "Utils/index", "Playfield/index"], function (require, exports, Utils, Playfield_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.EditItemEventHandler = void 0;
     Utils = __importStar(Utils);
-    class JedEditItemEventHandler extends Playfield_3.EventHandler {
+    class EditItemEventHandler extends Playfield_4.EventHandler {
         constructor(editItem) {
             super(editItem.playfield, editItem);
             this.logger = new Utils.Logger("EditItemEventHandler", "info");
@@ -956,14 +1053,14 @@ define("Jed/JedEditItemEventHandler", ["require", "exports", "Utils/index", "Pla
             obj.cursorInc(+1);
         }
     }
-    exports.JedEditItemEventHandler = JedEditItemEventHandler;
+    exports.EditItemEventHandler = EditItemEventHandler;
 });
-define("Jed/JedEditItem", ["require", "exports", "Utils/index", "Jed/JedItem", "Jed/JedEditItemEventHandler"], function (require, exports, Utils, JedItem_1, JedEditItemEventHandler_1) {
+define("Jed/EditItem", ["require", "exports", "Utils/index", "Jed/Item", "Jed/EditItemEventHandler"], function (require, exports, Utils, Item_4, EditItemEventHandler_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedEditItem = void 0;
+    exports.EditItem = void 0;
     Utils = __importStar(Utils);
-    class JedEditItem extends JedItem_1.JedItem {
+    class EditItem extends Item_4.Item {
         constructor(parent, name, value, x, y, w = 100, h = 24) {
             super(parent, name, value, x, y, w, h);
             this.cursor = 0;
@@ -974,7 +1071,7 @@ define("Jed/JedEditItem", ["require", "exports", "Utils/index", "Jed/JedItem", "
             this.nchars = 0;
             this.nchars2 = 0;
             this.gparms.fontFace = "monospace";
-            this.eventHandler = new JedEditItemEventHandler_1.JedEditItemEventHandler(this);
+            this.eventHandler = new EditItemEventHandler_1.EditItemEventHandler(this);
             this.nchars = Math.ceil(this.w() / this.playfield.gfx.boundingBox("m", this.gparms).w);
             this.nchars2 = Math.ceil(this.w() / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
             this.left = 0;
@@ -1071,42 +1168,18 @@ define("Jed/JedEditItem", ["require", "exports", "Utils/index", "Jed/JedItem", "
             this.logger.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
         }
     }
-    exports.JedEditItem = JedEditItem;
+    exports.EditItem = EditItem;
 });
-define("Jed/JedLabelItem", ["require", "exports", "Jed/JedItem"], function (require, exports, JedItem_2) {
+define("Jed/TextItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "Jed/EditItem"], function (require, exports, Item_5, LabelItem_2, EditItem_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedLabelItem = void 0;
-    class JedLabelItem extends JedItem_2.JedItem {
-        constructor(parent, name, value, x, y, w = 0, h = 0) {
-            super(parent, name, value, x, y, w, h);
-            this.gparms.fontFace = "serif";
-            this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
-            if (!w)
-                this.w(this.bb.w);
-            if (!h)
-                this.h(this.bb.h);
-        }
-        draw() {
-            let gfx = this.playfield.gfx;
-            // this.bb = gfx.boundingBox(this.value(), this.gparms);
-            // this.w = this.bb.w;
-            // this.h = this.bb.h;
-            gfx.text(this.value(), this.x(), this.y(), this.gparms);
-        }
-    }
-    exports.JedLabelItem = JedLabelItem;
-});
-define("Jed/JedTextItem", ["require", "exports", "Jed/JedItem", "Jed/JedLabelItem", "Jed/JedEditItem"], function (require, exports, JedItem_3, JedLabelItem_1, JedEditItem_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedTextItem = void 0;
-    class JedTextItem extends JedItem_3.JedItem {
+    exports.TextItem = void 0;
+    class TextItem extends Item_5.Item {
         constructor(parent, name, label, value, x, y, w = 0, h = 0, ww = 0, hh = 0) {
             super(parent, name, value, x, y, 0, 0);
             this.cursorOn = true;
-            this.labelItem = new JedLabelItem_1.JedLabelItem(this, name + "-label", label, 0, 0, ww, hh);
-            this.editItem = new JedEditItem_1.JedEditItem(this, name + "-editor", value, this.labelItem.w() + 2, 0, w, h);
+            this.labelItem = new LabelItem_2.LabelItem(this, name + "-label", label, 0, 0, ww, hh);
+            this.editItem = new EditItem_1.EditItem(this, name + "-editor", value, this.labelItem.w() + 2, 0, w, h);
         }
         click(x, y) {
             this.playfield.focusObj(this.editItem);
@@ -1115,30 +1188,32 @@ define("Jed/JedTextItem", ["require", "exports", "Jed/JedItem", "Jed/JedLabelIte
             return this.labelItem.bb;
         }
     }
-    exports.JedTextItem = JedTextItem;
+    exports.TextItem = TextItem;
 });
-define("Jed/index", ["require", "exports", "Jed/JedEditItem", "Jed/JedEditItemEventHandler", "Jed/JedItem", "Jed/JedLabelItem", "Jed/JedTextItem"], function (require, exports, JedEditItem_2, JedEditItemEventHandler_2, JedItem_4, JedLabelItem_2, JedTextItem_1) {
+define("Jed/index", ["require", "exports", "Jed/CheckBoxItem", "Jed/EditItem", "Jed/EditItemEventHandler", "Jed/Item", "Jed/LabelItem", "Jed/TextItem"], function (require, exports, CheckBoxItem_1, EditItem_2, EditItemEventHandler_2, Item_6, LabelItem_3, TextItem_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedTextItem = exports.JedLabelItem = exports.JedItem = exports.JedEditItemEventHandler = exports.JedEditItem = void 0;
-    Object.defineProperty(exports, "JedEditItem", { enumerable: true, get: function () { return JedEditItem_2.JedEditItem; } });
-    Object.defineProperty(exports, "JedEditItemEventHandler", { enumerable: true, get: function () { return JedEditItemEventHandler_2.JedEditItemEventHandler; } });
-    Object.defineProperty(exports, "JedItem", { enumerable: true, get: function () { return JedItem_4.JedItem; } });
-    Object.defineProperty(exports, "JedLabelItem", { enumerable: true, get: function () { return JedLabelItem_2.JedLabelItem; } });
-    Object.defineProperty(exports, "JedTextItem", { enumerable: true, get: function () { return JedTextItem_1.JedTextItem; } });
+    exports.TextItem = exports.LabelItem = exports.Item = exports.EditItemEventHandler = exports.EditItem = exports.CheckBoxItem = void 0;
+    Object.defineProperty(exports, "CheckBoxItem", { enumerable: true, get: function () { return CheckBoxItem_1.CheckBoxItem; } });
+    Object.defineProperty(exports, "EditItem", { enumerable: true, get: function () { return EditItem_2.EditItem; } });
+    Object.defineProperty(exports, "EditItemEventHandler", { enumerable: true, get: function () { return EditItemEventHandler_2.EditItemEventHandler; } });
+    Object.defineProperty(exports, "Item", { enumerable: true, get: function () { return Item_6.Item; } });
+    Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_3.LabelItem; } });
+    Object.defineProperty(exports, "TextItem", { enumerable: true, get: function () { return TextItem_1.TextItem; } });
 });
-define("Test/JedTest", ["require", "exports", "Jed/index", "Playfield/index"], function (require, exports, Jed, Playfield_4) {
+define("Test/JedTest", ["require", "exports", "Jed/index", "Playfield/index"], function (require, exports, Jed, Playfield_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.JedTest = void 0;
     Jed = __importStar(Jed);
     class JedTest {
         constructor() {
-            let playfield = new Playfield_4.Playfield("#my_canvas");
-            let TextItem1 = new Jed.JedTextItem(playfield, "first_name", "First Name:", "Gregory L. Smith", 10, 10, 75, 24);
+            let playfield = new Playfield_5.Playfield("#my_canvas");
+            let TextItem1 = new Jed.TextItem(playfield, "first_name", "First Name:", "Gregory L. Smith", 10, 10, 75, 24);
             let labelBB = TextItem1.labelBB();
-            let TextItem2 = new Jed.JedTextItem(playfield, "mi", "M.I.:", "Smith", 10, 40, 150, 24, labelBB.w, labelBB.h);
-            let TextItem3 = new Jed.JedTextItem(playfield, "last_name", "Last Name:", "Smith", 10, 70, 8, 24, labelBB.w, labelBB.h);
+            new Jed.TextItem(playfield, "mi", "M.I.:", "Smith", 10, 40, 150, 24, labelBB.w, labelBB.h);
+            new Jed.TextItem(playfield, "last_name", "Last Name:", "Smith", 10, 70, 8, 24, labelBB.w, labelBB.h);
+            new Jed.CheckBoxItem(playfield, "email_signup", "Email Signup: ", ["yes", "no"], 10, 100, 30, 30, 0, 0, "black", "white", "red");
             playfield.start();
         }
     }

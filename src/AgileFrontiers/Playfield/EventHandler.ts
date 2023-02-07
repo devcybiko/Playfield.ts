@@ -60,7 +60,7 @@ export class EventHandler {
         this.logger.error("handleUnknownEvent:", event);
     }
     handleMouseEvent(event: any) {
-        this.logger.log("handleMouseEvent:", event);
+        this.logger.info("handleMouseEvent:", event);
         let playfield = this.playfield;
         if (!playfield) return this.logger.error('ERROR: mousemove not associated with a playfield');
         if (event.type === "mousedown") {

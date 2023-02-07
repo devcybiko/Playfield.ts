@@ -10,15 +10,15 @@ export class Logger {
     }
     info(...args: any[]) {
       // most verbose
-      if (["warn", "log", "info"].includes(this.level)) console.log("INFO:", this.module + ": ", ...args);
+      if (["info"].includes(this.level)) console.log("INFO:", this.module + ": ", ...args);
     }
     log(...args: any[]) {
       // less verbose
-      if (["warn", "log"].includes(this.level)) console.log("LOG:", this.module + ": ", ...args);
+      if (["info", "log"].includes(this.level)) console.log("LOG:", this.module + ": ", ...args);
     }
     warn(...args: any[]) {
       // less verbose
-      if (["warn"].includes(this.level)) console.log("WARN:", this.module + ": ", ...args);
+      if (["info", "log", "warn"].includes(this.level)) console.log("WARN:", this.module + ": ", ...args);
     }
     error(...args: any[]) {
       // always show errors

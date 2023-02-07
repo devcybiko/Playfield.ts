@@ -23,7 +23,6 @@ export class Playfield extends Mixins.BaseRectTree {
     public playfield: Playfield; 
     public gparms = null as GfxParms;
 
-
     constructor(canvasId: string) {
         super();
         this.canvas = document.querySelector(canvasId);
@@ -51,9 +50,10 @@ export class Playfield extends Mixins.BaseRectTree {
         this.focusedObj = obj;
         if (obj !== null) obj.focus();
     }
-    add(obj: any) {
+    add(obj: Actor) {
         super.add(obj);
         obj.playfield = this;
+        obj.gfx = this.gfx;
     }
     grabObj(obj: Actor, x: number, y: number, toFront: boolean) {
         if (obj && obj.draggable) {

@@ -8,11 +8,12 @@ import {Playfield} from "./Playfield";
 export class Actor extends Mixins.BaseRectTree {
     public draggable: Draggable;
     public eventHandler: EventHandler;
-    public isSelected: boolean;
+    public _isSelected: boolean;
     public hasFocus: boolean;
     public logger: Utils.Logger;
     public playfield: Playfield;
     public gparms = new GfxParms();
+    public gfx: Gfx;
 
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w: number, h: number) {
         super();
@@ -24,15 +25,20 @@ export class Actor extends Mixins.BaseRectTree {
         this.logger = new Utils.Logger("Actor", "warn");
         this.eventHandler = null;
     }
-    get X(): number {
+    X(): number {
         return this.x() + this.gparms.xOffset;
     }
-    get Y(): number {
+    Y(): number {
         return this.y() + this.gparms.yOffset;
+    }
+    isSelected(selected? : boolean) {
+        if (selected !== undefined) this._isSelected = selected;
+        return this._isSelected;
     }
     add(obj: Actor) {
         super.add(obj);
         obj.playfield = this.parent().playfield;
+        obj.gfx = this.parent().gfx;
     }
     move(x: number, y: number, w = this.w(), h = this.h()): void {
         this.x(x);
@@ -47,10 +53,10 @@ export class Actor extends Mixins.BaseRectTree {
         this.h(this.h() + dh);
     }
     select() {
-        this.isSelected = true;
+        this.isSelected(true);
     }
     deselect() {
-        this.isSelected = false;
+        this.isSelected(false);
     }
     focus() {
         this.hasFocus = true;
@@ -71,7 +77,7 @@ export class Actor extends Mixins.BaseRectTree {
         return null;
     }
     click(x: number, y: number) {
-        this.logger.log("CLICK! " + this.name + ": " + x + "," + y);
+        this.logger.log("CLICK! " + this.name() + ": " + x + "," + y);
     }
     keydown(key: string) {
         if (key === "ArrowUp") this.y(this.y() - 10);

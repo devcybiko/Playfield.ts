@@ -1,19 +1,19 @@
 import * as Utils from "../Utils";
-import {JedEditItem} from "./JedEditItem";
+import {EditItem} from "./EditItem";
 import {Playfield, EventHandler} from "../Playfield";
 
-export class JedEditItemEventHandler extends EventHandler {
-    constructor(editItem: JedEditItem) {
+export class EditItemEventHandler extends EventHandler {
+    constructor(editItem: EditItem) {
         super(editItem.playfield, editItem);
         this.logger = new Utils.Logger("EditItemEventHandler", "info");
     }
-    ArrowLeft(event: any, playfield: Playfield, obj: JedEditItem) {
+    ArrowLeft(event: any, playfield: Playfield, obj: EditItem) {
         obj.cursorInc(-1);
     }
-    ArrowRight(event: any, playfield: Playfield, obj: JedEditItem) {
+    ArrowRight(event: any, playfield: Playfield, obj: EditItem) {
         obj.cursorInc(+1);
     }
-    Backspace(event: any, playfield: Playfield, obj: JedEditItem) {
+    Backspace(event: any, playfield: Playfield, obj: EditItem) {
         this.logger.log(obj.cursor, obj._value);
         if (obj.cursor > 0) {
             let c = obj.cursor;
@@ -24,7 +24,7 @@ export class JedEditItemEventHandler extends EventHandler {
             this.logger.log(left, right, obj.cursor, obj._value);
         }
     }
-    OrdinaryKey(event: any, playfield: Playfield, obj: JedEditItem) {
+    OrdinaryKey(event: any, playfield: Playfield, obj: EditItem) {
         let c = obj.cursor;
         obj.value(obj._value.substring(0, c) + event.key + obj._value.substring(c));
         obj.cursorInc(+1);

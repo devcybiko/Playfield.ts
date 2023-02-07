@@ -4,7 +4,7 @@ import * as Utils from "../Utils";
 export class Gfx {
     public ctx: CanvasRenderingContext2D;
     public gparms: GfxParms;
-    private logger = new Utils.Logger("Gfx", "info");
+    private logger = new Utils.Logger("Gfx", "log");
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
@@ -68,6 +68,7 @@ export class Gfx {
         y1: number,
         gparms = this.gparms
     ) {
+        this.logger.info("line", x0, y0, x1, y1);
         this.ctx.beginPath();
         this.ctx.strokeStyle = gparms.color;
         this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
