@@ -7,23 +7,19 @@ export class XBox extends Box {
         this.gparms.color = color;
     }
     select() {
-        super.select();
-        this.logger.log("selected", this.name(), this.isSelected());
     }
     deselect() {
-        super.deselect();
-        this.logger.log("deselected", this.name(), this.isSelected());
     }
     draw() {
         super.draw();
         if (this.isSelected()) {
             this.gfx.line(
-                this.x(), this.y(),
-                this.x() + this.w(), this.y() + this.h(),
+                this.x, this.y,
+                this.x + this.w, this.y + this.h,
                 this.gparms);
             this.gfx.line(
-                this.x()+this.w(), this.y(),
-                this.x(), this.y() + this.h(),
+                this.x+this.w, this.y,
+                this.x, this.y + this.h,
                 this.gparms);    
         }
     }

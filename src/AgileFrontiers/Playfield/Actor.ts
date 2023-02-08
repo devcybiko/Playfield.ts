@@ -1,12 +1,14 @@
 import * as Utils from "../Utils";
-import * as Mixins from "../Mixins";
+import {Named, Tree, Rect, Null} from "../Mixins";
 import {Gfx, GfxParms} from "../Graphics";
+import {Movable} from "./Movable";
 import {Draggable} from "./Draggable";
+import {Selectable} from "./Selectable";
 import {EventHandler} from "./EventHandler";
 import {Playfield} from "./Playfield";
 
-export class Actor extends Mixins.BaseRectTree {
-    public draggable: Draggable;
+const _Actor = Named(Tree(Rect(Movable(Draggable(Selectable(Null))))));
+export class Actor extends _Actor {
     public eventHandler: EventHandler;
     public _isSelected: boolean;
     public hasFocus: boolean;
@@ -17,19 +19,21 @@ export class Actor extends Mixins.BaseRectTree {
 
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w: number, h: number) {
         super();
-        this.Base(name);
+        this.Named(name);
         this.Rect(x, y, w, h);
         this.Tree(null);
+        this.Movable(x, y);
+        this.Dragabble();
         parent.add(this);
         this.playfield = parent.playfield;
         this.logger = new Utils.Logger("log");
         this.eventHandler = null;
     }
     X(): number {
-        return this.x() + this.gparms.xOffset;
+        return this.x + this.gparms.xOffset;
     }
     Y(): number {
-        return this.y() + this.gparms.yOffset;
+        return this.y + this.gparms.yOffset;
     }
     isSelected(selected? : boolean) {
         if (selected !== undefined) this._isSelected = selected;
@@ -39,22 +43,6 @@ export class Actor extends Mixins.BaseRectTree {
         super.add(obj);
         obj.playfield = this.parent().playfield;
         obj.gfx = this.parent().gfx;
-    }
-    move(x: number, y: number, w = this.w(), h = this.h()): void {
-        this.x(x);
-        this.y(y);
-        this.w(w);
-        this.h(h);
-    }
-    rmove(dx: number, dy: number, dw = 0, dh = 0): void {
-        this.x(this.x() + dx);
-        this.y(this.y() + dy);
-        this.w(this.w() + dw);
-        this.h(this.h() + dh);
-    }
-    select() {
-        this.isSelected(true);
-        this.logger.warn("Selected", this.name(), this.isSelected());
     }
     deselect() {
         this.isSelected(false);
@@ -68,8 +56,8 @@ export class Actor extends Mixins.BaseRectTree {
     }
     inBounds(x: number, y: number): Actor {
         let result =
-            Utils.between(this.gparms.xOffset + this.x(), x, this.gparms.xOffset + this.x() + this.w()) &&
-            Utils.between(this.gparms.yOffset + this.y(), y, this.gparms.yOffset + this.y() + this.h());
+            Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
+            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
         if (result) return this;
         for (let i = this._children.length - 1; i >= 0; i--) {
             let obj = this._children[i];
@@ -82,18 +70,18 @@ export class Actor extends Mixins.BaseRectTree {
         this.logger.log("CLICK! " + this.name() + ": " + x + "," + y);
     }
     keydown(key: string) {
-        if (key === "ArrowUp") this.y(this.y() - 10);
-        if (key === "ArrowDown") this.y(this.y() + 10);
-        if (key === "ArrowLeft") this.x(this.x() - 10);
-        if (key === "ArrowRight") this.x(this.x() + 10);
+        if (key === "ArrowUp") this.y = this.y - 10;
+        if (key === "ArrowDown") this.y = this.y + 10;
+        if (key === "ArrowLeft") this.x = this.x - 10;
+        if (key === "ArrowRight") this.x = this.x + 10;
     }
     go(): void {
     }
     recompute() {
         let parentGparms = this.parent().gparms;
         if (parentGparms) {
-            this.gparms.xOffset = this.parent().x() + parentGparms.xOffset;
-            this.gparms.yOffset = this.parent().y() + parentGparms.yOffset;
+            this.gparms.xOffset = this.parent().x + parentGparms.xOffset;
+            this.gparms.yOffset = this.parent().y + parentGparms.yOffset;
         }
     }
     drawAll(): void {
@@ -103,3 +91,4 @@ export class Actor extends Mixins.BaseRectTree {
     draw(): void {
     }
 }
+

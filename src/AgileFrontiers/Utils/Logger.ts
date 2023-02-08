@@ -13,7 +13,6 @@ export class Logger {
     source(depth = 0): string {
         let err = new Error("error");
         let stack = err.stack.split("\n");
-        console.log(stack);
         let source = stack[depth];
         return source;
     }

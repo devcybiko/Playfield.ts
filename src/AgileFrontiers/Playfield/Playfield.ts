@@ -1,13 +1,16 @@
 import * as Utils from "../Utils";
-import * as Mixins from "../Mixins";
+import {Named, Tree, Rect, Null} from "../Mixins";
+import {Movable} from "./Movable";
+import {Draggable} from "./Draggable";
+
 import {Gfx, GfxParms} from "../Graphics";
 
 import {Actor} from "./Actor";
 import {EventHandler} from "./EventHandler";
 import {PlayfieldEventHandler} from "./PlayfieldEventHandler";
 
-export class Playfield extends Mixins.BaseRectTree {
-    readonly SNAP = 10;
+const _Playfield = Named(Tree(Rect(Null)));
+export class Playfield extends _Playfield {
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D;
     public logger: Utils.Logger;
@@ -21,16 +24,16 @@ export class Playfield extends Mixins.BaseRectTree {
     public eventHandler: EventHandler;
     // Actor compatibility
     public playfield: Playfield; 
-    public gparms = null as GfxParms;
+    public gparms = new GfxParms();
 
     constructor(canvasId: string) {
         super();
         this.canvas = document.querySelector(canvasId);
         this.ctx = this.canvas.getContext("2d");
-        this.Base("_playfield");
+        this.Named("_playfield");
         this.Rect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
         this.Tree(null);
-        this.logger = new Utils.Logger("info");
+        this.logger = new Utils.Logger("log");
         this.gfx = new Gfx(this.ctx);
         this.selectedObj = null; // mouse object
         this.focusedObj = null; // keyboard object
@@ -56,26 +59,26 @@ export class Playfield extends Mixins.BaseRectTree {
         obj.gfx = this.gfx;
     }
     grabObj(obj: Actor, x: number, y: number, toFront: boolean) {
-        if (obj && obj.draggable) {
+        if (obj && obj.isDraggable) {
             this.dropObj();
             if (toFront) this.toFront(obj);
             else this.toBack(obj);
             this._dragObj = obj;
             this.grabX = x;
             this.grabY = y;
-            obj.draggable.grab();
+            obj.grab();
         }
     }
     dragObj(x: number, y: number) {
         if (this._dragObj) {
             let dx = x - this.grabX;
             let dy = y - this.grabY;
-            this.logger.log(dx, dy);
-            this._dragObj.draggable.drag(dx, dy);
+            this.logger.info(dx, dy);
+            this._dragObj.drag(dx, dy);
         }
     }
     dropObj() {
-        if (this._dragObj) this._dragObj.draggable.drop();
+        if (this._dragObj) this._dragObj.drop();
         this._dragObj = null;
     }
     recompute() {
@@ -124,10 +127,10 @@ export class Playfield extends Mixins.BaseRectTree {
         let results = [];
         for (let obj of this._children) {
             if (theObj === obj) continue;
-            if (obj.inBounds(theObj.x(), theObj.y()) ||
-                obj.inBounds(theObj.x() + theObj.w(), theObj.y()) ||
-                obj.inBounds(theObj.x(), theObj.y() + theObj.h()) ||
-                obj.inBounds(theObj.x() + theObj.w(), theObj.y() + theObj.h()))
+            if (obj.inBounds(theObj.x, theObj.y) ||
+                obj.inBounds(theObj.x + theObj.w, theObj.y) ||
+                obj.inBounds(theObj.x, theObj.y + theObj.h) ||
+                obj.inBounds(theObj.x + theObj.w, theObj.y + theObj.h))
                 results.push(obj);
         }
         return results;

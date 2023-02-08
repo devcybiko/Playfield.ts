@@ -5,10 +5,9 @@ export class Box extends Actor {
         super(parent, name, x, y, w, h);
         this.gparms.borderColor = borderColor;
         this.gparms.fillColor = fillColor;
-        this.draggable = new Draggable(this);
     }
     draw() {
         super.draw();
-        this.gfx.rect(this.x(), this.y(), this.w(), this.h(), this.gparms);
+        this.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
 }

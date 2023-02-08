@@ -1,6 +1,6 @@
-import {Constructor} from "./Constructor";
+import {Mixin} from "./Mixin";
 
-export function Rect<TBase extends Constructor>(_base: TBase) {
+export function Rect<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         // Mixins may not declare private/protected properties
         // however, you can use ES2020 private fields
@@ -9,22 +9,31 @@ export function Rect<TBase extends Constructor>(_base: TBase) {
         _w = 0;
         _h = 0;
 
-        public x(xx?: number): number {
-            if (xx !== undefined) this._x = xx;
+        get x() {
             return this._x;
         }
-        public y(yy?: number): number {
-            if (yy !== undefined) this._y = yy;
+        set x(n: number) {
+            this._x = n;
+        }
+        get y() {
             return this._y;
         }
-        public w(ww?: number): number {
-            if (ww !== undefined) this._w = ww;
+        set y(n: number) {
+            this._y = n;
+        }
+        get w() {
             return this._w;
         }
-        public h(hh?: number): number {
-            if (hh !== undefined) this._h = hh;
+        set w(n: number) {
+            this._w = n;
+        }
+        get h() {
             return this._h;
         }
+        set h(n: number) {
+            this._h = n;
+        }
+
         public Rect(x: number, y: number, w: number, h: number) {
             this._x = x;
             this._y = y;

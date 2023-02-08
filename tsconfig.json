@@ -13,5 +13,5 @@
     },
     "lib": ["es2016", "dom"]
   },
-  "include": ["./src/**/*", "src/AgileFrontiers/Mixins/Base.ts", "Main.js"]
+  "include": ["./src/**/*", "src/AgileFrontiers/Mixins/Named.ts", "Main.js"]
 }

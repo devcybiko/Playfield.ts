@@ -18,8 +18,8 @@ export class EditItem extends Item {
         super(parent, name, value, x, y, w, h);
         this.gparms.fontFace = "monospace";
         this.eventHandler = new EditItemEventHandler(this);
-        this.nchars = Math.ceil(this.w() / this.playfield.gfx.boundingBox("m", this.gparms).w);
-        this.nchars2 = Math.ceil(this.w() / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
+        this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+        this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
@@ -43,11 +43,11 @@ export class EditItem extends Item {
         let valueBB = gfx.boundingBox(this.value().substring(this.left, this.cursor), this.gparms);
         let dw = valueBB.w;
         if (dw <= 0) dw = 1;
-        else if (dw >= this.w()) dw = this.w() - 1;
-        let x0 = this.x() + dw;
-        if (x0 <= this.x()) x0 = this.x() + 1;
+        else if (dw >= this.w) dw = this.w - 1;
+        let x0 = this.x + dw;
+        if (x0 <= this.x) x0 = this.x + 1;
         let x1 = x0;
-        let y0 = this.y();
+        let y0 = this.y;
         let y1 = y0 + valueBB.h;
         gfx.line(x0, y0, x1, y1, this.gparms);
         gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
@@ -56,8 +56,8 @@ export class EditItem extends Item {
         let gfx = this.playfield.gfx;
         if (this.hasFocus) this.gparms.color = "red";
         else this.gparms.color = "black";
-        gfx.clipRect(this.x(), this.y(), this.w(), this.h(), this.gparms)
-        gfx.textRect(this.value().substring(this.left), this.x(), this.y(), this.w(), this.h(), this.gparms);
+        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms)
+        gfx.textRect(this.value().substring(this.left), this.x, this.y, this.w, this.h, this.gparms);
         this.drawCursor();
         gfx.restore();
     }
@@ -67,7 +67,7 @@ export class EditItem extends Item {
         // for(let i=this.left; i<=this._value.length; i++) {
         //     let bb = gfx.boundingBox(this._value.substring(this.left, i));
         //     right = i;
-        //     if (bb.w > this.w()) break;
+        //     if (bb.w > this.w) break;
         // }
         let right = this.left + this.nchars2 * 2;
         if (right >= this._value.length) right = this._value.length - 1;
@@ -78,7 +78,7 @@ export class EditItem extends Item {
         // let left = this.right;
         // for(let i=this.right; i>=0; i--) {
         //     let bb = gfx.boundingBox(this._value.substring(i, this.right));
-        //     if (bb.w > this.w()) break;
+        //     if (bb.w > this.w) break;
         //     left = i;
         // }
         let left = this.right - this.nchars2 * 2 + 1;

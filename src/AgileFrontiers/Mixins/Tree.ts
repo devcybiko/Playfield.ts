@@ -1,6 +1,6 @@
-import {Constructor} from "./Constructor";
+import {Mixin} from "./Mixin";
 
-export function Tree<TBase extends Constructor>(_base: TBase) {
+export function Tree<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         _parent = null as any;
         _children = Array<any>();

@@ -10,12 +10,12 @@ export class CheckBoxItem extends Item {
 
     constructor(parent: Playfield | Actor, name: string, label: string, values: string | string[], x: number, y: number, w = 0, h = 0, ww = 0, hh = 0, borderColor = "black", fillColor = "white", color = "black") {
         super(parent, name, null, x, y, 0, 0);
-        this.labelItem = new LabelItem(this, name + "-label", label, 0, 0, ww, hh);
-        this.xboxItem = new XBoxItem(this, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
+        this.labelItem = new LabelItem(parent, name + "-label", label, 0, 0, ww, hh);
+        this.xboxItem = new XBoxItem(parent, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
         this.values(values);
-        this.logger.log(this.w(), this.h())
-        this.w(0);
-        this.h(0)
+        this.logger.log(this.w, this.h)
+        this.w = 0;
+        this.h = 0;
     }
     click(x: number, y: number) {
         super.click(x, y);
