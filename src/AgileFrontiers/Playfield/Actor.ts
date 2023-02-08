@@ -1,12 +1,12 @@
 import {Loggable, between} from "../Utils";
 import {Named, Tree, Rect, Base} from "../Mixins";
 import {Focusable, Movable, Drawable, Draggable, Selectable, Clickable, Playable} from "./Capabilities";
-import {EventHandler} from "./EventHandler";
+import {EventDispatcher} from "./EventHandlers/EventDispatcher";
 import {Playfield} from "./Playfield";
 
 const ActorBase = Focusable(Playable(Clickable(Drawable(Loggable(Named(Tree(Rect(Movable(Draggable(Selectable(Base)))))))))));
 export class Actor extends ActorBase {
-    public eventHandler: EventHandler;
+    public eventHandler: EventDispatcher;
 
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w: number, h: number) {
         super();

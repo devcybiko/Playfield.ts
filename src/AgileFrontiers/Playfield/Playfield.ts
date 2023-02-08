@@ -1,14 +1,14 @@
 import { Loggable } from "../Utils";
 import { Named, Tree, iTree, Rect, Base } from "../Mixins";
 import { Actor } from "./Actor";
-import { EventHandler } from "./EventHandler";
+import { CanvasEventHandler } from "./EventHandlers/CanvasEventHandler";
 import { PlayfieldEventHandler } from "./PlayfieldEventHandler";
 import { iFocusable, iDraggable, iSelectable, Drawable, iDrawable, Playable, iPlayable } from "./Capabilities";
-import { Gfx, GfxParms} from "../Graphics";
+import { MouseEnabled, iMouseEnabled} from "./EventHandlers/Capabilities";
 
 interface iAddable extends iPlayable, iDrawable, iTree {}
 
-const PlayfieldBase = Playable(Loggable(Drawable(Named(Tree(Rect(Base))))));
+const PlayfieldBase = MouseEnabled(Playable(Loggable(Drawable(Named(Tree(Rect(Base)))))));
 export class Playfield extends PlayfieldBase {
     private _canvas: HTMLCanvasElement;
     public _ctx: CanvasRenderingContext2D;
@@ -18,7 +18,7 @@ export class Playfield extends PlayfieldBase {
     private _grabX = 0;
     private _grabY = 0;
     private _body: any;
-    private _eventHandler: EventHandler;
+    private _eventHandler: CanvasEventHandler;
 
     constructor(canvasId: string) {
         super();
@@ -30,9 +30,10 @@ export class Playfield extends PlayfieldBase {
         this.Loggable();
         this.Drawable(this._ctx)
         this.Playable(this);
+        this.MouseEnabled();
         this._selectedObj = null;
         this._focusedObj = null;
-        this._eventHandler = new PlayfieldEventHandler(this, this._canvas);
+        this._eventHandler = new CanvasEventHandler(this._canvas, this);
         this._dragObj = null;
         this._body = document.querySelector('body');
         this._body.playfield = this;
@@ -141,4 +142,20 @@ export class Playfield extends PlayfieldBase {
         }
         return results;
     }
+    MouseMove(event: any, playfield: Playfield, canvas: any) {
+        playfield.dragObj(event.offsetX, event.offsetY);
+    }
+    MouseUp(event: any, playfield: Playfield, canvas: any) {
+        playfield.dropObj();
+    }
+    MouseDown(event: any, playfield: Playfield, convas: any) {
+        let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
+        this.logger.log("MouseDown", obj);
+        playfield.selectObj(obj);
+        if (obj) {
+            obj.click(event.offsetX, event.offsetY);
+            playfield.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
+        }
+    }
+
 }
