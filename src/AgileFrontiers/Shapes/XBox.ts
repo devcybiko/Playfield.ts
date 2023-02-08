@@ -12,7 +12,7 @@ export class XBox extends Box {
     }
     draw() {
         super.draw();
-        if (this.isSelected()) {
+        if (this.isSelected) {
             this.gfx.line(
                 this.x, this.y,
                 this.x + this.w, this.y + this.h,

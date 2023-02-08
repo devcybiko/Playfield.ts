@@ -23,7 +23,6 @@ export class EditItem extends Item {
         this.left = 0;
         this.right = this.computeRight();
         this._setIntervalTimer();
-        this.logger = new Utils.Logger("none");
     }
     _setIntervalTimer() {
         this.cursorOn = true;
@@ -96,6 +95,6 @@ export class EditItem extends Item {
         this.right = this.left + this.nchars;
         if (this.right > this._value.length) this.right = this._value.length;
         if (this.right === this._value.length) this.left = Math.max(this.right - this.nchars + 1, 0);
-        this.logger.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
+        this.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
     }
 }

@@ -1,6 +1,8 @@
-import * as Utils from "../Utils";
-import { Mixin, Null } from "../Mixins";
+import * as Utils from "../../Utils";
+import { Mixin, Base } from "../../Mixins";
 
+export const MovableBase = Movable(Base);
+export abstract class MovableClass extends MovableBase {};
 export function Movable<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         _x = 0;
@@ -31,10 +33,4 @@ export function Movable<TBase extends Mixin>(_base: TBase) {
             this.y += dy;
         }
     };
-}
-
-export const __Movable = Movable(Null);
-export class _Movable extends __Movable {
-    costructor() {
-    }
 }

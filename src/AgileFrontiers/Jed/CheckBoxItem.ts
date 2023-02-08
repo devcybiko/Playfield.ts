@@ -13,7 +13,8 @@ export class CheckBoxItem extends Item {
         this.labelItem = new LabelItem(parent, name + "-label", label, 0, 0, ww, hh);
         this.xboxItem = new XBoxItem(parent, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
         this.values(values);
-        this.logger.log(this.w, this.h)
+        console.log("Hello", this);
+        this.log(this.w, this.h)
         this.w = 0;
         this.h = 0;
     }

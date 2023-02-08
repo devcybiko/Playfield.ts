@@ -1,5 +1,17 @@
 import {Mixin} from "./Mixin";
+import {Base} from "./Base";
 
+export interface iTree {
+    Tree(parent: any): void ;
+    parent(): any ;
+    add(obj: any): void;
+    dfs(visit: (obj: any, ctx: any) => any, ctx?: any): any;
+    toFront(obj: any): void ;
+    toBack(obj: any): void ;
+}
+
+export const TreeBase = Tree(Base);
+export abstract class TreeClass extends TreeBase { };
 export function Tree<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         _parent = null as any;

@@ -132,7 +132,7 @@ export class EventHandler {
         else return this.defaultKey(event, this.playfield, this.obj);
     }
     SpecialKey(event: any, playfield: Playfield, obj: any) {
-        this.logger.warn("SpecialKey:", event);
+        this.logger.log("SpecialKey:", event);
         let key = event.key;
         if (key === "ArrowUp") return this.ArrowUp(event, this.playfield, this.obj);
         else if (key === "ArrowDown") return this.ArrowDown(event, this.playfield, this.obj);

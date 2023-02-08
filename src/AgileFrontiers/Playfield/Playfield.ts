@@ -1,79 +1,85 @@
-import * as Utils from "../Utils";
-import {Named, Tree, Rect, Null} from "../Mixins";
-import {Movable} from "./Movable";
-import {Draggable} from "./Draggable";
+import { Loggable } from "../Utils";
+import { Named, Tree, iTree, Rect, Base } from "../Mixins";
+import { Actor } from "./Actor";
+import { EventHandler } from "./EventHandler";
+import { PlayfieldEventHandler } from "./PlayfieldEventHandler";
+import { iFocusable, iDraggable, iSelectable, Drawable, iDrawable, Playable, iPlayable } from "./Capabilities";
+import { Gfx, GfxParms} from "../Graphics";
 
-import {Gfx, GfxParms} from "../Graphics";
+interface iAddable extends iPlayable, iDrawable, iTree {}
 
-import {Actor} from "./Actor";
-import {EventHandler} from "./EventHandler";
-import {PlayfieldEventHandler} from "./PlayfieldEventHandler";
-
-const _Playfield = Named(Tree(Rect(Null)));
-export class Playfield extends _Playfield {
-    public canvas: HTMLCanvasElement;
-    public ctx: CanvasRenderingContext2D;
-    public logger: Utils.Logger;
-    public gfx!: Gfx;
-    public selectedObj: Actor; // mouse object
-    public focusedObj: Actor; // keyboard object
-    public _dragObj: Actor;
-    public grabX = 0;
-    public grabY = 0;
-    public body: any;
-    public eventHandler: EventHandler;
-    // Actor compatibility
-    public playfield: Playfield; 
-    public gparms = new GfxParms();
+const PlayfieldBase = Playable(Loggable(Drawable(Named(Tree(Rect(Base))))));
+export class Playfield extends PlayfieldBase {
+    private _canvas: HTMLCanvasElement;
+    public _ctx: CanvasRenderingContext2D;
+    private _selectedObj: iSelectable; // mouse object
+    private _focusedObj: iFocusable; // keyboard object
+    private _dragObj: iDraggable;
+    private _grabX = 0;
+    private _grabY = 0;
+    private _body: any;
+    private _eventHandler: EventHandler;
 
     constructor(canvasId: string) {
         super();
-        this.canvas = document.querySelector(canvasId);
-        this.ctx = this.canvas.getContext("2d");
+        this._canvas = document.querySelector(canvasId);
+        this._ctx = this._canvas.getContext("2d");
         this.Named("_playfield");
-        this.Rect(0, 0, this.ctx.canvas.clientWidth, this.ctx.canvas.clientHeight);
+        this.Rect(0, 0, this._ctx.canvas.clientWidth, this._ctx.canvas.clientHeight);
         this.Tree(null);
-        this.logger = new Utils.Logger("log");
-        this.gfx = new Gfx(this.ctx);
-        this.selectedObj = null; // mouse object
-        this.focusedObj = null; // keyboard object
-        this.eventHandler = new PlayfieldEventHandler(this, this.canvas);
+        this.Loggable();
+        this.Drawable(this._ctx)
+        this.Playable(this);
+        this._selectedObj = null;
+        this._focusedObj = null;
+        this._eventHandler = new PlayfieldEventHandler(this, this._canvas);
         this._dragObj = null;
-        this.body = document.querySelector('body');
-        this.body.playfield = this;
-        this.playfield = this;
+        this._body = document.querySelector('body');
+        this._body.playfield = this;
     }
-    selectObj(obj: Actor) {
-        if (this.selectedObj) this.selectedObj.deselect();
-        this.selectedObj = obj;
+    get selectedObj() {
+        return this._selectedObj
+    }
+    set selectedObj(obj: iSelectable) {
+        this._selectedObj = obj;
+    }
+    get focusedObj() :iFocusable {
+        return this._focusedObj
+    }
+    set focusedObj(obj: iFocusable) {
+        this._focusedObj = obj;
+    }
+    selectObj(obj: iSelectable) {
+        if (this._selectedObj) this._selectedObj.deselect();
+        this._selectedObj = obj;
         if (obj !== null) obj.select();
     }
-    focusObj(obj: Actor) {
-        if (this.focusedObj) this.focusedObj.defocus();
+    focusObj(obj: iFocusable) {
+        if (this._focusedObj) this._focusedObj.defocus();
         this.focusedObj = obj;
         if (obj !== null) obj.focus();
     }
-    add(obj: Actor) {
+    add(obj: iAddable) {
         super.add(obj);
         obj.playfield = this;
         obj.gfx = this.gfx;
     }
-    grabObj(obj: Actor, x: number, y: number, toFront: boolean) {
+    grabObj(obj: iDraggable, x: number, y: number, toFront: boolean) {
         if (obj && obj.isDraggable) {
             this.dropObj();
             if (toFront) this.toFront(obj);
             else this.toBack(obj);
             this._dragObj = obj;
-            this.grabX = x;
-            this.grabY = y;
+            this._grabX = x;
+            this._grabY = y;
             obj.grab();
         }
     }
     dragObj(x: number, y: number) {
         if (this._dragObj) {
-            let dx = x - this.grabX;
-            let dy = y - this.grabY;
-            this.logger.info(dx, dy);
+            let dx = x - this._grabX;
+            let dy = y - this._grabY;
+            this.info(dx, dy);
             this._dragObj.drag(dx, dy);
         }
     }
@@ -85,7 +91,7 @@ export class Playfield extends _Playfield {
         //for Actor compatibility
     }
     draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
         // for partial actor compatibility
     }
     drawObj(obj: Actor) {
@@ -107,10 +113,10 @@ export class Playfield extends _Playfield {
     handleKeyDown(event: any) {
         let playfield = event.srcElement.playfield as Playfield;
         if (!playfield)
-            return this.logger.error(
+            return this.error(
                 "ERROR: keydown not associated with a playfield"
             );
-        if (playfield.selectedObj) playfield.selectedObj.keydown(event.key);
+        if (playfield._selectedObj) playfield._selectedObj.any.keydown(event.key);
     }
     timer() {
         this.goAll();

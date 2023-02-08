@@ -13,15 +13,14 @@ export class XBoxItem extends Item {
         super(parent, name, null, x, y, 0, 0);
         this.values(values);
         this.xbox = new XBox(parent, name, x, y, w, h, borderColor, fillColor, color);
-        this.logger = new Utils.Logger("log");
     }
     click(x: number, y: number) {
         super.click(x, y);
         this._isChecked = !this._isChecked;
-        this.logger.log(this.value());
+        this.log(this.value());
     }
     isChecked(checked?: boolean) {
-        return this.isSelected();
+        return this.isSelected;
     }
     values(values?: string | string[]): string[]{
         if (values === undefined) return this._values;

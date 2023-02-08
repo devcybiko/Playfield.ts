@@ -1,21 +1,12 @@
-import * as Utils from "../Utils";
-import {Named, Tree, Rect, Null} from "../Mixins";
-import {Gfx, GfxParms} from "../Graphics";
-import {Movable} from "./Movable";
-import {Draggable} from "./Draggable";
-import {Selectable} from "./Selectable";
+import {Loggable, between} from "../Utils";
+import {Named, Tree, Rect, Base} from "../Mixins";
+import {Focusable, Movable, Drawable, Draggable, Selectable, Clickable, Playable} from "./Capabilities";
 import {EventHandler} from "./EventHandler";
 import {Playfield} from "./Playfield";
 
-const _Actor = Named(Tree(Rect(Movable(Draggable(Selectable(Null))))));
-export class Actor extends _Actor {
+const ActorBase = Focusable(Playable(Clickable(Drawable(Loggable(Named(Tree(Rect(Movable(Draggable(Selectable(Base)))))))))));
+export class Actor extends ActorBase {
     public eventHandler: EventHandler;
-    public _isSelected: boolean;
-    public hasFocus: boolean;
-    public logger: Utils.Logger;
-    public playfield: Playfield;
-    public gparms = new GfxParms();
-    public gfx: Gfx;
 
     constructor(parent: Playfield | Actor, name: string, x: number, y: number, w: number, h: number) {
         super();
@@ -24,10 +15,13 @@ export class Actor extends _Actor {
         this.Tree(null);
         this.Movable(x, y);
         this.Dragabble();
-        parent.add(this);
-        this.playfield = parent.playfield;
-        this.logger = new Utils.Logger("log");
+        this.Selectable();
+        this.Focusable();
+        this.Loggable();
+        this.Playable(parent.playfield);
         this.eventHandler = null;
+        this.Drawable(this.playfield._ctx);
+        parent.add(this);
     }
     X(): number {
         return this.x + this.gparms.xOffset;
@@ -35,29 +29,10 @@ export class Actor extends _Actor {
     Y(): number {
         return this.y + this.gparms.yOffset;
     }
-    isSelected(selected? : boolean) {
-        if (selected !== undefined) this._isSelected = selected;
-        return this._isSelected;
-    }
-    add(obj: Actor) {
-        super.add(obj);
-        obj.playfield = this.parent().playfield;
-        obj.gfx = this.parent().gfx;
-    }
-    deselect() {
-        this.isSelected(false);
-        this.logger.warn("Selected", this.name(), this.isSelected());
-    }
-    focus() {
-        this.hasFocus = true;
-    }
-    defocus() {
-        this.hasFocus = false;
-    }
     inBounds(x: number, y: number): Actor {
         let result =
-            Utils.between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
-            Utils.between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
+            between(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
+            between(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
         if (result) return this;
         for (let i = this._children.length - 1; i >= 0; i--) {
             let obj = this._children[i];
@@ -65,9 +40,6 @@ export class Actor extends _Actor {
             if (found) return found;
         }
         return null;
-    }
-    click(x: number, y: number) {
-        this.logger.log("CLICK! " + this.name() + ": " + x + "," + y);
     }
     keydown(key: string) {
         if (key === "ArrowUp") this.y = this.y - 10;

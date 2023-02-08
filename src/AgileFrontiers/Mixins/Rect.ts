@@ -1,5 +1,20 @@
-import {Mixin} from "./Mixin";
+import { Base } from "./Base";
+import { Mixin } from "./Mixin";
 
+export interface iRect {
+    Rect(x: number, y: number, w: number, h: number): void;
+    get x(): number;
+    set x(n: number);
+    get y(): number;
+    set y(n: number);
+    get w(): number;
+    set w(n: number);
+    get h(): number;
+    set h(n: number);
+}    
+
+export const RectBase = Rect(Base);
+export abstract class RectClass extends RectBase { };
 export function Rect<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         // Mixins may not declare private/protected properties

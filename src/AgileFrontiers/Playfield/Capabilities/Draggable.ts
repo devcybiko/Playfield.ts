@@ -1,18 +1,28 @@
-import * as Utils from "../Utils";
-import { Mixin } from "../Mixins";
-import { _Movable } from "./Movable";
+import * as Utils from "../../Utils";
+import { Mixin, Base, iBase } from "../../Mixins";
+import { MovableClass } from "./Movable";
 
+export interface iDraggable extends iBase {
+    Dragabble(snap: number): void;
+    get isDraggable(): boolean;
+    set isDraggable(b: boolean);
+    drag(dx: number, dy: number): void;
+    grab(): void;
+    drop(): void;
+}
+
+export const DraggleBase = Draggable(Base);
+export abstract class DraggableClass extends DraggleBase {};
 export function Draggable<TBase extends Mixin>(_base: TBase) {
     return class extends _base {
         _origX = 0; // original x
         _origY = 0; // original y
         _snap = 10;
         _isDraggable = true;
-        _movable: _Movable;
+        any: MovableClass;
 
         Dragabble(snap=10) {
             this._snap = snap;
-            this._movable = this as unknown as _Movable;
         }
         get isDraggable() {
             return this._isDraggable;
@@ -23,11 +33,11 @@ export function Draggable<TBase extends Mixin>(_base: TBase) {
         drag(dx: number, dy: number) {
             let newX = Utils.snapTo(this._origX + dx, this._snap);
             let newY = Utils.snapTo(this._origY + dy, this._snap);
-            this._movable.move(newX, newY);
+            this.any.move(newX, newY);
         }
         grab() {
-            this._origX = this._movable.x;
-            this._origY = this._movable.y;
+            this._origX = this.any.x;
+            this._origY = this.any.y;
         }
         drop() {
         }
