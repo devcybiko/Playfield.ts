@@ -776,26 +776,26 @@ define("Playfield/EventHandlers/EventDispatcher", ["require", "exports", "Utils/
 - handleKeyboardEvent
 - keydown:
 - SpecialKey (Shift, Meta, Alt, Control)
-    - ArrowUp
-    - ArrowDown
-    - ArrowRight
-    - ArrowLeft
-    - Meta
-    - Shift
-    - Alt
-    - Control
-    - Backspace
-    - FunctionKey
-    - defaultKey
+- ArrowUp
+- ArrowDown
+- ArrowRight
+- ArrowLeft
+- Meta
+- Shift
+- Alt
+- Control
+- Backspace
+- FunctionKey
+- defaultKey
 - ControlKey (Control-xxx)
 - MetaKey (Meta-xxx)
 - AltKey (Alt-xxx)
 - OrdinaryKey (a-z, A-Z, etc...)
-    - UpperCase
-    - LowerCase
-    - Digit
-    - Punctuation
-    - defaultKey
+- UpperCase
+- LowerCase
+- Digit
+- Punctuation
+- defaultKey
 - defaultKey (any others)
 - defaultKey (keyup, etc...)
 - handleUnknownEvent
@@ -808,7 +808,6 @@ define("Playfield/EventHandlers/CanvasEventHandler", ["require", "exports", "Uti
     class CanvasEventHandler {
         constructor(canvas, obj) {
             this._logger = new Utils_2.Logger("warn");
-            this._obj = obj;
             this._eventDispatcher = new EventDispatcher_1.EventDispatcher(obj);
             this._registerEventHandlers(canvas);
         }
@@ -822,47 +821,6 @@ define("Playfield/EventHandlers/CanvasEventHandler", ["require", "exports", "Uti
         }
     }
     exports.CanvasEventHandler = CanvasEventHandler;
-});
-define("Playfield/PlayfieldEventHandler", ["require", "exports", "Utils/index", "Playfield/EventHandlers/EventDispatcher"], function (require, exports, Utils, EventDispatcher_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayfieldEventHandler = void 0;
-    Utils = __importStar(Utils);
-    class PlayfieldEventHandler extends EventDispatcher_2.EventDispatcher {
-        constructor(playfield, canvas) {
-            super(playfield, canvas);
-            this.logger = new Utils.Logger("warn");
-            this._registerEventHandlers(canvas);
-        }
-        _registerEventHandlers(canvas) {
-            canvas.addEventListener('mousedown', this.dispatchEvent.bind(this));
-            canvas.addEventListener('mousemove', this.dispatchEvent.bind(this));
-            canvas.addEventListener('mouseup', this.dispatchEvent.bind(this));
-            canvas.addEventListener('wheel', this.dispatchEvent.bind(this), false);
-            addEventListener("keydown", this.dispatchEvent.bind(this));
-        }
-        dispatchKeyboardEvent(event) {
-            if (this.playfield.focusedObj && this.playfield.focusedObj.any.eventHandler) {
-                this.playfield.focusedObj.any.eventHandler.handleEvent(event);
-            }
-        }
-        MouseMove(event, playfield, canvas) {
-            playfield.dragObj(event.offsetX, event.offsetY);
-        }
-        MouseUp(event, playfield, canvas) {
-            playfield.dropObj();
-        }
-        MouseDown(event, playfield, convas) {
-            let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-            this.logger.log("MouseDown", obj);
-            playfield.selectObj(obj);
-            if (obj) {
-                obj.click(event.offsetX, event.offsetY);
-                playfield.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
-            }
-        }
-    }
-    exports.PlayfieldEventHandler = PlayfieldEventHandler;
 });
 define("Playfield/EventHandlers/Capabilities/MouseEnabled", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_7) {
     "use strict";
@@ -908,18 +866,100 @@ define("Playfield/EventHandlers/Capabilities/MouseEnabled", ["require", "exports
     }
     exports.MouseEnabled = MouseEnabled;
 });
-define("Playfield/EventHandlers/Capabilities/index", ["require", "exports", "Playfield/EventHandlers/Capabilities/MouseEnabled"], function (require, exports, MouseEnabled_1) {
+define("Playfield/EventHandlers/Capabilities/KeyboardEnabled", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MouseEnabledClass = exports.MouseEnabled = void 0;
+    exports.KeyboardEnabled = exports.KeyboardEnabledClass = exports.KeyboardEnabledBase = void 0;
+    exports.KeyboardEnabledBase = KeyboardEnabled(Mixins_8.Base);
+    class KeyboardEnabledClass extends exports.KeyboardEnabledBase {
+    }
+    exports.KeyboardEnabledClass = KeyboardEnabledClass;
+    ;
+    function KeyboardEnabled(_base) {
+        return class extends _base {
+            KeyboardEnabled() {
+            }
+            KeyDown(event) {
+            }
+            KeyUp(event) {
+            }
+            OrdinaryKey(event) {
+            }
+            SpecialKey(event) {
+                this.any.log("SpecialKey:", event);
+            }
+            Shift(event) {
+                this.any.log("Shift:", event);
+            }
+            Meta(event) {
+                this.any.log("Meta:", event);
+            }
+            MetaKey(event) {
+                this.any.log("MetaKey:", event);
+            }
+            Alt(event) {
+                this.any.log("Alt:", event);
+            }
+            AltKey(event) {
+                this.any.log("AltKey:", event);
+            }
+            Control(event) {
+                this.any.log("Control:", event);
+            }
+            ControlKey(event) {
+                this.any.log("ControlKey:", event);
+            }
+            Backspace(event) {
+                this.any.log("Backspace:", event);
+            }
+            UpperCase(event) {
+                this.any.log("UpperCase:", event);
+            }
+            LowerCase(event) {
+                this.any.log("LowerCase:", event);
+            }
+            Digit(event) {
+                this.any.log("Digit:", event);
+            }
+            Punctuation(event) {
+                this.any.log("Punctuation:", event);
+            }
+            FunctionKey(event) {
+                this.any.log("FunctionKey:", event);
+            }
+            ArrowUp(event) {
+                this.any.log("ArrowUp:", event);
+            }
+            ArrowDown(event) {
+                this.any.log("ArrowDown:", event);
+            }
+            ArrowLeft(event) {
+                this.any.log("ArrowLeft:", event);
+            }
+            ArrowRight(event) {
+                this.any.log("ArrowRight:", event);
+            }
+            defaultKey(event) {
+                this.any.log("unknown keypress:", event.key, event);
+            }
+        };
+    }
+    exports.KeyboardEnabled = KeyboardEnabled;
+});
+define("Playfield/EventHandlers/Capabilities/index", ["require", "exports", "Playfield/EventHandlers/Capabilities/MouseEnabled", "Playfield/EventHandlers/Capabilities/KeyboardEnabled"], function (require, exports, MouseEnabled_1, KeyboardEnabled_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.KeyboardEnabledClass = exports.KeyboardEnabled = exports.MouseEnabledClass = exports.MouseEnabled = void 0;
     Object.defineProperty(exports, "MouseEnabled", { enumerable: true, get: function () { return MouseEnabled_1.MouseEnabled; } });
     Object.defineProperty(exports, "MouseEnabledClass", { enumerable: true, get: function () { return MouseEnabled_1.MouseEnabledClass; } });
+    Object.defineProperty(exports, "KeyboardEnabled", { enumerable: true, get: function () { return KeyboardEnabled_1.KeyboardEnabled; } });
+    Object.defineProperty(exports, "KeyboardEnabledClass", { enumerable: true, get: function () { return KeyboardEnabled_1.KeyboardEnabledClass; } });
 });
-define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/EventHandlers/CanvasEventHandler", "Playfield/Capabilities/index", "Playfield/EventHandlers/Capabilities/index"], function (require, exports, Utils_3, Mixins_8, CanvasEventHandler_1, Capabilities_1, Capabilities_2) {
+define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/EventHandlers/CanvasEventHandler", "Playfield/Capabilities/index", "Playfield/EventHandlers/Capabilities/index"], function (require, exports, Utils_3, Mixins_9, CanvasEventHandler_1, Capabilities_1, Capabilities_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Playfield = void 0;
-    const PlayfieldBase = (0, Capabilities_2.MouseEnabled)((0, Capabilities_1.Playable)((0, Utils_3.Loggable)((0, Capabilities_1.Drawable)((0, Mixins_8.Named)((0, Mixins_8.Tree)((0, Mixins_8.Rect)(Mixins_8.Base)))))));
+    const PlayfieldBase = (0, Capabilities_2.MouseEnabled)((0, Capabilities_1.Playable)((0, Utils_3.Loggable)((0, Capabilities_1.Drawable)((0, Mixins_9.Named)((0, Mixins_9.Tree)((0, Mixins_9.Rect)(Mixins_9.Base)))))));
     class Playfield extends PlayfieldBase {
         constructor(canvasId) {
             super();
@@ -1054,30 +1094,30 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/inde
             }
             return results;
         }
-        MouseMove(event, playfield, canvas) {
-            playfield.dragObj(event.offsetX, event.offsetY);
+        MouseMove(event) {
+            this.dragObj(event.offsetX, event.offsetY);
         }
-        MouseUp(event, playfield, canvas) {
-            playfield.dropObj();
+        MouseUp(event) {
+            this.dropObj();
         }
-        MouseDown(event, playfield, convas) {
-            let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-            this.logger.log("MouseDown", obj);
-            playfield.selectObj(obj);
+        MouseDown(event) {
+            let obj = this.findObjInBounds(event.offsetX, event.offsetY);
+            this.log("MouseDown", obj);
+            this.selectObj(obj);
             if (obj) {
                 obj.click(event.offsetX, event.offsetY);
-                playfield.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
+                this.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
             }
         }
     }
     exports.Playfield = Playfield;
 });
-define("Playfield/Capabilities/Playable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_9) {
+define("Playfield/Capabilities/Playable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Playable = exports.PlayableClass = exports.PlayableBase = void 0;
     ;
-    exports.PlayableBase = Playable(Mixins_9.Base);
+    exports.PlayableBase = Playable(Mixins_10.Base);
     class PlayableClass extends exports.PlayableBase {
     }
     exports.PlayableClass = PlayableClass;
@@ -1097,11 +1137,11 @@ define("Playfield/Capabilities/Playable", ["require", "exports", "Mixins/index"]
     }
     exports.Playable = Playable;
 });
-define("Playfield/Capabilities/Focusable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_10) {
+define("Playfield/Capabilities/Focusable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Focusable = exports.FocusableClass = exports.FocusableBase = void 0;
-    exports.FocusableBase = Focusable(Mixins_10.Base);
+    exports.FocusableBase = Focusable(Mixins_11.Base);
     class FocusableClass extends exports.FocusableBase {
     }
     exports.FocusableClass = FocusableClass;
@@ -1149,11 +1189,11 @@ define("Playfield/Capabilities/index", ["require", "exports", "Playfield/Capabil
     Object.defineProperty(exports, "Focusable", { enumerable: true, get: function () { return Focusable_1.Focusable; } });
     Object.defineProperty(exports, "FocusableClass", { enumerable: true, get: function () { return Focusable_1.FocusableClass; } });
 });
-define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/Capabilities/index"], function (require, exports, Utils_4, Mixins_11, Capabilities_3) {
+define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/Capabilities/index"], function (require, exports, Utils_4, Mixins_12, Capabilities_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Actor = void 0;
-    const ActorBase = (0, Capabilities_3.Focusable)((0, Capabilities_3.Playable)((0, Capabilities_3.Clickable)((0, Capabilities_3.Drawable)((0, Utils_4.Loggable)((0, Mixins_11.Named)((0, Mixins_11.Tree)((0, Mixins_11.Rect)((0, Capabilities_3.Movable)((0, Capabilities_3.Draggable)((0, Capabilities_3.Selectable)(Mixins_11.Base)))))))))));
+    const ActorBase = (0, Capabilities_3.Focusable)((0, Capabilities_3.Playable)((0, Capabilities_3.Clickable)((0, Capabilities_3.Drawable)((0, Utils_4.Loggable)((0, Mixins_12.Named)((0, Mixins_12.Tree)((0, Mixins_12.Rect)((0, Capabilities_3.Movable)((0, Capabilities_3.Draggable)((0, Capabilities_3.Selectable)(Mixins_12.Base)))))))))));
     class Actor extends ActorBase {
         constructor(parent, name, x, y, w, h) {
             super();
@@ -1218,15 +1258,14 @@ define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", 
     }
     exports.Actor = Actor;
 });
-define("Playfield/index", ["require", "exports", "Playfield/Actor", "Playfield/Capabilities/Draggable", "Playfield/EventHandlers/EventDispatcher", "Playfield/Playfield", "Playfield/PlayfieldEventHandler"], function (require, exports, Actor_1, Draggable_2, EventDispatcher_3, Playfield_1, PlayfieldEventHandler_1) {
+define("Playfield/index", ["require", "exports", "Playfield/Actor", "Playfield/Capabilities/Draggable", "Playfield/EventHandlers/EventDispatcher", "Playfield/Playfield"], function (require, exports, Actor_1, Draggable_2, EventDispatcher_2, Playfield_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayfieldEventHandler = exports.Playfield = exports.EventHandler = exports.Draggable = exports.Actor = void 0;
+    exports.Playfield = exports.EventDispatcher = exports.Draggable = exports.Actor = void 0;
     Object.defineProperty(exports, "Actor", { enumerable: true, get: function () { return Actor_1.Actor; } });
     Object.defineProperty(exports, "Draggable", { enumerable: true, get: function () { return Draggable_2.Draggable; } });
-    Object.defineProperty(exports, "EventHandler", { enumerable: true, get: function () { return EventDispatcher_3.EventDispatcher; } });
+    Object.defineProperty(exports, "EventDispatcher", { enumerable: true, get: function () { return EventDispatcher_2.EventDispatcher; } });
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
-    Object.defineProperty(exports, "PlayfieldEventHandler", { enumerable: true, get: function () { return PlayfieldEventHandler_1.PlayfieldEventHandler; } });
 });
 define("Jed/Item", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
     "use strict";
@@ -1395,15 +1434,16 @@ define("Jed/CheckBoxItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "
     }
     exports.CheckBoxItem = CheckBoxItem;
 });
-define("Jed/EditItemEventHandler", ["require", "exports", "Utils/index", "Playfield/index"], function (require, exports, Utils, Playfield_4) {
+define("Jed/EditItemEventDispatcher", ["require", "exports", "Utils/index", "Playfield/EventHandlers/Capabilities/index", "Mixins/index"], function (require, exports, Utils_5, Capabilities_4, Mixins_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.EditItemEventHandler = void 0;
-    Utils = __importStar(Utils);
-    class EditItemEventHandler extends Playfield_4.EventHandler {
+    exports.EditItemEventDispatcher = void 0;
+    const DispatcherBase = (0, Capabilities_4.KeyboardEnabled)((0, Capabilities_4.MouseEnabled)((0, Utils_5.Loggable)(Mixins_13.Base)));
+    class EditItemEventDispatcher extends DispatcherBase {
         constructor(editItem) {
             super(editItem.playfield, editItem);
-            this.logger = new Utils.Logger("log");
+            this.Loggable("log");
+            this.MouseEnabled();
         }
         ArrowLeft(event, playfield, obj) {
             obj.cursorInc(-1);
@@ -1412,14 +1452,14 @@ define("Jed/EditItemEventHandler", ["require", "exports", "Utils/index", "Playfi
             obj.cursorInc(+1);
         }
         Backspace(event, playfield, obj) {
-            this.logger.log(obj.cursor, obj._value);
+            this._logger.log(obj.cursor, obj._value);
             if (obj.cursor > 0) {
                 let c = obj.cursor;
                 let left = obj._value.substring(0, c - 1);
                 let right = obj._value.substring(c);
                 obj.value(left + right);
                 obj.cursorInc(-1);
-                this.logger.log(left, right, obj.cursor, obj._value);
+                this._logger.log(left, right, obj.cursor, obj._value);
             }
         }
         OrdinaryKey(event, playfield, obj) {
@@ -1428,9 +1468,9 @@ define("Jed/EditItemEventHandler", ["require", "exports", "Utils/index", "Playfi
             obj.cursorInc(+1);
         }
     }
-    exports.EditItemEventHandler = EditItemEventHandler;
+    exports.EditItemEventDispatcher = EditItemEventDispatcher;
 });
-define("Jed/EditItem", ["require", "exports", "Jed/Item", "Jed/EditItemEventHandler"], function (require, exports, Item_4, EditItemEventHandler_1) {
+define("Jed/EditItem", ["require", "exports", "Jed/Item", "Jed/EditItemEventDispatcher"], function (require, exports, Item_4, EditItemEventDispatcher_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.EditItem = void 0;
@@ -1445,7 +1485,7 @@ define("Jed/EditItem", ["require", "exports", "Jed/Item", "Jed/EditItemEventHand
             this.nchars = 0;
             this.nchars2 = 0;
             this.gparms.fontFace = "monospace";
-            this.eventHandler = new EditItemEventHandler_1.EditItemEventHandler(this);
+            this.eventHandler = new EditItemEventDispatcher_1.EditItemEventDispatcher(this);
             this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
             this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
             this.left = 0;
@@ -1563,105 +1603,25 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "Jed/
     }
     exports.TextItem = TextItem;
 });
-define("Jed/index", ["require", "exports", "Jed/CheckBoxItem", "Jed/EditItem", "Jed/EditItemEventHandler", "Jed/Item", "Jed/LabelItem", "Jed/TextItem"], function (require, exports, CheckBoxItem_1, EditItem_2, EditItemEventHandler_2, Item_6, LabelItem_3, TextItem_1) {
+define("Jed/index", ["require", "exports", "Jed/CheckBoxItem", "Jed/EditItem", "Jed/EditItemEventDispatcher", "Jed/Item", "Jed/LabelItem", "Jed/TextItem"], function (require, exports, CheckBoxItem_1, EditItem_2, EditItemEventDispatcher_2, Item_6, LabelItem_3, TextItem_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.TextItem = exports.LabelItem = exports.Item = exports.EditItemEventHandler = exports.EditItem = exports.CheckBoxItem = void 0;
+    exports.TextItem = exports.LabelItem = exports.Item = exports.EditItemEventDispatcher = exports.EditItem = exports.CheckBoxItem = void 0;
     Object.defineProperty(exports, "CheckBoxItem", { enumerable: true, get: function () { return CheckBoxItem_1.CheckBoxItem; } });
     Object.defineProperty(exports, "EditItem", { enumerable: true, get: function () { return EditItem_2.EditItem; } });
-    Object.defineProperty(exports, "EditItemEventHandler", { enumerable: true, get: function () { return EditItemEventHandler_2.EditItemEventHandler; } });
+    Object.defineProperty(exports, "EditItemEventDispatcher", { enumerable: true, get: function () { return EditItemEventDispatcher_2.EditItemEventDispatcher; } });
     Object.defineProperty(exports, "Item", { enumerable: true, get: function () { return Item_6.Item; } });
     Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_3.LabelItem; } });
     Object.defineProperty(exports, "TextItem", { enumerable: true, get: function () { return TextItem_1.TextItem; } });
 });
-define("Playfield/EventHandlers/Capabilities/KeyboardEnabled", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_12) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.KeyboardEnabled = exports.KeyboardEnabledClass = exports.KeyboardEnabledBase = void 0;
-    exports.KeyboardEnabledBase = KeyboardEnabled(Mixins_12.Base);
-    class KeyboardEnabledClass extends exports.KeyboardEnabledBase {
-    }
-    exports.KeyboardEnabledClass = KeyboardEnabledClass;
-    ;
-    function KeyboardEnabled(_base) {
-        return class extends _base {
-            KeyboardEnabled() {
-            }
-            KeyDown(event) {
-            }
-            KeyUp(event) {
-            }
-            OrdinaryKey(event) {
-            }
-            SpecialKey(event) {
-                this.any.log("SpecialKey:", event);
-            }
-            Shift(event) {
-                this.any.log("Shift:", event);
-            }
-            Meta(event) {
-                this.any.log("Meta:", event);
-            }
-            MetaKey(event) {
-                this.any.log("MetaKey:", event);
-            }
-            Alt(event) {
-                this.any.log("Alt:", event);
-            }
-            AltKey(event) {
-                this.any.log("AltKey:", event);
-            }
-            Control(event) {
-                this.any.log("Control:", event);
-            }
-            ControlKey(event) {
-                this.any.log("ControlKey:", event);
-            }
-            Backspace(event) {
-                this.any.log("Backspace:", event);
-            }
-            UpperCase(event) {
-                this.any.log("UpperCase:", event);
-            }
-            LowerCase(event) {
-                this.any.log("LowerCase:", event);
-            }
-            Digit(event) {
-                this.any.log("Digit:", event);
-            }
-            Punctuation(event) {
-                this.any.log("Punctuation:", event);
-            }
-            FunctionKey(event) {
-                this.any.log("FunctionKey:", event);
-            }
-            ArrowUp(event) {
-                this.any.log("ArrowUp:", event);
-            }
-            ArrowDown(event) {
-                this.any.log("ArrowDown:", event);
-            }
-            ArrowLeft(event) {
-                this.any.log("ArrowLeft:", event);
-            }
-            ArrowRight(event) {
-                this.any.log("ArrowRight:", event);
-            }
-            defaultKey(event) {
-                this.any.log("unknown keypress:", event.key, event);
-            }
-        };
-    }
-    exports.KeyboardEnabled = KeyboardEnabled;
-});
-define("Test/JedTest", ["require", "exports", "Jed/index", "Playfield/index"], function (require, exports, Jed, Playfield_5) {
+define("Test/JedTest", ["require", "exports", "Jed/index", "Playfield/index"], function (require, exports, Jed, Playfield_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.JedTest = void 0;
     Jed = __importStar(Jed);
     class JedTest {
         constructor() {
-            let playfield = new Playfield_5.Playfield("#my_canvas");
+            let playfield = new Playfield_4.Playfield("#my_canvas");
             let TextItem1 = new Jed.TextItem(playfield, "first_name", "First Name:", "Gregory L. Smith", 10, 10, 75, 24);
             let labelBB = TextItem1.labelBB();
             new Jed.TextItem(playfield, "mi", "M.I.:", "Smith", 10, 40, 150, 24, labelBB.w, labelBB.h);

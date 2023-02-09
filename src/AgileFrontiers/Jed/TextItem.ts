@@ -3,7 +3,10 @@ import {LabelItem} from "./LabelItem";
 import {EditItem} from "./EditItem";
 import {Playfield, Actor} from "../Playfield";
 
-export class TextItem extends Item {
+import {KeyboardEnabled} from "../Playfield/EventHandlers/Capabilities";
+
+const KeyboardEnabledItem = KeyboardEnabled(Item);
+export class TextItem extends KeyboardEnabledItem {
     public cursor: number;
     public cursorOn = true;
     public timerId: any;

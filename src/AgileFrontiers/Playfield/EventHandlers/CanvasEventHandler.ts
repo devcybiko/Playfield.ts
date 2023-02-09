@@ -6,11 +6,9 @@ import {Playfield} from "../Playfield";
 export class CanvasEventHandler {
     private _eventDispatcher: EventDispatcher;
     private _logger: Logger;
-    private _obj: any;
 
     constructor(canvas: any, obj: any) {
         this._logger = new Logger("warn");
-        this._obj = obj;
         this._eventDispatcher = new EventDispatcher(obj);
         this._registerEventHandlers(canvas);
     }

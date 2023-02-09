@@ -2,7 +2,6 @@ import { Loggable } from "../Utils";
 import { Named, Tree, iTree, Rect, Base } from "../Mixins";
 import { Actor } from "./Actor";
 import { CanvasEventHandler } from "./EventHandlers/CanvasEventHandler";
-import { PlayfieldEventHandler } from "./PlayfieldEventHandler";
 import { iFocusable, iDraggable, iSelectable, Drawable, iDrawable, Playable, iPlayable } from "./Capabilities";
 import { MouseEnabled, iMouseEnabled} from "./EventHandlers/Capabilities";
 
@@ -142,19 +141,24 @@ export class Playfield extends PlayfieldBase {
         }
         return results;
     }
-    MouseMove(event: any, playfield: Playfield, canvas: any) {
-        playfield.dragObj(event.offsetX, event.offsetY);
+    MouseMove(event: any): void {
+        this.dragObj(event.offsetX, event.offsetY);
     }
-    MouseUp(event: any, playfield: Playfield, canvas: any) {
-        playfield.dropObj();
+    MouseUp(event: any) {
+        this.dropObj();
     }
-    MouseDown(event: any, playfield: Playfield, convas: any) {
-        let obj = playfield.findObjInBounds(event.offsetX, event.offsetY);
-        this.logger.log("MouseDown", obj);
-        playfield.selectObj(obj);
+    MouseDown(event: any) {
+        let obj = this.findObjInBounds(event.offsetX, event.offsetY);
+        this.log("MouseDown", obj);
+        this.selectObj(obj);
         if (obj) {
             obj.click(event.offsetX, event.offsetY);
-            playfield.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
+            this.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
+        }
+    }
+    KeyDown(event: any) {
+        if (this.focusedObj) {
+            if ()
         }
     }
 

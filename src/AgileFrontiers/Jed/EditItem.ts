@@ -1,8 +1,5 @@
 import {Playfield, Actor} from "../Playfield";
-import * as Utils from "../Utils";
-
 import {Item} from "./Item";
-import {EditItemEventHandler} from "./EditItemEventHandler";
 
 export class EditItem extends Item {
     public cursor = 0;
@@ -17,7 +14,6 @@ export class EditItem extends Item {
     constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w = 100, h = 24) {
         super(parent, name, value, x, y, w, h);
         this.gparms.fontFace = "monospace";
-        this.eventHandler = new EditItemEventHandler(this);
         this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
         this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this.left = 0;

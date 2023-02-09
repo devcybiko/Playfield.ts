@@ -1,6 +1,6 @@
 export {CheckBoxItem} from "./CheckBoxItem";
 export {EditItem} from "./EditItem";
-export {EditItemEventHandler} from "./EditItemEventHandler";
+export {EditItemEventDispatcher} from "./EditItemEventDispatcher";
 export {Item} from "./Item";
 export {LabelItem} from "./LabelItem";
 export {TextItem} from "./TextItem";

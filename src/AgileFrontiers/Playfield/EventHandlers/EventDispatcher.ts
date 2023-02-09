@@ -1,11 +1,11 @@
 import { inclusive, Logger } from "../../Utils";
 
 export class EventDispatcher {
-    private _obj: any;
-    private _logger: Logger;
-    private _doKeyDown = true;
-    private _doKeyUp = false;
-    constructor(obj: any, options = {}) {
+    _obj: any;
+    _logger: Logger;
+    _doKeyDown = true;
+    _doKeyUp = false;
+    constructor(obj: any, options = {} as any) {
         this._obj = obj;
         this._logger = new Logger("log");
         this._doKeyDown = options.doKeyDown || this._doKeyDown;
@@ -108,28 +108,28 @@ export class EventDispatcher {
 - handleMouseMove
 - handleKeyboardEvent
 - keydown: 
-    - SpecialKey (Shift, Meta, Alt, Control)
-        - ArrowUp
-        - ArrowDown
-        - ArrowRight
-        - ArrowLeft
-        - Meta
-        - Shift
-        - Alt
-        - Control
-        - Backspace
-        - FunctionKey
-        - defaultKey
-    - ControlKey (Control-xxx)
-    - MetaKey (Meta-xxx)
-    - AltKey (Alt-xxx)
-    - OrdinaryKey (a-z, A-Z, etc...)
-        - UpperCase
-        - LowerCase
-        - Digit
-        - Punctuation
-        - defaultKey
-    - defaultKey (any others)
+- SpecialKey (Shift, Meta, Alt, Control)
+    - ArrowUp
+    - ArrowDown
+    - ArrowRight
+    - ArrowLeft
+    - Meta
+    - Shift
+    - Alt
+    - Control
+    - Backspace
+    - FunctionKey
+    - defaultKey
+- ControlKey (Control-xxx)
+- MetaKey (Meta-xxx)
+- AltKey (Alt-xxx)
+- OrdinaryKey (a-z, A-Z, etc...)
+    - UpperCase
+    - LowerCase
+    - Digit
+    - Punctuation
+    - defaultKey
+- defaultKey (any others)
 - defaultKey (keyup, etc...)
 - handleUnknownEvent
 * 
