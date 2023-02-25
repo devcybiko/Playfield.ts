@@ -10,6 +10,6 @@ export class RootTile extends Tile {
         super("_root", null, x, y, w, h, playfield);
     }
     draw() {
-        this._playfield.clear();
+        this.redrawChildren();
     }
 }

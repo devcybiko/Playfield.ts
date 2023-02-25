@@ -7,7 +7,7 @@ export class Tree {
     _obj: any;
     _parent: Tree;
     _children = Array<Tree>();
-    constructor(name: string, parent: Tree, obj: any) {
+    constructor(name: string, obj: any, parent?: Tree) {
         this._name = name;
         this._obj = obj;
         if (parent) parent.add(this);

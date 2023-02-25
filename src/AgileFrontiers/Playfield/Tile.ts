@@ -1,5 +1,5 @@
 import { Tree, hasTree, Rect, hasRect, between } from "../Utils";
-import { GfxParms } from "../Graphics";
+import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
 import {Playfield, hasPlayfield} from "./Playfield";
 /**
  * A Tile is a rectangular item on a Playfield.
@@ -13,17 +13,27 @@ export interface hasTile {
     get tile(): Tile;
 }
 
-export class Tile implements hasTree, hasRect {
+export class Tile implements hasTree, hasRect, hasGfx, hasGfxParms {
     _tree: Tree;
     _rect: Rect;
     _playfield: Playfield;
     _gparms: GfxParms;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
-        this._tree = new Tree(name, parent ? parent.tree : null, this);
+        this._tree = new Tree(name, this);
         this._rect = new Rect(x, y, w, h);
         this._gparms = new GfxParms();
+        if (parent) parent.add(this);
         this._playfield = playfield;
+    }
+    get gfx(): Gfx {
+        return this._playfield.gfx;
+    }
+    get gparms(): GfxParms {
+        return this._gparms;
+    }
+    get name() {
+        return this.tree.name;
     }
     get rect(): Rect {
         return this._rect;
@@ -31,31 +41,50 @@ export class Tile implements hasTree, hasRect {
     get tree(): Tree {
         return this._tree;
     }
-    get gparms(): GfxParms {
-        return this._gparms;
+    get x(): number {
+        return this.rect.x;
+    }
+    get y(): number {
+        return this.rect.y;
+    }
+    get w(): number {
+        return this.rect.w;
+    }
+    get h(): number {
+        return this.rect.h;
+    }
+    get X(): number {
+        return this.rect.x + this.gparms.dx;
+    }
+    get Y(): number {
+        return this.rect.y + this.gparms.dy;
+    }
+    get children(): Array<Tile> {
+        return this.tree.children.map(child => child.obj);
+    }
+    get parent(): Tile {
+        return this.tree.parentObj;
+    }
+    add(child: Tile) {
+        this.tree.add(child.tree);
+        child._playfield = this._playfield;
     }
     inBounds(x: number, y: number): Tile {
         let result =
-            between(this.gparms.xOffset + this.rect.x, x, this.gparms.xOffset + this.rect.x + this.rect.w) &&
-            between(this.gparms.yOffset + this.rect.y, y, this.gparms.yOffset + this.rect.y + this.rect.h);
+            between(this.X, x, this.Y + this.w) &&
+            between(this.Y, y, this.Y + this.h);
         if (result) return this;
-        for (let child of this.tree.children.reverse()) {
-            let found = child.obj.inBounds(x, y);
+        for (let child of this.children.reverse()) {
+            let found = child.inBounds(x, y);
             if (found) return found;
         }
         return null;
     }
     _recompute() {
-        let parentTile = this.tree.parentObj as Tile;
-        if (parentTile) {
-            let parentGparms = parentTile.gparms;
-            this.gparms.xOffset = parentTile.rect.x + parentGparms.xOffset;
-            this.gparms.yOffset = parentTile.rect.y + parentGparms.yOffset;
+        if (this.parent) {
+            this.gparms.dx = this.parent.X;
+            this.gparms.dy = this.parent.Y;
         }
-    }
-    add(tile: Tile) {
-        this.tree.add(tile.tree);
-        tile._playfield = this._playfield;
     }
     move(x: number, y: number) {
         this.rect.x = x;
@@ -74,17 +103,23 @@ export class Tile implements hasTree, hasRect {
         this.rect.h += dh;
     }
     drawAll(): void {
-        this._recompute();
-        this.draw();
+        this.redraw();
         for (let child of this.tree.children) {
             child.obj.drawAll();
         }
     }
+    redraw() {
+        this._recompute();
+        this.draw();
+    }
+    redrawChildren() {
+        this.children.forEach(child => child.redraw());
+    }
     draw() {
-        throw new Error("Method not implemented.");
+        this.redrawChildren();
     }
     tick(): void {
-        throw new Error("Method not implemented.");
+        this.tree.children.forEach(child => child.obj.tick());
     }
     go(): void {
         throw new Error("Method not implemented.");

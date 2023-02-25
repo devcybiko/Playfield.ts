@@ -30,8 +30,8 @@ define("Graphics/GfxParms", ["require", "exports"], function (require, exports) 
             this.color = "black";
             this.borderColor = "black";
             this.fillColor = "white";
-            this.xOffset = 0;
-            this.yOffset = 0;
+            this.dx = 0;
+            this.dy = 0;
             this.textAlign = "left";
             this.textBaseline = "top";
             this.fontSize = 24;
@@ -201,7 +201,7 @@ define("Utils/Tree", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Tree = void 0;
     class Tree {
-        constructor(name, parent, obj) {
+        constructor(name, obj, parent) {
             this._children = Array();
             this._name = name;
             this._obj = obj;
@@ -287,36 +287,36 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
         rect(x, y, w, h, gparms = this.gparms) {
             if (gparms.fillColor) {
                 this.ctx.fillStyle = gparms.fillColor;
-                this.ctx.fillRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
+                this.ctx.fillRect(gparms.dx + x, gparms.dy + y, w, h);
             }
             if (gparms.borderColor) {
                 this.ctx.strokeStyle = gparms.borderColor;
-                this.ctx.strokeRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
+                this.ctx.strokeRect(gparms.dx + x, gparms.dy + y, w, h);
             }
         }
         ellipse(x, y, w, h, gparms = this.gparms) {
             if (gparms.fillColor) {
                 this.ctx.beginPath();
-                this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
                 this.ctx.fillStyle = gparms.fillColor;
                 this.ctx.fill();
             }
             if (gparms.borderColor) {
                 this.ctx.beginPath();
-                this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
                 this.ctx.strokeStyle = gparms.borderColor;
                 this.ctx.stroke();
             }
         }
         circle(x, y, r, gparms = this.gparms) {
-            this.ellipse(x - r, y - r, r, r, gparms);
+            this.ellipse(x - r, y - r, r * 2, r * 2, gparms);
         }
-        line(x0, y0, x1, y1, gparms = this.gparms) {
+        line(x0, y0, x1, y1, gparms0 = this.gparms, gparms1 = gparms0) {
             this.logger.info("line", x0, y0, x1, y1);
             this.ctx.beginPath();
-            this.ctx.strokeStyle = gparms.color;
-            this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
-            this.ctx.lineTo(gparms.xOffset + x1, gparms.yOffset + y1);
+            this.ctx.strokeStyle = gparms0.color;
+            this.ctx.moveTo(gparms0.dx + x0, gparms0.dy + y0);
+            this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
             this.ctx.stroke();
         }
         text(msg, x = 0, y = 0, gparms = this.gparms) {
@@ -324,7 +324,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
             this.ctx.font = gparms.font;
             this.ctx.textAlign = gparms.textAlign;
             this.ctx.textBaseline = gparms.textBaseline;
-            this.ctx.fillText(msg, gparms.xOffset + x, gparms.yOffset + y);
+            this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y);
         }
         textRect(msg, x = 0, y = 0, w, h, gparms = this.gparms) {
             this.ctx.font = gparms.font;
@@ -344,7 +344,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
         clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
             this.save();
             let region = new Path2D();
-            region.rect(x + gparms.xOffset, y + gparms.yOffset, w, h);
+            region.rect(x + gparms.dx, y + gparms.dy, w, h);
             this.ctx.clip(region);
         }
         save() {
@@ -369,10 +369,21 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Graphics/index"]
     exports.Tile = void 0;
     class Tile {
         constructor(name, parent, x, y, w, h, playfield = parent._playfield) {
-            this._tree = new Utils_1.Tree(name, parent ? parent.tree : null, this);
+            this._tree = new Utils_1.Tree(name, this);
             this._rect = new Utils_1.Rect(x, y, w, h);
             this._gparms = new Graphics_1.GfxParms();
+            if (parent)
+                parent.add(this);
             this._playfield = playfield;
+        }
+        get gfx() {
+            return this._playfield.gfx;
+        }
+        get gparms() {
+            return this._gparms;
+        }
+        get name() {
+            return this.tree.name;
         }
         get rect() {
             return this._rect;
@@ -380,32 +391,51 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Graphics/index"]
         get tree() {
             return this._tree;
         }
-        get gparms() {
-            return this._gparms;
+        get x() {
+            return this.rect.x;
+        }
+        get y() {
+            return this.rect.y;
+        }
+        get w() {
+            return this.rect.w;
+        }
+        get h() {
+            return this.rect.h;
+        }
+        get X() {
+            return this.rect.x + this.gparms.dx;
+        }
+        get Y() {
+            return this.rect.y + this.gparms.dy;
+        }
+        get children() {
+            return this.tree.children.map(child => child.obj);
+        }
+        get parent() {
+            return this.tree.parentObj;
+        }
+        add(child) {
+            this.tree.add(child.tree);
+            child._playfield = this._playfield;
         }
         inBounds(x, y) {
-            let result = (0, Utils_1.between)(this.gparms.xOffset + this.rect.x, x, this.gparms.xOffset + this.rect.x + this.rect.w) &&
-                (0, Utils_1.between)(this.gparms.yOffset + this.rect.y, y, this.gparms.yOffset + this.rect.y + this.rect.h);
+            let result = (0, Utils_1.between)(this.X, x, this.Y + this.w) &&
+                (0, Utils_1.between)(this.Y, y, this.Y + this.h);
             if (result)
                 return this;
-            for (let child of this.tree.children.reverse()) {
-                let found = child.obj.inBounds(x, y);
+            for (let child of this.children.reverse()) {
+                let found = child.inBounds(x, y);
                 if (found)
                     return found;
             }
             return null;
         }
         _recompute() {
-            let parentTile = this.tree.parentObj;
-            if (parentTile) {
-                let parentGparms = parentTile.gparms;
-                this.gparms.xOffset = parentTile.rect.x + parentGparms.xOffset;
-                this.gparms.yOffset = parentTile.rect.y + parentGparms.yOffset;
+            if (this.parent) {
+                this.gparms.dx = this.parent.X;
+                this.gparms.dy = this.parent.Y;
             }
-        }
-        add(tile) {
-            this.tree.add(tile.tree);
-            tile._playfield = this._playfield;
         }
         move(x, y) {
             this.rect.x = x;
@@ -424,17 +454,23 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Graphics/index"]
             this.rect.h += dh;
         }
         drawAll() {
-            this._recompute();
-            this.draw();
+            this.redraw();
             for (let child of this.tree.children) {
                 child.obj.drawAll();
             }
         }
+        redraw() {
+            this._recompute();
+            this.draw();
+        }
+        redrawChildren() {
+            this.children.forEach(child => child.redraw());
+        }
         draw() {
-            throw new Error("Method not implemented.");
+            this.redrawChildren();
         }
         tick() {
-            throw new Error("Method not implemented.");
+            this.tree.children.forEach(child => child.obj.tick());
         }
         go() {
             throw new Error("Method not implemented.");
@@ -454,7 +490,7 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile"], function 
             super("_root", null, x, y, w, h, playfield);
         }
         draw() {
-            this._playfield.clear();
+            this.redrawChildren();
         }
     }
     exports.RootTile = RootTile;
@@ -465,6 +501,11 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
     exports.Playfield = void 0;
     class Playfield {
         constructor(canvasId) {
+            this._lastTime = 0;
+            this._delay = 0;
+            this._count = 0;
+            this._busy = false;
+            this._timerId = 0;
             this._canvas = document.querySelector(canvasId);
             this._ctx = this._canvas.getContext("2d");
             this._gfx = new Graphics_2.Gfx(this._ctx);
@@ -472,6 +513,16 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             this._rect = new Utils_2.Rect(0, 0, this._canvas.width, this._canvas.height);
             this._tile = new RootTile_1.RootTile(0, 0, this.rect.w, this.rect.h, this);
             this._logger = new Utils_2.Logger();
+            // const dpr = window.devicePixelRatio;
+            // const rect = this._canvas.getBoundingClientRect();
+            // // Set the "actual" size of the canvas
+            // this._canvas.width = rect.width * dpr;
+            // this._canvas.height = rect.height * dpr;
+            // // Scale the context to ensure correct drawing operations
+            // this._ctx.scale(dpr, dpr);
+            // // Set the "drawn" size of the canvas
+            // this._canvas.style.width = `${rect.width}px`;
+            // this._canvas.style.height = `${rect.height}px`;
         }
         get playfield() {
             return this;
@@ -493,7 +544,37 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
         }
         redraw() {
             this.clear();
-            this.tile.drawAll();
+            this.tile.redraw();
+        }
+        tick() {
+            // note: what if the time to process one 'tick' is greater than the delay?
+            if (this._busy)
+                console.error("INTERRUPTED WHILE BUSY!");
+            clearTimeout(this._timerId);
+            this._count = 0;
+            this._busy = true;
+            let now = Date.now();
+            let extra = now - this._lastTime;
+            this.tile.tick(); // process all ticks
+            this.redraw(); // redraw the playfield
+            this._lastTime = Date.now();
+            let delta = this._lastTime - now;
+            // if (delta > this._delay) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+            // if (this._count >= 5000) {
+            console.log(`NOTE: The tick() processing time is: (${delta}ms aka ${1000 / delta} fps) and the _delay is: (${this._delay}ms aka ${1000 / this._delay} fps). There is ${extra}ms between frames`);
+            console.log(`NOTE: This is ${this._count / delta * 1000} objects per second`);
+            //     this._count = 0;
+            // }
+            console.log(this._count);
+            this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
+            this._busy = false;
+        }
+        start(delay = 125) {
+            this._delay = delay;
+            this._lastTime = Date.now();
+            this.redraw();
+            // note: what if the time to process one 'tick' is greater than the delay?
+            this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
         }
     }
     exports.Playfield = Playfield;
@@ -505,30 +586,63 @@ define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfie
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
     Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_2.Tile; } });
 });
-define("Test/CircleTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
+define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CircleTile = void 0;
-    class CircleTile extends Playfield_2.Tile {
-        constructor(name, parent, x, y, w, h) {
+    exports.BoxTestTile = void 0;
+    class BoxTestTile extends Playfield_2.Tile {
+        constructor(name, parent, x, y, w, h = w) {
             super(name, parent, x, y, w, h);
-        }
-        draw() {
             this.gparms.borderColor = "red";
             this.gparms.color = "blue";
             this.gparms.fillColor = "green";
-            this._playfield.gfx.circle(this.rect.x, this.rect.y, this.rect.w, this.gparms);
+        }
+        draw() {
+            this._playfield.gfx.rect(this.rect.x, this.rect.y, this.rect.w, this.rect.h, this.gparms);
+            this._playfield._count++;
         }
         tick() {
-            throw new Error("Method not implemented.");
+            let obj = this;
+            this.rmove(obj.DX || 10, obj.DY || 10);
+            if (this.X > this._playfield.rect.w || this.X <= 0) {
+                if (obj.DX === undefined)
+                    this.rmove(-this.x, 0);
+                else
+                    obj.DX = -obj.DX;
+            }
+            if (this.Y > this._playfield.rect.h || this.Y <= 0) {
+                if (obj.DY === undefined)
+                    this.rmove(0, -this.y);
+                else
+                    obj.DY = -obj.DY;
+            }
+            // notice - does not move children
         }
         go() {
             throw new Error("Method not implemented.");
         }
     }
-    exports.CircleTile = CircleTile;
+    exports.BoxTestTile = BoxTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTile"], function (require, exports, Playfield_3, CircleTile_1) {
+define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], function (require, exports, BoxTestTile_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CircleTestTile = void 0;
+    class CircleTestTile extends BoxTestTile_1.BoxTestTile {
+        constructor(name, parent, x, y, w, h = w) {
+            super(name, parent, x, y, w, h);
+            this.gparms.borderColor = "red";
+            this.gparms.color = "blue";
+            this.gparms.fillColor = "green";
+        }
+        draw() {
+            this._playfield.gfx.circle(this.rect.x, this.rect.y, this.rect.w, this.gparms);
+            this._playfield._count++;
+        }
+    }
+    exports.CircleTestTile = CircleTestTile;
+});
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index"], function (require, exports, Playfield_3, CircleTestTile_1, BoxTestTile_2, Utils_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
@@ -539,10 +653,68 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
         boxTest() {
             this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);
         }
-        tileTest() {
+        circleTestTile() {
             let parent = this._playfield.tile;
-            let circleTile = new CircleTile_1.CircleTile("_root", parent, parent.rect.w / 2, parent.rect.h / 2, 50, 50);
-            this._playfield.redraw();
+            let circleTile = new CircleTestTile_1.CircleTestTile("circle", parent, parent.rect.w / 2, parent.rect.h / 2, 50, 50);
+            this._playfield.start();
+        }
+        groupTestTile() {
+            let parent = this._playfield.tile;
+            let lcircle = new CircleTestTile_1.CircleTestTile("left", parent, -75, +75, 50);
+            let rcircle = new CircleTestTile_1.CircleTestTile("right", parent, +75, +75, 50);
+            lcircle.gparms.fillColor = "red";
+            rcircle.gparms.fillColor = "red";
+            let llcircle = new CircleTestTile_1.CircleTestTile("left", lcircle, -50, 50, 50, 50);
+            let lrcircle = new CircleTestTile_1.CircleTestTile("right", lcircle, +50, 50, 50, 50);
+            llcircle.gparms.fillColor = "blue";
+            lrcircle.gparms.fillColor = "blue";
+            let rlcircle = new CircleTestTile_1.CircleTestTile("left", rcircle, -50, 50, 50, 50);
+            let rrcircle = new CircleTestTile_1.CircleTestTile("right", rcircle, +50, 50, 50, 50);
+            rlcircle.gparms.fillColor = "green";
+            rrcircle.gparms.fillColor = "green";
+            this._playfield.start();
+        }
+        tenthousandTestTile() {
+            let parent = this._playfield.tile;
+            let max = 100;
+            for (let i = 0; i < max; i++) {
+                for (let j = 0; j < 1000; j++) {
+                    let x = (0, Utils_3.random)(0, this._playfield.rect.w);
+                    let y = (0, Utils_3.random)(0, this._playfield.rect.h);
+                    let r = (0, Utils_3.random)(10, 50);
+                    let DX = (0, Utils_3.random)(-10, 10);
+                    let DY = (0, Utils_3.random)(-10, 10);
+                    let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
+                    // circle.gparms.fillColor = null;
+                    circle.DX = DX;
+                    circle.DY = DY;
+                }
+            }
+            max *= 1000;
+            // let fps = 1;
+            // let delay = Math.floor(1000/fps);
+            let delay = 0;
+            let fps = 1000 / delay;
+            console.log({ fps, delay, max });
+            this._playfield.start(delay);
+            // note: processing 10,000 Circles stressed the app at 55 FPS
+            // note: processing 10,000 Boxes stressed the app at 142 FPS
+            // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
+            // note: at 30FPS, about 18,500 circles could be processed
+            // note: at 30FPS, about 20,000 boxes could be processed
+            // note: at 30FPS, about 45,000 empty boxes could be processed
+            // note: at 60FPS, about 8700 circles could be processed
+            // note: at 60FPS, about 20,000 boxes could be processed
+            // note: at 60FPS, about 28,000 empty boxes could be processed
+            // 5,000,000 empty boxes per second
+            // 2,000,000 filled boxes per second
+            // 1,428,571 empty circles per second
+            // 714,000 filled circles per second
+            // 1 fps: 16ms/62.5fps
+            // 2 fps: 16ms/62.5fps
+            // 4 fps: 16ms/62.5fps
+            // 8 fps: 13ms/77fps
+            // 15 fps: 7ms/143fps
         }
     }
     exports.PlayfieldTest = PlayfieldTest;
@@ -554,6 +726,8 @@ define(function (require) {
     console.log(TestClass);
     let main = new TestClass();
     // main.boxTest();
-    main.tileTest();
+    // main.circleTestTile();
+    // main.groupTestTile();
+    main.tenthousandTestTile();
  });
  

@@ -1,6 +1,10 @@
 import {GfxParms} from "./GfxParms";
 import * as Utils from "../Utils";
 
+export interface hasGfx {
+    get gfx(): Gfx;
+}
+
 export class Gfx {
     public ctx: CanvasRenderingContext2D;
     public gparms: GfxParms;
@@ -23,11 +27,11 @@ export class Gfx {
     ) {
         if (gparms.fillColor) {
             this.ctx.fillStyle = gparms.fillColor;
-            this.ctx.fillRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
+            this.ctx.fillRect(gparms.dx + x, gparms.dy + y, w, h);
         }
         if (gparms.borderColor) {
             this.ctx.strokeStyle = gparms.borderColor;
-            this.ctx.strokeRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
+            this.ctx.strokeRect(gparms.dx + x, gparms.dy + y, w, h);
         }
     }
 
@@ -40,13 +44,13 @@ export class Gfx {
     ) {
         if (gparms.fillColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.fillStyle = gparms.fillColor;
             this.ctx.fill();
         }
         if (gparms.borderColor) {
             this.ctx.beginPath();
-            this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this.ctx.strokeStyle = gparms.borderColor;
             this.ctx.stroke();
         }
@@ -58,7 +62,7 @@ export class Gfx {
         r: number,
         gparms = this.gparms
     ) {
-        this.ellipse(x - r, y - r, r, r, gparms);
+        this.ellipse(x - r, y - r, r*2, r*2, gparms);
     }
 
     line(
@@ -66,13 +70,14 @@ export class Gfx {
         y0: number,
         x1: number,
         y1: number,
-        gparms = this.gparms
+        gparms0 = this.gparms,
+        gparms1 = gparms0
     ) {
         this.logger.info("line", x0, y0, x1, y1);
         this.ctx.beginPath();
-        this.ctx.strokeStyle = gparms.color;
-        this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
-        this.ctx.lineTo(gparms.xOffset + x1, gparms.yOffset + y1);
+        this.ctx.strokeStyle = gparms0.color;
+        this.ctx.moveTo(gparms0.dx + x0, gparms0.dy + y0);
+        this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
         this.ctx.stroke();
     }
     text(msg: string, x = 0, y = 0, gparms = this.gparms) {
@@ -80,7 +85,7 @@ export class Gfx {
         this.ctx.font = gparms.font;
         this.ctx.textAlign = gparms.textAlign;
         this.ctx.textBaseline = gparms.textBaseline;
-        this.ctx.fillText(msg, gparms.xOffset + x, gparms.yOffset + y);
+        this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y);
     }
     textRect(
         msg: string,
@@ -105,7 +110,7 @@ export class Gfx {
     clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
         this.save();
         let region = new Path2D();
-        region.rect(x + gparms.xOffset, y + gparms.yOffset, w, h);
+        region.rect(x + gparms.dx, y + gparms.dy, w, h);
         this.ctx.clip(region);
     }
     save() {

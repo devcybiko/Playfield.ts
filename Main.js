@@ -5,6 +5,8 @@ define(function (require) {
     console.log(TestClass);
     let main = new TestClass();
     // main.boxTest();
-    main.tileTest();
+    // main.circleTestTile();
+    // main.groupTestTile();
+    main.tenthousandTestTile();
  });
  

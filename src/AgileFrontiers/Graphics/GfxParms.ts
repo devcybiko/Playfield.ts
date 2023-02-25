@@ -1,3 +1,7 @@
+export interface hasGfxParms {
+    get gparms(): GfxParms;
+}
+
 export class GfxParms {
     private _fontSize: number;
     private _fontFace: string;
@@ -6,8 +10,8 @@ export class GfxParms {
     fillColor = "white";
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
-    xOffset = 0;
-    yOffset = 0;
+    dx = 0;
+    dy = 0;
     private _font: string;
 
     constructor() {
