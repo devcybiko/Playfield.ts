@@ -11,7 +11,7 @@ export class CanvasEventHandler {
     _obj: Mouseable | Keyboardable;
 
     constructor(canvas: any, obj: Mouseable | Keyboardable) {
-        this._logger = new Logger("warn");
+        this._logger = new Logger();
         this._obj = obj;
         this._registerEventHandlers(canvas);
     }

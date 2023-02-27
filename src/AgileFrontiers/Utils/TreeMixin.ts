@@ -1,10 +1,11 @@
 export class Tree {
     _name: string;
     _parent: Tree;
-    _children = Array<Tree>();
+    _children: Tree[];
 
     Tree(name: string, parent?: Tree) {
         this._name = name;
+        this._children = [];
         if (parent) parent.add(this);
     }
 
@@ -44,3 +45,5 @@ export class Tree {
         this._children.splice(0, 0, obj);
     }
 }
+
+export type TreeMixin = Tree;

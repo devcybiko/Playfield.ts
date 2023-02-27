@@ -1,4 +1,5 @@
-import { Tile, hasTile, Playfield, hasPlayfield } from "..";
+import { Tile } from "..";
+import { applyMixins } from "../../Utils";
 
 export class ShapeTile extends Tile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h = w) {

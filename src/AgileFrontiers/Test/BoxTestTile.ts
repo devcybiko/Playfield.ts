@@ -1,4 +1,4 @@
-import { Tile, hasTile, Playfield, hasPlayfield } from "../Playfield";
+import { Tile } from "../Playfield";
 
 export class BoxTestTile extends Tile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h = w) {

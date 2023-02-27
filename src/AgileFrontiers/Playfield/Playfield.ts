@@ -1,4 +1,4 @@
-import { Tile, hasTile } from "./Tile";
+import { Tile } from "./Tile";
 import { Tree, Rect, Logger, applyMixins } from "../Utils";
 import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
 import { RootTile } from "./RootTile";
@@ -11,20 +11,15 @@ import { CanvasEventHandler } from "./Events/CanvasEventHandler";
  */
 
 export class _Playfield { };
-export interface _Playfield extends Rect, Tree { };
-applyMixins(_Playfield, [Rect, Tree]);
+export interface _Playfield extends Logger, Rect { };
+applyMixins(_Playfield, [Logger, Rect]);
 
-export interface hasPlayfield {
-    get playfield(): Playfield;
-}
-
-export class Playfield extends _Playfield implements hasTile, hasGfx, hasGfxParms {
+export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
     _canvas: HTMLCanvasElement;
     _ctx: CanvasRenderingContext2D;
     _rootTile: RootTile;
     _gfx: Gfx;
     _gparms: GfxParms;
-    _logger: Logger;
     _lastTime = 0;
     _delay = 0;
     _timerId = 0 as any;
@@ -38,7 +33,6 @@ export class Playfield extends _Playfield implements hasTile, hasGfx, hasGfxParm
         this._gparms = new GfxParms();
         this.Rect(0, 0, this._canvas.width, this._canvas.height);
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
-        this._logger = new Logger();
         this._canvasEventHandler = new CanvasEventHandler(this._canvas, this._rootTile);
     }
     get playfield(): Playfield {
@@ -78,4 +72,3 @@ export class Playfield extends _Playfield implements hasTile, hasGfx, hasGfxParm
         this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
     }
 }
-

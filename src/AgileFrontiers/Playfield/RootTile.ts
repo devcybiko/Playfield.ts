@@ -1,19 +1,23 @@
-import {Playfield} from "./Playfield";
-import {Tile} from "./Tile";
-import {Dragger, hasDragger} from "./Dragger";
-import {Mouseable} from "./Events/Mouseable";
-import {Keyboardable} from "./Events/Keyboardable";
+import { Playfield } from "./Playfield";
+import { Tile } from "./Tile";
+import { Dragger } from "./DraggerMixin";
+import { Mouseable } from "./Events/Mouseable";
+import { Keyboardable } from "./Events/Keyboardable";
+import { applyMixins, Logger } from "../Utils";
 
 /**
  * The RootTile has some special capabilities
  */
 
-export class RootTile extends Tile implements hasDragger, Mouseable, Keyboardable {
-    _dragger: Dragger;
+export class _RootTile extends Tile { };
+export interface _RootTile extends Dragger, Logger { };
+applyMixins(_RootTile, [Dragger, Logger]);
 
+export class RootTile extends _RootTile implements Mouseable, Keyboardable {
     constructor(x: number, y: number, w: number, h: number, playfield: Playfield) {
         super("_root", null, x, y, w, h, playfield);
-        this._dragger = new Dragger(this);
+        this.Dragger(this);
+        return this;
     }
     KeyDown(event: any): boolean {
         return false;
@@ -81,12 +85,6 @@ export class RootTile extends Tile implements hasDragger, Mouseable, Keyboardabl
     defaultKey(event: any): boolean {
         return false;
     }
-    MouseUp(event: any): boolean {
-        return this._dragger.MouseUp(event);
-    }
-    MouseDown(event: any): boolean {
-        return this._dragger.MouseDown(event);
-    }
     MenuUp(event: any): boolean {
         return false;
     }
@@ -104,12 +102,6 @@ export class RootTile extends Tile implements hasDragger, Mouseable, Keyboardabl
     }
     WheelDown(event: any, delta: number): boolean {
         return false;
-    }
-    MouseMove(event: any): boolean {
-        return this._dragger.MouseMove(event);
-    }
-    get dragger(): Dragger {
-        return this._dragger;
     }
     draw() {
         this.redrawChildren();

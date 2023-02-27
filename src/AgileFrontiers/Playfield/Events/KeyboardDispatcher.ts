@@ -12,7 +12,7 @@ export class KeyboardDispatcher {
     _doKeyUp = false;
     constructor(obj: Keyboardable, options = {} as any) {
         this._obj = obj;
-        this._logger = new Logger("log");
+        this._logger = new Logger();
         this._doKeyDown = options.doKeyDown || this._doKeyDown;
         this._doKeyUp = options.doKeyUp || this._doKeyUp;
     }

@@ -1,22 +1,16 @@
-import { Tile, hasTile, Playfield, hasPlayfield } from "..";
+import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import {Draggable} from "../Draggable";
+import {Draggable} from "../DraggableMixin";
+import { applyMixins } from "../../Utils";
 
+export class _BoxTile extends ShapeTile { };
+export interface _BoxTile extends Draggable { };
+applyMixins(_BoxTile, [Draggable]);
 
-export class BoxTile extends ShapeTile implements Draggable {
+export class BoxTile extends _BoxTile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-    }
-    grab(): boolean {
-        console.log("grab", this.name);
-        return true;
-    }
-    drag(dx: number, dy: number): boolean {
-        this.rmove(-dx, -dy);
-        return true;
-    }
-    drop(): boolean {
-        return true;
+        this.Draggable(this);
     }
     draw() {
         this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);

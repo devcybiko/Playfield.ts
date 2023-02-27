@@ -1,3 +1,4 @@
+export interface Logger {}
 export class Logger {
     _level: string;
     _link: string;
@@ -7,9 +8,10 @@ export class Logger {
     // LOG  ==> LOG, WARN, ERROR
     // WARN ==> WARN, ERROR
     // ERROR==> ERROR
-    constructor(logLevel = "error", uselink = true) {
+    Logger(logLevel = "error", uselink = true) {
         this._level = logLevel;
         this._uselink = uselink;
+        return this;
     }
 
     _source(depth = 0): string {

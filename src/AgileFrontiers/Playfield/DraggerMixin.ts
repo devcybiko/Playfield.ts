@@ -1,25 +1,27 @@
 import { Tile } from "./Tile";
-import { Mouseable } from "./Events/Mouseable";
-import { Draggable } from "./Draggable";
+import { Draggable } from "./DraggableMixin";
+import {applyMixins} from "../Utils";
 
-export interface hasDragger {
-    get dragger(): Dragger;
-}
+// export class DraggerMixin { };
+// export interface DraggerMixin { };
+// applyMixins(DraggerMixin, []);
 
-export class Dragger implements Mouseable {
-    _obj: hasDragger & Tile;
+export interface Dragger {};
+export class Dragger {
     _isMouseHandler: true;
     _dragObj: Draggable;
-    _dragX: number;;
+    _dragX: number;
     _dragY: number;
+    _dragger: Tile;
 
-    constructor(obj: hasDragger & Tile) {
-        this._obj = obj;
+    Dragger(dragger: Tile) {
+        this._dragger = dragger;
+        return this;
     }
 
     MouseDown(event: any): boolean {
         console.log("MouseDown", event);
-        for (let _child of this._obj.children.reverse()) {
+        for (let _child of this._dragger.children.reverse()) {
             let child = _child as any;
             if (child.inBounds && child.inBounds(event.x, event.y) && child.grab) {
                 this._dragObj = child as Draggable;

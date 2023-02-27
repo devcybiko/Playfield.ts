@@ -8,7 +8,7 @@ export interface hasGfx {
 export class Gfx {
     public ctx: CanvasRenderingContext2D;
     public gparms: GfxParms;
-    private logger = new Utils.Logger("log");
+    private logger = new Utils.Logger();
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;

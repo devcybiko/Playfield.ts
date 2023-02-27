@@ -10,7 +10,7 @@ export class MouseDispatcher {
     _logger: Logger;
     constructor(obj: Mouseable, options = {} as any) {
         this._obj = obj;
-        this._logger = new Logger("log");
+        this._logger = new Logger();
     }
     dispatchEvent(event: any) {
         if (event.button !== undefined) return this.dispatchMouseEvent(event);

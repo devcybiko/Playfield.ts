@@ -1,6 +1,6 @@
-import { applyMixins, Tree, Rect, between } from "../Utils";
+import { applyMixins, Tree, Rect, between, Logger } from "../Utils";
 import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
-import {Playfield, hasPlayfield} from "./Playfield";
+import { Playfield } from "./Playfield";
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -9,25 +9,23 @@ import {Playfield, hasPlayfield} from "./Playfield";
  * it is hierarcically organized so is drawn relative to its parent
  */
 
-export interface hasTile {
-    get tile(): Tile;
-}
-
 export class _Tile { };
-export interface _Tile extends Rect, Tree { };
-applyMixins(_Tile, [Rect, Tree]);
+export interface _Tile extends Logger, Tree, Rect { };
+applyMixins(_Tile, [Logger, Tree, Rect]);
 
+export interface Tile {};
 export class Tile extends _Tile implements hasGfx, hasGfxParms {
     _playfield: Playfield;
     _gparms: GfxParms;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
         super();
-        this.Tree(name, this);
+        this.Tree(name, parent);
         this.Rect(x, y, w, h);
         this._gparms = new GfxParms();
         if (parent) parent.add(this);
         this._playfield = playfield;
+        return this;
     }
     get gfx(): Gfx {
         return this._playfield.gfx;
@@ -42,8 +40,8 @@ export class Tile extends _Tile implements hasGfx, hasGfxParms {
         return this.y + this.gparms.dy;
     }
     // add(child: Tile) {
-        // super.add(child);
-        // child._playfield = this._playfield;
+    // super.add(child);
+    // child._playfield = this._playfield;
     // }
     inBounds(x: number, y: number): Tile {
         let result =

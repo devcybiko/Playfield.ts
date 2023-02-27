@@ -1,4 +1,4 @@
-import { Tile, hasTile, Playfield, hasPlayfield } from "../Playfield";
+import { Tile } from "../Playfield";
 import {BoxTestTile} from "./BoxTestTile";
 
 export class CircleTestTile extends BoxTestTile {
