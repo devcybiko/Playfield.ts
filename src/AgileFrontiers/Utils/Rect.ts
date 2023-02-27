@@ -1,14 +1,10 @@
-export interface hasRect {
-    get rect(): Rect;
-}
-
 export class Rect {
     _x = 0;
     _y = 0;
     _w = 0;
     _h = 0;
 
-    constructor(x: number, y: number, w: number, h: number) {
+    Rect(x: number, y: number, w: number, h: number) {
         this._x = x;
         this._y = y;
         this._w = w;
@@ -38,5 +34,21 @@ export class Rect {
     }
     set h(n: number) {
         this._h = n;
+    }
+    move(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+    rmove(dx: number, dy: number) {
+        this.x += dx;
+        this.y += dy;
+    }
+    size(w: number, h: number) {
+        this.w = w;
+        this.h = h;
+    }
+    rsize(dw: number, dh: number) {
+        this.w += dw;
+        this.h += dh;
     }
 }

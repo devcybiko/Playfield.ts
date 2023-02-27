@@ -1,4 +1,5 @@
 export {Logger} from "./Logger";
 export {between, inclusive, random, snapTo} from "./Functions";
-export {Rect, hasRect} from "./Rect";
-export {Tree, hasTree} from "./Tree";
+export {Rect} from "./Rect";
+export {Tree} from "./Tree";
+export {applyMixins} from "./Mixins";

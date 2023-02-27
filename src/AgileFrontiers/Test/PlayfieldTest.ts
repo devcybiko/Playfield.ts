@@ -2,6 +2,7 @@ import {Playfield, Tile} from "../Playfield";
 import {CircleTestTile} from "./CircleTestTile";
 import {BoxTestTile} from "./BoxTestTile";
 import {random} from "../Utils";
+import {CircleTile, BoxTile} from "../Playfield/Shapes";
 
 export class PlayfieldTest {
     _playfield: Playfield;
@@ -13,7 +14,7 @@ export class PlayfieldTest {
     }
     circleTestTile() {
         let parent = this._playfield.tile;
-        let circleTile = new CircleTestTile("circle", parent, parent.rect.w/2, parent.rect.h/2, 50, 50);
+        let circleTile = new CircleTestTile("circle", parent, parent.w/2, parent.h/2, 50, 50);
         this._playfield.start();
     }
     groupTestTile() {
@@ -40,8 +41,8 @@ export class PlayfieldTest {
         let max = 100;
         for(let i=0; i<max; i++) {
             for(let j=0; j<1000; j++) {
-                let x = random(0, this._playfield.rect.w);
-                let y = random(0, this._playfield.rect.h);
+                let x = random(0, this._playfield.w);
+                let y = random(0, this._playfield.h);
                 let r = random(10, 50);
                 let DX = random(-10, 10);
                 let DY = random(-10, 10);
@@ -80,5 +81,11 @@ export class PlayfieldTest {
         // 4 fps: 16ms/62.5fps
         // 8 fps: 13ms/77fps
         // 15 fps: 7ms/143fps
+    }
+    shapeTest() {
+        let parent = this._playfield.tile;
+        let circleTile = new CircleTile("circle", parent, 50, 50, 50);
+        let boxTile = new BoxTile("box", parent, 100, 100, 50, 50);
+        this._playfield.start();
     }
 }

@@ -7,6 +7,7 @@ define(function (require) {
     // main.boxTest();
     // main.circleTestTile();
     // main.groupTestTile();
-    main.tenthousandTestTile();
+    // main.tenthousandTestTile();
+    main.shapeTest();
  });
  

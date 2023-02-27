@@ -1,5 +1,4 @@
 import { Tile, hasTile, Playfield, hasPlayfield } from "../Playfield";
-import { hasTree } from "../Utils";
 import {BoxTestTile} from "./BoxTestTile";
 
 export class CircleTestTile extends BoxTestTile {
@@ -10,7 +9,6 @@ export class CircleTestTile extends BoxTestTile {
         this.gparms.fillColor = "green";
     }
     draw() {
-        this._playfield.gfx.circle(this.rect.x, this.rect.y, this.rect.w, this.gparms);
-        this._playfield._count++;
+        this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
     }
 }
