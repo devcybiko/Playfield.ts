@@ -32,17 +32,25 @@ export class Tree {
         }
         return null;
     }
-    toFront(obj: Tree) {
-        let i = this._children.indexOf(obj);
-        if (i === -1) return;
-        this._children.splice(i, 1);
-        this._children.push(obj);
+    toFront(obj?: Tree) {
+        if (obj) {
+            let i = this._children.indexOf(obj);
+            if (i === -1) return;
+            this._children.splice(i, 1);
+            this._children.push(obj);
+        } else {
+            this.parent.toFront(this);
+        }
     }
-    toBack(obj: Tree) {
-        let i = this._children.indexOf(obj);
-        if (i === -1) return;
-        this._children.splice(i, 1);
-        this._children.splice(0, 0, obj);
+    toBack(obj?: Tree) {
+        if (obj) {
+            let i = this._children.indexOf(obj);
+            if (i === -1) return;
+            this._children.splice(i, 1);
+            this._children.splice(0, 0, obj);
+        } else {
+            this.parent.toBack(this);
+        }
     }
 }
 

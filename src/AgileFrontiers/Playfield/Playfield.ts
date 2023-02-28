@@ -62,7 +62,7 @@ export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
         this.redraw(); // redraw the playfield
         this._lastTime = Date.now();
         let delta = this._lastTime - now;
-        if (delta > this._delay) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+        if (this._delay && (delta > this._delay)) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
         this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
     }
     start(delay = 125) {

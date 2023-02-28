@@ -22,8 +22,8 @@ export class Tile extends _Tile implements hasGfx, hasGfxParms {
         super();
         this.Tree(name, parent);
         this.Rect(x, y, w, h);
+        this.Logger("info");
         this._gparms = new GfxParms();
-        if (parent) parent.add(this);
         this._playfield = playfield;
         return this;
     }
@@ -45,7 +45,7 @@ export class Tile extends _Tile implements hasGfx, hasGfxParms {
     // }
     inBounds(x: number, y: number): Tile {
         let result =
-            between(this.X, x, this.Y + this.w) &&
+            between(this.X, x, this.X + this.w) &&
             between(this.Y, y, this.Y + this.h);
         if (result) return this;
         for (let child of this.children.reverse()) {

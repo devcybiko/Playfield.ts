@@ -1,5 +1,5 @@
 import { inclusive, Logger } from "../../Utils";
-import {Keyboardable} from "./Keyboardable";
+import {Keyboardable} from "./KeyboardableMixin";
 
 export interface hasKeyboardDispatcher {
     get keyboardDispatcher(): KeyboardDispatcher;

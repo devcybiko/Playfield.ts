@@ -1,8 +1,8 @@
 import { Logger } from "../../Utils";
 import { KeyboardDispatcher } from "./KeyboardDispatcher";
-import { Keyboardable } from "./Keyboardable";
+import { Keyboardable } from "./KeyboardableMixin";
 import { MouseDispatcher } from "./MouseDispatcher";
-import { Mouseable } from "./Mouseable";
+import { Mouseable } from "./MouseableMixin";
 
 export class CanvasEventHandler {
     _keyboardDispatcher: KeyboardDispatcher;

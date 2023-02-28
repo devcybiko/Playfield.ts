@@ -86,6 +86,7 @@ export class PlayfieldTest {
         let parent = this._playfield.tile;
         let circleTile = new CircleTile("circle", parent, 50, 50, 50, 50);
         let boxTile = new BoxTile("box", parent, 100, 100, 50, 50);
-        this._playfield.start();
+        let boxTile2 = new BoxTile("box", parent, 200, 200, 50, 50);
+        this._playfield.start(0);
     }
 }
