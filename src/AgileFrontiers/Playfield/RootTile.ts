@@ -14,7 +14,7 @@ applyMixins(_RootTile, [Keyboardable, Mouseable, Clicker, Selecter, Dragger, Log
 
 export class RootTile extends _RootTile implements Mouseable, Keyboardable {
     constructor(x: number, y: number, w: number, h: number, playfield: Playfield) {
-        super("_root", null, x, y, w, h, playfield);
+        super("_root", null as unknown as Tile, x, y, w, h, playfield);
         this.Dragger();
         this.Selecter();
         this.Logger("info", false);

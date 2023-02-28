@@ -1,5 +1,5 @@
 import { Tile } from "./Tile";
-import { Tree, Rect, Logger, applyMixins } from "../Utils";
+import { Rect, Logger, applyMixins } from "../Utils";
 import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
 import { RootTile } from "./RootTile";
 import { CanvasEventHandler } from "./Events/CanvasEventHandler";
