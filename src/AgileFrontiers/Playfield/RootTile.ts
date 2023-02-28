@@ -35,9 +35,11 @@ export class RootTile extends _RootTile implements Mouseable, Keyboardable {
             let child = _child as any;
             if (child.inBounds && child.inBounds(myEvent.x, myEvent.y)) {
                 this.warn("Found...", child);
-                if (child.onGrab) this._grabChild(child, myEvent);
-                if (child.onSelected) this._selectChild(child, myEvent);
-                if (child.onClick) this._clickChild(child, myEvent);
+                let processed = false;
+                if (child.onGrab) processed = this._grabChild(child, myEvent) || processed;
+                if (child.onSelected) processed = this._selectChild(child, myEvent) || processed;
+                if (child.onClick) processed = this._clickChild(child, myEvent) || processed;
+                if (processed) return true;
             }
         }
         return false;
@@ -46,5 +48,4 @@ export class RootTile extends _RootTile implements Mouseable, Keyboardable {
         this._dropChild(myEvent);
         return true;
     }
-
 }

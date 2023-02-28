@@ -1,11 +1,11 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import { Draggable } from "../Abilities/DraggableMixin";
-import { applyMixins, between } from "../../Utils";
+import { Draggable, Selectable } from "../Abilities";
+import { applyMixins } from "../../Utils";
 
 export class _CircleTile extends ShapeTile { };
-export interface _CircleTile extends Draggable { };
-applyMixins(_CircleTile, [Draggable]);
+export interface _CircleTile extends Draggable , Selectable{ };
+applyMixins(_CircleTile, [Draggable, Selectable]);
 
 export class CircleTile extends _CircleTile {
     _dx = 0;
@@ -21,6 +21,10 @@ export class CircleTile extends _CircleTile {
         return true;
     }
     draw() {
+        if (this.isSelected) this.gparms.borderColor = "black";
+        else this.gparms.borderColor = "";
+        this.gparms.fillColor = "gray";
+        
         this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
         if (this._dx && this._dy) {
             let oldColor = this.gparms.fillColor;

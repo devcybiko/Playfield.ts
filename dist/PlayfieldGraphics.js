@@ -1104,12 +1104,15 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
                 let child = _child;
                 if (child.inBounds && child.inBounds(myEvent.x, myEvent.y)) {
                     this.warn("Found...", child);
+                    let processed = false;
                     if (child.onGrab)
-                        this._grabChild(child, myEvent);
+                        processed = this._grabChild(child, myEvent) || processed;
                     if (child.onSelected)
-                        this._selectChild(child, myEvent);
+                        processed = this._selectChild(child, myEvent) || processed;
                     if (child.onClick)
-                        this._clickChild(child, myEvent);
+                        processed = this._clickChild(child, myEvent) || processed;
+                    if (processed)
+                        return true;
                 }
             }
             return false;
@@ -1117,6 +1120,11 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
         MouseUp(myEvent) {
             this._dropChild(myEvent);
             return true;
+        }
+        tick() {
+            super.tick();
+            if (this._selectedObj)
+                this._selectedObj.rmove(1, 1);
         }
     }
     exports.RootTile = RootTile;
@@ -1251,7 +1259,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/DraggableMixin", "Utils/index"], function (require, exports, ShapeTile_2, DraggableMixin_3, Utils_8) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_3, Utils_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -1260,7 +1268,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
     exports._CircleTile = _CircleTile;
     ;
     ;
-    (0, Utils_8.applyMixins)(_CircleTile, [DraggableMixin_3.Draggable]);
+    (0, Utils_8.applyMixins)(_CircleTile, [Abilities_3.Draggable, Abilities_3.Selectable]);
     class CircleTile extends _CircleTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -1275,6 +1283,11 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
             return true;
         }
         draw() {
+            if (this.isSelected)
+                this.gparms.borderColor = "black";
+            else
+                this.gparms.borderColor = "";
+            this.gparms.fillColor = "gray";
             this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
             if (this._dx && this._dy) {
                 let oldColor = this.gparms.fillColor;
