@@ -1,72 +1,80 @@
 
-import { MyEvent } from "./MyEvent";
+import { KeyEvent } from "./KeyEvent";
 
 export interface Keyboardable { }
 export class Keyboardable {
-    KeyDown(myEvent: MyEvent): boolean {
+    KeyDown(keyEvent: KeyEvent): boolean {
         return false;
     }
-    KeyUp(myEvent: MyEvent): boolean {
+    KeyUp(keyEvent: KeyEvent): boolean {
         return false;
     }
-    OrdinaryKey(myEvent: MyEvent): boolean {
+    OrdinaryKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    SpecialKey(myEvent: MyEvent): boolean {
+    SpecialKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Shift(myEvent: MyEvent): boolean {
+    Shift(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Meta(myEvent: MyEvent): boolean {
+    Meta(keyEvent: KeyEvent): boolean {
         return false;
     }
-    MetaKey(myEvent: MyEvent): boolean {
+    MetaKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Alt(myEvent: MyEvent): boolean {
+    Alt(keyEvent: KeyEvent): boolean {
         return false;
     }
-    AltKey(myEvent: MyEvent): boolean {
+    AltKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Control(myEvent: MyEvent): boolean {
+    Control(keyEvent: KeyEvent): boolean {
         return false;
     }
-    ControlKey(myEvent: MyEvent): boolean {
+    ControlKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Backspace(myEvent: MyEvent): boolean {
+    Backspace(keyEvent: KeyEvent): boolean {
         return false;
     }
-    UpperCase(myEvent: MyEvent): boolean {
+    UpperCase(keyEvent: KeyEvent): boolean {
         return false;
     }
-    LowerCase(myEvent: MyEvent): boolean {
+    LowerCase(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Digit(myEvent: MyEvent): boolean {
+    Digit(keyEvent: KeyEvent): boolean {
         return false;
     }
-    Punctuation(myEvent: MyEvent): boolean {
+    Punctuation(keyEvent: KeyEvent): boolean {
         return false;
     }
-    FunctionKey(myEvent: MyEvent): boolean {
+    FunctionKey(keyEvent: KeyEvent): boolean {
         return false;
     }
-    ArrowUp(myEvent: MyEvent): boolean {
+    ArrowUp(keyEvent: KeyEvent): boolean {
         return false;
     }
-    ArrowDown(myEvent: MyEvent): boolean {
+    ArrowDown(keyEvent: KeyEvent): boolean {
         return false;
     }
-    ArrowLeft(myEvent: MyEvent): boolean {
+    ArrowLeft(keyEvent: KeyEvent): boolean {
         return false;
     }
-    ArrowRight(myEvent: MyEvent): boolean {
+    ArrowRight(keyEvent: KeyEvent): boolean {
         return false;
     }
-    defaultKey(myEvent: MyEvent): boolean {
+    defaultKey(keyEvent: KeyEvent): boolean {
+        return false;
+    }
+    private BackSpace(keyEvent: KeyEvent): boolean {
+        // this is the wrong method
+        // you should be using Backspace(), above
+        // this is purposely mispelled with upper-case "S"
+        // to force a compile-time error
+        // if you attempt to override it.
         return false;
     }
 }

@@ -1,4 +1,4 @@
-import { MyEvent } from "./MyEvent";
+import { MouseEvent } from "./MouseEvent";
 
 export interface Mouseable {}
 export class Mouseable {

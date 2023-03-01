@@ -3,6 +3,7 @@ import {CircleTestTile} from "./CircleTestTile";
 import {BoxTestTile} from "./BoxTestTile";
 import {random} from "../Utils";
 import {CircleTile, BoxTile} from "../Playfield/Shapes";
+import {TextItem} from "../Jed";
 
 export class PlayfieldTest {
     _playfield: Playfield;
@@ -57,7 +58,6 @@ export class PlayfieldTest {
         // let delay = Math.floor(1000/fps);
         let delay = 0;
         let fps = 1000/delay;
-        console.log({fps, delay, max});
         this._playfield.start(delay);
         // note: processing 10,000 Circles stressed the app at 55 FPS
         // note: processing 10,000 Boxes stressed the app at 142 FPS
@@ -84,9 +84,20 @@ export class PlayfieldTest {
     }
     shapeTest() {
         let parent = this._playfield.tile;
+        // for (let i=0; i<10; i++) {
+        //     for(let j=0; j<1000; j++) {
+        //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
+        //     }
+        // }
+        let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
         let circleTile = new CircleTile("circle", parent, 50, 50, 50, 50);
-        let boxTile = new BoxTile("box", parent, 100, 100, 50, 50);
         let boxTile2 = new BoxTile("box", parent, 200, 200, 50, 50);
-        this._playfield.start(0);
+        let fps = 16;
+        this._playfield.start(Math.floor(1/fps*1000));
+    }
+    jedTest() {
+        let parent = this._playfield.tile;
+        let textItem = new TextItem("textitem", parent, 10, 10, 250, 28, "Hello World");
+        this._playfield.start();
     }
 }

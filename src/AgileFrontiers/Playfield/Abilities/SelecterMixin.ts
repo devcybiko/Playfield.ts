@@ -1,5 +1,5 @@
 import { Selectable } from "./SelectableMixin";
-import { MyEvent } from "../Events";
+import { MouseEvent } from "../Events";
 
 export interface Selecter { };
 export class Selecter {
@@ -9,18 +9,18 @@ export class Selecter {
         return this;
     }
 
-    _selectChild(child: Selectable, myEvent: MyEvent): boolean {
-        this._unselectChild( myEvent);
+    _selectChild(child: Selectable, mouseEvent: MouseEvent): boolean {
+        this._unselectChild( mouseEvent);
         this._selectedObj = child;
         child._isSelected = true;
-        child.onSelected(myEvent);
+        child.onSelect();
         return true;
     }
 
-    _unselectChild(myEvent: MyEvent): boolean {
+    _unselectChild(mouseEvent: MouseEvent): boolean {
         if (this._selectedObj) {
             this._selectedObj._isSelected = false;
-            this._selectedObj.onUnselected(myEvent);
+            this._selectedObj.onUnselect();
             return true;
         }
         return false;

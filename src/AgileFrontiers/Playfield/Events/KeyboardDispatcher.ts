@@ -1,5 +1,6 @@
 import { inclusive, Logger } from "../../Utils";
 import {Keyboardable} from "./KeyboardableMixin";
+import {KeyEvent} from "./KeyEvent";
 
 export interface hasKeyboardDispatcher {
     get keyboardDispatcher(): KeyboardDispatcher;
@@ -10,12 +11,19 @@ export class KeyboardDispatcher {
     _logger: Logger;
     _doKeyDown = true;
     _doKeyUp = false;
+
     constructor(obj: Keyboardable, options = {} as any) {
         this._obj = obj;
         this._logger = new Logger();
+        this._logger.Logger();
         this._doKeyDown = options.doKeyDown || this._doKeyDown;
         this._doKeyUp = options.doKeyUp || this._doKeyUp;
     }
+    _keyEvent(event: any): KeyEvent {
+        let myEvent = new KeyEvent(event.key);
+        return myEvent;
+    }
+
     dispatchEvent(event: any) {
         if (event.key !== undefined) return this.dispatchKeyboardEvent(event);
         else return this.dispatchUnknownKeyboardEvent(event);
@@ -24,11 +32,12 @@ export class KeyboardDispatcher {
         this._logger.error("dispatchUnknownKeyboardEvent:", event);
     }
     dispatchKeyboardEvent(event: any) {
+        let keyEvent = this._keyEvent(event);
         this._logger.log("dispatchKeyboardEvent:", event);
         let obj = this._obj;
         let stop = false;
         if (event.type === "keydown" && this._doKeyDown) {
-            stop = obj.KeyDown(event);
+            stop = obj.KeyDown(keyEvent);
             stop = this.dispatchMoreKeys(event);
         }
         if (!stop && event.type === "keyup" && this._doKeyUp) {
@@ -38,42 +47,45 @@ export class KeyboardDispatcher {
     }
     dispatchMoreKeys(event: any) {
         this._logger.log("dispatchMoreKeys:", event);
+        let keyEvent = this._keyEvent(event);
         let key = event.key;
         let obj = this._obj;
-        let stop = false;
-        if (key.length > 1) return obj.SpecialKey(event);
-        else if (key.length === 1 && event.ctrlKey) return obj.ControlKey(event);
-        else if (key.length === 1 && event.metaKey) return obj.MetaKey(event);
-        else if (key.length === 1 && event.altKey) return obj.AltKey(event);
-        else if (key.length === 1) return obj.OrdinaryKey(event);
-        else return obj.defaultKey(event);
+        if (key.length > 1) return this._specialKey(keyEvent);
+        else if (key.length === 1 && event.ctrlKey) return obj.ControlKey(keyEvent);
+        else if (key.length === 1 && event.metaKey) return obj.MetaKey(keyEvent);
+        else if (key.length === 1 && event.altKey) return obj.AltKey(keyEvent);
+        else if (key.length === 1) return this._ordinaryKey(keyEvent);
+        else return obj.defaultKey(keyEvent);
     }
-    OrdinaryKey(event: any) {
-        this._logger.log("OrdinaryKey:", event);
-        let key = event.key;
+    _ordinaryKey(keyEvent: KeyEvent) {
+        this._logger.log("OrdinaryKey:", keyEvent);
         let obj = this._obj;
-        if (inclusive("A", key, "Z")) return obj.UpperCase(event);
-        else if (inclusive("a", key, "z")) return obj.LowerCase(event);
-        else if (inclusive("0", key, "9")) return obj.Digit(event);
-        else if ("!@#$%^&*()-_+={}[]|\:;\"'<>,.?/".includes(key)) return obj.Punctuation(event);
-        else return obj.defaultKey(event);
+        let key = keyEvent.key;
+        if (obj.OrdinaryKey(keyEvent)) return true;
+
+        if (inclusive("A", key, "Z")) return obj.UpperCase(keyEvent);
+        else if (inclusive("a", key, "z")) return obj.LowerCase(keyEvent);
+        else if (inclusive("0", key, "9")) return obj.Digit(keyEvent);
+        else if ("!@#$%^&*()-_+={}[]|\:;\"'<>,.?/".includes(key)) return obj.Punctuation(keyEvent);
+        else return obj.defaultKey(keyEvent);
     }
-    SpecialKey(event: any) {
-        this._logger.log("SpecialKey:", event);
-        let key = event.key;
+    _specialKey(keyEvent: KeyEvent) {
+        let key = keyEvent.key;
         let obj = this._obj;
-        if (key === "ArrowUp") return obj.ArrowUp(event);
-        else if (key === "ArrowDown") return obj.ArrowDown(event);
-        else if (key === "ArrowLeft") return obj.ArrowLeft(event);
-        else if (key === "ArrowRight") return obj.ArrowRight(event);
-        else if (key === "ArrowLeft") return obj.ArrowLeft(event);
-        else if (key === "Shift") return obj.Shift(event);
-        else if (key === "Meta") return obj.Meta(event);
-        else if (key === "Alt") return obj.Alt(event);
-        else if (key === "Control") return obj.Control(event);
-        else if (key === "Backspace") return obj.Backspace(event);
-        else if (key[0] === "F") return obj.FunctionKey(event);
-        else return obj.defaultKey(event);
+        if (obj.SpecialKey(keyEvent)) return true;
+
+        if (key === "ArrowUp") return obj.ArrowUp(keyEvent);
+        else if (key === "ArrowDown") return obj.ArrowDown(keyEvent);
+        else if (key === "ArrowLeft") return obj.ArrowLeft(keyEvent);
+        else if (key === "ArrowRight") return obj.ArrowRight(keyEvent);
+        else if (key === "ArrowLeft") return obj.ArrowLeft(keyEvent);
+        else if (key === "Shift") return obj.Shift(keyEvent);
+        else if (key === "Meta") return obj.Meta(keyEvent);
+        else if (key === "Alt") return obj.Alt(keyEvent);
+        else if (key === "Control") return obj.Control(keyEvent);
+        else if (key === "Backspace") return obj.Backspace(keyEvent);
+        else if (key[0] === "F") return obj.FunctionKey(keyEvent);
+        else return obj.defaultKey(keyEvent);
     }
 }
     /**

@@ -4,3 +4,6 @@ export {Selectable} from "./SelectableMixin";
 export {Selecter} from "./SelecterMixin";
 export {Clicker} from "./ClickerMixin";
 export {Clickable} from "./ClickableMixin";
+export {Editable} from "./EditableMixin";
+export {Focuser} from "./FocuserMixin";
+export {Focusable} from "./FocusableMixin";

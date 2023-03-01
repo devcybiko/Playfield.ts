@@ -1,10 +1,6 @@
 import { inclusive, Logger } from "../../Utils";
 import { Mouseable } from "./MouseableMixin";
-import { MyEvent } from "./MyEvent";
-
-export interface hasMouseDispatcher {
-    get mouseDispatcher(): MouseDispatcher;
-}
+import { MouseEvent } from "./MouseEvent";
 
 export class MouseDispatcher {
     _obj: Mouseable;
@@ -13,37 +9,37 @@ export class MouseDispatcher {
         this._obj = obj;
         this._logger = new Logger();
     }
-    _myEvent(event: any): MyEvent {
-        let myEvent = new MyEvent(event.offsetX, event.offsetY, event.button, event.type);
-        return myEvent;
+    _mouseEvent(event: any): MouseEvent {
+        let mouseEvent = new MouseEvent(event.offsetX, event.offsetY, event.button, event.type);
+        return mouseEvent;
     }
     dispatchEvent(event: any) {
-        let myEvent = this._myEvent(event);
-        if (event.button !== undefined) return this.dispatchMouseEvent(myEvent);
+        let mouseEvent = this._mouseEvent(event);
+        if (event.button !== undefined) return this.dispatchMouseEvent(mouseEvent);
         else return this.dispatchUnknownMouseEvent(event);
     }
     dispatchUnknownMouseEvent(event: any) {
         this._logger.error("dispatchUnknownMouseEvent:", event);
     }
-    dispatchMouseEvent(myEvent: MyEvent) {
-        this._logger.warn("dispatchMouseEvent:", myEvent);
+    dispatchMouseEvent(mouseEvent: MouseEvent) {
+        this._logger.warn("dispatchMouseEvent:", mouseEvent);
         let obj = this._obj;
         if (!obj) return this._logger.error('ERROR: mousemove not associated with an object');
-        if (myEvent.type === "mousedown") {
-            if (myEvent.button === "select") return obj.MouseDown(myEvent);
-            if (myEvent.button === "middle") return obj.MiddleDown(myEvent);
-            if (myEvent.button === "menu") return obj.MenuDown(myEvent);
-        } else if (myEvent.type === "mouseup") {
-            if (myEvent.button === "select") return obj.MouseUp(myEvent);
-            if (myEvent.button === "middle") return obj.MiddleUp(myEvent);
-            if (myEvent.button === "menu") return obj.MenuUp(myEvent);
-        } else if (myEvent.type === "mousemove") {
-            return obj.MouseMove(myEvent);
-        } else if (myEvent.type === "wheel") {
-            if (myEvent.wheelDelta >= 0) return obj.WheelDown(myEvent, myEvent.wheelDelta);
-            if (myEvent.wheelDelta < 0) return obj.WheelUp(myEvent, -myEvent.wheelDelta);
+        if (mouseEvent.type === "mousedown") {
+            if (mouseEvent.button === "select") return obj.MouseDown(mouseEvent);
+            if (mouseEvent.button === "middle") return obj.MiddleDown(mouseEvent);
+            if (mouseEvent.button === "menu") return obj.MenuDown(mouseEvent);
+        } else if (mouseEvent.type === "mouseup") {
+            if (mouseEvent.button === "select") return obj.MouseUp(mouseEvent);
+            if (mouseEvent.button === "middle") return obj.MiddleUp(mouseEvent);
+            if (mouseEvent.button === "menu") return obj.MenuUp(mouseEvent);
+        } else if (mouseEvent.type === "mousemove") {
+            return obj.MouseMove(mouseEvent);
+        } else if (mouseEvent.type === "wheel") {
+            if (mouseEvent.wheelDelta >= 0) return obj.WheelDown(mouseEvent, mouseEvent.wheelDelta);
+            if (mouseEvent.wheelDelta < 0) return obj.WheelUp(mouseEvent, -mouseEvent.wheelDelta);
         } else {
-            return this.dispatchUnknownMouseEvent(myEvent);
+            return this.dispatchUnknownMouseEvent(mouseEvent);
         }
     }
 }

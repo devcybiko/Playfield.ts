@@ -5,15 +5,11 @@ export class Selectable {
         return this;
     }
 
-    onSelected(event?: any): boolean {
-        let that = this as any;
-        this._isSelected = true;
+    onSelect(): boolean {
         return true;
     }
 
-    onUnselected(event?: any): boolean {
-        let that = this as any;
-        this._isSelected = false;
+    onUnselect(): boolean {
         return true;
     }
     get isSelected(): boolean {

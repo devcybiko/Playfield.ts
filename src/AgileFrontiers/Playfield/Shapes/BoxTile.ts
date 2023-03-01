@@ -1,6 +1,6 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import { applyMixins } from "../../Utils";
+import { applyMixins, random } from "../../Utils";
 import { Draggable, Selectable } from "../Abilities";
 
 export class _BoxTile extends ShapeTile { };
@@ -15,6 +15,8 @@ export class BoxTile extends _BoxTile {
         super(name, parent, x, y, w, h);
         this.Draggable();
         this.Selectable();
+        this.gparms.fillColor = this._colors[2];
+
     }
     onGrab() {
         this.toFront();
@@ -25,13 +27,15 @@ export class BoxTile extends _BoxTile {
         this.warn(this._color);
     }
     draw() {
-        if (this.isSelected) this.gparms.borderColor = "black";
-        else this.gparms.borderColor = "";
-        this.gparms.fillColor = this._colors[this._color];
+        // if (this.isSelected) this.gparms.borderColor = "black";
+        // else this.gparms.borderColor = "";
+        // this.gparms.fillColor = this._colors[this._color];
         this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
     onDrop() {
         this.toFront();
         return true;
+    }
+    tick() {
     }
 }

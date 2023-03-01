@@ -5,7 +5,6 @@ export class Draggable {
 
     onGrab(event?: any): boolean {
         let that = this as any;
-        console.log("grab", that.name);
         return true;
     }
     onDrag(dx: number, dy: number, event?: any): boolean {

@@ -1,5 +1,5 @@
 import { Clickable } from "./ClickableMixin";
-import { MyEvent } from "../Events";
+import { MouseEvent } from "../Events";
 
 export interface Clicker { };
 export class Clicker {
@@ -7,8 +7,8 @@ export class Clicker {
         return this;
     }
 
-    _clickChild(child: Clickable, myEvent: MyEvent): boolean {
-        child.onClick(myEvent);
+    _clickChild(child: Clickable, mouseEvent: MouseEvent): boolean {
+        child.onClick(mouseEvent);
         return true;
     }
 }

@@ -17,12 +17,13 @@ export interface Tile {};
 export class Tile extends _Tile implements hasGfx, hasGfxParms {
     _playfield: Playfield;
     _gparms: GfxParms;
+    _logger: Logger;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
         super();
         this.Tree(name, parent);
         this.Rect(x, y, w, h);
-        this.Logger("info");
+        this.Logger();
         this._gparms = new GfxParms();
         this._playfield = playfield;
         return this;

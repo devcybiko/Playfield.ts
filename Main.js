@@ -8,6 +8,7 @@ define(function (require) {
     // main.circleTestTile();
     // main.groupTestTile();
     // main.tenthousandTestTile();
-    main.shapeTest();
- });
+    // main.shapeTest();
+    main.jedTest();
+});
  
