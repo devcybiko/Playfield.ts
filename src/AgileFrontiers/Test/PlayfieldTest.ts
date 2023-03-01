@@ -97,7 +97,8 @@ export class PlayfieldTest {
     }
     jedTest() {
         let parent = this._playfield.tile;
-        let textItem = new TextItem("textitem", parent, 10, 10, 250, 28, "Hello World");
+        let textItem1 = new TextItem("textitem", parent, 10, 10, 250, 28, "Hello World");
+        let textItem2 = new TextItem("textitem", parent, 10, 50, 250, 28, "Hello World");
         this._playfield.start();
     }
 }
