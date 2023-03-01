@@ -1446,7 +1446,9 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
             else
                 this.gparms.color = "black";
             gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            let value = this.value.substring(this._left).replaceAll(" ", '\uA788'); // \u00B7
+            let value = this.value.substring(this._left);
+            if (this.isFocused)
+                value = value.replaceAll(" ", '\uA788'); // \u00B7
             gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
             this.drawCursor();
             gfx.restore();
@@ -1794,7 +1796,8 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
         }
         jedTest() {
             let parent = this._playfield.tile;
-            let textItem = new Jed_1.TextItem("textitem", parent, 10, 10, 250, 28, "Hello World");
+            let textItem1 = new Jed_1.TextItem("textitem", parent, 10, 10, 250, 28, "Hello World");
+            let textItem2 = new Jed_1.TextItem("textitem", parent, 10, 50, 250, 28, "Hello World");
             this._playfield.start();
         }
     }

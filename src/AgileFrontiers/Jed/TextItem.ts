@@ -60,7 +60,8 @@ export class TextItem extends _TextItem {
         if (this.isFocused) this.gparms.color = "red";
         else this.gparms.color = "black";
         gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-        let value = this.value.substring(this._left).replaceAll(" ", '\uA788'); // \u00B7
+        let value = this.value.substring(this._left)
+        if (this.isFocused) value = value.replaceAll(" ", '\uA788'); // \u00B7
         gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
         this.drawCursor();
         gfx.restore();
