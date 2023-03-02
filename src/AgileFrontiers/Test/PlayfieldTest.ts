@@ -99,9 +99,10 @@ export class PlayfieldTest {
         let x = 10;
         let y = 10;
         let parent = this._playfield.tile;
-        let textItem1 = new TextItem("textitem-1", parent, x, y, 250, 14, "Hello World");
-        let textItem2 = new TextItem("textitem-2", parent, x, y+=50, 250, 14, "Hello World");
-        let textItem3 = new TextItem("textitem-3", parent, x, y+=50, 250, 14, "Hello World");
+        let textItem1 = new TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
+        let textItem2 = new TextItem("textitem-2", parent, x, y+=50, 250, 14, "Hello World 2");
+        let textItem3 = new TextItem("textitem-3", parent, x, y+=50, 250, 14, "Hello World 3");
+        let textItem4 = new TextItem("textitem-4", parent, x, y+=50, 250, 14, "Hello World 4 ");
         let buttonItem1 = new ButtonItem("ButtonItem", parent, x, y+=50, 45, 14);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
