@@ -1,3 +1,4 @@
 node_modules/
+dist/
 *.jnk/
 .DS_Store

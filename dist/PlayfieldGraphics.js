@@ -1331,6 +1331,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             let delta = this._lastTime - now;
             if (this._delay && (delta > this._delay))
                 console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+            // console.log(` The tick() processing time (${delta}ms aka ${1000 / delta} fps)\nthe _delay (${this._delay}ms aka ${1000 / this._delay} fps).\nThere is only ${extra}ms between frames\n`);
             this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
         }
         start(delay = 125) {
@@ -1561,6 +1562,8 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             this.Draggable();
             this.Selectable();
             this.gparms.fillColor = this._colors[2];
+            this.DX = (0, Utils_9.random)(-10, 10);
+            this.DY = (0, Utils_9.random)(-10, 10);
         }
         onGrab() {
             this.toFront();
@@ -1574,6 +1577,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             // if (this.isSelected) this.gparms.borderColor = "black";
             // else this.gparms.borderColor = "";
             // this.gparms.fillColor = this._colors[this._color];
+            // this.gparms.fillColor = "";
             this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
         }
         onDrop() {
@@ -1581,6 +1585,20 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             return true;
         }
         tick() {
+            let obj = this;
+            this.rmove(obj.DX || 10, obj.DY || 10);
+            if (this.X > this._playfield.w || this.X <= 0) {
+                if (obj.DX === undefined)
+                    this.rmove(-this.x, 0);
+                else
+                    obj.DX = -obj.DX;
+            }
+            if (this.Y > this._playfield.h || this.Y <= 0) {
+                if (obj.DY === undefined)
+                    this.rmove(0, -this.y);
+                else
+                    obj.DY = -obj.DY;
+            }
         }
     }
     exports.BoxTile = BoxTile;
@@ -1654,7 +1672,7 @@ define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTil
     Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
     Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
 });
-define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_3) {
+define("Test/BoxTestTile", ["require", "exports", "Playfield/index", "Utils/index"], function (require, exports, Playfield_3, Utils_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTestTile = void 0;
@@ -1664,9 +1682,12 @@ define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (
             this.gparms.borderColor = "red";
             this.gparms.color = "blue";
             this.gparms.fillColor = "green";
+            this.DX = (0, Utils_11.random)(-10, 10);
+            this.DY = (0, Utils_11.random)(-10, 10);
         }
         draw() {
             this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+            this.tick();
         }
         tick() {
             let obj = this;
@@ -1708,7 +1729,7 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_11, Shapes_1, Jed_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_12, Shapes_1, Jed_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
@@ -1745,11 +1766,11 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let max = 100;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_11.random)(0, this._playfield.w);
-                    let y = (0, Utils_11.random)(0, this._playfield.h);
-                    let r = (0, Utils_11.random)(10, 50);
-                    let DX = (0, Utils_11.random)(-10, 10);
-                    let DY = (0, Utils_11.random)(-10, 10);
+                    let x = (0, Utils_12.random)(0, this._playfield.w);
+                    let y = (0, Utils_12.random)(0, this._playfield.h);
+                    let r = (0, Utils_12.random)(10, 50);
+                    let DX = (0, Utils_12.random)(-10, 10);
+                    let DY = (0, Utils_12.random)(-10, 10);
                     let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
                     // circle.gparms.fillColor = null;
                     circle.DX = DX;
@@ -1783,16 +1804,17 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
         }
         shapeTest() {
             let parent = this._playfield.tile;
-            // for (let i=0; i<10; i++) {
-            //     for(let j=0; j<1000; j++) {
-            //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
-            //     }
-            // }
-            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_11.random)(0, 1000), (0, Utils_11.random)(0, 1000), 50, 50);
-            let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
-            let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
-            let fps = 16;
-            this._playfield.start(Math.floor(1 / fps * 1000));
+            for (let i = 0; i < 1000; i++) {
+                for (let j = 0; j < 1000; j++) {
+                    let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_12.random)(0, 1000), (0, Utils_12.random)(0, 1000), 50, 50);
+                }
+            }
+            // let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
+            // let circleTile = new CircleTile("circle", parent, 50, 50, 50, 50);
+            // let boxTile2 = new BoxTile("box", parent, 200, 200, 50, 50);
+            // let fps = 1000;
+            // this._playfield.start(Math.floor(1/fps*1000));
+            this._playfield.start(0);
         }
         jedTest() {
             let parent = this._playfield.tile;

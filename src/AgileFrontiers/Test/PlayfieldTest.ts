@@ -84,16 +84,17 @@ export class PlayfieldTest {
     }
     shapeTest() {
         let parent = this._playfield.tile;
-        // for (let i=0; i<10; i++) {
-        //     for(let j=0; j<1000; j++) {
-        //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
-        //     }
-        // }
-        let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
-        let circleTile = new CircleTile("circle", parent, 50, 50, 50, 50);
-        let boxTile2 = new BoxTile("box", parent, 200, 200, 50, 50);
-        let fps = 16;
-        this._playfield.start(Math.floor(1/fps*1000));
+        for (let i=0; i<1000; i++) {
+            for(let j=0; j<1000; j++) {
+                let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
+            }
+        }
+        // let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
+        // let circleTile = new CircleTile("circle", parent, 50, 50, 50, 50);
+        // let boxTile2 = new BoxTile("box", parent, 200, 200, 50, 50);
+        // let fps = 1000;
+        // this._playfield.start(Math.floor(1/fps*1000));
+        this._playfield.start(0);
     }
     jedTest() {
         let parent = this._playfield.tile;

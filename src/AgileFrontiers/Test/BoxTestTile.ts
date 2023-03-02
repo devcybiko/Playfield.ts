@@ -1,14 +1,21 @@
 import { Tile } from "../Playfield";
+import { random } from "../Utils";
 
 export class BoxTestTile extends Tile {
+    DX: number;
+    DY: number;
+    
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h = w) {
         super(name, parent, x, y, w, h);
         this.gparms.borderColor = "red";
         this.gparms.color = "blue";
         this.gparms.fillColor = "green";
+        this.DX = random(-10, 10)
+        this.DY = random(-10, 10);
     }
     draw() {
         this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        this.tick();
     }
     tick(): void {
         let obj = this as any;
