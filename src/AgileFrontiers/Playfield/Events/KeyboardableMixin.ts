@@ -39,6 +39,9 @@ export class Keyboardable {
     Backspace(keyEvent: KeyEvent): boolean {
         return false;
     }
+    TabKey(keyEvent: KeyEvent): boolean {
+        return false;
+    }
     UpperCase(keyEvent: KeyEvent): boolean {
         return false;
     }
@@ -67,6 +70,7 @@ export class Keyboardable {
         return false;
     }
     defaultKey(keyEvent: KeyEvent): boolean {
+        console.log("default key", keyEvent);
         return false;
     }
     private BackSpace(keyEvent: KeyEvent): boolean {
