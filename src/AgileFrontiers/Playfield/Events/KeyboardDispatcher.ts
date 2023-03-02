@@ -20,13 +20,15 @@ export class KeyboardDispatcher {
         this._doKeyUp = options.doKeyUp || this._doKeyUp;
     }
     _keyEvent(event: any): KeyEvent {
-        let myEvent = new KeyEvent(event.key);
+        let myEvent = new KeyEvent(event);
         return myEvent;
     }
 
     dispatchEvent(event: any) {
-        if (event.key !== undefined) return this.dispatchKeyboardEvent(event);
-        else return this.dispatchUnknownKeyboardEvent(event);
+        event.preventDefault();
+        if (event.key !== undefined) this.dispatchKeyboardEvent(event);
+        else this.dispatchUnknownKeyboardEvent(event);
+        return false;
     }
     dispatchUnknownKeyboardEvent(event: any) {
         this._logger.error("dispatchUnknownKeyboardEvent:", event);
@@ -70,9 +72,11 @@ export class KeyboardDispatcher {
         else return obj.defaultKey(keyEvent);
     }
     _specialKey(keyEvent: KeyEvent) {
+        console.log("special key", event);
         let key = keyEvent.key;
         let obj = this._obj;
         if (obj.SpecialKey(keyEvent)) return true;
+        console.log("////special key", keyEvent);
 
         if (key === "ArrowUp") return obj.ArrowUp(keyEvent);
         else if (key === "ArrowDown") return obj.ArrowDown(keyEvent);
@@ -84,6 +88,7 @@ export class KeyboardDispatcher {
         else if (key === "Alt") return obj.Alt(keyEvent);
         else if (key === "Control") return obj.Control(keyEvent);
         else if (key === "Backspace") return obj.Backspace(keyEvent);
+        else if (key === "Tab") return obj.TabKey(keyEvent);
         else if (key[0] === "F") return obj.FunctionKey(keyEvent);
         else return obj.defaultKey(keyEvent);
     }

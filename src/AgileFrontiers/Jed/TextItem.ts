@@ -1,18 +1,17 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
-import { Draggable, Editable, Focusable } from "../Playfield/Abilities";
+import { Draggable, Editable, Repeatable } from "../Playfield/Abilities";
 
 export class _TextItem extends Item { };
-export interface _TextItem extends Draggable, Editable, Focusable { };
-applyMixins(_TextItem, [Draggable, Editable, Focusable]);
+export interface _TextItem extends Draggable, Editable, Repeatable { };
+applyMixins(_TextItem, [Draggable, Editable, Repeatable]);
 
 export class TextItem extends _TextItem {
     _cursor = 0;
     _left = 0;
     _right = 0;
     _cursorOn = true;
-    _timerId: any;
     _cursorBlinkRate = 500;
     _nchars = 0;
     _nchars2 = 0;
@@ -20,21 +19,28 @@ export class TextItem extends _TextItem {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value);
         this.Draggable();
-        this.Selectable();
         this.Editable();
-        this.Focusable();
         this.Logger();
-        this.gparms.fontFace = "monospace";
+        this.Repeatable(this._cursorBlinkRate);
+        this.options.fontFace = "monospace";
+        this.options.fontSize = h;
+        this._updateGparms();
         this._nchars = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w);
         this._nchars2 = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this._left = 0;
         this._right = this.computeRight();
-        this._setIntervalTimer();
     }
-    _setIntervalTimer() {
+    _startCursorBlinking() {
         this._cursorOn = true;
-        if (this._timerId) clearInterval(this._timerId);
-        this._timerId = setInterval(this.blink.bind(this), this._cursorBlinkRate);
+        this.startRepeat(this._cursorBlinkRate);
+    }
+    _stopCursorBlinking() {
+        this._cursorOn = false;
+        this.stopRepeat();
+    }
+    onRepeat(): boolean {
+        this.blink();
+        return true;
     }
     blink() {
         this._cursorOn = !this._cursorOn;
@@ -57,8 +63,9 @@ export class TextItem extends _TextItem {
     }
     draw() {
         let gfx = this._playfield.gfx;
-        if (this.isFocused) this.gparms.color = "red";
-        else this.gparms.color = "black";
+        this._updateGparms();
+        if (this.isFocused) this.gparms.color = this.options.selectColor;
+        else this.gparms.color = this.options.textColor;
         gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
         let value = this.value.substring(this._left)
         if (this.isFocused) value = value.replaceAll(" ", '\uA788'); // \u00B7
@@ -69,20 +76,20 @@ export class TextItem extends _TextItem {
     computeRight() {
         // let gfx = this._playfield.gfx;
         // let right = this._left;
-        // for(let i=this._left; i<=this._value.length; i++) {
-        //     let bb = gfx.boundingBox(this._value.substring(this._left, i));
+        // for(let i=this._left; i<=this.value.length; i++) {
+        //     let bb = gfx.boundingBox(this.value.substring(this._left, i));
         //     right = i;
         //     if (bb.w > this.w) break;
         // }
         let right = this._left + this._nchars2 * 2;
-        if (right >= this._value.length) right = this._value.length - 1;
+        if (right >= this.value.length) right = this.value.length - 1;
         return right;
     }
     computeLeft() {
         // let gfx = this._playfield.gfx;
         // let left = this._right;
         // for(let i=this._right; i>=0; i--) {
-        //     let bb = gfx.boundingBox(this._value.substring(i, this._right));
+        //     let bb = gfx.boundingBox(this.value.substring(i, this._right));
         //     if (bb.w > this.w) break;
         //     left = i;
         // }
@@ -92,15 +99,15 @@ export class TextItem extends _TextItem {
     }
     cursorInc(delta: number) {
         this._cursor += delta;
-        this._setIntervalTimer();
+        this._startCursorBlinking();
         this._cursorOn = true;
         if (this._cursor < 0) this._cursor = 0;
-        if (this._cursor > this._value.length) this._cursor = this._value.length;
+        if (this._cursor > this.value.length) this._cursor = this.value.length;
         this._left = this._cursor - this._nchars2;
         if (this._left < 0) this._left = 0;
         this._right = this._left + this._nchars;
-        if (this._right > this._value.length) this._right = this._value.length;
-        if (this._right === this._value.length) this._left = Math.max(this._right - this._nchars + 1, 0);
+        if (this._right > this.value.length) this._right = this.value.length;
+        if (this._right === this.value.length) this._left = Math.max(this._right - this._nchars + 1, 0);
         this.log(this._left, this._cursor, this._right, this._nchars, this._nchars2);
     }
     onArrowLeft(): boolean {
@@ -114,19 +121,29 @@ export class TextItem extends _TextItem {
     onBackspace(): boolean {
         if (this._cursor > 0) {
             let c = this._cursor;
-            let left = this._value.substring(0, c - 1);
-            let right = this._value.substring(c);
+            let left = this.value.substring(0, c - 1);
+            let right = this.value.substring(c);
             this.value = left + right;
             this.cursorInc(-1);
-            this.log(left, right, this._cursor, this._value);
+            this.log(left, right, this._cursor, this.value);
             return true;
         }
         return false;
     }
     onKey(key: string): boolean {
         let c = this._cursor;
-        this.value = this._value.substring(0, c) + key + this._value.substring(c);
+        this.value = this.value.substring(0, c) + key + this.value.substring(c);
         this.cursorInc(+1);
+        return true;
+    }
+    onFocus(): boolean {
+        super.onFocus();
+        this.toFront();
+        this._startCursorBlinking();
+        return true;
+    }
+    onUnfocus(): boolean {
+        this._stopCursorBlinking();
         return true;
     }
 }

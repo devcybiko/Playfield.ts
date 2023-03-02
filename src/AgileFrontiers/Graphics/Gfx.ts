@@ -75,7 +75,7 @@ export class Gfx {
     ) {
         this.logger.info("line", x0, y0, x1, y1);
         this.ctx.beginPath();
-        this.ctx.strokeStyle = gparms0.color;
+        this.ctx.strokeStyle = gparms0.borderColor;
         this.ctx.moveTo(gparms0.dx + x0, gparms0.dy + y0);
         this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
         this.ctx.stroke();

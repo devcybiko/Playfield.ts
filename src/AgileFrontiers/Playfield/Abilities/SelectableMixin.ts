@@ -1,7 +1,25 @@
 export interface Selectable { }
 export class Selectable {
-    _isSelected: boolean;
+    private _isSelected: boolean;
+    private _isSelectable: boolean;
+
+    public get isSelected(): boolean {
+        return this._isSelected;
+    }
+    public set isSelected(value: boolean) {
+        this._isSelected = value;
+    }
+
+    public get isSelectable(): boolean {
+        return this._isSelectable;
+    }
+    public set isSelectable(value: boolean) {
+        this._isSelectable = value;
+    }
+
     Selectable() {
+        this._isSelected = false;
+        this._isSelectable = true;
         return this;
     }
 
@@ -11,8 +29,5 @@ export class Selectable {
 
     onUnselect(): boolean {
         return true;
-    }
-    get isSelected(): boolean {
-        return this._isSelected;
     }
 }

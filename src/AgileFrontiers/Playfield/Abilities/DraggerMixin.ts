@@ -8,11 +8,14 @@ export class Dragger {
     _dragY: number;
 
     Dragger() {
+        this._dragObj = null;
+        this._dragX = 0;
+        this._dragY = 0;
         return this;
     }
 
     _grabChild(child: Draggable, myEvent: MouseEvent): boolean {
-        if (!this._dragObj) {
+        if (child.isDraggable && !this._dragObj) {
             this._dragObj = child as Draggable;
             child.onGrab(myEvent);
             this._dragX = myEvent.x;

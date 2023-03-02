@@ -1,10 +1,33 @@
 export interface Editable { }
 export class Editable {
-    _isEditable: boolean;
+    private _isEditable: boolean;
+    private _isFocused: boolean;
+    private _isFocusable: boolean;
 
     Editable() {
-        this._isEditable = true;
+        this.isEditable = true;
+        this.isFocused = false;
+        this.isFocusable = true;
         return this;
+    }
+
+    public get isEditable(): boolean {
+        return this._isEditable;
+    }
+    public set isEditable(value: boolean) {
+        this._isEditable = value;
+    }
+    public get isFocusable(): boolean {
+        return this._isFocusable;
+    }
+    public set isFocusable(value: boolean) {
+        this._isFocusable = value;
+    }
+    public get isFocused(): boolean {
+        return this._isFocused;
+    }
+    public set isFocused(value: boolean) {
+        this._isFocused = value;
     }
 
     onKey(key: string, event?: any): boolean {
@@ -35,4 +58,13 @@ export class Editable {
         // if you attempt to override it.
         return true;
     }
+
+    onFocus(): boolean {
+        return true;
+    }
+
+    onUnfocus(): boolean {
+        return true;
+    }
+
 }
