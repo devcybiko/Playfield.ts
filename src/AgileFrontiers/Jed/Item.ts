@@ -18,6 +18,7 @@ export class Item extends _Item {
         this._value = value;
         this._options = new ItemOptions;
         this._options.text = text || value;
+        this._options.fontSize = h;
     }
     get value(): string {
         return this._value;
@@ -34,5 +35,8 @@ export class Item extends _Item {
         this.gparms.borderColor = this.options.borderColor;
         this.gparms.fontSize = this.options.fontSize;
         this.gparms.fontFace = this.options.fontFace;
+        this.gparms.textAlign = this.options.textAlign;
+        this.gparms.textBaseline = this.options.textBaseline;
+    
     }
 }

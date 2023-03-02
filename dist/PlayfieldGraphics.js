@@ -354,12 +354,12 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
             this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
             this.ctx.stroke();
         }
-        text(msg, x = 0, y = 0, gparms = this.gparms) {
+        text(msg, x = 0, y = 0, gparms = this.gparms, w) {
             this.ctx.fillStyle = gparms.color;
             this.ctx.font = gparms.font;
             this.ctx.textAlign = gparms.textAlign;
             this.ctx.textBaseline = gparms.textBaseline;
-            this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y);
+            this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y, w);
         }
         textRect(msg, x = 0, y = 0, w, h, gparms = this.gparms) {
             this.ctx.font = gparms.font;
@@ -369,7 +369,7 @@ define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"
             if (!h)
                 h = boundingBox.h;
             this.rect(x, y, w, h, gparms);
-            this.text(msg, x, y, gparms);
+            this.text(msg, x, y, gparms, w);
         }
         boundingBox(msg, gparms = this.gparms) {
             this.ctx.font = gparms.font;
@@ -425,7 +425,6 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Graphics/index"]
             this._gparms = new Graphics_1.GfxParms();
             this._playfield = playfield;
             this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
-            console.log("taborder", this._tabOrder);
             return this;
         }
         get gfx() {
@@ -814,12 +813,10 @@ define("Playfield/Events/KeyboardDispatcher", ["require", "exports", "Utils/inde
                 return obj.defaultKey(keyEvent);
         }
         _specialKey(keyEvent) {
-            console.log("special key", event);
             let key = keyEvent.key;
             let obj = this._obj;
             if (obj.SpecialKey(keyEvent))
                 return true;
-            console.log("////special key", keyEvent);
             if (key === "ArrowUp")
                 return obj.ArrowUp(keyEvent);
             else if (key === "ArrowDown")
@@ -1548,7 +1545,6 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
             return false;
         }
         TabKey(keyEvent) {
-            console.log("TabKey");
             if (this.focusObj) {
                 if (!keyEvent._isShift)
                     return this._nextChild(+1, null);
@@ -1643,7 +1639,7 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
     exports.ItemOptions = void 0;
     class ItemOptions {
         constructor() {
-            this.fontSize = 14;
+            this.fontSize = 24;
             this.fontFace = "sans-serif";
             this.text = "";
             this.label = "";
@@ -1652,6 +1648,8 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
             this.fillColor = "white";
             this.selectColor = "red";
             this.hoverColor = "#c88";
+            this.textAlign = "left";
+            this.textBaseline = "top";
         }
     }
     exports.ItemOptions = ItemOptions;
@@ -1674,6 +1672,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
             this._value = value;
             this._options = new ItemOptions_1.ItemOptions;
             this._options.text = text || value;
+            this._options.fontSize = h;
         }
         get value() {
             return this._value;
@@ -1690,6 +1689,8 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
             this.gparms.borderColor = this.options.borderColor;
             this.gparms.fontSize = this.options.fontSize;
             this.gparms.fontFace = this.options.fontFace;
+            this.gparms.textAlign = this.options.textAlign;
+            this.gparms.textBaseline = this.options.textBaseline;
         }
     }
     exports.Item = Item;
@@ -1746,16 +1747,55 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Utils/index", "Play
     }
     exports.ButtonItem = ButtonItem;
 });
-define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_9, Abilities_4) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_9, Abilities_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.LabelItem = exports._LabelItem = void 0;
+    class _LabelItem extends Item_2.Item {
+    }
+    exports._LabelItem = _LabelItem;
+    ;
+    ;
+    (0, Utils_9.applyMixins)(_LabelItem, [Abilities_4.Draggable]);
+    class LabelItem extends _LabelItem {
+        constructor(name, parent, x, y, w, h, value = "", label = "") {
+            super(name, parent, x, y, w, h, value);
+            this.Draggable();
+            this.Logger();
+            this.options.fontSize = h;
+            this._updateGparms();
+            this._label = label;
+        }
+        draw() {
+            let gfx = this._playfield.gfx;
+            this._updateGparms();
+            let w = this.w;
+            let h = this.h;
+            let x = this.x;
+            let y = this.y;
+            if (w < 0) {
+                this.gparms.textAlign = "right";
+                w = -w;
+                x -= w;
+            }
+            gfx.clipRect(x, y, w, h, this.gparms);
+            // gfx.rect(x, y, w, h);
+            gfx.text(this._label, this.x, y, this.gparms, w);
+            gfx.restore();
+        }
+    }
+    exports.LabelItem = LabelItem;
+});
+define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_10, Abilities_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TextItem = exports._TextItem = void 0;
-    class _TextItem extends Item_2.Item {
+    class _TextItem extends Item_3.Item {
     }
     exports._TextItem = _TextItem;
     ;
     ;
-    (0, Utils_9.applyMixins)(_TextItem, [Abilities_4.Draggable, Abilities_4.Editable, Abilities_4.Repeatable]);
+    (0, Utils_10.applyMixins)(_TextItem, [Abilities_5.Draggable, Abilities_5.Editable, Abilities_5.Repeatable]);
     class TextItem extends _TextItem {
         constructor(name, parent, x, y, w, h, value = "") {
             super(name, parent, x, y, w, h, value);
@@ -1912,16 +1952,16 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
     }
     exports.TextItem = TextItem;
 });
-define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_10, Abilities_5) {
+define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_4, Utils_11, Abilities_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ToggleItem = exports._ToggleItem = void 0;
-    class _ToggleItem extends Item_3.Item {
+    class _ToggleItem extends Item_4.Item {
     }
     exports._ToggleItem = _ToggleItem;
     ;
     ;
-    (0, Utils_10.applyMixins)(_ToggleItem, [Abilities_5.Draggable, Abilities_5.Clickable, Abilities_5.Hoverable]);
+    (0, Utils_11.applyMixins)(_ToggleItem, [Abilities_6.Draggable, Abilities_6.Clickable, Abilities_6.Hoverable]);
     class ToggleItem extends _ToggleItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value);
@@ -1979,13 +2019,14 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Utils/index", "Play
     }
     exports.ToggleItem = ToggleItem;
 });
-define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Jed/ToggleItem"], function (require, exports, TextItem_1, ButtonItem_1, ToggleItem_1) {
+define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Jed/ToggleItem", "Jed/LabelItem"], function (require, exports, TextItem_1, ButtonItem_1, ToggleItem_1, LabelItem_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ToggleItem = exports.ButtonItem = exports.TextItem = void 0;
+    exports.LabelItem = exports.ToggleItem = exports.ButtonItem = exports.TextItem = void 0;
     Object.defineProperty(exports, "TextItem", { enumerable: true, get: function () { return TextItem_1.TextItem; } });
     Object.defineProperty(exports, "ButtonItem", { enumerable: true, get: function () { return ButtonItem_1.ButtonItem; } });
     Object.defineProperty(exports, "ToggleItem", { enumerable: true, get: function () { return ToggleItem_1.ToggleItem; } });
+    Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_1.LabelItem; } });
 });
 define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __1) {
     "use strict";
@@ -1998,7 +2039,7 @@ define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], 
     }
     exports.ShapeTile = ShapeTile;
 });
-define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_11, Abilities_6) {
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_12, Abilities_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTile = exports._BoxTile = void 0;
@@ -2007,7 +2048,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     exports._BoxTile = _BoxTile;
     ;
     ;
-    (0, Utils_11.applyMixins)(_BoxTile, [Abilities_6.Draggable, Abilities_6.Selectable]);
+    (0, Utils_12.applyMixins)(_BoxTile, [Abilities_7.Draggable, Abilities_7.Selectable]);
     class BoxTile extends _BoxTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -2040,7 +2081,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_7, Utils_12) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -2049,7 +2090,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
     exports._CircleTile = _CircleTile;
     ;
     ;
-    (0, Utils_12.applyMixins)(_CircleTile, [Abilities_7.Draggable, Abilities_7.Selectable]);
+    (0, Utils_13.applyMixins)(_CircleTile, [Abilities_8.Draggable, Abilities_8.Selectable]);
     class CircleTile extends _CircleTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -2163,7 +2204,7 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_13, Shapes_1, Jed_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_14, Shapes_1, Jed_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
@@ -2200,11 +2241,11 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let max = 100;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_13.random)(0, this._playfield.w);
-                    let y = (0, Utils_13.random)(0, this._playfield.h);
-                    let r = (0, Utils_13.random)(10, 50);
-                    let DX = (0, Utils_13.random)(-10, 10);
-                    let DY = (0, Utils_13.random)(-10, 10);
+                    let x = (0, Utils_14.random)(0, this._playfield.w);
+                    let y = (0, Utils_14.random)(0, this._playfield.h);
+                    let r = (0, Utils_14.random)(10, 50);
+                    let DX = (0, Utils_14.random)(-10, 10);
+                    let DY = (0, Utils_14.random)(-10, 10);
                     let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
                     // circle.gparms.fillColor = null;
                     circle.DX = DX;
@@ -2243,19 +2284,22 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
             //     }
             // }
-            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_13.random)(0, 1000), (0, Utils_13.random)(0, 1000), 50, 50);
+            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_14.random)(0, 1000), (0, Utils_14.random)(0, 1000), 50, 50);
             let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
             let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
             let fps = 16;
             this._playfield.start(Math.floor(1 / fps * 1000));
         }
         jedTest() {
-            let x = 10;
+            let x = 110;
             let y = 10;
             let parent = this._playfield.tile;
-            let textItem1 = new Jed_1.TextItem("textitem-1", parent, x, y, 250, 14, "Hello World");
-            let textItem2 = new Jed_1.TextItem("textitem-2", parent, x, y += 50, 250, 14, "Hello World");
-            let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += 50, 250, 14, "Hello World");
+            let textItem1 = new Jed_1.TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
+            let lablItem1 = new Jed_1.LabelItem("Label-1", parent, x - 10, y, -100, 14, "Label-1", "Label-1");
+            let textItem2 = new Jed_1.TextItem("textitem-2", parent, x, y += 50, 100, 14, "Hello World 2");
+            let lablItem2 = new Jed_1.LabelItem("Label-2", parent, x - 100, y, 100, 14, "Label-2", "Label-2");
+            let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += 50, 100, 14, "Hello World 3");
+            let textItem4 = new Jed_1.TextItem("textitem-4", parent, x, y += 50, 100, 14, "Hello World 4 ");
             let buttonItem1 = new Jed_1.ButtonItem("ButtonItem", parent, x, y += 50, 45, 14);
             buttonItem1.label = "Hello World";
             buttonItem1.value = "Greg Smith";

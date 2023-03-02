@@ -72,11 +72,9 @@ export class KeyboardDispatcher {
         else return obj.defaultKey(keyEvent);
     }
     _specialKey(keyEvent: KeyEvent) {
-        console.log("special key", event);
         let key = keyEvent.key;
         let obj = this._obj;
         if (obj.SpecialKey(keyEvent)) return true;
-        console.log("////special key", keyEvent);
 
         if (key === "ArrowUp") return obj.ArrowUp(keyEvent);
         else if (key === "ArrowDown") return obj.ArrowDown(keyEvent);

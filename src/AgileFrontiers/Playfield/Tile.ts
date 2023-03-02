@@ -28,7 +28,6 @@ export class Tile extends _Tile implements hasGfx, hasGfxParms {
         this._gparms = new GfxParms();
         this._playfield = playfield;
         this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
-        console.log("taborder", this._tabOrder);
         return this;
     }
     get gfx(): Gfx {

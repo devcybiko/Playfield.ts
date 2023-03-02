@@ -80,12 +80,12 @@ export class Gfx {
         this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
         this.ctx.stroke();
     }
-    text(msg: string, x = 0, y = 0, gparms = this.gparms) {
+    text(msg: string, x = 0, y = 0, gparms = this.gparms, w?: number) {
         this.ctx.fillStyle = gparms.color;
         this.ctx.font = gparms.font;
         this.ctx.textAlign = gparms.textAlign;
         this.ctx.textBaseline = gparms.textBaseline;
-        this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y);
+        this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y, w);
     }
     textRect(
         msg: string,
@@ -100,7 +100,7 @@ export class Gfx {
         if (!w) w = boundingBox.w;
         if (!h) h = boundingBox.h;
         this.rect(x, y, w, h, gparms);
-        this.text(msg, x, y, gparms);
+        this.text(msg, x, y, gparms, w);
     }
     boundingBox(msg: string, gparms = this.gparms): any {
         this.ctx.font = gparms.font;

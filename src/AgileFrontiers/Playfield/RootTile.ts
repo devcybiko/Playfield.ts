@@ -95,7 +95,6 @@ export class RootTile extends _RootTile implements Mouseable, Keyboardable {
         return false;
     }
     TabKey(keyEvent: KeyEvent): boolean {
-        console.log("TabKey");
         if (this.focusObj) {
             if (!keyEvent._isShift) return this._nextChild(+1, null);
             return this._nextChild(-1, null);
