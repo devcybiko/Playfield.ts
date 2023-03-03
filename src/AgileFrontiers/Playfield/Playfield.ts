@@ -1,8 +1,8 @@
 import { Tile } from "./Tile";
 import { Rect, Logger, applyMixins } from "../Utils";
-import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
+import { Gfx, GfxParms } from "../Graphics";
 import { RootTile } from "./RootTile";
-import { CanvasEventHandler } from "./Events/CanvasEventHandler";
+import { iEventQueue, PlayfieldEvent } from "./PlayfieldEvents";
 
 /**
  * Playfield is a graphic area for rendering
@@ -14,26 +14,22 @@ export class _Playfield { };
 export interface _Playfield extends Logger, Rect { };
 applyMixins(_Playfield, [Logger, Rect]);
 
-export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
-    _canvas: HTMLCanvasElement;
-    _ctx: CanvasRenderingContext2D;
+export class Playfield extends _Playfield {
     _rootTile: RootTile;
     _gfx: Gfx;
     _gparms: GfxParms;
     _lastTime = 0;
     _delay = 0;
     _timerId = 0 as any;
-    _canvasEventHandler: CanvasEventHandler;
+    _eventQueue: iEventQueue;
 
-    constructor(canvasId: string) {
+    constructor(gfx: Gfx, eventQueue: iEventQueue) {
         super();
-        this._canvas = document.querySelector(canvasId);
-        this._ctx = this._canvas.getContext("2d");
-        this._gfx = new Gfx(this._ctx);
+        this._gfx = gfx;
+        this._eventQueue = eventQueue;
         this._gparms = new GfxParms();
-        this.Rect(0, 0, this._canvas.width, this._canvas.height);
+        this.Rect(0, 0, this._gfx.width, this._gfx.height);
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
-        this._canvasEventHandler = new CanvasEventHandler(this._canvas, this._rootTile);
     }
     get playfield(): Playfield {
         return this;
@@ -48,7 +44,7 @@ export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
         return this._gfx;
     }
     clear() {
-        this.gfx.rect(0, 0, this._canvas.width, this._canvas.height, this.gparms);
+        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
     }
     redraw() {
         this.clear();
@@ -58,6 +54,7 @@ export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
         clearTimeout(this._timerId);
         let now = Date.now();
         let extra = now - this._lastTime;
+        this.handleEvents();
         this.tile.tick(); // process all ticks
         this.redraw(); // redraw the playfield
         this._lastTime = Date.now();
@@ -70,5 +67,15 @@ export class Playfield extends _Playfield implements hasGfx, hasGfxParms {
         this._lastTime = Date.now();
         this.redraw();
         this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
+    }
+    handleEvents() {
+        for (
+            let hidEvent = this._eventQueue.getEvent();
+            hidEvent;
+            hidEvent = this._eventQueue.getEvent()) {
+            this.dispatchEvent(hidEvent);
+        }
+    }
+    dispatchEvent(pfEvent: PlayfieldEvent) {
     }
 }

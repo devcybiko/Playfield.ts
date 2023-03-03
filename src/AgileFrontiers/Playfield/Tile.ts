@@ -1,5 +1,5 @@
 import { applyMixins, Tree, Rect, between, Logger } from "../Utils";
-import { Gfx, hasGfx, GfxParms, hasGfxParms } from "../Graphics";
+import { Gfx, GfxParms } from "../Graphics";
 import { Playfield } from "./Playfield";
 /**
  * A Tile is a rectangular item on a Playfield.
@@ -14,7 +14,7 @@ export interface _Tile extends Logger, Tree, Rect { };
 applyMixins(_Tile, [Logger, Tree, Rect]);
 
 export interface Tile {};
-export class Tile extends _Tile implements hasGfx, hasGfxParms {
+export class Tile extends _Tile  {
     _playfield: Playfield;
     _gparms: GfxParms;
     _logger: Logger;

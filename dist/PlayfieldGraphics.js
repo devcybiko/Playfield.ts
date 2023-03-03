@@ -1,26 +1,3 @@
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 define("Graphics/GfxParms", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -62,6 +39,110 @@ define("Graphics/GfxParms", ["require", "exports"], function (require, exports) 
         }
     }
     exports.GfxParms = GfxParms;
+});
+define("Graphics/Gfx", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Graphics/GfxBrowser", ["require", "exports", "Graphics/GfxParms"], function (require, exports, GfxParms_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GfxBrowser = void 0;
+    class GfxBrowser {
+        constructor(canvasId) {
+            this._canvas = document.querySelector(canvasId); // canvasId
+            this._ctx = this._canvas.getContext("2d");
+            this._gparms = new GfxParms_1.GfxParms();
+            this._ctx.fontKerning = "none";
+            this._ctx.letterSpacing = "1px";
+            this._ctx.textRendering = "geometricPrecision";
+        }
+        get width() {
+            return this._canvas.width;
+        }
+        get height() {
+            return this._canvas.height;
+        }
+        get canvas() {
+            return this._canvas;
+        }
+        rect(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+            if (_gparms.borderColor) {
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+        }
+        ellipse(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fill();
+            }
+            if (_gparms.borderColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.stroke();
+            }
+        }
+        circle(x, y, r, _gparms = this._gparms) {
+            this.ellipse(x - r, y - r, r * 2, r * 2, _gparms);
+        }
+        line(x0, y0, x1, y1, _gparms0 = this._gparms, _gparms1 = _gparms0) {
+            this._ctx.beginPath();
+            this._ctx.strokeStyle = _gparms0.borderColor;
+            this._ctx.moveTo(_gparms0.dx + x0, _gparms0.dy + y0);
+            this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
+            this._ctx.stroke();
+        }
+        text(msg, x = 0, y = 0, _gparms = this._gparms, w) {
+            this._ctx.fillStyle = _gparms.color;
+            this._ctx.font = _gparms.font;
+            this._ctx.textAlign = _gparms.textAlign;
+            this._ctx.textBaseline = _gparms.textBaseline;
+            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
+        }
+        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let boundingBox = this.boundingBox(msg, _gparms);
+            if (!w)
+                w = boundingBox.w;
+            if (!h)
+                h = boundingBox.h;
+            this.rect(x, y, w, h, _gparms);
+            this.text(msg, x, y, _gparms, w);
+        }
+        boundingBox(msg, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let boundingBox = this._ctx.measureText(msg);
+            return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
+        }
+        clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
+            this.save();
+            let region = new Path2D();
+            region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
+            this._ctx.clip(region);
+        }
+        save() {
+            this._ctx.save();
+        }
+        restore() {
+            this._ctx.restore();
+        }
+    }
+    exports.GfxBrowser = GfxBrowser;
+});
+define("Graphics/index", ["require", "exports", "Graphics/GfxBrowser", "Graphics/GfxParms"], function (require, exports, GfxBrowser_1, GfxParms_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GfxParms = exports.GfxBrowser = void 0;
+    Object.defineProperty(exports, "GfxBrowser", { enumerable: true, get: function () { return GfxBrowser_1.GfxBrowser; } });
+    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_2.GfxParms; } });
 });
 define("Utils/Mixins", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -304,99 +385,6 @@ define("Utils/index", ["require", "exports", "Utils/Mixins", "Utils/Functions", 
     Object.defineProperty(exports, "Rect", { enumerable: true, get: function () { return RectMixin_1.Rect; } });
     Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return TreeMixin_1.Tree; } });
     Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return LoggerMixin_1.Logger; } });
-});
-define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"], function (require, exports, GfxParms_1, Utils) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Gfx = void 0;
-    Utils = __importStar(Utils);
-    class Gfx {
-        constructor(ctx) {
-            this.logger = new Utils.Logger();
-            this.ctx = ctx;
-            this.gparms = new GfxParms_1.GfxParms();
-            this.ctx.fontKerning = "none";
-            this.ctx.letterSpacing = "1px";
-            this.ctx.textRendering = "geometricPrecision";
-        }
-        rect(x, y, w, h, gparms = this.gparms) {
-            if (gparms.fillColor) {
-                this.ctx.fillStyle = gparms.fillColor;
-                this.ctx.fillRect(gparms.dx + x, gparms.dy + y, w, h);
-            }
-            if (gparms.borderColor) {
-                this.ctx.strokeStyle = gparms.borderColor;
-                this.ctx.strokeRect(gparms.dx + x, gparms.dy + y, w, h);
-            }
-        }
-        ellipse(x, y, w, h, gparms = this.gparms) {
-            if (gparms.fillColor) {
-                this.ctx.beginPath();
-                this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this.ctx.fillStyle = gparms.fillColor;
-                this.ctx.fill();
-            }
-            if (gparms.borderColor) {
-                this.ctx.beginPath();
-                this.ctx.ellipse(gparms.dx + x + w / 2, gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this.ctx.strokeStyle = gparms.borderColor;
-                this.ctx.stroke();
-            }
-        }
-        circle(x, y, r, gparms = this.gparms) {
-            this.ellipse(x - r, y - r, r * 2, r * 2, gparms);
-        }
-        line(x0, y0, x1, y1, gparms0 = this.gparms, gparms1 = gparms0) {
-            this.logger.info("line", x0, y0, x1, y1);
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = gparms0.borderColor;
-            this.ctx.moveTo(gparms0.dx + x0, gparms0.dy + y0);
-            this.ctx.lineTo(gparms1.dx + x1, gparms1.dy + y1);
-            this.ctx.stroke();
-        }
-        text(msg, x = 0, y = 0, gparms = this.gparms, w) {
-            this.ctx.fillStyle = gparms.color;
-            this.ctx.font = gparms.font;
-            this.ctx.textAlign = gparms.textAlign;
-            this.ctx.textBaseline = gparms.textBaseline;
-            this.ctx.fillText(msg, gparms.dx + x, gparms.dy + y, w);
-        }
-        textRect(msg, x = 0, y = 0, w, h, gparms = this.gparms) {
-            this.ctx.font = gparms.font;
-            let boundingBox = this.boundingBox(msg, gparms);
-            if (!w)
-                w = boundingBox.w;
-            if (!h)
-                h = boundingBox.h;
-            this.rect(x, y, w, h, gparms);
-            this.text(msg, x, y, gparms, w);
-        }
-        boundingBox(msg, gparms = this.gparms) {
-            this.ctx.font = gparms.font;
-            let boundingBox = this.ctx.measureText(msg);
-            return { w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize };
-        }
-        clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
-            this.save();
-            let region = new Path2D();
-            region.rect(x + gparms.dx, y + gparms.dy, w, h);
-            this.ctx.clip(region);
-        }
-        save() {
-            this.ctx.save();
-        }
-        restore() {
-            this.ctx.restore();
-        }
-    }
-    exports.Gfx = Gfx;
-});
-define("Graphics/index", ["require", "exports", "Graphics/Gfx", "Graphics/GfxParms"], function (require, exports, Gfx_1, GfxParms_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxParms = exports.Gfx = void 0;
-    Object.defineProperty(exports, "Gfx", { enumerable: true, get: function () { return Gfx_1.Gfx; } });
-    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_2.GfxParms; } });
 });
 define("Playfield/Tile", ["require", "exports", "Utils/index", "Graphics/index"], function (require, exports, Utils_1, Graphics_1) {
     "use strict";
@@ -1555,7 +1543,45 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
     }
     exports.RootTile = RootTile;
 });
-define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/index", "Playfield/RootTile", "Playfield/Events/CanvasEventHandler"], function (require, exports, Utils_6, Graphics_2, RootTile_1, CanvasEventHandler_2) {
+define("Playfield/PlayfieldEvents/PlayfieldEvent", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayfieldEvent = void 0;
+    class PlayfieldEvent {
+        constructor(event) {
+        }
+    }
+    exports.PlayfieldEvent = PlayfieldEvent;
+});
+define("Playfield/PlayfieldEvents/iEventQueue", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Playfield/PlayfieldEvents/EventQueue", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.EventQueue = void 0;
+    class EventQueue {
+        constructor() {
+            this._eventQueue = [];
+        }
+        getEvent() {
+            return this._eventQueue.shift();
+        }
+        pushEvent(pfEvent) {
+            this._eventQueue.push(pfEvent);
+        }
+    }
+    exports.EventQueue = EventQueue;
+});
+define("Playfield/PlayfieldEvents/index", ["require", "exports", "Playfield/PlayfieldEvents/EventQueue", "Playfield/PlayfieldEvents/PlayfieldEvent"], function (require, exports, EventQueue_1, PlayfieldEvent_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayfieldEvent = exports.EventQueue = void 0;
+    Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
+    Object.defineProperty(exports, "PlayfieldEvent", { enumerable: true, get: function () { return PlayfieldEvent_1.PlayfieldEvent; } });
+});
+define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/index", "Playfield/RootTile"], function (require, exports, Utils_6, Graphics_2, RootTile_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Playfield = exports._Playfield = void 0;
@@ -1571,18 +1597,16 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
     ;
     (0, Utils_6.applyMixins)(_Playfield, [Utils_6.Logger, Utils_6.Rect]);
     class Playfield extends _Playfield {
-        constructor(canvasId) {
+        constructor(gfx, eventQueue) {
             super();
             this._lastTime = 0;
             this._delay = 0;
             this._timerId = 0;
-            this._canvas = document.querySelector(canvasId);
-            this._ctx = this._canvas.getContext("2d");
-            this._gfx = new Graphics_2.Gfx(this._ctx);
+            this._gfx = gfx;
+            this._eventQueue = eventQueue;
             this._gparms = new Graphics_2.GfxParms();
-            this.Rect(0, 0, this._canvas.width, this._canvas.height);
+            this.Rect(0, 0, this._gfx.width, this._gfx.height);
             this._rootTile = new RootTile_1.RootTile(0, 0, this.w, this.h, this);
-            this._canvasEventHandler = new CanvasEventHandler_2.CanvasEventHandler(this._canvas, this._rootTile);
         }
         get playfield() {
             return this;
@@ -1597,7 +1621,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             return this._gfx;
         }
         clear() {
-            this.gfx.rect(0, 0, this._canvas.width, this._canvas.height, this.gparms);
+            this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
         }
         redraw() {
             this.clear();
@@ -1607,6 +1631,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             clearTimeout(this._timerId);
             let now = Date.now();
             let extra = now - this._lastTime;
+            this.handleEvents();
             this.tile.tick(); // process all ticks
             this.redraw(); // redraw the playfield
             this._lastTime = Date.now();
@@ -1620,6 +1645,13 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             this._lastTime = Date.now();
             this.redraw();
             this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
+        }
+        handleEvents() {
+            for (let hidEvent = this._eventQueue.getEvent(); hidEvent; hidEvent = this._eventQueue.getEvent()) {
+                this.dispatchEvent(hidEvent);
+            }
+        }
+        dispatchEvent(pfEvent) {
         }
     }
     exports.Playfield = Playfield;
@@ -2028,6 +2060,37 @@ define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Je
     Object.defineProperty(exports, "ToggleItem", { enumerable: true, get: function () { return ToggleItem_1.ToggleItem; } });
     Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_1.LabelItem; } });
 });
+define("Playfield/Browser/CanvasEventPump", ["require", "exports", "Utils/index", "Playfield/PlayfieldEvents/index"], function (require, exports, Utils_12, PlayfieldEvents_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CanvasEventPump = void 0;
+    class CanvasEventPump {
+        constructor(canvas, eventQueue) {
+            this._logger = new Utils_12.Logger();
+            this._eventQueue = eventQueue;
+            this._registerEventHandlers(canvas);
+        }
+        _registerEventHandlers(canvas) {
+            canvas.addEventListener('mousedown', this._handler.bind(this));
+            canvas.addEventListener('mousemove', this._handler.bind(this));
+            canvas.addEventListener('mouseup', this._handler.bind(this));
+            canvas.addEventListener('wheel', this._handler.bind(this));
+            addEventListener("keydown", this._handler.bind(this));
+            addEventListener("keyup", this._handler.bind(this));
+        }
+        _handler(event) {
+            let pfEvent = new PlayfieldEvents_1.PlayfieldEvent(event);
+            this._eventQueue.pushEvent(pfEvent);
+        }
+    }
+    exports.CanvasEventPump = CanvasEventPump;
+});
+define("Playfield/Browser/index", ["require", "exports", "Playfield/Browser/CanvasEventPump"], function (require, exports, CanvasEventPump_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CanvasEventPump = void 0;
+    Object.defineProperty(exports, "CanvasEventPump", { enumerable: true, get: function () { return CanvasEventPump_1.CanvasEventPump; } });
+});
 define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2039,7 +2102,7 @@ define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], 
     }
     exports.ShapeTile = ShapeTile;
 });
-define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_12, Abilities_7) {
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_13, Abilities_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTile = exports._BoxTile = void 0;
@@ -2048,7 +2111,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     exports._BoxTile = _BoxTile;
     ;
     ;
-    (0, Utils_12.applyMixins)(_BoxTile, [Abilities_7.Draggable, Abilities_7.Selectable]);
+    (0, Utils_13.applyMixins)(_BoxTile, [Abilities_7.Draggable, Abilities_7.Selectable]);
     class BoxTile extends _BoxTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -2081,7 +2144,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_13) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -2090,7 +2153,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
     exports._CircleTile = _CircleTile;
     ;
     ;
-    (0, Utils_13.applyMixins)(_CircleTile, [Abilities_8.Draggable, Abilities_8.Selectable]);
+    (0, Utils_14.applyMixins)(_CircleTile, [Abilities_8.Draggable, Abilities_8.Selectable]);
     class CircleTile extends _CircleTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -2204,13 +2267,16 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_14, Shapes_1, Jed_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Graphics/index", "Playfield/Browser/index", "Playfield/PlayfieldEvents/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_15, Shapes_1, Jed_1, Graphics_3, Browser_1, PlayfieldEvents_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
     class PlayfieldTest {
         constructor() {
-            this._playfield = new Playfield_4.Playfield("#my_canvas");
+            this._gfx = new Graphics_3.GfxBrowser("#my_canvas");
+            this._eventQueue = new PlayfieldEvents_2.EventQueue();
+            this._canvasEventPump = new Browser_1.CanvasEventPump(this._gfx.canvas, this._eventQueue);
+            this._playfield = new Playfield_4.Playfield(this._gfx, this._eventQueue);
         }
         boxTest() {
             this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);
@@ -2241,11 +2307,11 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let max = 100;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_14.random)(0, this._playfield.w);
-                    let y = (0, Utils_14.random)(0, this._playfield.h);
-                    let r = (0, Utils_14.random)(10, 50);
-                    let DX = (0, Utils_14.random)(-10, 10);
-                    let DY = (0, Utils_14.random)(-10, 10);
+                    let x = (0, Utils_15.random)(0, this._playfield.w);
+                    let y = (0, Utils_15.random)(0, this._playfield.h);
+                    let r = (0, Utils_15.random)(10, 50);
+                    let DX = (0, Utils_15.random)(-10, 10);
+                    let DY = (0, Utils_15.random)(-10, 10);
                     let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
                     // circle.gparms.fillColor = null;
                     circle.DX = DX;
@@ -2284,7 +2350,7 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
             //     }
             // }
-            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_14.random)(0, 1000), (0, Utils_14.random)(0, 1000), 50, 50);
+            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_15.random)(0, 1000), (0, Utils_15.random)(0, 1000), 50, 50);
             let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
             let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
             let fps = 16;

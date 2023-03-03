@@ -1,7 +1,3 @@
-export interface hasGfxParms {
-    get gparms(): GfxParms;
-}
-
 export class GfxParms {
     private _fontSize: number;
     private _fontFace: string;

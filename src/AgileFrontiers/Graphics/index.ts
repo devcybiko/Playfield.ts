@@ -1,2 +1,3 @@
-export {Gfx, hasGfx} from "./Gfx";
-export {GfxParms, hasGfxParms} from "./GfxParms";
+export {Gfx} from "./Gfx";
+export {GfxBrowser} from "./GfxBrowser";
+export {GfxParms} from "./GfxParms";
