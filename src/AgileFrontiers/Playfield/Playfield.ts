@@ -23,13 +23,16 @@ export class Playfield extends _Playfield {
     _timerId = 0 as any;
     _eventQueue: iEventQueue;
 
-    constructor(gfx: Gfx, eventQueue: iEventQueue) {
+    constructor(gfx: Gfx, eventQueue: iEventQueue, eventPump?: any) {
         super();
         this._gfx = gfx;
         this._eventQueue = eventQueue;
         this._gparms = new GfxParms();
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
+        if (eventPump) {
+            eventPump.setRootTile(this._rootTile);
+        }
     }
     get playfield(): Playfield {
         return this;

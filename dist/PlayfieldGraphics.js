@@ -1597,7 +1597,7 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
     ;
     (0, Utils_6.applyMixins)(_Playfield, [Utils_6.Logger, Utils_6.Rect]);
     class Playfield extends _Playfield {
-        constructor(gfx, eventQueue) {
+        constructor(gfx, eventQueue, eventPump) {
             super();
             this._lastTime = 0;
             this._delay = 0;
@@ -1607,6 +1607,9 @@ define("Playfield/Playfield", ["require", "exports", "Utils/index", "Graphics/in
             this._gparms = new Graphics_2.GfxParms();
             this.Rect(0, 0, this._gfx.width, this._gfx.height);
             this._rootTile = new RootTile_1.RootTile(0, 0, this.w, this.h, this);
+            if (eventPump) {
+                eventPump.setRootTile(this._rootTile);
+            }
         }
         get playfield() {
             return this;
@@ -2060,7 +2063,7 @@ define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Je
     Object.defineProperty(exports, "ToggleItem", { enumerable: true, get: function () { return ToggleItem_1.ToggleItem; } });
     Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_1.LabelItem; } });
 });
-define("Playfield/Browser/CanvasEventPump", ["require", "exports", "Utils/index", "Playfield/PlayfieldEvents/index"], function (require, exports, Utils_12, PlayfieldEvents_1) {
+define("Playfield/Browser/CanvasEventPump", ["require", "exports", "Utils/index", "Playfield/Events/index"], function (require, exports, Utils_12, Events_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CanvasEventPump = void 0;
@@ -2078,9 +2081,18 @@ define("Playfield/Browser/CanvasEventPump", ["require", "exports", "Utils/index"
             addEventListener("keydown", this._handler.bind(this));
             addEventListener("keyup", this._handler.bind(this));
         }
+        setRootTile(rootTile) {
+            this._rootTile = rootTile;
+            this._mouseDispatcher = new Events_2.MouseDispatcher(this._rootTile);
+            this._keyboardDispatcher = new Events_2.KeyboardDispatcher(this._rootTile);
+        }
         _handler(event) {
-            let pfEvent = new PlayfieldEvents_1.PlayfieldEvent(event);
-            this._eventQueue.pushEvent(pfEvent);
+            if (event.type[0] === 'm')
+                this._mouseDispatcher.dispatchEvent(event);
+            if (event.type[0] === 'w')
+                this._mouseDispatcher.dispatchEvent(event);
+            if (event.type[0] === 'k')
+                this._keyboardDispatcher.dispatchEvent(event);
         }
     }
     exports.CanvasEventPump = CanvasEventPump;
@@ -2267,16 +2279,16 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Graphics/index", "Playfield/Browser/index", "Playfield/PlayfieldEvents/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_15, Shapes_1, Jed_1, Graphics_3, Browser_1, PlayfieldEvents_2) {
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Graphics/index", "Playfield/Browser/index", "Playfield/PlayfieldEvents/index"], function (require, exports, Playfield_4, CircleTestTile_1, BoxTestTile_2, Utils_15, Shapes_1, Jed_1, Graphics_3, Browser_1, PlayfieldEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
     class PlayfieldTest {
         constructor() {
             this._gfx = new Graphics_3.GfxBrowser("#my_canvas");
-            this._eventQueue = new PlayfieldEvents_2.EventQueue();
+            this._eventQueue = new PlayfieldEvents_1.EventQueue();
             this._canvasEventPump = new Browser_1.CanvasEventPump(this._gfx.canvas, this._eventQueue);
-            this._playfield = new Playfield_4.Playfield(this._gfx, this._eventQueue);
+            this._playfield = new Playfield_4.Playfield(this._gfx, this._eventQueue, this._canvasEventPump);
         }
         boxTest() {
             this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);
