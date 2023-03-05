@@ -35,12 +35,12 @@ export class CircleTile extends _CircleTile {
         else this.gparms.borderColor = "";
         this.gparms.fillColor = "gray";
 
-        this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+        this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
         if (this._dx && this._dy) {
             let oldColor = this.gparms.fillColor;
             this.gparms.fillColor = "red";
             let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
-            this._playfield.gfx.circle(this.x, this.y, r, this.gparms);
+            this.playfield.gfx.circle(this.x, this.y, r, this.gparms);
             this.gparms.fillColor = oldColor;
         }
 

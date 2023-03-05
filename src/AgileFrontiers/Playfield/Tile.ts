@@ -15,12 +15,12 @@ export class _Tile { };
 export interface _Tile extends Logger, Tree, Rect { };
 applyMixins(_Tile, [Logger, Tree, Rect]);
 
-export interface Tile {};
-export class Tile extends _Tile  {
-    _playfield: Playfield;
-    _gparms: GfxParms;
-    _logger: Logger;
-    _tabOrder: number;
+export interface Tile { };
+export class Tile extends _Tile {
+    private _playfield: Playfield;
+    private _gparms: GfxParms;
+    private _logger: Logger;
+    private _tabOrder: number;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
         super();
@@ -94,5 +94,10 @@ export class Tile extends _Tile  {
     get Y(): number {
         return this.y + this.gparms.dy;
     }
-
+    public get playfield(): Playfield {
+        return this._playfield;
+    }
+    public set playfield(value: Playfield) {
+        this._playfield = value;
+    }
 }

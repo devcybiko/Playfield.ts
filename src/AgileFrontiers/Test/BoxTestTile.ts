@@ -8,16 +8,16 @@ export class BoxTestTile extends Tile {
         this.gparms.fillColor = "green";
     }
     draw() {
-        this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
     onTick(): boolean {
         let obj = this as any;
         this.rmove(obj.DX || 10, obj.DY || 10);
-        if (this.X > this._playfield.w || this.X <= 0) {
+        if (this.X > this.playfield.w || this.X <= 0) {
             if (obj.DX === undefined) this.rmove(-this.x, 0);
             else obj.DX = -obj.DX;
         }
-        if (this.Y> this._playfield.h || this.Y <= 0) {
+        if (this.Y> this.playfield.h || this.Y <= 0) {
             if (obj.DY === undefined) this.rmove(0, -this.y);
             else obj.DY = -obj.DY;
         }

@@ -20,7 +20,7 @@ export class LabelItem extends _LabelItem {
 
     // --- Overrides --- //
     draw() {
-        let gfx = this._playfield.gfx;
+        let gfx = this.playfield.gfx;
         this._updateGparms();
         let w = this.w;
         let h = this.h;

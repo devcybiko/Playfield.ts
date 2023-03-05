@@ -30,7 +30,7 @@ export class ToggleItem extends _ToggleItem {
     // --- Overrides --- //
 
     draw() {
-        let gfx = this._playfield.gfx;
+        let gfx = this.playfield.gfx;
         this._updateGparms();
         if (this.isOn) this.gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) this.gparms.fillColor = this.options.hoverColor;

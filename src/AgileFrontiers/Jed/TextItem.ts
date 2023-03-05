@@ -25,8 +25,8 @@ export class TextItem extends _TextItem {
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
-        this._nchars = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w);
-        this._nchars2 = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w / 2);
+        this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+        this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this._left = 0;
         this._right = this._computeRight();
     }
@@ -34,7 +34,7 @@ export class TextItem extends _TextItem {
     // --- Overrides --- //
 
     draw() {
-        let gfx = this._playfield.gfx;
+        let gfx = this.playfield.gfx;
         this._updateGparms();
         if (this.isFocus) this.gparms.color = this.options.selectColor;
         else this.gparms.color = this.options.textColor;
@@ -107,7 +107,7 @@ export class TextItem extends _TextItem {
     _drawCursor() {
         if (!this.isFocus) return;
         if (!this._cursorOn) return;
-        let gfx = this._playfield.gfx;
+        let gfx = this.playfield.gfx;
         let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor), this.gparms);
         let dw = valueBB.w;
         if (dw <= 0) dw = 1;
@@ -122,7 +122,7 @@ export class TextItem extends _TextItem {
     }
 
     _computeRight() {
-        // let gfx = this._playfield.gfx;
+        // let gfx = this.playfield.gfx;
         // let right = this._left;
         // for(let i=this._left; i<=this.value.length; i++) {
         //     let bb = gfx.boundingBox(this.value.substring(this._left, i));
@@ -134,7 +134,7 @@ export class TextItem extends _TextItem {
         return right;
     }
     _computeLeft() {
-        // let gfx = this._playfield.gfx;
+        // let gfx = this.playfield.gfx;
         // let left = this._right;
         // for(let i=this._right; i>=0; i--) {
         //     let bb = gfx.boundingBox(this.value.substring(i, this._right));

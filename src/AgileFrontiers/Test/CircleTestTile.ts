@@ -9,6 +9,6 @@ export class CircleTestTile extends BoxTestTile {
         this.gparms.fillColor = "green";
     }
     draw() {
-        this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+        this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
     }
 }

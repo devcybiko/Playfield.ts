@@ -25,7 +25,7 @@ export class BoxTile extends _BoxTile {
         // if (this.isSelected) this.gparms.borderColor = "black";
         // else this.gparms.borderColor = "";
         // this.gparms.fillColor = this._colors[this._color];
-        this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
 
     // --- onActions --- //

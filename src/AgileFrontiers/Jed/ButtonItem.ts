@@ -28,7 +28,7 @@ export class ButtonItem extends _ButtonItem {
     }
 
     draw() {
-        let gfx = this._playfield.gfx;
+        let gfx = this.playfield.gfx;
         this._updateGparms();
         if (this.isHovering && this.isPressed) this.gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) this.gparms.fillColor = this.options.hoverColor;

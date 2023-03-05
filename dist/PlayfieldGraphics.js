@@ -644,6 +644,12 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
         get Y() {
             return this.y + this.gparms.dy;
         }
+        get playfield() {
+            return this._playfield;
+        }
+        set playfield(value) {
+            this._playfield = value;
+        }
     }
     exports.Tile = Tile;
 });
@@ -1500,7 +1506,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             return true;
         }
         draw() {
-            let gfx = this._playfield.gfx;
+            let gfx = this.playfield.gfx;
             this._updateGparms();
             if (this.isHovering && this.isPressed)
                 this.gparms.fillColor = this.options.selectColor;
@@ -1549,7 +1555,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
         }
         // --- Overrides --- //
         draw() {
-            let gfx = this._playfield.gfx;
+            let gfx = this.playfield.gfx;
             this._updateGparms();
             let w = this.w;
             let h = this.h;
@@ -1595,14 +1601,14 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             this.options.fontFace = "monospace";
             this.options.fontSize = h;
             this._updateGparms();
-            this._nchars = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w);
-            this._nchars2 = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w / 2);
+            this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+            this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
             this._left = 0;
             this._right = this._computeRight();
         }
         // --- Overrides --- //
         draw() {
-            let gfx = this._playfield.gfx;
+            let gfx = this.playfield.gfx;
             this._updateGparms();
             if (this.isFocus)
                 this.gparms.color = this.options.selectColor;
@@ -1674,7 +1680,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
                 return;
             if (!this._cursorOn)
                 return;
-            let gfx = this._playfield.gfx;
+            let gfx = this.playfield.gfx;
             let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor), this.gparms);
             let dw = valueBB.w;
             if (dw <= 0)
@@ -1691,7 +1697,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
         }
         _computeRight() {
-            // let gfx = this._playfield.gfx;
+            // let gfx = this.playfield.gfx;
             // let right = this._left;
             // for(let i=this._left; i<=this.value.length; i++) {
             //     let bb = gfx.boundingBox(this.value.substring(this._left, i));
@@ -1704,7 +1710,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             return right;
         }
         _computeLeft() {
-            // let gfx = this._playfield.gfx;
+            // let gfx = this.playfield.gfx;
             // let left = this._right;
             // for(let i=this._right; i>=0; i--) {
             //     let bb = gfx.boundingBox(this.value.substring(i, this._right));
@@ -1765,7 +1771,7 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
         }
         // --- Overrides --- //
         draw() {
-            let gfx = this._playfield.gfx;
+            let gfx = this.playfield.gfx;
             this._updateGparms();
             if (this.isOn)
                 this.gparms.fillColor = this.options.selectColor;
@@ -1852,7 +1858,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             // if (this.isSelected) this.gparms.borderColor = "black";
             // else this.gparms.borderColor = "";
             // this.gparms.fillColor = this._colors[this._color];
-            this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+            this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
         }
         // --- onActions --- //
         onGrab() {
@@ -1911,12 +1917,12 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
             else
                 this.gparms.borderColor = "";
             this.gparms.fillColor = "gray";
-            this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+            this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
             if (this._dx && this._dy) {
                 let oldColor = this.gparms.fillColor;
                 this.gparms.fillColor = "red";
                 let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
-                this._playfield.gfx.circle(this.x, this.y, r, this.gparms);
+                this.playfield.gfx.circle(this.x, this.y, r, this.gparms);
                 this.gparms.fillColor = oldColor;
             }
         }
@@ -1956,18 +1962,18 @@ define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (
             this.gparms.fillColor = "green";
         }
         draw() {
-            this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+            this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
         }
         onTick() {
             let obj = this;
             this.rmove(obj.DX || 10, obj.DY || 10);
-            if (this.X > this._playfield.w || this.X <= 0) {
+            if (this.X > this.playfield.w || this.X <= 0) {
                 if (obj.DX === undefined)
                     this.rmove(-this.x, 0);
                 else
                     obj.DX = -obj.DX;
             }
-            if (this.Y > this._playfield.h || this.Y <= 0) {
+            if (this.Y > this.playfield.h || this.Y <= 0) {
                 if (obj.DY === undefined)
                     this.rmove(0, -this.y);
                 else
@@ -1994,7 +2000,7 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
             this.gparms.fillColor = "green";
         }
         draw() {
-            this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+            this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
         }
     }
     exports.CircleTestTile = CircleTestTile;
