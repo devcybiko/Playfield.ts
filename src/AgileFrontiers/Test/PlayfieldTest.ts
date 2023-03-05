@@ -4,17 +4,15 @@ import { BoxTestTile } from "./BoxTestTile";
 import { random } from "../Playfield/Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
-import { GfxBrowser } from "../Playfield/Graphics";
-import { CanvasEventPump } from "../Browser";
+import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
-import { BrowserPlayfieldApp } from "../Browser/BrowserPlayfieldApp";
 
 export class PlayfieldTest {
     _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;
-    _gfx: GfxBrowser;
+    _gfx: BrowserGfx;
     _eventQueue: EventQueue;
-    _canvasEventPump: CanvasEventPump;
+    _canvasEventPump: BrowserEventPump;
 
     constructor() {
         this._playfieldApp = new BrowserPlayfieldApp();

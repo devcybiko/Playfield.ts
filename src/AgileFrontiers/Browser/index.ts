@@ -1,1 +1,4 @@
-export {BrowserEventPump as CanvasEventPump} from "./BrowserEventPump";
+export { BrowserEventPump } from "./BrowserEventPump";
+export { BrowserGfx } from "./BrowserGfx";
+export { BrowserPlayfieldApp } from "./BrowserPlayfieldApp";
+export { BrowserPlayfieldEvent } from "./BrowserPlayfieldEvent";
