@@ -1,63 +1,45 @@
-export class PlayfieldEvent {
-     event: any;
-    //  type: string;
+export interface PlayfieldEvent {
 
-     // mouse events
-     x: number;
-     y: number;
-     isMove: boolean;
-     isPress: boolean;
-     isRelease: boolean;
-     isMenu: boolean;
-     isMenuRelease: boolean;
+    get event(): any;
+    set event(value: any);
 
-     // keyboard events
-     key: string;
-     isKeyDown: boolean;
-     isKeyUp: boolean;
-     isShift: boolean;
-     isControl: boolean;
-     isAlt: boolean;
-     isOption: boolean;
-     isMeta: boolean;
-     isCommand: boolean;
-    //  button: string;
+    get x(): number;
+    set x(value: number);
+    get y(): number;
+    set y(value: number);
+    get isMove(): boolean;
+    set isMove(value: boolean);
+    get isPress(): boolean;
+    set isPress(value: boolean);
+    get isRelease(): boolean;
+    set isRelease(value: boolean);
+    get isMenu(): boolean;
+    set isMenu(value: boolean);
+    get isMenuRelease(): boolean;
+    set isMenuRelease(value: boolean);
 
-    // gestures
-     swipe: number;
-     isSwipeLeft: boolean;
-     isSwipeRight: boolean;
-
-    constructor(event: any) {
-        this.event = event;
-        // this.type = event.type;
-
-        // mouse events
-        this.x = event.offsetX;
-        this.y = event.offsetY;
-        this.isMove = event.type === "mousemove";
-        this.isPress = event.type === "mousedown" && event.button === 0;
-        this.isRelease = event.type === "mouseup" && event.button === 0;
-        this.isMenu = event.type === "mousedown" && event.button === 2;
-        this.isMenuRelease = event.type === "mousedown" && event.button === 2;
-
-        // keyboard events
-        this.key = event.key;   
-        this.isKeyDown = event.type === "keydown";
-        this.isKeyUp = event.type === "keyup";
-        this.isShift = event.shiftKey;
-        this.isControl = event.ctrlKey;
-        this.isAlt = event.altKey;
-        this.isOption = event.altKey;
-        this.isMeta = event.metaKey;
-        this.isCommand = event.metaKey;
-        // if (event.button === 0) this.button = "select";
-        // if (event.button === 1) this.button = "middle";
-        // if (event.button === 2) this.button = "menu";
-
-        // gestures
-        this.swipe = event.wheelDelta;
-        this.isSwipeLeft = event.wheelDelta < 0;
-        this.isSwipeRight = event.wheelDelta > 0;
-    }
+    get key(): string;
+    set key(value: string);
+    get isKeyDown(): boolean;
+    set isKeyDown(value: boolean);
+    get isKeyUp(): boolean;
+    set isKeyUp(value: boolean);
+    get isShift(): boolean;
+    set isShift(value: boolean);
+    get isControl(): boolean;
+    set isControl(value: boolean);
+    get isAlt(): boolean;
+    set isAlt(value: boolean);
+    get isOption(): boolean;
+    set isOption(value: boolean);
+    get isMeta(): boolean;
+    set isMeta(value: boolean);
+    get isCommand(): boolean;
+    set isCommand(value: boolean);
+    get swipe(): number;
+    set swipe(value: number);
+    get isSwipeLeft(): boolean;
+    set isSwipeLeft(value: boolean);
+    get isSwipeRight(): boolean;
+    set isSwipeRight(value: boolean);
 }

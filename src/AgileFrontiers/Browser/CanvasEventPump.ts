@@ -1,19 +1,17 @@
-import { Logger } from "../Playfield/Utils";
-import { PlayfieldEvent, EventQueue } from "../Playfield";
+import { EventQueue } from "../Playfield";
+import { BrowserPlayfieldEvent } from "./BrowserPlayfieldEvent";
 
 export class CanvasEventPump {
-    private _logger: Logger;
     private _eventQueue: EventQueue;
 
     constructor(canvas: HTMLCanvasElement, eventQueue: EventQueue) {
-        this._logger = new Logger();
         this._eventQueue = eventQueue;
         this._registerEventHandlers(canvas);
 
     }
 
     // --- Private Methods --- //
-    
+
     private _registerEventHandlers(canvas: HTMLCanvasElement) {
         canvas.addEventListener('mousedown', this._handler.bind(this));
         canvas.addEventListener('mousemove', this._handler.bind(this));
@@ -24,7 +22,7 @@ export class CanvasEventPump {
     }
 
     private _handler(event: any) {
-        let pfEvent = new PlayfieldEvent(event);
+        let pfEvent = new BrowserPlayfieldEvent(event);
         this._eventQueue.pushEvent(pfEvent);
     }
 }
