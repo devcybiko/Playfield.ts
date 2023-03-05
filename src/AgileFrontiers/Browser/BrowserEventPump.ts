@@ -1,7 +1,7 @@
 import { EventQueue } from "../Playfield";
 import { BrowserPlayfieldEvent } from "./BrowserPlayfieldEvent";
 
-export class CanvasEventPump {
+export class BrowserEventPump {
     private _eventQueue: EventQueue;
 
     constructor(canvas: HTMLCanvasElement, eventQueue: EventQueue) {

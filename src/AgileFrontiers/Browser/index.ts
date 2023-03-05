@@ -1,1 +1,1 @@
-export {CanvasEventPump} from "./CanvasEventPump";
+export {BrowserEventPump as CanvasEventPump} from "./BrowserEventPump";

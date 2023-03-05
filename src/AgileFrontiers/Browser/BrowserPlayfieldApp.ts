@@ -1,17 +1,17 @@
 import { GfxBrowser } from "../Playfield/Graphics";
 import { Playfield, EventQueue } from "../Playfield";
-import { CanvasEventPump } from "./CanvasEventPump";
+import { BrowserEventPump } from "./BrowserEventPump";
 
 export class BrowserPlayfieldApp {
     private _playfield: Playfield;
     private _gfx: GfxBrowser;
     private _eventQueue: EventQueue;
-    private _canvasEventPump: CanvasEventPump;
+    private _canvasEventPump: BrowserEventPump;
 
     constructor(canvasId = "#playfield") {
         this._gfx = new GfxBrowser(canvasId);
         this._eventQueue = new EventQueue();
-        this._canvasEventPump = new CanvasEventPump(this._gfx.canvas, this._eventQueue);
+        this._canvasEventPump = new BrowserEventPump(this._gfx.canvas, this._eventQueue);
         this._playfield = new Playfield(this._gfx, this._eventQueue);
     }
 
@@ -35,10 +35,10 @@ export class BrowserPlayfieldApp {
     public set eventQueue(value: EventQueue) {
         this._eventQueue = value;
     }
-    public get canvasEventPump(): CanvasEventPump {
+    public get canvasEventPump(): BrowserEventPump {
         return this._canvasEventPump;
     }
-    public set canvasEventPump(value: CanvasEventPump) {
+    public set canvasEventPump(value: BrowserEventPump) {
         this._canvasEventPump = value;
     }
 

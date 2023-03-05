@@ -1,3 +1,3 @@
 export {Gfx} from "./Gfx";
-export {GfxBrowser} from "../../Browser/GfxBrowser";
+export {BrowserGfx as GfxBrowser} from "../../Browser/BrowserGfx";
 export {GfxParms} from "./GfxParms";

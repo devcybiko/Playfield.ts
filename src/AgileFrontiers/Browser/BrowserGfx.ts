@@ -1,7 +1,7 @@
 import { Gfx } from "../Playfield/Graphics/Gfx";
 import { GfxParms } from "../Playfield/Graphics/GfxParms";
 
-export class GfxBrowser implements Gfx {
+export class BrowserGfx implements Gfx {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
     private _gparms: GfxParms;
