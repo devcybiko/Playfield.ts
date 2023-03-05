@@ -8,13 +8,13 @@ export interface _TextItem extends Draggable, Editable, Repeatable { };
 applyMixins(_TextItem, [Draggable, Editable, Repeatable]);
 
 export class TextItem extends _TextItem {
-    _cursor = 0;
-    _left = 0;
-    _right = 0;
-    _cursorOn = true;
-    _cursorBlinkRate = 500;
-    _nchars = 0;
-    _nchars2 = 0;
+    private _cursor = 0;
+    private _left = 0;
+    private _right = 0;
+    private _cursorOn = true;
+    private _cursorBlinkRate = 500;
+    private _nchars = 0;
+    private _nchars2 = 0;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value);

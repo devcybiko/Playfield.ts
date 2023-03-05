@@ -20,7 +20,7 @@ export class PlayfieldTest {
 
     }
     boxTest() {
-        this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);
+        this._playfield.gfx.rect(10, 10, 100, 100, this._playfield.gparms);
     }
     circleTestTile() {
         let parent = this._playfield.tile;

@@ -8,7 +8,8 @@ export interface _LabelItem extends Draggable { };
 applyMixins(_LabelItem, [Draggable]);
 
 export class LabelItem extends _LabelItem {
-    _label: string;
+    private _label: string;
+
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value);
         this.Draggable();
@@ -35,5 +36,14 @@ export class LabelItem extends _LabelItem {
         // gfx.rect(x, y, w, h);
         gfx.text(this._label, this.x, y, this.gparms, w);
         gfx.restore();
+    }
+
+    // --- Accessors --- //
+    
+    public get label(): string {
+        return this._label;
+    }
+    public set label(value: string) {
+        this._label = value;
     }
 }

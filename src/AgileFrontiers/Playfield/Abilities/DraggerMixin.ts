@@ -35,6 +35,7 @@ export class Dragger {
         }
         return false;
     }
+    
     _grabChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
         let tileChild = child as unknown as Tile;
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {

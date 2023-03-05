@@ -10,10 +10,11 @@ export class Draggable {
     }
 
     // --- onActions --- //
-    
+
     onGrab(pfEvent: PlayfieldEvent): boolean {
         return false;
     }
+    
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let that = this as any;
         if (that.rmove) that.rmove(dx, dy);

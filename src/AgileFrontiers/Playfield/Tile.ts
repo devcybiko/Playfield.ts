@@ -33,12 +33,7 @@ export class Tile extends _Tile {
         return this;
     }
 
-    _recompute() {
-        if (this.parent) {
-            this.gparms.dx = (this.parent as Tile).X;
-            this.gparms.dy = (this.parent as Tile).Y;
-        }
-    }
+    // --- Public Methods --- //
 
     inBounds(x: number, y: number): Tile {
         let result =
@@ -62,9 +57,11 @@ export class Tile extends _Tile {
         this._recompute();
         this.draw();
     }
+
     redrawChildren() {
         this.children.forEach(child => (child as Tile).redraw());
     }
+
     draw() {
         this.redrawChildren();
     }
@@ -75,9 +72,19 @@ export class Tile extends _Tile {
         this.children.forEach(child => (child as Tile).onTick());
         return true;
     }
+
     onEvent(pfEvent: PlayfieldEvent): boolean {
         this.children.forEach(child => (child as Tile).onEvent(pfEvent));
         return true;
+    }
+
+    // --- Private Methods --- //
+    
+    _recompute() {
+        if (this.parent) {
+            this.gparms.dx = (this.parent as Tile).X;
+            this.gparms.dy = (this.parent as Tile).Y;
+        }
     }
 
     // --- Accessors --- //

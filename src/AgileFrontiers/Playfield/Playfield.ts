@@ -15,13 +15,13 @@ export interface _Playfield extends Logger, Rect { };
 applyMixins(_Playfield, [Logger, Rect]);
 
 export class Playfield extends _Playfield {
-    _rootTile: RootTile;
-    _gfx: Gfx;
-    _gparms: GfxParms;
-    _lastTime = 0;
-    _delay = 0;
-    _timerId = 0 as any;
-    _eventQueue: EventQueue;
+    private _rootTile: RootTile;
+    private _gfx: Gfx;
+    private _gparms: GfxParms;
+    private _lastTime = 0;
+    private _delay = 0;
+    private _timerId = 0 as any;
+    private _eventQueue: EventQueue;
 
     constructor(gfx: Gfx, eventQueue: EventQueue) {
         super();
@@ -30,6 +30,24 @@ export class Playfield extends _Playfield {
         this._gparms = new GfxParms();
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
+    }
+
+    // --- Public Methods --- //
+
+    clear() {
+        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
+    }
+
+    redraw() {
+        this.clear();
+        this.tile.redraw();
+    }
+
+    start(delay = 125) {
+        this._delay = delay;
+        this._lastTime = Date.now();
+        this.redraw();
+        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
     // --- Private Methods --- //
@@ -55,24 +73,6 @@ export class Playfield extends _Playfield {
         function next() {
             return that._eventQueue.getEvent();
         }
-    }
-    
-    // --- Public Methods --- //
-
-    clear() {
-        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
-    }
-
-    redraw() {
-        this.clear();
-        this.tile.redraw();
-    }
-
-    start(delay = 125) {
-        this._delay = delay;
-        this._lastTime = Date.now();
-        this.redraw();
-        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
     // --- Accessors --- //

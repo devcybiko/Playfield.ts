@@ -180,31 +180,6 @@ define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require,
             this._uselink = uselink;
             return this;
         }
-        // --- Private Methods --- //
-        _source(depth = 0) {
-            let err = new Error("error");
-            let stack = err.stack.split("\n");
-            let source = stack[depth];
-            return source;
-        }
-        _module() {
-            let source = this._source(4).trim();
-            let words = source.split(" ");
-            let module = words[1];
-            this._link = words[2];
-            if (module === "new") {
-                module = words[2] + ".new";
-                this._link = words[3];
-            }
-            return module;
-        }
-        // --- Private Methods --- //
-        _format(level, module, ...args) {
-            let format = `${level}: ${module}: ${args.join(", ")}`;
-            if (this._uselink)
-                format += "\n" + " ".repeat(level.length + 2) + this._link;
-            return format;
-        }
         // --- Public Methods --- //
         info(...args) {
             // most verbose
@@ -224,6 +199,30 @@ define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require,
         error(...args) {
             // always show errors
             console.error(this._format("ERROR", this._module(), ...args));
+        }
+        // --- Private Methods --- //
+        _format(level, module, ...args) {
+            let format = `${level}: ${module}: ${args.join(", ")}`;
+            if (this._uselink)
+                format += "\n" + " ".repeat(level.length + 2) + this._link;
+            return format;
+        }
+        _source(depth = 0) {
+            let err = new Error("error");
+            let stack = err.stack.split("\n");
+            let source = stack[depth];
+            return source;
+        }
+        _module() {
+            let source = this._source(4).trim();
+            let words = source.split(" ");
+            let module = words[1];
+            this._link = words[2];
+            if (module === "new") {
+                module = words[2] + ".new";
+                this._link = words[3];
+            }
+            return module;
         }
         // --- Accessors --- //
         get logLevel() {
@@ -264,14 +263,14 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.fontSize = 24;
             this.fontFace = "sans-serif";
         }
-        // --- Private Methods --- //
-        _updateFont() {
-            this._font = "" + this._fontSize + "px " + this._fontFace;
-        }
         // --- Public Methods --- //
         clone() {
             // make a shallow copy
             return Object.assign({}, this);
+        }
+        // --- Private Methods --- //
+        _updateFont() {
+            this._font = "" + this._fontSize + "px " + this._fontFace;
         }
         // --- Accessors --- //
         get font() {
@@ -337,12 +336,7 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
             this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
             return this;
         }
-        _recompute() {
-            if (this.parent) {
-                this.gparms.dx = this.parent.X;
-                this.gparms.dy = this.parent.Y;
-            }
-        }
+        // --- Public Methods --- //
         inBounds(x, y) {
             let result = (0, Utils_1.between)(this.X, x, this.X + this.w) &&
                 (0, Utils_1.between)(this.Y, y, this.Y + this.h);
@@ -379,6 +373,13 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
         onEvent(pfEvent) {
             this.children.forEach(child => child.onEvent(pfEvent));
             return true;
+        }
+        // --- Private Methods --- //
+        _recompute() {
+            if (this.parent) {
+                this.gparms.dx = this.parent.X;
+                this.gparms.dy = this.parent.Y;
+            }
         }
         // --- Accessors --- //
         get gfx() {
@@ -961,7 +962,7 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
             this.Editor();
             this.Hoverer();
         }
-        // --- Public Methods --- //
+        // --- Overrides --- //
         draw() {
             this.redrawChildren();
         }
@@ -1034,6 +1035,20 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "P
             this.Rect(0, 0, this._gfx.width, this._gfx.height);
             this._rootTile = new RootTile_1.RootTile(0, 0, this.w, this.h, this);
         }
+        // --- Public Methods --- //
+        clear() {
+            this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
+        }
+        redraw() {
+            this.clear();
+            this.tile.redraw();
+        }
+        start(delay = 125) {
+            this._delay = delay;
+            this._lastTime = Date.now();
+            this.redraw();
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
         // --- Private Methods --- //
         _tick() {
             clearTimeout(this._timerId);
@@ -1056,20 +1071,6 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "P
             function next() {
                 return that._eventQueue.getEvent();
             }
-        }
-        // --- Public Methods --- //
-        clear() {
-            this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
-        }
-        redraw() {
-            this.clear();
-            this.tile.redraw();
-        }
-        start(delay = 125) {
-            this._delay = delay;
-            this._lastTime = Date.now();
-            this.redraw();
-            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
         }
         // --- Accessors --- //
         get playfield() {
@@ -1573,6 +1574,13 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             gfx.text(this._label, this.x, y, this.gparms, w);
             gfx.restore();
         }
+        // --- Accessors --- //
+        get label() {
+            return this._label;
+        }
+        set label(value) {
+            this._label = value;
+        }
     }
     exports.LabelItem = LabelItem;
 });
@@ -2017,7 +2025,7 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             this._playfield = this._playfieldApp.playfield;
         }
         boxTest() {
-            this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);
+            this._playfield.gfx.rect(10, 10, 100, 100, this._playfield.gparms);
         }
         circleTestTile() {
             let parent = this._playfield.tile;

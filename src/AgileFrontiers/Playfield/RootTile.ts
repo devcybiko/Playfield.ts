@@ -20,8 +20,8 @@ export class RootTile extends _RootTile {
         this.Hoverer();
     }
 
-    // --- Public Methods --- //
-    
+    // --- Overrides --- //
+
     draw() {
         this.redrawChildren();
     }

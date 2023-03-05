@@ -43,7 +43,6 @@ export class CircleTile extends _CircleTile {
             this.playfield.gfx.circle(this.x, this.y, r, this.gparms);
             this.gparms.fillColor = oldColor;
         }
-
     }
 
     // --- onActions --- //

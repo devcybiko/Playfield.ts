@@ -17,12 +17,6 @@ export class GfxParms {
         this.fontFace = "sans-serif"
     }
 
-    // --- Private Methods --- //
-
-    private _updateFont() {
-        this._font = "" + this._fontSize + "px " + this._fontFace;
-    }
-
     // --- Public Methods --- //
 
     public clone(): GfxParms {
@@ -30,8 +24,15 @@ export class GfxParms {
         return { ...this } as GfxParms;
     }
 
+    // --- Private Methods --- //
+
+    private _updateFont() {
+        this._font = "" + this._fontSize + "px " + this._fontFace;
+    }
+
+
     // --- Accessors --- //
-    
+
     public get font(): string {
         return this._font;
     }
