@@ -9,6 +9,8 @@ export class Clickable {
         return this;
     }
 
+    // --- onActions --- //
+    
     onClick(pfEvent: PlayfieldEvent): boolean {
         return false;
     }

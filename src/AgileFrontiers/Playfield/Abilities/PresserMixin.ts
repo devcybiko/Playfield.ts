@@ -8,15 +8,17 @@ export class Presser {
         return this;
     }
 
+    // --- Public Methods --- //
+    
     pressEvent(pfEvent: PlayfieldEvent, child: Pressable) {
         let treeChild = child as unknown as Tile;
         if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-            if (pfEvent.type === "mousedown") {
+            if (pfEvent.isPress) {
                 child.isPressed = true;
                 child.onPress(pfEvent);
             }
         }
-        if (pfEvent.type === "mouseup" && child.isPressed) {
+        if (pfEvent.isRelease && child.isPressed) {
             child.isPressed = false;
             child.onPress(pfEvent);
         }

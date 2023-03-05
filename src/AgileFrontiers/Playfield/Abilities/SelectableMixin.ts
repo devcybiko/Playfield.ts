@@ -9,6 +9,8 @@ export class Selectable {
         return this;
     }
 
+    // --- onActions --- //
+    
     onSelect(): boolean {
         return false;
     }

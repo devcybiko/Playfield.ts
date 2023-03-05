@@ -12,6 +12,8 @@ export class CanvasEventPump {
 
     }
 
+    // --- Private Methods --- //
+    
     private _registerEventHandlers(canvas: HTMLCanvasElement) {
         canvas.addEventListener('mousedown', this._handler.bind(this));
         canvas.addEventListener('mousemove', this._handler.bind(this));

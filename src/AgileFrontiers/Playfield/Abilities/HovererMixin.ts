@@ -8,9 +8,11 @@ export class Hoverer {
         return this;
     }
 
+    // --- Public Methods --- //
+    
     hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable): boolean {
         let treeChild = child as unknown as Tile;
-        if (pfEvent.type === "mousemove") {
+        if (pfEvent.isMove) {
             if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
                 if (child.isHovering) {
                     child.onHovering(pfEvent);

@@ -20,6 +20,36 @@ export class ToggleItem extends _ToggleItem {
         this._label = label || value;
     }
     
+    // --- Public Methods --- //
+
+    go(): boolean {
+        window.alert(this.value);
+        return true;
+    }
+
+    // --- Overrides --- //
+
+    draw() {
+        let gfx = this._playfield.gfx;
+        this._updateGparms();
+        if (this.isOn) this.gparms.fillColor = this.options.selectColor;
+        else if (this.isHovering) this.gparms.fillColor = this.options.hoverColor;
+        else this.gparms.fillColor = "white";
+        gfx.clipRect(this.x, this.y, this.w, this.h);
+        gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+        gfx.restore();
+    }
+
+    // --- onAcations --- //
+
+    onClick(): boolean {
+        this.isOn = !this.isOn;
+        this.go();
+        return true;
+    }
+
+    // --- Accessors --- //
+
     public get label() {
         return this._label;
     }
@@ -38,24 +68,5 @@ export class ToggleItem extends _ToggleItem {
     }
     public set value(s: string) {
         super.value  = s;
-    }
-    draw() {
-        let gfx = this._playfield.gfx;
-        this._updateGparms();
-        if (this.isOn) this.gparms.fillColor = this.options.selectColor;
-        else if (this.isHovering) this.gparms.fillColor = this.options.hoverColor;
-        else this.gparms.fillColor = "white";
-        gfx.clipRect(this.x, this.y, this.w, this.h);
-        gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
-        gfx.restore();
-    }
-    onClick(): boolean {
-        this.isOn = !this.isOn;
-        this.go();
-        return true;
-    }
-    go(): boolean {
-        window.alert(this.value);
-        return true;
     }
 }

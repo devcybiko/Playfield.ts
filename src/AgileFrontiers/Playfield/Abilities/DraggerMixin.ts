@@ -1,28 +1,30 @@
 import { Draggable } from "./DraggableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
-import { Logger } from "../Utils";
 import { Tile } from "../Tile";
 
 
 export interface Dragger { };
 export class Dragger {
-    _dragObj: Draggable;
-    _dragX: number;
-    _dragY: number;
-    _logger: Logger;
+    private _dragObj: Draggable;
+    private _dragX: number;
+    private _dragY: number;
 
     Dragger() {
         this._dragObj = null;
         this._dragX = 0;
         this._dragY = 0;
-        this._logger = (this as unknown as Logger);
         return this;
     }
+
+    // --- Public Methods --- //
+
     dragEvent(pfEvent: PlayfieldEvent, child: Draggable): boolean {
-        if (pfEvent.type === "mousemove") return this._dragChild(pfEvent, child);
-        else if (pfEvent.type === "mousedown") return this._grabChild(pfEvent, child);
-        else if (pfEvent.type === "mouseup") return this._dropChild(pfEvent, child);
+        if (pfEvent.isMove) return this._dragChild(pfEvent, child);
+        else if (pfEvent.isPress) return this._grabChild(pfEvent, child);
+        else if (pfEvent.isRelease) return this._dropChild(pfEvent, child);
     }
+
+    // --- Private Methods --- //
 
     _dragChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
         if (this._dragObj) {
@@ -54,4 +56,5 @@ export class Dragger {
         }
         return false;
     }
+
 }

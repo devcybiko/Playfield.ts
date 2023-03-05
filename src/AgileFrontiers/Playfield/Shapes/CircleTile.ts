@@ -4,7 +4,7 @@ import { Draggable, Selectable } from "../Abilities";
 import { applyMixins } from "../Utils";
 
 export class _CircleTile extends ShapeTile { };
-export interface _CircleTile extends Draggable , Selectable{ };
+export interface _CircleTile extends Draggable, Selectable { };
 applyMixins(_CircleTile, [Draggable, Selectable]);
 
 export class CircleTile extends _CircleTile {
@@ -14,33 +14,9 @@ export class CircleTile extends _CircleTile {
         super(name, parent, x, y, w, h);
         this.Draggable();
     }
-    onGrab(event: any) {
-        this._dx = this.X - event.x;
-        this._dy = this.Y - event.y;
-        this.toFront();
-        return true;
-    }
-    draw() {
-        if (this.isSelected) this.gparms.borderColor = "black";
-        else this.gparms.borderColor = "";
-        this.gparms.fillColor = "gray";
-        
-        this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
-        if (this._dx && this._dy) {
-            let oldColor = this.gparms.fillColor;
-            this.gparms.fillColor = "red";
-            let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
-            this._playfield.gfx.circle(this.x, this.y, r, this.gparms);
-            this.gparms.fillColor = oldColor;
-        }
 
-    }
-    onDrop() {
-        this.toFront();
-        this._dx = 0;
-        this._dy = 0;
-        return true;
-    }
+    // --- Overrides --- //
+
     inBounds(x: number, y: number): Tile {
         let dx = this.X - x;
         let dy = this.Y - y;
@@ -52,5 +28,37 @@ export class CircleTile extends _CircleTile {
             if (found) return found;
         }
         return null as unknown as Tile;
+    }
+
+    draw() {
+        if (this.isSelected) this.gparms.borderColor = "black";
+        else this.gparms.borderColor = "";
+        this.gparms.fillColor = "gray";
+
+        this._playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+        if (this._dx && this._dy) {
+            let oldColor = this.gparms.fillColor;
+            this.gparms.fillColor = "red";
+            let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
+            this._playfield.gfx.circle(this.x, this.y, r, this.gparms);
+            this.gparms.fillColor = oldColor;
+        }
+
+    }
+
+    // --- onActions --- //
+
+    onGrab(event: any) {
+        this._dx = this.X - event.x;
+        this._dy = this.Y - event.y;
+        this.toFront();
+        return true;
+    }
+
+    onDrop() {
+        this.toFront();
+        this._dx = 0;
+        this._dy = 0;
+        return true;
     }
 }

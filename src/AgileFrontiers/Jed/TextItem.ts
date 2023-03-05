@@ -28,8 +28,73 @@ export class TextItem extends _TextItem {
         this._nchars = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w);
         this._nchars2 = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w / 2);
         this._left = 0;
-        this._right = this.computeRight();
+        this._right = this._computeRight();
     }
+
+    // --- Overrides --- //
+
+    draw() {
+        let gfx = this._playfield.gfx;
+        this._updateGparms();
+        if (this.isFocus) this.gparms.color = this.options.selectColor;
+        else this.gparms.color = this.options.textColor;
+        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
+        let value = this.value.substring(this._left)
+        if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
+        gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
+        this._drawCursor();
+        gfx.restore();
+    }
+
+    // --- onActions --- //
+
+    onRepeat(): boolean {
+        this._blink();
+        return true;
+    }
+    onArrowLeft(): boolean {
+        this._cursorInc(-1);
+        return true;
+    }
+    onArrowRight(): boolean {
+        this._cursorInc(+1);
+        return true;
+    }
+    onBackspace(): boolean {
+        if (this._cursor > 0) {
+            let c = this._cursor;
+            let left = this.value.substring(0, c - 1);
+            let right = this.value.substring(c);
+            this.value = left + right;
+            this._cursorInc(-1);
+            this.log(left, right, this._cursor, this.value);
+            return true;
+        }
+        return false;
+    }
+    onKey(key: string): boolean {
+        let c = this._cursor;
+        this.value = this.value.substring(0, c) + key + this.value.substring(c);
+        this._cursorInc(+1);
+        return true;
+    }
+    onFocus(): boolean {
+        super.onFocus();
+        this.toFront();
+        this._startCursorBlinking();
+        return true;
+    }
+    onUnfocus(): boolean {
+        this._stopCursorBlinking();
+        return true;
+    }
+
+    // --- Private Methods --- //
+
+    _blink() {
+        this._cursorOn = !this._cursorOn;
+    }
+
     _startCursorBlinking() {
         this._cursorOn = true;
         this.startRepeat(this._cursorBlinkRate);
@@ -38,14 +103,8 @@ export class TextItem extends _TextItem {
         this._cursorOn = false;
         this.stopRepeat();
     }
-    onRepeat(): boolean {
-        this.blink();
-        return true;
-    }
-    blink() {
-        this._cursorOn = !this._cursorOn;
-    }
-    drawCursor() {
+
+    _drawCursor() {
         if (!this.isFocus) return;
         if (!this._cursorOn) return;
         let gfx = this._playfield.gfx;
@@ -61,19 +120,8 @@ export class TextItem extends _TextItem {
         gfx.line(x0, y0, x1, y1, this.gparms);
         gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
     }
-    draw() {
-        let gfx = this._playfield.gfx;
-        this._updateGparms();
-        if (this.isFocus) this.gparms.color = this.options.selectColor;
-        else this.gparms.color = this.options.textColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-        let value = this.value.substring(this._left)
-        if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
-        gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
-        this.drawCursor();
-        gfx.restore();
-    }
-    computeRight() {
+
+    _computeRight() {
         // let gfx = this._playfield.gfx;
         // let right = this._left;
         // for(let i=this._left; i<=this.value.length; i++) {
@@ -85,7 +133,7 @@ export class TextItem extends _TextItem {
         if (right >= this.value.length) right = this.value.length - 1;
         return right;
     }
-    computeLeft() {
+    _computeLeft() {
         // let gfx = this._playfield.gfx;
         // let left = this._right;
         // for(let i=this._right; i>=0; i--) {
@@ -97,7 +145,7 @@ export class TextItem extends _TextItem {
         if (left < 0) left = 0;
         return left;
     }
-    cursorInc(delta: number) {
+    _cursorInc(delta: number) {
         this._cursor += delta;
         this._startCursorBlinking();
         this._cursorOn = true;
@@ -109,41 +157,5 @@ export class TextItem extends _TextItem {
         if (this._right > this.value.length) this._right = this.value.length;
         if (this._right === this.value.length) this._left = Math.max(this._right - this._nchars + 1, 0);
         this.log(this._left, this._cursor, this._right, this._nchars, this._nchars2);
-    }
-    onArrowLeft(): boolean {
-        this.cursorInc(-1);
-        return true;
-    }
-    onArrowRight(): boolean {
-        this.cursorInc(+1);
-        return true;
-    }
-    onBackspace(): boolean {
-        if (this._cursor > 0) {
-            let c = this._cursor;
-            let left = this.value.substring(0, c - 1);
-            let right = this.value.substring(c);
-            this.value = left + right;
-            this.cursorInc(-1);
-            this.log(left, right, this._cursor, this.value);
-            return true;
-        }
-        return false;
-    }
-    onKey(key: string): boolean {
-        let c = this._cursor;
-        this.value = this.value.substring(0, c) + key + this.value.substring(c);
-        this.cursorInc(+1);
-        return true;
-    }
-    onFocus(): boolean {
-        super.onFocus();
-        this.toFront();
-        this._startCursorBlinking();
-        return true;
-    }
-    onUnfocus(): boolean {
-        this._stopCursorBlinking();
-        return true;
     }
 }

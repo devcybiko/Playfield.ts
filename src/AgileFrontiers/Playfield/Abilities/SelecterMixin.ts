@@ -10,19 +10,23 @@ import { Tile } from "../Tile";
  */
 export interface Selecter { };
 export class Selecter {
-    _selectedObj: Selectable;
+    private _selectedObj: Selectable;
 
     Selecter() {
         this._selectedObj = null;
         return this;
     }
 
+    // --- Public Methods --- //
+
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
         let treeChild = child as unknown as Tile;
         if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-            if (pfEvent.type === "mousedown" && this._selectedObj != child) this._selectChild(pfEvent, child);
+            if (pfEvent.isPress && this._selectedObj != child) this._selectChild(pfEvent, child);
         } 
     }
+
+    // --- Private Methods --- //
 
     _selectChild(pfEvent: PlayfieldEvent, child: Selectable): boolean {
         this._unselectChild(pfEvent, child);
@@ -40,5 +44,11 @@ export class Selecter {
             return true;
         }
         return false;
+    }
+
+    // --- Accessors --- //
+
+    get selectedObj(): Selectable {
+        return this._selectedObj;
     }
 }

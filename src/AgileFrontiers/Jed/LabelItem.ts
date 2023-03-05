@@ -17,6 +17,8 @@ export class LabelItem extends _LabelItem {
         this._updateGparms();
         this._label = label;
     }
+
+    // --- Overrides --- //
     draw() {
         let gfx = this._playfield.gfx;
         this._updateGparms();

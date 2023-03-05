@@ -6,6 +6,9 @@ export class EventQueue {
     constructor() {
         this._eventQueue = [];
     }
+
+    // --- Public Methods --- //
+    
     public getEvent(): PlayfieldEvent {
         return this._eventQueue.shift();
     }

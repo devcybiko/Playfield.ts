@@ -10,6 +10,8 @@ export class Repeatable {
         return this;
     }
 
+    // --- Public Methods --- //
+
     startRepeat(delay?: number) {
         if (delay !== undefined) this._delay = delay;
         this.stopRepeat();
@@ -21,6 +23,8 @@ export class Repeatable {
         this._timerId = null;
     }
 
+    // --- onActions --- //
+    
     onRepeat(): boolean {
         return false;
     }

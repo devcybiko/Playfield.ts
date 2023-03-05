@@ -15,17 +15,7 @@ export class GfxBrowser implements Gfx {
         (this._ctx as any).textRendering = "geometricPrecision";
     }
 
-    get width(): number {
-        return this._canvas.width;
-    }
-
-    get height(): number {
-        return this._canvas.height;
-    }
-
-    get canvas(): HTMLCanvasElement {
-        return this._canvas;
-    }
+    // --- Public Methods --- //
 
     rect(
         x: number,
@@ -88,6 +78,7 @@ export class GfxBrowser implements Gfx {
         this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
         this._ctx.stroke();
     }
+
     text(msg: string, x = 0, y = 0, _gparms = this._gparms, w?: number) {
         this._ctx.fillStyle = _gparms.color;
         this._ctx.font = _gparms.font;
@@ -95,6 +86,7 @@ export class GfxBrowser implements Gfx {
         this._ctx.textBaseline = _gparms.textBaseline;
         this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
     }
+
     textRect(
         msg: string,
         x = 0,
@@ -110,21 +102,40 @@ export class GfxBrowser implements Gfx {
         this.rect(x, y, w, h, _gparms);
         this.text(msg, x, y, _gparms, w);
     }
+
     boundingBox(msg: string, _gparms = this._gparms): any {
         this._ctx.font = _gparms.font;
         let boundingBox = this._ctx.measureText(msg) as any;
         return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
     }
+
     clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
         this.save();
         let region = new Path2D();
         region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
         this._ctx.clip(region);
     }
+
     save() {
         this._ctx.save();
     }
+    
     restore() {
         this._ctx.restore();
     }
+
+    // --- Accessors --- //
+
+    get width(): number {
+        return this._canvas.width;
+    }
+
+    get height(): number {
+        return this._canvas.height;
+    }
+
+    get canvas(): HTMLCanvasElement {
+        return this._canvas;
+    }
+
 }

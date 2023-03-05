@@ -13,6 +13,8 @@ export class Editable {
         return this;
     }
 
+    // --- onActons --- //
+
     onKey(key: string, pfEvent: PlayfieldEvent): boolean {
         return true;
     }

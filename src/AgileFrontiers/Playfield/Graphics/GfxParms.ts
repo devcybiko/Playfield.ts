@@ -16,12 +16,22 @@ export class GfxParms {
         this.fontSize = 24;
         this.fontFace = "sans-serif"
     }
-    public clone(): GfxParms {
-        return { ...this } as GfxParms;
-    }
+
+    // --- Private Methods --- //
+
     private _updateFont() {
         this._font = "" + this._fontSize + "px " + this._fontFace;
     }
+
+    // --- Public Methods --- //
+
+    public clone(): GfxParms {
+        // make a shallow copy
+        return { ...this } as GfxParms;
+    }
+
+    // --- Accessors --- //
+    
     public get font(): string {
         return this._font;
     }

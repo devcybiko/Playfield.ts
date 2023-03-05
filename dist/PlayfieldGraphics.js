@@ -56,6 +56,24 @@ define("Playfield/Utils/RectMixin", ["require", "exports"], function (require, e
             this._w = w;
             this._h = h;
         }
+        // --- Public Methods --- //
+        move(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        rmove(dx, dy) {
+            this.x += dx;
+            this.y += dy;
+        }
+        size(w, h) {
+            this.w = w;
+            this.h = h;
+        }
+        rsize(dw, dh) {
+            this.w += dw;
+            this.h += dh;
+        }
+        // --- Accessors --- //
         get x() {
             return this._x;
         }
@@ -80,22 +98,6 @@ define("Playfield/Utils/RectMixin", ["require", "exports"], function (require, e
         set h(n) {
             this._h = n;
         }
-        move(x, y) {
-            this.x = x;
-            this.y = y;
-        }
-        rmove(dx, dy) {
-            this.x += dx;
-            this.y += dy;
-        }
-        size(w, h) {
-            this.w = w;
-            this.h = h;
-        }
-        rsize(dw, dh) {
-            this.w += dw;
-            this.h += dh;
-        }
     }
     exports.Rect = Rect;
 });
@@ -110,16 +112,7 @@ define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, e
             if (parent)
                 parent.add(this);
         }
-        get parent() {
-            return this._parent;
-        }
-        get name() {
-            return this._name;
-        }
-        get children() {
-            // return a shallow copy
-            return [...this._children];
-        }
+        // --- Public Methods --- //
         add(child) {
             child._parent = this;
             this._children.push(child);
@@ -159,6 +152,17 @@ define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, e
                 this.parent.toBack(this);
             }
         }
+        // --- Accessors --- //
+        get parent() {
+            return this._parent;
+        }
+        get name() {
+            return this._name;
+        }
+        get children() {
+            // return a shallow copy
+            return [...this._children];
+        }
     }
     exports.Tree = Tree;
 });
@@ -176,6 +180,7 @@ define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require,
             this._uselink = uselink;
             return this;
         }
+        // --- Private Methods --- //
         _source(depth = 0) {
             let err = new Error("error");
             let stack = err.stack.split("\n");
@@ -193,36 +198,39 @@ define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require,
             }
             return module;
         }
-        get logLevel() {
-            return this._level;
-        }
-        set logLevel(level) {
-            this._level = level;
-        }
-        format(level, module, ...args) {
+        // --- Private Methods --- //
+        _format(level, module, ...args) {
             let format = `${level}: ${module}: ${args.join(", ")}`;
             if (this._uselink)
                 format += "\n" + " ".repeat(level.length + 2) + this._link;
             return format;
         }
+        // --- Public Methods --- //
         info(...args) {
             // most verbose
             if (["info"].includes(this._level))
-                console.log(this.format("INFO", this._module()), ...args);
+                console.log(this._format("INFO", this._module()), ...args);
         }
         log(...args) {
             // less verbose
             if (["info", "log"].includes(this._level))
-                console.log(this.format("LOG", this._module()), ...args);
+                console.log(this._format("LOG", this._module()), ...args);
         }
         warn(...args) {
             // less verbose
             if (["info", "log", "warn"].includes(this._level))
-                console.log(this.format("WARN", this._module()), ...args);
+                console.log(this._format("WARN", this._module()), ...args);
         }
         error(...args) {
             // always show errors
-            console.error(this.format("ERROR", this._module(), ...args));
+            console.error(this._format("ERROR", this._module(), ...args));
+        }
+        // --- Accessors --- //
+        get logLevel() {
+            return this._level;
+        }
+        set logLevel(level) {
+            this._level = level;
         }
     }
     exports.Logger = Logger;
@@ -256,12 +264,16 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.fontSize = 24;
             this.fontFace = "sans-serif";
         }
-        clone() {
-            return Object.assign({}, this);
-        }
+        // --- Private Methods --- //
         _updateFont() {
             this._font = "" + this._fontSize + "px " + this._fontFace;
         }
+        // --- Public Methods --- //
+        clone() {
+            // make a shallow copy
+            return Object.assign({}, this);
+        }
+        // --- Accessors --- //
         get font() {
             return this._font;
         }
@@ -299,15 +311,7 @@ define("Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms
             this._ctx.letterSpacing = "1px";
             this._ctx.textRendering = "geometricPrecision";
         }
-        get width() {
-            return this._canvas.width;
-        }
-        get height() {
-            return this._canvas.height;
-        }
-        get canvas() {
-            return this._canvas;
-        }
+        // --- Public Methods --- //
         rect(x, y, w, h, _gparms = this._gparms) {
             if (_gparms.fillColor) {
                 this._ctx.fillStyle = _gparms.fillColor;
@@ -376,6 +380,16 @@ define("Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms
         restore() {
             this._ctx.restore();
         }
+        // --- Accessors --- //
+        get width() {
+            return this._canvas.width;
+        }
+        get height() {
+            return this._canvas.height;
+        }
+        get canvas() {
+            return this._canvas;
+        }
     }
     exports.GfxBrowser = GfxBrowser;
 });
@@ -393,23 +407,32 @@ define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, ex
     class PlayfieldEvent {
         constructor(event) {
             this.event = event;
-            this.type = event.type;
+            // this.type = event.type;
+            // mouse events
+            this.x = event.offsetX;
+            this.y = event.offsetY;
+            this.isMove = event.type === "mousemove";
+            this.isPress = event.type === "mousedown" && event.button === 0;
+            this.isRelease = event.type === "mouseup" && event.button === 0;
+            this.isMenu = event.type === "mousedown" && event.button === 2;
+            this.isMenuRelease = event.type === "mousedown" && event.button === 2;
+            // keyboard events
             this.key = event.key;
+            this.isKeyDown = event.type === "keydown";
+            this.isKeyUp = event.type === "keyup";
             this.isShift = event.shiftKey;
             this.isControl = event.ctrlKey;
             this.isAlt = event.altKey;
             this.isOption = event.altKey;
             this.isMeta = event.metaKey;
             this.isCommand = event.metaKey;
-            this.x = event.offsetX;
-            this.y = event.offsetY;
-            if (event.button === 0)
-                this.button = "select";
-            if (event.button === 1)
-                this.button = "middle";
-            if (event.button === 2)
-                this.button = "menu";
-            this.wheelDelta = event.wheelDelta;
+            // if (event.button === 0) this.button = "select";
+            // if (event.button === 1) this.button = "middle";
+            // if (event.button === 2) this.button = "menu";
+            // gestures
+            this.swipe = event.wheelDelta;
+            this.isSwipeLeft = event.wheelDelta < 0;
+            this.isSwipeRight = event.wheelDelta > 0;
         }
     }
     exports.PlayfieldEvent = PlayfieldEvent;
@@ -435,30 +458,20 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
     class Tile extends _Tile {
         constructor(name, parent, x, y, w, h, playfield = parent._playfield) {
             super();
+            this.Logger();
             this.Tree(name, parent);
             this.Rect(x, y, w, h);
-            this.Logger();
             this._gparms = new Graphics_1.GfxParms();
             this._playfield = playfield;
             this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
             return this;
         }
-        get gfx() {
-            return this._playfield.gfx;
+        _recompute() {
+            if (this.parent) {
+                this.gparms.dx = this.parent.X;
+                this.gparms.dy = this.parent.Y;
+            }
         }
-        get gparms() {
-            return this._gparms;
-        }
-        get X() {
-            return this.x + this.gparms.dx;
-        }
-        get Y() {
-            return this.y + this.gparms.dy;
-        }
-        // add(child: Tile) {
-        // super.add(child);
-        // child._playfield = this._playfield;
-        // }
         inBounds(x, y) {
             let result = (0, Utils_1.between)(this.X, x, this.X + this.w) &&
                 (0, Utils_1.between)(this.Y, y, this.Y + this.h);
@@ -470,12 +483,6 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
                     return found;
             }
             return null;
-        }
-        _recompute() {
-            if (this.parent) {
-                this.gparms.dx = this.parent.X;
-                this.gparms.dy = this.parent.Y;
-            }
         }
         drawAll() {
             this.redraw();
@@ -493,6 +500,7 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
         draw() {
             this.redrawChildren();
         }
+        // --- OnActions --- //
         onTick() {
             this.children.forEach(child => child.onTick());
             return true;
@@ -500,6 +508,19 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfi
         onEvent(pfEvent) {
             this.children.forEach(child => child.onEvent(pfEvent));
             return true;
+        }
+        // --- Accessors --- //
+        get gfx() {
+            return this._playfield.gfx;
+        }
+        get gparms() {
+            return this._gparms;
+        }
+        get X() {
+            return this.x + this.gparms.dx;
+        }
+        get Y() {
+            return this.y + this.gparms.dy;
         }
     }
     exports.Tile = Tile;
@@ -513,6 +534,7 @@ define("Playfield/Abilities/DraggableMixin", ["require", "exports"], function (r
             this.isDraggable = true;
             return this;
         }
+        // --- onActions --- //
         onGrab(pfEvent) {
             return false;
         }
@@ -545,17 +567,18 @@ define("Playfield/Abilities/DraggerMixin", ["require", "exports"], function (req
             this._dragObj = null;
             this._dragX = 0;
             this._dragY = 0;
-            this._logger = this;
             return this;
         }
+        // --- Public Methods --- //
         dragEvent(pfEvent, child) {
-            if (pfEvent.type === "mousemove")
+            if (pfEvent.isMove)
                 return this._dragChild(pfEvent, child);
-            else if (pfEvent.type === "mousedown")
+            else if (pfEvent.isPress)
                 return this._grabChild(pfEvent, child);
-            else if (pfEvent.type === "mouseup")
+            else if (pfEvent.isRelease)
                 return this._dropChild(pfEvent, child);
         }
+        // --- Private Methods --- //
         _dragChild(pfEvent, child) {
             if (this._dragObj) {
                 this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
@@ -598,6 +621,7 @@ define("Playfield/Abilities/SelectableMixin", ["require", "exports"], function (
             this._isSelectable = true;
             return this;
         }
+        // --- onActions --- //
         onSelect() {
             return false;
         }
@@ -630,13 +654,15 @@ define("Playfield/Abilities/SelecterMixin", ["require", "exports"], function (re
             this._selectedObj = null;
             return this;
         }
+        // --- Public Methods --- //
         selectEvent(pfEvent, child) {
             let treeChild = child;
             if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-                if (pfEvent.type === "mousedown" && this._selectedObj != child)
+                if (pfEvent.isPress && this._selectedObj != child)
                     this._selectChild(pfEvent, child);
             }
         }
+        // --- Private Methods --- //
         _selectChild(pfEvent, child) {
             this._unselectChild(pfEvent, child);
             this._selectedObj = child;
@@ -653,6 +679,10 @@ define("Playfield/Abilities/SelecterMixin", ["require", "exports"], function (re
             }
             return false;
         }
+        // --- Accessors --- //
+        get selectedObj() {
+            return this._selectedObj;
+        }
     }
     exports.Selecter = Selecter;
 });
@@ -666,6 +696,7 @@ define("Playfield/Abilities/PressableMixin", ["require", "exports"], function (r
             this.isPressable = true;
             return this;
         }
+        // --- onActions --- //
         onPress(pfEvent) {
             return true;
         }
@@ -697,15 +728,16 @@ define("Playfield/Abilities/PresserMixin", ["require", "exports"], function (req
         Presser() {
             return this;
         }
+        // --- Public Methods --- //
         pressEvent(pfEvent, child) {
             let treeChild = child;
             if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-                if (pfEvent.type === "mousedown") {
+                if (pfEvent.isPress) {
                     child.isPressed = true;
                     child.onPress(pfEvent);
                 }
             }
-            if (pfEvent.type === "mouseup" && child.isPressed) {
+            if (pfEvent.isRelease && child.isPressed) {
                 child.isPressed = false;
                 child.onPress(pfEvent);
             }
@@ -722,6 +754,7 @@ define("Playfield/Abilities/ClickableMixin", ["require", "exports"], function (r
             this.isClickable = true;
             return this;
         }
+        // --- onActions --- //
         onClick(pfEvent) {
             return false;
         }
@@ -744,8 +777,9 @@ define("Playfield/Abilities/ClickerMixin", ["require", "exports"], function (req
         Clicker() {
             return this;
         }
+        // --- Public Methods --- //
         clickEvent(pfEvent, child) {
-            if (pfEvent.type === "mousedown") {
+            if (pfEvent.isPress) {
                 let tileChild = child;
                 if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                     child.onClick(pfEvent);
@@ -766,6 +800,7 @@ define("Playfield/Abilities/HoverableMixin", ["require", "exports"], function (r
             this.isHoverable = true;
             return this;
         }
+        // --- onActions --- //
         onHovering(pfEvent) {
             return false;
         }
@@ -800,9 +835,10 @@ define("Playfield/Abilities/HovererMixin", ["require", "exports"], function (req
         Hoverer() {
             return this;
         }
+        // --- Public Methods --- //
         hoverEvent(pfEvent, child) {
             let treeChild = child;
-            if (pfEvent.type === "mousemove") {
+            if (pfEvent.isMove) {
                 if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
                     if (child.isHovering) {
                         child.onHovering(pfEvent);
@@ -836,6 +872,7 @@ define("Playfield/Abilities/EditableMixin", ["require", "exports"], function (re
             this.isFocusable = true;
             return this;
         }
+        // --- onActons --- //
         onKey(key, pfEvent) {
             return true;
         }
@@ -894,12 +931,14 @@ define("Playfield/Abilities/EditorMixin", ["require", "exports"], function (requ
             this._focusObj = null;
             return this;
         }
+        // --- Public Methods --- //
         editorEvent(pfEvent, child) {
-            if (pfEvent.type === "mousedown")
+            if (pfEvent.isPress)
                 return this._focusChild(pfEvent, child);
-            else if (pfEvent.type === "keydown")
+            else if (pfEvent.isKeyDown)
                 return this._dispatchKey(pfEvent, child);
         }
+        // --- Private Methods --- //
         _focusChild(pfEvent, child) {
             let tileChild = child;
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
@@ -974,6 +1013,7 @@ define("Playfield/Abilities/RepeatableMixin", ["require", "exports"], function (
             this._delay = delay;
             return this;
         }
+        // --- Public Methods --- //
         startRepeat(delay) {
             if (delay !== undefined)
                 this._delay = delay;
@@ -985,6 +1025,7 @@ define("Playfield/Abilities/RepeatableMixin", ["require", "exports"], function (
                 clearInterval(this._timerId);
             this._timerId = null;
         }
+        // --- onActions --- //
         onRepeat() {
             return false;
         }
@@ -1026,25 +1067,28 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RootTile = exports._RootTile = void 0;
-    /**
-     * The RootTile has some special capabilities
-     */
     class _RootTile extends Tile_1.Tile {
     }
     exports._RootTile = _RootTile;
     ;
     ;
-    (0, Utils_2.applyMixins)(_RootTile, [Abilities_1.Clicker, Abilities_1.Selecter, Abilities_1.Presser, Abilities_1.Dragger, Utils_2.Logger, Abilities_1.Editor, Abilities_1.Hoverer]);
+    (0, Utils_2.applyMixins)(_RootTile, [Utils_2.Logger, Abilities_1.Clicker, Abilities_1.Presser, Abilities_1.Selecter, Abilities_1.Dragger, Abilities_1.Editor, Abilities_1.Hoverer]);
     class RootTile extends _RootTile {
         constructor(x, y, w, h, playfield) {
             super("_root", null, x, y, w, h, playfield);
-            this.Dragger();
-            this.Selecter();
             this.Logger();
+            this.Clicker();
+            this.Presser();
+            this.Selecter();
+            this.Dragger();
+            this.Editor();
+            this.Hoverer();
         }
+        // --- Public Methods --- //
         draw() {
             this.redrawChildren();
         }
+        // --- onActions --- //
         onEvent(pfEvent) {
             let children = this.children.reverse();
             for (let _child of children) {
@@ -1076,6 +1120,7 @@ define("Playfield/EventQueue", ["require", "exports"], function (require, export
         constructor() {
             this._eventQueue = [];
         }
+        // --- Public Methods --- //
         getEvent() {
             return this._eventQueue.shift();
         }
@@ -1112,6 +1157,30 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "P
             this.Rect(0, 0, this._gfx.width, this._gfx.height);
             this._rootTile = new RootTile_1.RootTile(0, 0, this.w, this.h, this);
         }
+        // --- Private Methods --- //
+        _tick() {
+            clearTimeout(this._timerId);
+            let now = Date.now();
+            let extra = now - this._lastTime;
+            this._handleEvents();
+            this.tile.onTick(); // process all ticks
+            this.redraw(); // redraw the playfield
+            this._lastTime = Date.now();
+            let delta = this._lastTime - now;
+            if (this._delay && (delta > this._delay))
+                console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
+        _handleEvents() {
+            let that = this;
+            for (let pfEvent = next(); pfEvent; pfEvent = next()) {
+                this._rootTile.onEvent(pfEvent);
+            }
+            function next() {
+                return that._eventQueue.getEvent();
+            }
+        }
+        // --- Public Methods --- //
         clear() {
             this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
         }
@@ -1119,33 +1188,11 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "P
             this.clear();
             this.tile.redraw();
         }
-        tick() {
-            clearTimeout(this._timerId);
-            let now = Date.now();
-            let extra = now - this._lastTime;
-            this.handleEvents();
-            this.tile.onTick(); // process all ticks
-            this.redraw(); // redraw the playfield
-            this._lastTime = Date.now();
-            let delta = this._lastTime - now;
-            if (this._delay && (delta > this._delay))
-                console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
-            this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
-        }
         start(delay = 125) {
             this._delay = delay;
             this._lastTime = Date.now();
             this.redraw();
-            this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
-        }
-        handleEvents() {
-            let that = this;
-            function next() {
-                return that._eventQueue.getEvent();
-            }
-            for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-                this._rootTile.onEvent(pfEvent);
-            }
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
         }
         // --- Accessors --- //
         get playfield() {
@@ -1182,6 +1229,7 @@ define("Browser/CanvasEventPump", ["require", "exports", "Playfield/Utils/index"
             this._eventQueue = eventQueue;
             this._registerEventHandlers(canvas);
         }
+        // --- Private Methods --- //
         _registerEventHandlers(canvas) {
             canvas.addEventListener('mousedown', this._handler.bind(this));
             canvas.addEventListener('mousemove', this._handler.bind(this));
@@ -1326,11 +1374,10 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             this.isDraggable = false;
             this._label = label || value;
         }
-        get label() {
-            return this._label;
-        }
-        set label(value) {
-            this._label = value;
+        // --- Overrides --- //
+        go() {
+            window.alert(this.value);
+            return true;
         }
         draw() {
             let gfx = this._playfield.gfx;
@@ -1345,14 +1392,18 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
             gfx.restore();
         }
+        // --- onActions --- //
         onRelease() {
             if (this.isHovering)
                 this.go();
             return true;
         }
-        go() {
-            window.alert(this.value);
-            return true;
+        // --- Accessors --- //
+        get label() {
+            return this._label;
+        }
+        set label(value) {
+            this._label = value;
         }
     }
     exports.ButtonItem = ButtonItem;
@@ -1376,6 +1427,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             this._updateGparms();
             this._label = label;
         }
+        // --- Overrides --- //
         draw() {
             let gfx = this._playfield.gfx;
             this._updateGparms();
@@ -1426,7 +1478,68 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             this._nchars = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w);
             this._nchars2 = Math.ceil(this.w / this._playfield.gfx.boundingBox("m", this.gparms).w / 2);
             this._left = 0;
-            this._right = this.computeRight();
+            this._right = this._computeRight();
+        }
+        // --- Overrides --- //
+        draw() {
+            let gfx = this._playfield.gfx;
+            this._updateGparms();
+            if (this.isFocus)
+                this.gparms.color = this.options.selectColor;
+            else
+                this.gparms.color = this.options.textColor;
+            gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
+            let value = this.value.substring(this._left);
+            if (this.isFocus)
+                value = value.replaceAll(" ", '\uA788'); // \u00B7
+            gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
+            this._drawCursor();
+            gfx.restore();
+        }
+        // --- onActions --- //
+        onRepeat() {
+            this._blink();
+            return true;
+        }
+        onArrowLeft() {
+            this._cursorInc(-1);
+            return true;
+        }
+        onArrowRight() {
+            this._cursorInc(+1);
+            return true;
+        }
+        onBackspace() {
+            if (this._cursor > 0) {
+                let c = this._cursor;
+                let left = this.value.substring(0, c - 1);
+                let right = this.value.substring(c);
+                this.value = left + right;
+                this._cursorInc(-1);
+                this.log(left, right, this._cursor, this.value);
+                return true;
+            }
+            return false;
+        }
+        onKey(key) {
+            let c = this._cursor;
+            this.value = this.value.substring(0, c) + key + this.value.substring(c);
+            this._cursorInc(+1);
+            return true;
+        }
+        onFocus() {
+            super.onFocus();
+            this.toFront();
+            this._startCursorBlinking();
+            return true;
+        }
+        onUnfocus() {
+            this._stopCursorBlinking();
+            return true;
+        }
+        // --- Private Methods --- //
+        _blink() {
+            this._cursorOn = !this._cursorOn;
         }
         _startCursorBlinking() {
             this._cursorOn = true;
@@ -1436,14 +1549,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             this._cursorOn = false;
             this.stopRepeat();
         }
-        onRepeat() {
-            this.blink();
-            return true;
-        }
-        blink() {
-            this._cursorOn = !this._cursorOn;
-        }
-        drawCursor() {
+        _drawCursor() {
             if (!this.isFocus)
                 return;
             if (!this._cursorOn)
@@ -1464,22 +1570,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             gfx.line(x0, y0, x1, y1, this.gparms);
             gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
         }
-        draw() {
-            let gfx = this._playfield.gfx;
-            this._updateGparms();
-            if (this.isFocus)
-                this.gparms.color = this.options.selectColor;
-            else
-                this.gparms.color = this.options.textColor;
-            gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            let value = this.value.substring(this._left);
-            if (this.isFocus)
-                value = value.replaceAll(" ", '\uA788'); // \u00B7
-            gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
-            this.drawCursor();
-            gfx.restore();
-        }
-        computeRight() {
+        _computeRight() {
             // let gfx = this._playfield.gfx;
             // let right = this._left;
             // for(let i=this._left; i<=this.value.length; i++) {
@@ -1492,7 +1583,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
                 right = this.value.length - 1;
             return right;
         }
-        computeLeft() {
+        _computeLeft() {
             // let gfx = this._playfield.gfx;
             // let left = this._right;
             // for(let i=this._right; i>=0; i--) {
@@ -1505,7 +1596,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
                 left = 0;
             return left;
         }
-        cursorInc(delta) {
+        _cursorInc(delta) {
             this._cursor += delta;
             this._startCursorBlinking();
             this._cursorOn = true;
@@ -1522,42 +1613,6 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
             if (this._right === this.value.length)
                 this._left = Math.max(this._right - this._nchars + 1, 0);
             this.log(this._left, this._cursor, this._right, this._nchars, this._nchars2);
-        }
-        onArrowLeft() {
-            this.cursorInc(-1);
-            return true;
-        }
-        onArrowRight() {
-            this.cursorInc(+1);
-            return true;
-        }
-        onBackspace() {
-            if (this._cursor > 0) {
-                let c = this._cursor;
-                let left = this.value.substring(0, c - 1);
-                let right = this.value.substring(c);
-                this.value = left + right;
-                this.cursorInc(-1);
-                this.log(left, right, this._cursor, this.value);
-                return true;
-            }
-            return false;
-        }
-        onKey(key) {
-            let c = this._cursor;
-            this.value = this.value.substring(0, c) + key + this.value.substring(c);
-            this.cursorInc(+1);
-            return true;
-        }
-        onFocus() {
-            super.onFocus();
-            this.toFront();
-            this._startCursorBlinking();
-            return true;
-        }
-        onUnfocus() {
-            this._stopCursorBlinking();
-            return true;
         }
     }
     exports.TextItem = TextItem;
@@ -1583,6 +1638,32 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             this.isDraggable = false;
             this._label = label || value;
         }
+        // --- Public Methods --- //
+        go() {
+            window.alert(this.value);
+            return true;
+        }
+        // --- Overrides --- //
+        draw() {
+            let gfx = this._playfield.gfx;
+            this._updateGparms();
+            if (this.isOn)
+                this.gparms.fillColor = this.options.selectColor;
+            else if (this.isHovering)
+                this.gparms.fillColor = this.options.hoverColor;
+            else
+                this.gparms.fillColor = "white";
+            gfx.clipRect(this.x, this.y, this.w, this.h);
+            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.restore();
+        }
+        // --- onAcations --- //
+        onClick() {
+            this.isOn = !this.isOn;
+            this.go();
+            return true;
+        }
+        // --- Accessors --- //
         get label() {
             return this._label;
         }
@@ -1603,28 +1684,6 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
         }
         set value(s) {
             super.value = s;
-        }
-        draw() {
-            let gfx = this._playfield.gfx;
-            this._updateGparms();
-            if (this.isOn)
-                this.gparms.fillColor = this.options.selectColor;
-            else if (this.isHovering)
-                this.gparms.fillColor = this.options.hoverColor;
-            else
-                this.gparms.fillColor = "white";
-            gfx.clipRect(this.x, this.y, this.w, this.h);
-            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
-            gfx.restore();
-        }
-        onClick() {
-            this.isOn = !this.isOn;
-            this.go();
-            return true;
-        }
-        go() {
-            window.alert(this.value);
-            return true;
         }
     }
     exports.ToggleItem = ToggleItem;
@@ -1668,6 +1727,14 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             this.Selectable();
             this.gparms.fillColor = this._colors[2];
         }
+        // --- Overrides ---//
+        draw() {
+            // if (this.isSelected) this.gparms.borderColor = "black";
+            // else this.gparms.borderColor = "";
+            // this.gparms.fillColor = this._colors[this._color];
+            this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        }
+        // --- onActions --- //
         onGrab() {
             this.toFront();
             return true;
@@ -1675,12 +1742,6 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
         onClick() {
             this._color = (this._color + 1) % this._colors.length;
             this.warn(this._color);
-        }
-        draw() {
-            // if (this.isSelected) this.gparms.borderColor = "black";
-            // else this.gparms.borderColor = "";
-            // this.gparms.fillColor = this._colors[this._color];
-            this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
         }
         onDrop() {
             this.toFront();
@@ -1709,11 +1770,20 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
             this._dy = 0;
             this.Draggable();
         }
-        onGrab(event) {
-            this._dx = this.X - event.x;
-            this._dy = this.Y - event.y;
-            this.toFront();
-            return true;
+        // --- Overrides --- //
+        inBounds(x, y) {
+            let dx = this.X - x;
+            let dy = this.Y - y;
+            let dr = dx * dx + dy * dy;
+            let dw = this.w * this.w;
+            if (dr <= dw)
+                return this;
+            for (let child of this.children.reverse()) {
+                let found = child.inBounds(x, y);
+                if (found)
+                    return found;
+            }
+            return null;
         }
         draw() {
             if (this.isSelected)
@@ -1730,25 +1800,18 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
                 this.gparms.fillColor = oldColor;
             }
         }
+        // --- onActions --- //
+        onGrab(event) {
+            this._dx = this.X - event.x;
+            this._dy = this.Y - event.y;
+            this.toFront();
+            return true;
+        }
         onDrop() {
             this.toFront();
             this._dx = 0;
             this._dy = 0;
             return true;
-        }
-        inBounds(x, y) {
-            let dx = this.X - x;
-            let dy = this.Y - y;
-            let dr = dx * dx + dy * dy;
-            let dw = this.w * this.w;
-            if (dr <= dw)
-                return this;
-            for (let child of this.children.reverse()) {
-                let found = child.inBounds(x, y);
-                if (found)
-                    return found;
-            }
-            return null;
         }
     }
     exports.CircleTile = CircleTile;

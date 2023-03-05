@@ -1,8 +1,8 @@
-export interface Logger {}
+export interface Logger { }
 export class Logger {
-    _level: string;
-    _link: string;
-    _uselink: boolean;
+    private _level: string;
+    private _link: string;
+    private _uselink: boolean;
 
     // INFO ==> INFO, LOG, WARN, ERROR
     // LOG  ==> LOG, WARN, ERROR
@@ -14,6 +14,7 @@ export class Logger {
         return this;
     }
 
+    // --- Private Methods --- //
     _source(depth = 0): string {
         let err = new Error("error");
         let stack = err.stack.split("\n");
@@ -31,31 +32,41 @@ export class Logger {
         }
         return module;
     }
+
+    // --- Private Methods --- //
+
+    _format(level: string, module: string, ...args: any[]) {
+        let format = `${level}: ${module}: ${args.join(", ")}`;
+        if (this._uselink) format += "\n" + " ".repeat(level.length + 2) + this._link;
+        return format;
+    }
+
+    // --- Public Methods --- //
+    
+    info(...args: any[]) {
+        // most verbose
+        if (["info"].includes(this._level)) console.log(this._format("INFO", this._module()), ...args);
+    }
+    log(...args: any[]) {
+        // less verbose
+        if (["info", "log"].includes(this._level)) console.log(this._format("LOG", this._module()), ...args);
+    }
+    warn(...args: any[]) {
+        // less verbose
+        if (["info", "log", "warn"].includes(this._level)) console.log(this._format("WARN", this._module()), ...args);
+    }
+    error(...args: any[]) {
+        // always show errors
+        console.error(this._format("ERROR", this._module(), ...args));
+    }
+
+    // --- Accessors --- //
+
     get logLevel() {
         return this._level;
     }
     set logLevel(level: string) {
         this._level = level;
     }
-    format(level: string, module: string, ...args: any[]) {
-        let format = `${level}: ${module}: ${args.join(", ")}`;
-        if (this._uselink) format += "\n" + " ".repeat(level.length + 2) + this._link;
-        return format;
-    }
-    info(...args: any[]) {
-        // most verbose
-        if (["info"].includes(this._level)) console.log(this.format("INFO", this._module()), ...args);
-    }
-    log(...args: any[]) {
-        // less verbose
-        if (["info", "log"].includes(this._level)) console.log(this.format("LOG", this._module()), ...args);
-    }
-    warn(...args: any[]) {
-        // less verbose
-        if (["info", "log", "warn"].includes(this._level)) console.log(this.format("WARN", this._module()), ...args);
-    }
-    error(...args: any[]) {
-        // always show errors
-        console.error(this.format("ERROR", this._module(), ...args));
-    }
+
 }

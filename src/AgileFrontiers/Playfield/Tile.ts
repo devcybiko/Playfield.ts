@@ -24,30 +24,22 @@ export class Tile extends _Tile  {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
         super();
+        this.Logger();
         this.Tree(name, parent);
         this.Rect(x, y, w, h);
-        this.Logger();
         this._gparms = new GfxParms();
         this._playfield = playfield;
         this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
         return this;
     }
-    get gfx(): Gfx {
-        return this._playfield.gfx;
+
+    _recompute() {
+        if (this.parent) {
+            this.gparms.dx = (this.parent as Tile).X;
+            this.gparms.dy = (this.parent as Tile).Y;
+        }
     }
-    get gparms(): GfxParms {
-        return this._gparms;
-    }
-    get X(): number {
-        return this.x + this.gparms.dx;
-    }
-    get Y(): number {
-        return this.y + this.gparms.dy;
-    }
-    // add(child: Tile) {
-    // super.add(child);
-    // child._playfield = this._playfield;
-    // }
+
     inBounds(x: number, y: number): Tile {
         let result =
             between(this.X, x, this.X + this.w) &&
@@ -59,12 +51,7 @@ export class Tile extends _Tile  {
         }
         return null;
     }
-    _recompute() {
-        if (this.parent) {
-            this.gparms.dx = (this.parent as Tile).X;
-            this.gparms.dy = (this.parent as Tile).Y;
-        }
-    }
+
     drawAll(): void {
         this.redraw();
         for (let child of this.children) {
@@ -81,6 +68,9 @@ export class Tile extends _Tile  {
     draw() {
         this.redrawChildren();
     }
+
+    // --- OnActions --- //
+
     onTick(): boolean {
         this.children.forEach(child => (child as Tile).onTick());
         return true;
@@ -89,4 +79,20 @@ export class Tile extends _Tile  {
         this.children.forEach(child => (child as Tile).onEvent(pfEvent));
         return true;
     }
+
+    // --- Accessors --- //
+
+    get gfx(): Gfx {
+        return this._playfield.gfx;
+    }
+    get gparms(): GfxParms {
+        return this._gparms;
+    }
+    get X(): number {
+        return this.x + this.gparms.dx;
+    }
+    get Y(): number {
+        return this.y + this.gparms.dy;
+    }
+
 }

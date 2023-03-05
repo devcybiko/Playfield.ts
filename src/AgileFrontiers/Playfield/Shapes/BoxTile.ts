@@ -18,6 +18,18 @@ export class BoxTile extends _BoxTile {
         this.gparms.fillColor = this._colors[2];
 
     }
+
+    // --- Overrides ---//
+
+    draw() {
+        // if (this.isSelected) this.gparms.borderColor = "black";
+        // else this.gparms.borderColor = "";
+        // this.gparms.fillColor = this._colors[this._color];
+        this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+    }
+
+    // --- onActions --- //
+
     onGrab() {
         this.toFront();
         return true;
@@ -25,12 +37,6 @@ export class BoxTile extends _BoxTile {
     onClick() {
         this._color = (this._color + 1) % this._colors.length;
         this.warn(this._color);
-    }
-    draw() {
-        // if (this.isSelected) this.gparms.borderColor = "black";
-        // else this.gparms.borderColor = "";
-        // this.gparms.fillColor = this._colors[this._color];
-        this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
     onDrop() {
         this.toFront();

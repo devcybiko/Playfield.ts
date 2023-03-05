@@ -12,11 +12,15 @@ export class Editor {
         return this;
     }
 
+    // --- Public Methods --- //
+
     editorEvent(pfEvent: PlayfieldEvent, child: Editable) {
-        if (pfEvent.type === "mousedown") return this._focusChild(pfEvent, child);
-        else if (pfEvent.type === "keydown") return this._dispatchKey(pfEvent, child);
+        if (pfEvent.isPress) return this._focusChild(pfEvent, child);
+        else if (pfEvent.isKeyDown) return this._dispatchKey(pfEvent, child);
     }
 
+    // --- Private Methods --- //
+    
     _focusChild(pfEvent: PlayfieldEvent, child: Editable): boolean {
         let tileChild = child as unknown as Tile;
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {

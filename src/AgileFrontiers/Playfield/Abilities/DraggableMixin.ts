@@ -2,13 +2,15 @@ import { PlayfieldEvent } from "../PlayfieldEvent";
 
 export interface Draggable { }
 export class Draggable {
-    _isDraggable: boolean;
+    private _isDraggable: boolean;
 
     Draggable() {
         this.isDraggable = true;
         return this;
     }
 
+    // --- onActions --- //
+    
     onGrab(pfEvent: PlayfieldEvent): boolean {
         return false;
     }

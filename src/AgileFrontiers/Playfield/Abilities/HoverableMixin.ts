@@ -11,6 +11,8 @@ export class Hoverable {
         return this;
     }
 
+    // --- onActions --- //
+    
     onHovering(pfEvent: PlayfieldEvent): boolean {
         return false;
     }

@@ -32,6 +32,33 @@ export class Playfield extends _Playfield {
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
     }
 
+    // --- Private Methods --- //
+
+    _tick() {
+        clearTimeout(this._timerId);
+        let now = Date.now();
+        let extra = now - this._lastTime;
+        this._handleEvents();
+        this.tile.onTick(); // process all ticks
+        this.redraw(); // redraw the playfield
+        this._lastTime = Date.now();
+        let delta = this._lastTime - now;
+        if (this._delay && (delta > this._delay)) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+    }
+
+    _handleEvents() {
+        let that = this;
+        for (let pfEvent = next(); pfEvent; pfEvent = next()) {
+            this._rootTile.onEvent(pfEvent);
+        }
+        function next() {
+            return that._eventQueue.getEvent();
+        }
+    }
+    
+    // --- Public Methods --- //
+
     clear() {
         this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
     }
@@ -41,36 +68,13 @@ export class Playfield extends _Playfield {
         this.tile.redraw();
     }
 
-    tick() {
-        clearTimeout(this._timerId);
-        let now = Date.now();
-        let extra = now - this._lastTime;
-        this.handleEvents();
-        this.tile.onTick(); // process all ticks
-        this.redraw(); // redraw the playfield
-        this._lastTime = Date.now();
-        let delta = this._lastTime - now;
-        if (this._delay && (delta > this._delay)) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
-        this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
-    }
-
     start(delay = 125) {
         this._delay = delay;
         this._lastTime = Date.now();
         this.redraw();
-        this._timerId = setTimeout(this.tick.bind(this), this._delay, this);
+        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
-    handleEvents() {
-        let that = this;
-        function next() {
-            return that._eventQueue.getEvent();
-        }
-        for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            this._rootTile.onEvent(pfEvent);
-        }
-    }
-    
     // --- Accessors --- //
 
     get playfield(): Playfield {

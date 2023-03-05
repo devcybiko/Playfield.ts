@@ -19,12 +19,12 @@ export class ButtonItem extends _ButtonItem {
         this.isDraggable = false;
         this._label = label || value;
     }
-    
-    public get label() {
-        return this._label;
-    }
-    public set label(value) {
-        this._label = value;
+
+    // --- Overrides --- //
+
+    go(): boolean {
+        window.alert(this.value);
+        return true;
     }
 
     draw() {
@@ -37,12 +37,20 @@ export class ButtonItem extends _ButtonItem {
         gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
         gfx.restore();
     }
+
+    // --- onActions --- //
     onRelease(): boolean {
         if (this.isHovering) this.go();
         return true;
     }
-    go(): boolean {
-        window.alert(this.value);
-        return true;
+
+    // --- Accessors --- //
+
+    public get label() {
+        return this._label;
     }
+    public set label(value) {
+        this._label = value;
+    }
+
 }
