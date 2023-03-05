@@ -1,5 +1,5 @@
 import { Draggable } from "./DraggableMixin";
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Logger } from "../../Utils";
 import { Tile } from "../Tile";
 
@@ -18,11 +18,12 @@ export class Dragger {
         this._logger = (this as unknown as Logger);
         return this;
     }
-    _dragEvent(pfEvent: PlayfieldEvent, child: Draggable): boolean {
+    dragEvent(pfEvent: PlayfieldEvent, child: Draggable): boolean {
         if (pfEvent.type === "mousemove") return this._dragChild(pfEvent, child);
-        if (pfEvent.type === "mousedown") return this._grabChild(pfEvent, child);
-        if (pfEvent.type === "mouseup") return this._dropChild(pfEvent, child);
+        else if (pfEvent.type === "mousedown") return this._grabChild(pfEvent, child);
+        else if (pfEvent.type === "mouseup") return this._dropChild(pfEvent, child);
     }
+
     _dragChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
         if (this._dragObj) {
             this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);

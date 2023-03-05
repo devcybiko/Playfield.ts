@@ -1,4 +1,4 @@
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 
 export interface Editable { }
 export class Editable {
@@ -11,25 +11,6 @@ export class Editable {
         this.isFocus = false;
         this.isFocusable = true;
         return this;
-    }
-
-    public get isEditable(): boolean {
-        return this._isEditable;
-    }
-    public set isEditable(value: boolean) {
-        this._isEditable = value;
-    }
-    public get isFocusable(): boolean {
-        return this._isFocusable;
-    }
-    public set isFocusable(value: boolean) {
-        this._isFocusable = value;
-    }
-    public get isFocus(): boolean {
-        return this._isFocus;
-    }
-    public set isFocus(value: boolean) {
-        this._isFocus = value;
     }
 
     onKey(key: string, pfEvent: PlayfieldEvent): boolean {
@@ -52,13 +33,31 @@ export class Editable {
         // if you attempt to override it.
         return true;
     }
-
     onFocus(): boolean {
         return true;
     }
-
     onUnfocus(): boolean {
         return true;
     }
 
+    // --- Accessors --- //
+
+    public get isEditable(): boolean {
+        return this._isEditable;
+    }
+    public set isEditable(value: boolean) {
+        this._isEditable = value;
+    }
+    public get isFocusable(): boolean {
+        return this._isFocusable;
+    }
+    public set isFocusable(value: boolean) {
+        this._isFocusable = value;
+    }
+    public get isFocus(): boolean {
+        return this._isFocus;
+    }
+    public set isFocus(value: boolean) {
+        this._isFocus = value;
+    }
 }

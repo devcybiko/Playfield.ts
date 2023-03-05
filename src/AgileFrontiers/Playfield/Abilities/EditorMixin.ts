@@ -1,6 +1,6 @@
 import { Editable } from "./EditableMixin";
 import { Tree } from "../../Utils";
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 export interface Editor { };
@@ -12,15 +12,11 @@ export class Editor {
         return this;
     }
 
-    get focusObj(): Editable {
-        return this._focusObj;
-    }
-
-    _editorEvent(pfEvent: PlayfieldEvent, child: Editable) {
+    editorEvent(pfEvent: PlayfieldEvent, child: Editable) {
         if (pfEvent.type === "mousedown") return this._focusChild(pfEvent, child);
-        if (pfEvent.type === "keydown") return this._dispatchKey(pfEvent, child);
-
+        else if (pfEvent.type === "keydown") return this._dispatchKey(pfEvent, child);
     }
+
     _focusChild(pfEvent: PlayfieldEvent, child: Editable): boolean {
         let tileChild = child as unknown as Tile;
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
@@ -41,6 +37,7 @@ export class Editor {
         }
         return false;
     }
+
     _dispatchKey(pfEvent: PlayfieldEvent, child: Editable): boolean {
         if (child.isFocus) {
             if (pfEvent.key.length === 1) child.onKey(pfEvent.key, pfEvent);
@@ -49,7 +46,9 @@ export class Editor {
             else if (pfEvent.key === "Backspace") child.onBackspace(pfEvent);
             else if (pfEvent.key === "Tab" && !pfEvent.isShift) this._nextChild(1, pfEvent);
             else if (pfEvent.key === "Tab" && pfEvent.isShift) this._nextChild(-1, pfEvent);
+            return true;
         }
+        return false;
     }
 
     _nextChild(direction: number, pfEvent: PlayfieldEvent): boolean {
@@ -62,17 +61,16 @@ export class Editor {
         for (let j = i + 1; children[j] !== focusObj; j += 1) {
             if (j >= children.length) j = 0;
             let sibling = children[j] as unknown as Editable;
-            if (sibling.isFocusable) return this._focusChild(sibling, pfEvent);
+            if (sibling.isFocusable) return this._focusChild(pfEvent, sibling);
             if (safety-- <= 0) break;
         }
         return false;
     }
-    TabKey(keyEvent: KeyEvent): boolean {
-        if (this.focusObj) {
-            if (!keyEvent._isShift) return this._nextChild(+1, null);
-            return this._nextChild(-1, null);
-        }
-        return false;
+
+    // -- Accessors --- //
+
+    get focusObj(): Editable {
+        return this._focusObj;
     }
 
 }

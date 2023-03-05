@@ -46,7 +46,7 @@ export class TextItem extends _TextItem {
         this._cursorOn = !this._cursorOn;
     }
     drawCursor() {
-        if (!this.isFocused) return;
+        if (!this.isFocus) return;
         if (!this._cursorOn) return;
         let gfx = this._playfield.gfx;
         let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor), this.gparms);
@@ -64,11 +64,11 @@ export class TextItem extends _TextItem {
     draw() {
         let gfx = this._playfield.gfx;
         this._updateGparms();
-        if (this.isFocused) this.gparms.color = this.options.selectColor;
+        if (this.isFocus) this.gparms.color = this.options.selectColor;
         else this.gparms.color = this.options.textColor;
         gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
         let value = this.value.substring(this._left)
-        if (this.isFocused) value = value.replaceAll(" ", '\uA788'); // \u00B7
+        if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
         gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
         this.drawCursor();
         gfx.restore();

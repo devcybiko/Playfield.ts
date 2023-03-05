@@ -10,6 +10,23 @@ export class Repeatable {
         return this;
     }
 
+    startRepeat(delay?: number) {
+        if (delay !== undefined) this._delay = delay;
+        this.stopRepeat();
+        this._timerId = setInterval(this.onRepeat.bind(this), this._delay, this);
+    }
+
+    stopRepeat() {
+        if (this._timerId) clearInterval(this._timerId);
+        this._timerId = null;
+    }
+
+    onRepeat(): boolean {
+        return false;
+    }
+
+    // --- Accessors --- //
+
     public get isRepeatable(): boolean {
         return this._isRepeatable;
     }
@@ -21,21 +38,6 @@ export class Repeatable {
     }
     public set delay(value: number) {
         this._delay = value;
-    }
-
-    startRepeat(delay?: number) {
-        if (delay !== undefined) this._delay = delay;
-        this.stopRepeat();
-        this._timerId = setInterval(this.onRepeat.bind(this), this._delay, this);
-    }
-
-    stopRepeat() {
-        if (this._timerId) clearInterval(this._timerId);
-        this._timerId = null;
-    }
-    
-    onRepeat(): boolean {
-        return false;
     }
 
 }

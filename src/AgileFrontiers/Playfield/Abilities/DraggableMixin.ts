@@ -1,4 +1,4 @@
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 
 export interface Draggable { }
 export class Draggable {
@@ -8,14 +8,6 @@ export class Draggable {
         this.isDraggable = true;
         return this;
     }
-
-    public get isDraggable() {
-        return this._isDraggable;
-    }
-    public set isDraggable(value) {
-        this._isDraggable = value;
-    }
-
 
     onGrab(pfEvent: PlayfieldEvent): boolean {
         return false;
@@ -27,5 +19,14 @@ export class Draggable {
     }
     onDrop(pfEvent: PlayfieldEvent): boolean {
         return false;
+    }
+
+    // --- Accessors --- //
+
+    public get isDraggable() {
+        return this._isDraggable;
+    }
+    public set isDraggable(value) {
+        this._isDraggable = value;
     }
 }

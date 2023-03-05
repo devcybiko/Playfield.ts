@@ -20,15 +20,7 @@ export class Item extends _Item {
         this._options.text = text || value;
         this._options.fontSize = h;
     }
-    get value(): string {
-        return this._value;
-    }
-    set value(_value: string) {
-        this._value = _value;
-    }
-    public get options(): ItemOptions {
-        return this._options;
-    }
+    
     public _updateGparms() {
         this.gparms.fillColor = this.options.fillColor;
         this.gparms.color = this.options.textColor;
@@ -38,5 +30,17 @@ export class Item extends _Item {
         this.gparms.textAlign = this.options.textAlign;
         this.gparms.textBaseline = this.options.textBaseline;
     
+    }
+
+    // --- Accessors --- //
+
+    get value(): string {
+        return this._value;
+    }
+    set value(_value: string) {
+        this._value = _value;
+    }
+    public get options(): ItemOptions {
+        return this._options;
     }
 }

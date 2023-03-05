@@ -1,4 +1,4 @@
-import { PlayfieldEvent } from "../PlayfieldEvents"
+import { PlayfieldEvent } from "../PlayfieldEvent"
 
 export interface Clickable { }
 export class Clickable {
@@ -9,6 +9,12 @@ export class Clickable {
         return this;
     }
 
+    onClick(pfEvent: PlayfieldEvent): boolean {
+        return false;
+    }
+
+    // --- Accessors --- //
+
     public get isClickable(): boolean {
         return this._isClickable;
     }
@@ -16,7 +22,4 @@ export class Clickable {
         this._isClickable = value;
     }
 
-    onClick(pfEvent: PlayfieldEvent): boolean {
-        return false;
-    }
 }

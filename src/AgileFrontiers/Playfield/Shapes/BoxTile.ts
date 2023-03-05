@@ -37,5 +37,6 @@ export class BoxTile extends _BoxTile {
         return true;
     }
     onTick() {
+        return true;
     }
 }

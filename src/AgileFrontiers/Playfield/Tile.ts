@@ -1,7 +1,7 @@
 import { applyMixins, Tree, Rect, between, Logger } from "../Utils";
-import { Gfx, GfxParms } from "../Graphics";
+import { Gfx, GfxParms } from "./Graphics";
 import { Playfield } from "./Playfield";
-import { PlayfieldEvent } from "./PlayfieldEvents";
+import { PlayfieldEvent } from "./PlayfieldEvent";
 
 /**
  * A Tile is a rectangular item on a Playfield.
@@ -86,6 +86,7 @@ export class Tile extends _Tile  {
         return true;
     }
     onEvent(pfEvent: PlayfieldEvent): boolean {
+        this.children.forEach(child => (child as Tile).onEvent(pfEvent));
         return true;
     }
 }

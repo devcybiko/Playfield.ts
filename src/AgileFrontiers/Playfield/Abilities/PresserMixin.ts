@@ -1,6 +1,6 @@
 import { Pressable } from "./PressableMixin";
-import { MouseEvent } from "../Events";
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 export interface Presser { };
 export class Presser {
@@ -8,12 +8,17 @@ export class Presser {
         return this;
     }
 
-    _pressDownChild(child: Pressable, pfEvent: PlayfieldEvent): boolean {
-        child.onPress(pfEvent);
-        return true;
-    }
-    _pressUpChild(child: Pressable, pfEvent: PlayfieldEvent): boolean {
-        child.onRelease(pfEvent);
-        return true;
+    pressEvent(pfEvent: PlayfieldEvent, child: Pressable) {
+        let treeChild = child as unknown as Tile;
+        if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (pfEvent.type === "mousedown") {
+                child.isPressed = true;
+                child.onPress(pfEvent);
+            }
+        }
+        if (pfEvent.type === "mouseup" && child.isPressed) {
+            child.isPressed = false;
+            child.onPress(pfEvent);
+        }
     }
 }

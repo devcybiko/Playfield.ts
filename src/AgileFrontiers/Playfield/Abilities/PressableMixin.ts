@@ -1,4 +1,4 @@
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 
 export interface Pressable { }
 export class Pressable {
@@ -11,6 +11,15 @@ export class Pressable {
         return this;
     }
 
+    onPress(pfEvent: PlayfieldEvent): boolean {
+        return true;
+    }
+    onRelease(pfEvent: PlayfieldEvent): boolean {
+        return true;
+    }
+
+    // --- Accessors --- //
+
     public get isPressed(): boolean {
         return this._isPressed;
     }
@@ -22,15 +31,6 @@ export class Pressable {
     }
     public set isPressable(value: boolean) {
         this._isPressable = value;
-    }
-
-    onPress(pfEvent: PlayfieldEvent): boolean {
-        this._isPressed = true;
-        return true;
-    }
-    onRelease(pfEvent: PlayfieldEvent): boolean {
-        this._isPressed = false;
-        return true;
     }
 
 }

@@ -4,21 +4,22 @@ import { BoxTestTile } from "./BoxTestTile";
 import { random } from "../Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
-import { GfxBrowser } from "../Graphics";
+import { GfxBrowser } from "../Playfield/Graphics";
 import { CanvasEventPump } from "../Playfield/Browser";
-import { iEventQueue, EventQueue } from "../Playfield/PlayfieldEvents";
+import { EventQueue } from "../Playfield";
+import { PlayfieldApp } from "../Playfield/Browser/PlayfieldApp";
 
 export class PlayfieldTest {
+    _playfieldApp: PlayfieldApp;
     _playfield: Playfield;
     _gfx: GfxBrowser;
-    _eventQueue: iEventQueue;
+    _eventQueue: EventQueue;
     _canvasEventPump: CanvasEventPump;
 
     constructor() {
-        this._gfx = new GfxBrowser("#my_canvas");
-        this._eventQueue = new EventQueue();
-        this._canvasEventPump = new CanvasEventPump(this._gfx.canvas, this._eventQueue);
-        this._playfield = new Playfield(this._gfx, this._eventQueue, this._canvasEventPump);
+        this._playfieldApp = new PlayfieldApp();
+        this._playfield = this._playfieldApp.playfield;
+
     }
     boxTest() {
         this._playfield._gfx.rect(10, 10, 100, 100, this._playfield.gparms);

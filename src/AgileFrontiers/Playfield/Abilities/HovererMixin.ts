@@ -1,5 +1,6 @@
 import { Hoverable } from "./HoverableMixin";
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 export interface Hoveer { };
 export class Hoverer {
@@ -7,10 +8,10 @@ export class Hoverer {
         return this;
     }
 
-    _hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable): boolean {
-        let anyChild = child as any;
+    hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable): boolean {
+        let treeChild = child as unknown as Tile;
         if (pfEvent.type === "mousemove") {
-            if (anyChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
                 if (child.isHovering) {
                     child.onHovering(pfEvent);
                 } else {
@@ -23,7 +24,8 @@ export class Hoverer {
                     child.onExit(pfEvent);
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }

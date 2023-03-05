@@ -10,7 +10,7 @@ export class BoxTestTile extends Tile {
     draw() {
         this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
-    onTick(): void {
+    onTick(): boolean {
         let obj = this as any;
         this.rmove(obj.DX || 10, obj.DY || 10);
         if (this.X > this._playfield.w || this.X <= 0) {
@@ -22,6 +22,7 @@ export class BoxTestTile extends Tile {
             else obj.DY = -obj.DY;
         }
         // notice - does not move children
+        return true;
     }
     go(): void {
         throw new Error("Method not implemented.");

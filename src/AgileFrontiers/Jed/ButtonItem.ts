@@ -39,7 +39,7 @@ export class ButtonItem extends _ButtonItem {
     }
     onRelease(): boolean {
         if (this.isHovering) this.go();
-        return super.onRelease();
+        return true;
     }
     go(): boolean {
         window.alert(this.value);

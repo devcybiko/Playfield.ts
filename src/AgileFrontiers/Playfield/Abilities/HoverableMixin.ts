@@ -1,4 +1,4 @@
-import { PlayfieldEvent } from "../PlayfieldEvents";
+import { PlayfieldEvent } from "../PlayfieldEvent";
 
 export interface Hoverable { }
 export class Hoverable {
@@ -10,6 +10,18 @@ export class Hoverable {
         this.isHoverable = true;
         return this;
     }
+
+    onHovering(pfEvent: PlayfieldEvent): boolean {
+        return false;
+    }
+    onEnter(pfEvent: PlayfieldEvent): boolean {
+        return false;
+    }
+    onExit(pfEvent: PlayfieldEvent): boolean {
+        return false;
+    }
+
+    // --- Accessors --- //
 
     public get isHovering() {
         return this._isHovering;
@@ -24,13 +36,4 @@ export class Hoverable {
         this._isHoverable = value;
     }
 
-    onHovering(pfEvent: PlayfieldEvent): boolean {
-        return false;
-    }
-    onEnter(pfEvent: PlayfieldEvent): boolean {
-        return false;
-    }
-    onExit(pfEvent: PlayfieldEvent): boolean {
-        return false;
-    }
 }
