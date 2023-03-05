@@ -1,12 +1,14 @@
+import { PlayfieldEvent } from "../PlayfieldEvents";
+
 export interface Editable { }
 export class Editable {
     private _isEditable: boolean;
-    private _isFocused: boolean;
+    private _isFocus: boolean;
     private _isFocusable: boolean;
 
     Editable() {
         this.isEditable = true;
-        this.isFocused = false;
+        this.isFocus = false;
         this.isFocusable = true;
         return this;
     }
@@ -23,34 +25,26 @@ export class Editable {
     public set isFocusable(value: boolean) {
         this._isFocusable = value;
     }
-    public get isFocused(): boolean {
-        return this._isFocused;
+    public get isFocus(): boolean {
+        return this._isFocus;
     }
-    public set isFocused(value: boolean) {
-        this._isFocused = value;
+    public set isFocus(value: boolean) {
+        this._isFocus = value;
     }
 
-    onKey(key: string, event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onKey", that.name);
+    onKey(key: string, pfEvent: PlayfieldEvent): boolean {
         return true;
     }
-    onArrowLeft(event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onArrowLeft", that.name);
+    onArrowLeft(pfEvent: PlayfieldEvent): boolean {
         return true;
     }
-    onArrowRight(event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onArrowRight", that.name);
+    onArrowRight(pfEvent: PlayfieldEvent): boolean {
         return true;
     }
-    onBackspace(event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onBackspace", that.name);
+    onBackspace(pfEvent: PlayfieldEvent): boolean {
         return true;
     }
-    onBackSpace(event?: any): boolean {
+    private onBackSpace(pfEvent: PlayfieldEvent): boolean {
         // this is the wrong method
         // you should be using onBackspace(), above
         // this is purposely mispelled with upper-case "S"

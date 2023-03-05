@@ -35,9 +35,7 @@ export class Repeatable {
     }
     
     onRepeat(): boolean {
-        let that = this as any;
-        if (that.log) that.log("onRepeat", that.name);
-        return true;
+        return false;
     }
 
 }

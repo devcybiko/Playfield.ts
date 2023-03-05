@@ -24,10 +24,10 @@ export class Selectable {
     }
 
     onSelect(): boolean {
-        return true;
+        return false;
     }
 
     onUnselect(): boolean {
-        return true;
+        return false;
     }
 }

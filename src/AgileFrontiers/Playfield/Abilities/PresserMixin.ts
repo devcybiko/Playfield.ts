@@ -1,5 +1,6 @@
 import { Pressable } from "./PressableMixin";
 import { MouseEvent } from "../Events";
+import { PlayfieldEvent } from "../PlayfieldEvents";
 
 export interface Presser { };
 export class Presser {
@@ -7,12 +8,12 @@ export class Presser {
         return this;
     }
 
-    _pressDownChild(child: Pressable, mouseEvent: MouseEvent): boolean {
-        child.onPress(mouseEvent);
+    _pressDownChild(child: Pressable, pfEvent: PlayfieldEvent): boolean {
+        child.onPress(pfEvent);
         return true;
     }
-    _pressUpChild(child: Pressable, mouseEvent: MouseEvent): boolean {
-        child.onRelease(mouseEvent);
+    _pressUpChild(child: Pressable, pfEvent: PlayfieldEvent): boolean {
+        child.onRelease(pfEvent);
         return true;
     }
 }

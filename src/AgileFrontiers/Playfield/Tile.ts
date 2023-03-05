@@ -1,6 +1,8 @@
 import { applyMixins, Tree, Rect, between, Logger } from "../Utils";
 import { Gfx, GfxParms } from "../Graphics";
 import { Playfield } from "./Playfield";
+import { PlayfieldEvent } from "./PlayfieldEvents";
+
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -79,10 +81,11 @@ export class Tile extends _Tile  {
     draw() {
         this.redrawChildren();
     }
-    tick(): void {
-        this.children.forEach(child => (child as Tile).tick());
+    onTick(): boolean {
+        this.children.forEach(child => (child as Tile).onTick());
+        return true;
     }
-    go(): void {
-        throw new Error("Method not implemented.");
+    onEvent(pfEvent: PlayfieldEvent): boolean {
+        return true;
     }
 }

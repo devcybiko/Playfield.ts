@@ -58,7 +58,7 @@ export class Playfield extends _Playfield {
         let now = Date.now();
         let extra = now - this._lastTime;
         this.handleEvents();
-        this.tile.tick(); // process all ticks
+        this.tile.onTick(); // process all ticks
         this.redraw(); // redraw the playfield
         this._lastTime = Date.now();
         let delta = this._lastTime - now;
@@ -73,10 +73,10 @@ export class Playfield extends _Playfield {
     }
     handleEvents() {
         for (
-            let hidEvent = this._eventQueue.getEvent();
-            hidEvent;
-            hidEvent = this._eventQueue.getEvent()) {
-            this.dispatchEvent(hidEvent);
+            let pfEvent = this._eventQueue.getEvent();
+            pfEvent;
+            pfEvent = this._eventQueue.getEvent()) {
+            this._rootTile.onEvent(pfEvent);
         }
     }
     dispatchEvent(pfEvent: PlayfieldEvent) {

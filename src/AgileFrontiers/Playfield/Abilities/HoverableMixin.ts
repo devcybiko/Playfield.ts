@@ -1,4 +1,4 @@
-import { MouseEvent } from "../Events/MouseEvent";
+import { PlayfieldEvent } from "../PlayfieldEvents";
 
 export interface Hoverable { }
 export class Hoverable {
@@ -24,13 +24,13 @@ export class Hoverable {
         this._isHoverable = value;
     }
 
-    onHovering(event?: MouseEvent): boolean {
-        return true;
+    onHovering(pfEvent: PlayfieldEvent): boolean {
+        return false;
     }
-    onEnter(event?: MouseEvent): boolean {
-        return true;
+    onEnter(pfEvent: PlayfieldEvent): boolean {
+        return false;
     }
-    onExit(event?: MouseEvent): boolean {
-        return true;
+    onExit(pfEvent: PlayfieldEvent): boolean {
+        return false;
     }
 }

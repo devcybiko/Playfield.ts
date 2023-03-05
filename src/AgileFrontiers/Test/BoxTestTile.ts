@@ -10,7 +10,7 @@ export class BoxTestTile extends Tile {
     draw() {
         this._playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
     }
-    tick(): void {
+    onTick(): void {
         let obj = this as any;
         this.rmove(obj.DX || 10, obj.DY || 10);
         if (this.X > this._playfield.w || this.X <= 0) {

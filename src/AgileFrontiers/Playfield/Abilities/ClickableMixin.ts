@@ -1,3 +1,5 @@
+import { PlayfieldEvent } from "../PlayfieldEvents"
+
 export interface Clickable { }
 export class Clickable {
     private _isClickable: boolean;
@@ -14,9 +16,7 @@ export class Clickable {
         this._isClickable = value;
     }
 
-    onClick(event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onClick", that.name);
-        return true;
+    onClick(pfEvent: PlayfieldEvent): boolean {
+        return false;
     }
 }

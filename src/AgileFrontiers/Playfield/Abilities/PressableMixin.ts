@@ -1,3 +1,5 @@
+import { PlayfieldEvent } from "../PlayfieldEvents";
+
 export interface Pressable { }
 export class Pressable {
     private _isPressed: boolean;
@@ -22,16 +24,12 @@ export class Pressable {
         this._isPressable = value;
     }
 
-    onPress(event?: any): boolean {
-        let that = this as any;
+    onPress(pfEvent: PlayfieldEvent): boolean {
         this._isPressed = true;
-        if (that.log) that.log("onPressDown", that.name);
         return true;
     }
-    onRelease(event?: any): boolean {
-        let that = this as any;
+    onRelease(pfEvent: PlayfieldEvent): boolean {
         this._isPressed = false;
-        if (that.log) that.log("onPressUp", that.name);
         return true;
     }
 

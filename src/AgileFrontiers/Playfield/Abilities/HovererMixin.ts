@@ -1,5 +1,5 @@
 import { Hoverable } from "./HoverableMixin";
-import { MouseEvent } from "../Events/MouseEvent";
+import { PlayfieldEvent } from "../PlayfieldEvents";
 
 export interface Hoveer { };
 export class Hoverer {
@@ -7,25 +7,23 @@ export class Hoverer {
         return this;
     }
 
-    _hoverChild(child: Hoverable, myEvent: MouseEvent): boolean {
-        if (child.isHoverable) {
-            if (!child.isHovering) {
-                child.isHovering = true;
-                child.onEnter(myEvent);
-                return true;
+    _hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable): boolean {
+        let anyChild = child as any;
+        if (pfEvent.type === "mousemove") {
+            if (anyChild.inBounds(pfEvent.x, pfEvent.y)) {
+                if (child.isHovering) {
+                    child.onHovering(pfEvent);
+                } else {
+                    child.isHovering = true;
+                    child.onEnter(pfEvent);
+                }
             } else {
-                child.onHovering(myEvent);
-                return true;
+                if (child.isHovering) {
+                    child.isHovering = false;
+                    child.onExit(pfEvent);
+                }
             }
         }
-        return false;
-    }
-    _hoverExitChild(child: Hoverable, myEvent?: MouseEvent): boolean {
-        if (child.isHovering) {
-            child.isHovering = false;
-            child.onExit(myEvent);
-            return true;
-        }
-        return false;
+        return true;
     }
 }

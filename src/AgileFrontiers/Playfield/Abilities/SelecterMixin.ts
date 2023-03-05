@@ -1,5 +1,5 @@
 import { Selectable } from "./SelectableMixin";
-import { MouseEvent } from "../Events";
+import { PlayfieldEvent } from "../PlayfieldEvents";
 
 export interface Selecter { };
 export class Selecter {
@@ -10,15 +10,15 @@ export class Selecter {
         return this;
     }
 
-    _selectChild(child: Selectable, mouseEvent: MouseEvent): boolean {
-        this._unselectChild( mouseEvent);
+    _selectChild(child: Selectable, pfEvent: PlayfieldEvent): boolean {
+        this._unselectChild( pfEvent);
         this._selectedObj = child;
         child.isSelected = true;
         child.onSelect();
         return true;
     }
 
-    _unselectChild(mouseEvent: MouseEvent): boolean {
+    _unselectChild(pfEvent: PlayfieldEvent): boolean {
         if (this._selectedObj) {
             this._selectedObj.isSelected = false;
             this._selectedObj.onUnselect();

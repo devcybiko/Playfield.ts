@@ -1,5 +1,6 @@
 import { Clickable } from "./ClickableMixin";
-import { MouseEvent } from "../Events";
+import { PlayfieldEvent } from "../PlayfieldEvents";
+import { Tile } from "../Tile";
 
 export interface Clicker { };
 export class Clicker {
@@ -7,8 +8,13 @@ export class Clicker {
         return this;
     }
 
-    _clickChild(child: Clickable, mouseEvent: MouseEvent): boolean {
-        child.onClick(mouseEvent);
+    _clickEvent(pfEvent: PlayfieldEvent, child: Clickable): boolean {
+        if (pfEvent.type === "mousedown") {
+            let tileChild = child as unknown as Tile;
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+                child.onClick(pfEvent);
+            }
+        }
         return true;
     }
 }

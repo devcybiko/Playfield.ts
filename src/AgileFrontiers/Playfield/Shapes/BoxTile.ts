@@ -36,6 +36,6 @@ export class BoxTile extends _BoxTile {
         this.toFront();
         return true;
     }
-    tick() {
+    onTick() {
     }
 }
