@@ -5,9 +5,9 @@ import { random } from "../Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
 import { GfxBrowser } from "../Playfield/Graphics";
-import { CanvasEventPump } from "../Playfield/Browser";
+import { CanvasEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
-import { PlayfieldApp } from "../Playfield/Browser/PlayfieldApp";
+import { PlayfieldApp } from "../Browser/PlayfieldApp";
 
 export class PlayfieldTest {
     _playfieldApp: PlayfieldApp;
