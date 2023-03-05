@@ -7,17 +7,17 @@ import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
 import { GfxBrowser } from "../Playfield/Graphics";
 import { CanvasEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
-import { PlayfieldApp } from "../Browser/PlayfieldApp";
+import { BrowserPlayfieldApp } from "../Browser/BrowserPlayfieldApp";
 
 export class PlayfieldTest {
-    _playfieldApp: PlayfieldApp;
+    _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;
     _gfx: GfxBrowser;
     _eventQueue: EventQueue;
     _canvasEventPump: CanvasEventPump;
 
     constructor() {
-        this._playfieldApp = new PlayfieldApp();
+        this._playfieldApp = new BrowserPlayfieldApp();
         this._playfield = this._playfieldApp.playfield;
 
     }

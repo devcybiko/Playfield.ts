@@ -2,7 +2,7 @@ import { GfxBrowser } from "../Playfield/Graphics";
 import { Playfield, EventQueue } from "../Playfield";
 import { CanvasEventPump } from "./CanvasEventPump";
 
-export class PlayfieldApp {
+export class BrowserPlayfieldApp {
     private _playfield: Playfield;
     private _gfx: GfxBrowser;
     private _eventQueue: EventQueue;

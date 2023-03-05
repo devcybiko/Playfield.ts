@@ -1,157 +1,154 @@
-define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (require, exports) {
+define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.BrowserPlayfieldEvent = void 0;
-    class BrowserPlayfieldEvent {
-        constructor(event) {
-            this.event = event;
-            // this.type = event.type;
-            // mouse events
-            this.x = event.offsetX;
-            this.y = event.offsetY;
-            this.isMove = event.type === "mousemove";
-            this.isPress = event.type === "mousedown" && event.button === 0;
-            this.isRelease = event.type === "mouseup" && event.button === 0;
-            this.isMenu = event.type === "mousedown" && event.button === 2;
-            this.isMenuRelease = event.type === "mousedown" && event.button === 2;
-            // keyboard events
-            this.key = event.key;
-            this.isKeyDown = event.type === "keydown";
-            this.isKeyUp = event.type === "keyup";
-            this.isShift = event.shiftKey;
-            this.isControl = event.ctrlKey;
-            this.isAlt = event.altKey;
-            this.isOption = event.altKey;
-            this.isMeta = event.metaKey;
-            this.isCommand = event.metaKey;
-            // gestures
-            this.swipe = event.wheelDelta;
-            this.isSwipeLeft = event.wheelDelta < 0;
-            this.isSwipeRight = event.wheelDelta > 0;
+    exports.GfxParms = void 0;
+    class GfxParms {
+        constructor() {
+            this.color = "black";
+            this.borderColor = "black";
+            this.fillColor = "white";
+            this.dx = 0;
+            this.dy = 0;
+            this.textAlign = "left";
+            this.textBaseline = "top";
+            this.fontSize = 24;
+            this.fontFace = "sans-serif";
+        }
+        // --- Private Methods --- //
+        _updateFont() {
+            this._font = "" + this._fontSize + "px " + this._fontFace;
+        }
+        // --- Public Methods --- //
+        clone() {
+            // make a shallow copy
+            return Object.assign({}, this);
         }
         // --- Accessors --- //
-        get event() {
-            return this._event;
+        get font() {
+            return this._font;
         }
-        set event(value) {
-            this._event = value;
+        get fontSize() {
+            return this._fontSize;
         }
-        get x() {
-            return this._x;
+        set fontSize(n) {
+            this._fontSize = n;
+            this._updateFont();
         }
-        set x(value) {
-            this._x = value;
+        get fontFace() {
+            return this._fontFace;
         }
-        get y() {
-            return this._y;
-        }
-        set y(value) {
-            this._y = value;
-        }
-        get isMove() {
-            return this._isMove;
-        }
-        set isMove(value) {
-            this._isMove = value;
-        }
-        get isPress() {
-            return this._isPress;
-        }
-        set isPress(value) {
-            this._isPress = value;
-        }
-        get isRelease() {
-            return this._isRelease;
-        }
-        set isRelease(value) {
-            this._isRelease = value;
-        }
-        get isMenu() {
-            return this._isMenu;
-        }
-        set isMenu(value) {
-            this._isMenu = value;
-        }
-        get isMenuRelease() {
-            return this._isMenuRelease;
-        }
-        set isMenuRelease(value) {
-            this._isMenuRelease = value;
-        }
-        get key() {
-            return this._key;
-        }
-        set key(value) {
-            this._key = value;
-        }
-        get isKeyDown() {
-            return this._isKeyDown;
-        }
-        set isKeyDown(value) {
-            this._isKeyDown = value;
-        }
-        get isKeyUp() {
-            return this._isKeyUp;
-        }
-        set isKeyUp(value) {
-            this._isKeyUp = value;
-        }
-        get isShift() {
-            return this._isShift;
-        }
-        set isShift(value) {
-            this._isShift = value;
-        }
-        get isControl() {
-            return this._isControl;
-        }
-        set isControl(value) {
-            this._isControl = value;
-        }
-        get isAlt() {
-            return this._isAlt;
-        }
-        set isAlt(value) {
-            this._isAlt = value;
-        }
-        get isOption() {
-            return this._isOption;
-        }
-        set isOption(value) {
-            this._isOption = value;
-        }
-        get isMeta() {
-            return this._isMeta;
-        }
-        set isMeta(value) {
-            this._isMeta = value;
-        }
-        get isCommand() {
-            return this._isCommand;
-        }
-        set isCommand(value) {
-            this._isCommand = value;
-        }
-        get swipe() {
-            return this._swipe;
-        }
-        set swipe(value) {
-            this._swipe = value;
-        }
-        get isSwipeLeft() {
-            return this._isSwipeLeft;
-        }
-        set isSwipeLeft(value) {
-            this._isSwipeLeft = value;
-        }
-        get isSwipeRight() {
-            return this._isSwipeRight;
-        }
-        set isSwipeRight(value) {
-            this._isSwipeRight = value;
+        set fontFace(n) {
+            this._fontFace = n;
+            this._updateFont();
         }
     }
-    exports.BrowserPlayfieldEvent = BrowserPlayfieldEvent;
+    exports.GfxParms = GfxParms;
+});
+define("Playfield/Graphics/Gfx", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GfxBrowser = void 0;
+    class GfxBrowser {
+        constructor(canvasId) {
+            this._canvas = document.querySelector(canvasId); // canvasId
+            this._ctx = this._canvas.getContext("2d");
+            this._gparms = new GfxParms_1.GfxParms();
+            this._ctx.fontKerning = "none";
+            this._ctx.letterSpacing = "1px";
+            this._ctx.textRendering = "geometricPrecision";
+        }
+        // --- Public Methods --- //
+        rect(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+            if (_gparms.borderColor) {
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+        }
+        ellipse(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fill();
+            }
+            if (_gparms.borderColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.stroke();
+            }
+        }
+        circle(x, y, r, _gparms = this._gparms) {
+            this.ellipse(x - r, y - r, r * 2, r * 2, _gparms);
+        }
+        line(x0, y0, x1, y1, _gparms0 = this._gparms, _gparms1 = _gparms0) {
+            this._ctx.beginPath();
+            this._ctx.strokeStyle = _gparms0.borderColor;
+            this._ctx.moveTo(_gparms0.dx + x0, _gparms0.dy + y0);
+            this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
+            this._ctx.stroke();
+        }
+        text(msg, x = 0, y = 0, _gparms = this._gparms, w) {
+            this._ctx.fillStyle = _gparms.color;
+            this._ctx.font = _gparms.font;
+            this._ctx.textAlign = _gparms.textAlign;
+            this._ctx.textBaseline = _gparms.textBaseline;
+            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
+        }
+        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let boundingBox = this.boundingBox(msg, _gparms);
+            if (!w)
+                w = boundingBox.w;
+            if (!h)
+                h = boundingBox.h;
+            this.rect(x, y, w, h, _gparms);
+            this.text(msg, x, y, _gparms, w);
+        }
+        boundingBox(msg, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let boundingBox = this._ctx.measureText(msg);
+            return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
+        }
+        clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
+            this.save();
+            let region = new Path2D();
+            region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
+            this._ctx.clip(region);
+        }
+        save() {
+            this._ctx.save();
+        }
+        restore() {
+            this._ctx.restore();
+        }
+        // --- Accessors --- //
+        get width() {
+            return this._canvas.width;
+        }
+        get height() {
+            return this._canvas.height;
+        }
+        get canvas() {
+            return this._canvas;
+        }
+    }
+    exports.GfxBrowser = GfxBrowser;
+});
+define("Playfield/Graphics/index", ["require", "exports", "Browser/GfxBrowser", "Playfield/Graphics/GfxParms"], function (require, exports, GfxBrowser_1, GfxParms_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.GfxParms = exports.GfxBrowser = void 0;
+    Object.defineProperty(exports, "GfxBrowser", { enumerable: true, get: function () { return GfxBrowser_1.GfxBrowser; } });
+    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_2.GfxParms; } });
 });
 define("Playfield/Utils/Mixins", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -402,158 +399,6 @@ define("Playfield/Utils/index", ["require", "exports", "Playfield/Utils/Mixins",
     Object.defineProperty(exports, "Rect", { enumerable: true, get: function () { return RectMixin_1.Rect; } });
     Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return TreeMixin_1.Tree; } });
     Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return LoggerMixin_1.Logger; } });
-});
-define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxParms = void 0;
-    class GfxParms {
-        constructor() {
-            this.color = "black";
-            this.borderColor = "black";
-            this.fillColor = "white";
-            this.dx = 0;
-            this.dy = 0;
-            this.textAlign = "left";
-            this.textBaseline = "top";
-            this.fontSize = 24;
-            this.fontFace = "sans-serif";
-        }
-        // --- Private Methods --- //
-        _updateFont() {
-            this._font = "" + this._fontSize + "px " + this._fontFace;
-        }
-        // --- Public Methods --- //
-        clone() {
-            // make a shallow copy
-            return Object.assign({}, this);
-        }
-        // --- Accessors --- //
-        get font() {
-            return this._font;
-        }
-        get fontSize() {
-            return this._fontSize;
-        }
-        set fontSize(n) {
-            this._fontSize = n;
-            this._updateFont();
-        }
-        get fontFace() {
-            return this._fontFace;
-        }
-        set fontFace(n) {
-            this._fontFace = n;
-            this._updateFont();
-        }
-    }
-    exports.GfxParms = GfxParms;
-});
-define("Playfield/Graphics/Gfx", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxBrowser = void 0;
-    class GfxBrowser {
-        constructor(canvasId) {
-            this._canvas = document.querySelector(canvasId); // canvasId
-            this._ctx = this._canvas.getContext("2d");
-            this._gparms = new GfxParms_1.GfxParms();
-            this._ctx.fontKerning = "none";
-            this._ctx.letterSpacing = "1px";
-            this._ctx.textRendering = "geometricPrecision";
-        }
-        // --- Public Methods --- //
-        rect(x, y, w, h, _gparms = this._gparms) {
-            if (_gparms.fillColor) {
-                this._ctx.fillStyle = _gparms.fillColor;
-                this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
-            }
-            if (_gparms.borderColor) {
-                this._ctx.strokeStyle = _gparms.borderColor;
-                this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
-            }
-        }
-        ellipse(x, y, w, h, _gparms = this._gparms) {
-            if (_gparms.fillColor) {
-                this._ctx.beginPath();
-                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this._ctx.fillStyle = _gparms.fillColor;
-                this._ctx.fill();
-            }
-            if (_gparms.borderColor) {
-                this._ctx.beginPath();
-                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this._ctx.strokeStyle = _gparms.borderColor;
-                this._ctx.stroke();
-            }
-        }
-        circle(x, y, r, _gparms = this._gparms) {
-            this.ellipse(x - r, y - r, r * 2, r * 2, _gparms);
-        }
-        line(x0, y0, x1, y1, _gparms0 = this._gparms, _gparms1 = _gparms0) {
-            this._ctx.beginPath();
-            this._ctx.strokeStyle = _gparms0.borderColor;
-            this._ctx.moveTo(_gparms0.dx + x0, _gparms0.dy + y0);
-            this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
-            this._ctx.stroke();
-        }
-        text(msg, x = 0, y = 0, _gparms = this._gparms, w) {
-            this._ctx.fillStyle = _gparms.color;
-            this._ctx.font = _gparms.font;
-            this._ctx.textAlign = _gparms.textAlign;
-            this._ctx.textBaseline = _gparms.textBaseline;
-            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
-        }
-        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
-            this._ctx.font = _gparms.font;
-            let boundingBox = this.boundingBox(msg, _gparms);
-            if (!w)
-                w = boundingBox.w;
-            if (!h)
-                h = boundingBox.h;
-            this.rect(x, y, w, h, _gparms);
-            this.text(msg, x, y, _gparms, w);
-        }
-        boundingBox(msg, _gparms = this._gparms) {
-            this._ctx.font = _gparms.font;
-            let boundingBox = this._ctx.measureText(msg);
-            return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
-        }
-        clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
-            this.save();
-            let region = new Path2D();
-            region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
-            this._ctx.clip(region);
-        }
-        save() {
-            this._ctx.save();
-        }
-        restore() {
-            this._ctx.restore();
-        }
-        // --- Accessors --- //
-        get width() {
-            return this._canvas.width;
-        }
-        get height() {
-            return this._canvas.height;
-        }
-        get canvas() {
-            return this._canvas;
-        }
-    }
-    exports.GfxBrowser = GfxBrowser;
-});
-define("Playfield/Graphics/index", ["require", "exports", "Browser/GfxBrowser", "Playfield/Graphics/GfxParms"], function (require, exports, GfxBrowser_1, GfxParms_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxParms = exports.GfxBrowser = void 0;
-    Object.defineProperty(exports, "GfxBrowser", { enumerable: true, get: function () { return GfxBrowser_1.GfxBrowser; } });
-    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_2.GfxParms; } });
 });
 define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1346,6 +1191,161 @@ define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfie
     Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_2.Tile; } });
     Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
 });
+define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserPlayfieldEvent = void 0;
+    class BrowserPlayfieldEvent {
+        constructor(event) {
+            this.event = event;
+            // this.type = event.type;
+            // mouse events
+            this.x = event.offsetX;
+            this.y = event.offsetY;
+            this.isMove = event.type === "mousemove";
+            this.isPress = event.type === "mousedown" && event.button === 0;
+            this.isRelease = event.type === "mouseup" && event.button === 0;
+            this.isMenu = event.type === "mousedown" && event.button === 2;
+            this.isMenuRelease = event.type === "mousedown" && event.button === 2;
+            // keyboard events
+            this.key = event.key;
+            this.isKeyDown = event.type === "keydown";
+            this.isKeyUp = event.type === "keyup";
+            this.isShift = event.shiftKey;
+            this.isControl = event.ctrlKey;
+            this.isAlt = event.altKey;
+            this.isOption = event.altKey;
+            this.isMeta = event.metaKey;
+            this.isCommand = event.metaKey;
+            // gestures
+            this.swipe = event.wheelDelta;
+            this.isSwipeLeft = event.wheelDelta < 0;
+            this.isSwipeRight = event.wheelDelta > 0;
+        }
+        // --- Accessors --- //
+        get event() {
+            return this._event;
+        }
+        set event(value) {
+            this._event = value;
+        }
+        get x() {
+            return this._x;
+        }
+        set x(value) {
+            this._x = value;
+        }
+        get y() {
+            return this._y;
+        }
+        set y(value) {
+            this._y = value;
+        }
+        get isMove() {
+            return this._isMove;
+        }
+        set isMove(value) {
+            this._isMove = value;
+        }
+        get isPress() {
+            return this._isPress;
+        }
+        set isPress(value) {
+            this._isPress = value;
+        }
+        get isRelease() {
+            return this._isRelease;
+        }
+        set isRelease(value) {
+            this._isRelease = value;
+        }
+        get isMenu() {
+            return this._isMenu;
+        }
+        set isMenu(value) {
+            this._isMenu = value;
+        }
+        get isMenuRelease() {
+            return this._isMenuRelease;
+        }
+        set isMenuRelease(value) {
+            this._isMenuRelease = value;
+        }
+        get key() {
+            return this._key;
+        }
+        set key(value) {
+            this._key = value;
+        }
+        get isKeyDown() {
+            return this._isKeyDown;
+        }
+        set isKeyDown(value) {
+            this._isKeyDown = value;
+        }
+        get isKeyUp() {
+            return this._isKeyUp;
+        }
+        set isKeyUp(value) {
+            this._isKeyUp = value;
+        }
+        get isShift() {
+            return this._isShift;
+        }
+        set isShift(value) {
+            this._isShift = value;
+        }
+        get isControl() {
+            return this._isControl;
+        }
+        set isControl(value) {
+            this._isControl = value;
+        }
+        get isAlt() {
+            return this._isAlt;
+        }
+        set isAlt(value) {
+            this._isAlt = value;
+        }
+        get isOption() {
+            return this._isOption;
+        }
+        set isOption(value) {
+            this._isOption = value;
+        }
+        get isMeta() {
+            return this._isMeta;
+        }
+        set isMeta(value) {
+            this._isMeta = value;
+        }
+        get isCommand() {
+            return this._isCommand;
+        }
+        set isCommand(value) {
+            this._isCommand = value;
+        }
+        get swipe() {
+            return this._swipe;
+        }
+        set swipe(value) {
+            this._swipe = value;
+        }
+        get isSwipeLeft() {
+            return this._isSwipeLeft;
+        }
+        set isSwipeLeft(value) {
+            this._isSwipeLeft = value;
+        }
+        get isSwipeRight() {
+            return this._isSwipeRight;
+        }
+        set isSwipeRight(value) {
+            this._isSwipeRight = value;
+        }
+    }
+    exports.BrowserPlayfieldEvent = BrowserPlayfieldEvent;
+});
 define("Browser/CanvasEventPump", ["require", "exports", "Browser/BrowserPlayfieldEvent"], function (require, exports, BrowserPlayfieldEvent_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1371,11 +1371,11 @@ define("Browser/CanvasEventPump", ["require", "exports", "Browser/BrowserPlayfie
     }
     exports.CanvasEventPump = CanvasEventPump;
 });
-define("Browser/PlayfieldApp", ["require", "exports", "Playfield/Graphics/index", "Playfield/index", "Browser/CanvasEventPump"], function (require, exports, Graphics_3, Playfield_2, CanvasEventPump_1) {
+define("Browser/BrowserPlayfieldApp", ["require", "exports", "Playfield/Graphics/index", "Playfield/index", "Browser/CanvasEventPump"], function (require, exports, Graphics_3, Playfield_2, CanvasEventPump_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayfieldApp = void 0;
-    class PlayfieldApp {
+    exports.BrowserPlayfieldApp = void 0;
+    class BrowserPlayfieldApp {
         constructor(canvasId = "#playfield") {
             this._gfx = new Graphics_3.GfxBrowser(canvasId);
             this._eventQueue = new Playfield_2.EventQueue();
@@ -1408,7 +1408,7 @@ define("Browser/PlayfieldApp", ["require", "exports", "Playfield/Graphics/index"
             this._canvasEventPump = value;
         }
     }
-    exports.PlayfieldApp = PlayfieldApp;
+    exports.BrowserPlayfieldApp = BrowserPlayfieldApp;
 });
 define("Browser/index", ["require", "exports", "Browser/CanvasEventPump"], function (require, exports, CanvasEventPump_2) {
     "use strict";
@@ -2005,13 +2005,13 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test/BoxTestTile", "Playfield/Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/PlayfieldApp"], function (require, exports, CircleTestTile_1, BoxTestTile_2, Utils_11, Shapes_1, Jed_1, PlayfieldApp_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test/BoxTestTile", "Playfield/Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/BrowserPlayfieldApp"], function (require, exports, CircleTestTile_1, BoxTestTile_2, Utils_11, Shapes_1, Jed_1, BrowserPlayfieldApp_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
     class PlayfieldTest {
         constructor() {
-            this._playfieldApp = new PlayfieldApp_1.PlayfieldApp();
+            this._playfieldApp = new BrowserPlayfieldApp_1.BrowserPlayfieldApp();
             this._playfield = this._playfieldApp.playfield;
         }
         boxTest() {
