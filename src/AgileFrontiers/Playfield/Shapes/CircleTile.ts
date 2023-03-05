@@ -1,7 +1,7 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
 import { Draggable, Selectable } from "../Abilities";
-import { applyMixins } from "../../Utils";
+import { applyMixins } from "../Utils";
 
 export class _CircleTile extends ShapeTile { };
 export interface _CircleTile extends Draggable , Selectable{ };

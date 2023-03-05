@@ -1,6 +1,6 @@
 import { Draggable } from "./DraggableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
-import { Logger } from "../../Utils";
+import { Logger } from "../Utils";
 import { Tile } from "../Tile";
 
 

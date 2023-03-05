@@ -1,4 +1,4 @@
-import { Logger } from "../Utils";
+import { Logger } from "../Playfield/Utils";
 import { PlayfieldEvent, EventQueue } from "../Playfield";
 
 export class CanvasEventPump {

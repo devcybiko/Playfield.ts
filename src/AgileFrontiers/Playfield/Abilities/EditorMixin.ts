@@ -1,5 +1,5 @@
 import { Editable } from "./EditableMixin";
-import { Tree } from "../../Utils";
+import { Tree } from "../Utils";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 

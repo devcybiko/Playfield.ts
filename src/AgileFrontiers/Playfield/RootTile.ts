@@ -1,7 +1,7 @@
 import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
 import { Dragger, Selecter, Clicker, Presser, Editor, Editable, Hoverer } from "./Abilities";
-import { applyMixins, Logger } from "../Utils";
+import { applyMixins, Logger } from "./Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 
 /**

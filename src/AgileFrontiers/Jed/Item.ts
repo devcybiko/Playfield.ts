@@ -1,5 +1,5 @@
 import { Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { applyMixins } from "../Playfield/Utils";
 import { Draggable, Selectable } from "../Playfield/Abilities";
 import {ItemOptions} from "./ItemOptions"
 
@@ -20,7 +20,7 @@ export class Item extends _Item {
         this._options.text = text || value;
         this._options.fontSize = h;
     }
-    
+
     public _updateGparms() {
         this.gparms.fillColor = this.options.fillColor;
         this.gparms.color = this.options.textColor;

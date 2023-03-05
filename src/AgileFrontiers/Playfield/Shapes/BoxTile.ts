@@ -1,6 +1,6 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import { applyMixins, random } from "../../Utils";
+import { applyMixins, random } from "../Utils";
 import { Draggable, Selectable } from "../Abilities";
 
 export class _BoxTile extends ShapeTile { };

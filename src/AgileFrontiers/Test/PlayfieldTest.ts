@@ -1,7 +1,7 @@
 import { Playfield } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
-import { random } from "../Utils";
+import { random } from "../Playfield/Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
 import { GfxBrowser } from "../Playfield/Graphics";

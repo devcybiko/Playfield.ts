@@ -1,4 +1,4 @@
-define("Utils/Mixins", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/Mixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.applyMixins = void 0;
@@ -12,7 +12,7 @@ define("Utils/Mixins", ["require", "exports"], function (require, exports) {
     }
     exports.applyMixins = applyMixins;
 });
-define("Utils/Functions", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/Functions", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
@@ -39,7 +39,7 @@ define("Utils/Functions", ["require", "exports"], function (require, exports) {
     }
     exports.snapTo = snapTo;
 });
-define("Utils/RectMixin", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/RectMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Rect = void 0;
@@ -99,7 +99,7 @@ define("Utils/RectMixin", ["require", "exports"], function (require, exports) {
     }
     exports.Rect = Rect;
 });
-define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Tree = void 0;
@@ -162,7 +162,7 @@ define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
     }
     exports.Tree = Tree;
 });
-define("Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Logger = void 0;
@@ -227,7 +227,7 @@ define("Utils/LoggerMixin", ["require", "exports"], function (require, exports) 
     }
     exports.Logger = Logger;
 });
-define("Utils/index", ["require", "exports", "Utils/Mixins", "Utils/Functions", "Utils/RectMixin", "Utils/TreeMixin", "Utils/LoggerMixin"], function (require, exports, Mixins_1, Functions_1, RectMixin_1, TreeMixin_1, LoggerMixin_1) {
+define("Playfield/Utils/index", ["require", "exports", "Playfield/Utils/Mixins", "Playfield/Utils/Functions", "Playfield/Utils/RectMixin", "Playfield/Utils/TreeMixin", "Playfield/Utils/LoggerMixin"], function (require, exports, Mixins_1, Functions_1, RectMixin_1, TreeMixin_1, LoggerMixin_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Logger = exports.Tree = exports.Rect = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
@@ -286,7 +286,7 @@ define("Playfield/Graphics/Gfx", ["require", "exports"], function (require, expo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Playfield/Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_1) {
+define("Browser/GfxBrowser", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.GfxBrowser = void 0;
@@ -379,7 +379,7 @@ define("Playfield/Browser/GfxBrowser", ["require", "exports", "Playfield/Graphic
     }
     exports.GfxBrowser = GfxBrowser;
 });
-define("Playfield/Graphics/index", ["require", "exports", "Playfield/Browser/GfxBrowser", "Playfield/Graphics/GfxParms"], function (require, exports, GfxBrowser_1, GfxParms_2) {
+define("Playfield/Graphics/index", ["require", "exports", "Browser/GfxBrowser", "Playfield/Graphics/GfxParms"], function (require, exports, GfxBrowser_1, GfxParms_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.GfxParms = exports.GfxBrowser = void 0;
@@ -414,7 +414,7 @@ define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, ex
     }
     exports.PlayfieldEvent = PlayfieldEvent;
 });
-define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Graphics/index"], function (require, exports, Utils_1, Graphics_1) {
+define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfield/Graphics/index"], function (require, exports, Utils_1, Graphics_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Tile = exports._Tile = void 0;
@@ -1022,7 +1022,7 @@ define("Playfield/Abilities/index", ["require", "exports", "Playfield/Abilities/
     Object.defineProperty(exports, "Editor", { enumerable: true, get: function () { return EditorMixin_1.Editor; } });
     Object.defineProperty(exports, "Repeatable", { enumerable: true, get: function () { return RepeatableMixin_1.Repeatable; } });
 });
-define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, Tile_1, Abilities_1, Utils_2) {
+define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, Tile_1, Abilities_1, Utils_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RootTile = exports._RootTile = void 0;
@@ -1085,7 +1085,7 @@ define("Playfield/EventQueue", ["require", "exports"], function (require, export
     }
     exports.EventQueue = EventQueue;
 });
-define("Playfield/Playfield", ["require", "exports", "Utils/index", "Playfield/Graphics/index", "Playfield/RootTile"], function (require, exports, Utils_3, Graphics_2, RootTile_1) {
+define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "Playfield/Graphics/index", "Playfield/RootTile"], function (require, exports, Utils_3, Graphics_2, RootTile_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Playfield = exports._Playfield = void 0;
@@ -1172,6 +1172,76 @@ define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfie
     Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
     Object.defineProperty(exports, "PlayfieldEvent", { enumerable: true, get: function () { return PlayfieldEvent_1.PlayfieldEvent; } });
 });
+define("Browser/CanvasEventPump", ["require", "exports", "Playfield/Utils/index", "Playfield/index"], function (require, exports, Utils_4, Playfield_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CanvasEventPump = void 0;
+    class CanvasEventPump {
+        constructor(canvas, eventQueue) {
+            this._logger = new Utils_4.Logger();
+            this._eventQueue = eventQueue;
+            this._registerEventHandlers(canvas);
+        }
+        _registerEventHandlers(canvas) {
+            canvas.addEventListener('mousedown', this._handler.bind(this));
+            canvas.addEventListener('mousemove', this._handler.bind(this));
+            canvas.addEventListener('mouseup', this._handler.bind(this));
+            canvas.addEventListener('wheel', this._handler.bind(this));
+            addEventListener("keydown", this._handler.bind(this));
+            addEventListener("keyup", this._handler.bind(this));
+        }
+        _handler(event) {
+            let pfEvent = new Playfield_2.PlayfieldEvent(event);
+            this._eventQueue.pushEvent(pfEvent);
+        }
+    }
+    exports.CanvasEventPump = CanvasEventPump;
+});
+define("Browser/PlayfieldApp", ["require", "exports", "Playfield/Graphics/index", "Playfield/index", "Browser/CanvasEventPump"], function (require, exports, Graphics_3, Playfield_3, CanvasEventPump_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayfieldApp = void 0;
+    class PlayfieldApp {
+        constructor(canvasId = "#playfield") {
+            this._gfx = new Graphics_3.GfxBrowser(canvasId);
+            this._eventQueue = new Playfield_3.EventQueue();
+            this._canvasEventPump = new CanvasEventPump_1.CanvasEventPump(this._gfx.canvas, this._eventQueue);
+            this._playfield = new Playfield_3.Playfield(this._gfx, this._eventQueue);
+        }
+        // --- Accessors --- //
+        get playfield() {
+            return this._playfield;
+        }
+        set playfield(value) {
+            this._playfield = value;
+        }
+        get gfx() {
+            return this._gfx;
+        }
+        set gfx(value) {
+            this._gfx = value;
+        }
+        get eventQueue() {
+            return this._eventQueue;
+        }
+        set eventQueue(value) {
+            this._eventQueue = value;
+        }
+        get canvasEventPump() {
+            return this._canvasEventPump;
+        }
+        set canvasEventPump(value) {
+            this._canvasEventPump = value;
+        }
+    }
+    exports.PlayfieldApp = PlayfieldApp;
+});
+define("Browser/index", ["require", "exports", "Browser/CanvasEventPump"], function (require, exports, CanvasEventPump_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CanvasEventPump = void 0;
+    Object.defineProperty(exports, "CanvasEventPump", { enumerable: true, get: function () { return CanvasEventPump_2.CanvasEventPump; } });
+});
 define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1193,16 +1263,16 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
     }
     exports.ItemOptions = ItemOptions;
 });
-define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions"], function (require, exports, Playfield_2, Utils_4, Abilities_2, ItemOptions_1) {
+define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions"], function (require, exports, Playfield_4, Utils_5, Abilities_2, ItemOptions_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Item = exports._Item = void 0;
-    class _Item extends Playfield_2.Tile {
+    class _Item extends Playfield_4.Tile {
     }
     exports._Item = _Item;
     ;
     ;
-    (0, Utils_4.applyMixins)(_Item, [Abilities_2.Draggable, Abilities_2.Selectable]);
+    (0, Utils_5.applyMixins)(_Item, [Abilities_2.Draggable, Abilities_2.Selectable]);
     class Item extends _Item {
         constructor(name, parent, x, y, w, h, value = "", text = "") {
             super(name, parent, x, y, w, h);
@@ -1235,7 +1305,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
     }
     exports.Item = Item;
 });
-define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_1, Utils_5, Abilities_3) {
+define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_1, Utils_6, Abilities_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ButtonItem = exports._ButtonItem = void 0;
@@ -1244,7 +1314,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Utils/index", "Play
     exports._ButtonItem = _ButtonItem;
     ;
     ;
-    (0, Utils_5.applyMixins)(_ButtonItem, [Abilities_3.Draggable, Abilities_3.Pressable, Abilities_3.Hoverable]);
+    (0, Utils_6.applyMixins)(_ButtonItem, [Abilities_3.Draggable, Abilities_3.Pressable, Abilities_3.Hoverable]);
     class ButtonItem extends _ButtonItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value);
@@ -1287,7 +1357,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Utils/index", "Play
     }
     exports.ButtonItem = ButtonItem;
 });
-define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_6, Abilities_4) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_7, Abilities_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LabelItem = exports._LabelItem = void 0;
@@ -1296,7 +1366,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Utils/index", "Playf
     exports._LabelItem = _LabelItem;
     ;
     ;
-    (0, Utils_6.applyMixins)(_LabelItem, [Abilities_4.Draggable]);
+    (0, Utils_7.applyMixins)(_LabelItem, [Abilities_4.Draggable]);
     class LabelItem extends _LabelItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value);
@@ -1326,7 +1396,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Utils/index", "Playf
     }
     exports.LabelItem = LabelItem;
 });
-define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_7, Abilities_5) {
+define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_8, Abilities_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TextItem = exports._TextItem = void 0;
@@ -1335,7 +1405,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
     exports._TextItem = _TextItem;
     ;
     ;
-    (0, Utils_7.applyMixins)(_TextItem, [Abilities_5.Draggable, Abilities_5.Editable, Abilities_5.Repeatable]);
+    (0, Utils_8.applyMixins)(_TextItem, [Abilities_5.Draggable, Abilities_5.Editable, Abilities_5.Repeatable]);
     class TextItem extends _TextItem {
         constructor(name, parent, x, y, w, h, value = "") {
             super(name, parent, x, y, w, h, value);
@@ -1492,7 +1562,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
     }
     exports.TextItem = TextItem;
 });
-define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_4, Utils_8, Abilities_6) {
+define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_4, Utils_9, Abilities_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ToggleItem = exports._ToggleItem = void 0;
@@ -1501,7 +1571,7 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Utils/index", "Play
     exports._ToggleItem = _ToggleItem;
     ;
     ;
-    (0, Utils_8.applyMixins)(_ToggleItem, [Abilities_6.Draggable, Abilities_6.Clickable, Abilities_6.Hoverable]);
+    (0, Utils_9.applyMixins)(_ToggleItem, [Abilities_6.Draggable, Abilities_6.Clickable, Abilities_6.Hoverable]);
     class ToggleItem extends _ToggleItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value);
@@ -1568,88 +1638,18 @@ define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Je
     Object.defineProperty(exports, "ToggleItem", { enumerable: true, get: function () { return ToggleItem_1.ToggleItem; } });
     Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_1.LabelItem; } });
 });
-define("Playfield/Browser/CanvasEventPump", ["require", "exports", "Utils/index", "Playfield/index"], function (require, exports, Utils_9, __1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CanvasEventPump = void 0;
-    class CanvasEventPump {
-        constructor(canvas, eventQueue) {
-            this._logger = new Utils_9.Logger();
-            this._eventQueue = eventQueue;
-            this._registerEventHandlers(canvas);
-        }
-        _registerEventHandlers(canvas) {
-            canvas.addEventListener('mousedown', this._handler.bind(this));
-            canvas.addEventListener('mousemove', this._handler.bind(this));
-            canvas.addEventListener('mouseup', this._handler.bind(this));
-            canvas.addEventListener('wheel', this._handler.bind(this));
-            addEventListener("keydown", this._handler.bind(this));
-            addEventListener("keyup", this._handler.bind(this));
-        }
-        _handler(event) {
-            let pfEvent = new __1.PlayfieldEvent(event);
-            this._eventQueue.pushEvent(pfEvent);
-        }
-    }
-    exports.CanvasEventPump = CanvasEventPump;
-});
-define("Playfield/Browser/PlayfieldApp", ["require", "exports", "Playfield/Graphics/index", "Playfield/index", "Playfield/Browser/CanvasEventPump"], function (require, exports, Graphics_3, __2, CanvasEventPump_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayfieldApp = void 0;
-    class PlayfieldApp {
-        constructor(canvasId = "#playfield") {
-            this._gfx = new Graphics_3.GfxBrowser(canvasId);
-            this._eventQueue = new __2.EventQueue();
-            this._canvasEventPump = new CanvasEventPump_1.CanvasEventPump(this._gfx.canvas, this._eventQueue);
-            this._playfield = new __2.Playfield(this._gfx, this._eventQueue);
-        }
-        // --- Accessors --- //
-        get playfield() {
-            return this._playfield;
-        }
-        set playfield(value) {
-            this._playfield = value;
-        }
-        get gfx() {
-            return this._gfx;
-        }
-        set gfx(value) {
-            this._gfx = value;
-        }
-        get eventQueue() {
-            return this._eventQueue;
-        }
-        set eventQueue(value) {
-            this._eventQueue = value;
-        }
-        get canvasEventPump() {
-            return this._canvasEventPump;
-        }
-        set canvasEventPump(value) {
-            this._canvasEventPump = value;
-        }
-    }
-    exports.PlayfieldApp = PlayfieldApp;
-});
-define("Playfield/Browser/index", ["require", "exports", "Playfield/Browser/CanvasEventPump"], function (require, exports, CanvasEventPump_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CanvasEventPump = void 0;
-    Object.defineProperty(exports, "CanvasEventPump", { enumerable: true, get: function () { return CanvasEventPump_2.CanvasEventPump; } });
-});
-define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __3) {
+define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ShapeTile = void 0;
-    class ShapeTile extends __3.Tile {
+    class ShapeTile extends __1.Tile {
         constructor(name, parent, x, y, w, h = w) {
             super(name, parent, x, y, w, h);
         }
     }
     exports.ShapeTile = ShapeTile;
 });
-define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_10, Abilities_7) {
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_10, Abilities_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTile = exports._BoxTile = void 0;
@@ -1692,7 +1692,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_11) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -1761,11 +1761,11 @@ define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTil
     Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
     Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
 });
-define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_3) {
+define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTestTile = void 0;
-    class BoxTestTile extends Playfield_3.Tile {
+    class BoxTestTile extends Playfield_5.Tile {
         constructor(name, parent, x, y, w, h = w) {
             super(name, parent, x, y, w, h);
             this.gparms.borderColor = "red";
@@ -1816,7 +1816,7 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Playfield/Browser/PlayfieldApp"], function (require, exports, CircleTestTile_1, BoxTestTile_2, Utils_12, Shapes_1, Jed_1, PlayfieldApp_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test/BoxTestTile", "Playfield/Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/PlayfieldApp"], function (require, exports, CircleTestTile_1, BoxTestTile_2, Utils_12, Shapes_1, Jed_1, PlayfieldApp_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
