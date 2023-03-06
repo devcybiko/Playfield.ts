@@ -14,6 +14,7 @@ export class MouseDispatcher {
         return mouseEvent;
     }
     dispatchEvent(event: any) {
+        event.preventDefault();
         let mouseEvent = this._mouseEvent(event);
         if (event.button !== undefined) return this.dispatchMouseEvent(mouseEvent);
         else return this.dispatchUnknownMouseEvent(event);

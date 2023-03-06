@@ -1,5 +1,6 @@
 import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
+import { MenuTile } from "./MenuTile";
 import { Dragger, Selecter, Clicker, Presser, Editor, Editable, Hoverer } from "./Abilities";
 import { Mouseable, Keyboardable, KeyEvent, MouseEvent } from "./Events";
 import { applyMixins, Logger } from "../Utils";
@@ -13,6 +14,8 @@ export interface _RootTile extends Keyboardable, Mouseable, Clicker, Presser, Se
 applyMixins(_RootTile, [Keyboardable, Mouseable, Clicker, Selecter, Presser, Dragger, Logger, Editor, Hoverer]);
 
 export class RootTile extends _RootTile implements Mouseable, Keyboardable {
+    private _menuTile: Tile;
+
     constructor(x: number, y: number, w: number, h: number, playfield: Playfield) {
         super("_root", null as unknown as Tile, x, y, w, h, playfield);
         this.Dragger();
@@ -70,6 +73,16 @@ export class RootTile extends _RootTile implements Mouseable, Keyboardable {
         }
         return processed;
     }
+    MenuDown(mouseEvent: MouseEvent): boolean {
+        if (this._menuTile) this.removeChild(this._menuTile);
+        this._menuTile = new MenuTile("Menu", this, mouseEvent.x, mouseEvent.y, 100, 14);
+        return true;
+    }
+    MenuUp(mouseEvent: MouseEvent): boolean {
+        if (this._menuTile) this.removeChild(this._menuTile);
+        this._menuTile = null;
+        return true;
+    }
     OrdinaryKey(keyEvent: KeyEvent): boolean {
         if (this.focusObj && this.focusObj.isEditable) {
             return (this.focusObj as unknown as Editable).onKey(keyEvent.key); // questionable
@@ -95,7 +108,6 @@ export class RootTile extends _RootTile implements Mouseable, Keyboardable {
         return false;
     }
     TabKey(keyEvent: KeyEvent): boolean {
-        console.log("TabKey");
         if (this.focusObj) {
             if (!keyEvent._isShift) return this._nextChild(+1, null);
             return this._nextChild(-1, null);

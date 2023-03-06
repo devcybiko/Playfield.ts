@@ -1,11 +1,11 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
-import { Draggable, Editable, Repeatable } from "../Playfield/Abilities";
+import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
 export class _TextItem extends Item { };
-export interface _TextItem extends Draggable, Editable, Repeatable { };
-applyMixins(_TextItem, [Draggable, Editable, Repeatable]);
+export interface _TextItem extends Draggable, Editable, Timer { };
+applyMixins(_TextItem, [Draggable, Editable, Timer]);
 
 export class TextItem extends _TextItem {
     _cursor = 0;
@@ -21,7 +21,7 @@ export class TextItem extends _TextItem {
         this.Draggable();
         this.Editable();
         this.Logger();
-        this.Repeatable(this._cursorBlinkRate);
+        this.Timer(this._cursorBlinkRate);
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
@@ -32,18 +32,15 @@ export class TextItem extends _TextItem {
     }
     _startCursorBlinking() {
         this._cursorOn = true;
-        this.startRepeat(this._cursorBlinkRate);
+        this.startTimer(this._cursorBlinkRate);
     }
     _stopCursorBlinking() {
         this._cursorOn = false;
-        this.stopRepeat();
-    }
-    onRepeat(): boolean {
-        this.blink();
-        return true;
     }
     blink() {
+        if (!this.isTimedOut) return;
         this._cursorOn = !this._cursorOn;
+        this.startTimer(this._cursorBlinkRate);
     }
     drawCursor() {
         if (!this.isFocused) return;
@@ -72,6 +69,9 @@ export class TextItem extends _TextItem {
         gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
         this.drawCursor();
         gfx.restore();
+    }
+    tick() {
+        this.blink();
     }
     computeRight() {
         // let gfx = this._playfield.gfx;

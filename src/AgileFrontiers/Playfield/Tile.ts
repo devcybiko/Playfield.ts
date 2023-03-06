@@ -19,16 +19,20 @@ export class Tile extends _Tile implements hasGfx, hasGfxParms {
     _gparms: GfxParms;
     _logger: Logger;
     _tabOrder: number;
+    _rightJustify = false;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
         super();
         this.Tree(name, parent);
+        if (w < 0) {
+            this._rightJustify = true;
+            w = -w;
+        }
         this.Rect(x, y, w, h);
         this.Logger();
         this._gparms = new GfxParms();
         this._playfield = playfield;
         this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
-        console.log("taborder", this._tabOrder);
         return this;
     }
     get gfx(): Gfx {

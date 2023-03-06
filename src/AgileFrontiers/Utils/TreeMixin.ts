@@ -23,6 +23,11 @@ export class Tree {
         child._parent = this;
         this._children.push(child);
     }
+    removeChild(child: Tree): Tree {
+        let i = this._children.indexOf(child);
+        if (i === -1) return null;
+        this._children.splice(i, 1);
+    }
     dfs(visit: (obj: Tree, ctx: any) => any, ctx?: any): any {
         let stop = visit(this, ctx);
         if (stop) return stop;
@@ -34,9 +39,7 @@ export class Tree {
     }
     toFront(obj?: Tree) {
         if (obj) {
-            let i = this._children.indexOf(obj);
-            if (i === -1) return;
-            this._children.splice(i, 1);
+            this.removeChild(obj);
             this._children.push(obj);
         } else {
             this.parent.toFront(this);
@@ -44,9 +47,7 @@ export class Tree {
     }
     toBack(obj?: Tree) {
         if (obj) {
-            let i = this._children.indexOf(obj);
-            if (i === -1) return;
-            this._children.splice(i, 1);
+            this.removeChild(obj);
             this._children.splice(0, 0, obj);
         } else {
             this.parent.toBack(this);

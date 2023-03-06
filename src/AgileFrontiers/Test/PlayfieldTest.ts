@@ -3,7 +3,7 @@ import {CircleTestTile} from "./CircleTestTile";
 import {BoxTestTile} from "./BoxTestTile";
 import {random} from "../Utils";
 import {CircleTile, BoxTile} from "../Playfield/Shapes";
-import {TextItem, ButtonItem, ToggleItem} from "../Jed";
+import {TextItem, ButtonItem, ToggleItem, LabelItem} from "../Jed";
 
 export class PlayfieldTest {
     _playfield: Playfield;
@@ -97,13 +97,15 @@ export class PlayfieldTest {
         this._playfield.start(0);
     }
     jedTest() {
-        let x = 10;
+        let x = 120;
         let y = 10;
         let parent = this._playfield.tile;
         let textItem1 = new TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
-        let textItem2 = new TextItem("textitem-2", parent, x, y+=50, 250, 14, "Hello World 2");
-        let textItem3 = new TextItem("textitem-3", parent, x, y+=50, 250, 14, "Hello World 3");
-        let textItem4 = new TextItem("textitem-4", parent, x, y+=50, 250, 14, "Hello World 4 ");
+        let lablItem1 = new LabelItem("Label-1", parent, x-110, y, -100, 14, "Label-1", "Label-1");
+        let textItem2 = new TextItem("textitem-2", parent, x, y+=50, 100, 14, "Hello World 2");
+        let lablItem2 = new LabelItem("Label-2", parent, x-110, y, 100, 14, "Label-2", "Label-2");
+        let textItem3 = new TextItem("textitem-3", parent, x, y+=50, 100, 14, "Hello World 3");
+        let textItem4 = new TextItem("textitem-4", parent, x, y+=50, 100, 14, "Hello World 4 ");
         let buttonItem1 = new ButtonItem("ButtonItem", parent, x, y+=50, 45, 14);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";

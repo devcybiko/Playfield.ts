@@ -1,3 +1,6 @@
+// I don't recommend this as it's asynchronous and can confuse the Playfield state
+// Use TimerMixin instead
+
 export interface Repeatable { }
 export class Repeatable {
     private _isRepeatable: boolean;
@@ -5,7 +8,7 @@ export class Repeatable {
     private _timerId: any;
 
     Repeatable(delay: number) {
-        this.isRepeatable = true;
+        this._isRepeatable = true;
         this._delay = delay;
         return this;
     }

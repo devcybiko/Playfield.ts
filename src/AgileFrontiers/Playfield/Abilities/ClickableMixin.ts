@@ -15,8 +15,6 @@ export class Clickable {
     }
 
     onClick(event?: any): boolean {
-        let that = this as any;
-        if (that.log) that.log("onClick", that.name);
         return true;
     }
 }

@@ -1,5 +1,6 @@
 import { Draggable } from "./DraggableMixin";
 import { MouseEvent } from "../Events/MouseEvent";
+import { Tile } from "../Tile";
 
 export interface Dragger { };
 export class Dragger {
@@ -16,7 +17,8 @@ export class Dragger {
 
     _grabChild(child: Draggable, myEvent: MouseEvent): boolean {
         if (child.isDraggable && !this._dragObj) {
-            this._dragObj = child as Draggable;
+            this._dragObj = child;
+            (this._dragObj as unknown as Tile).toFront();
             child.onGrab(myEvent);
             this._dragX = myEvent.x;
             this._dragY = myEvent.y;

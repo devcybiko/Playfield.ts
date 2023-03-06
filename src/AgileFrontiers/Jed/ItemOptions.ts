@@ -1,5 +1,5 @@
 export class ItemOptions {
-    fontSize = 14;
+    fontSize = 24;
     fontFace = "sans-serif";
     text = "";
     label = "";
@@ -8,4 +8,6 @@ export class ItemOptions {
     fillColor = "white";
     selectColor = "red";
     hoverColor = "#c88";
+    textAlign = "left" as CanvasTextAlign;
+    textBaseline = "top" as CanvasTextBaseline;
 }
