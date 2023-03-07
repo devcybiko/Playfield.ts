@@ -1,20 +1,35 @@
-import {Item}  from "./Item";
-import {Playfield, Actor} from "../Playfield";
+import { Item } from "./Item";
+import { Tile } from "../Playfield";
+import { applyMixins } from "../Playfield/Utils";
+import { Draggable } from "../Playfield/Abilities";
+import { GfxParms } from "../Playfield/Graphics";
 
-export class LabelItem extends Item {
-    public bb: any;
-    constructor(parent: Playfield | Actor, name: string, value: string, x: number, y: number, w = 0, h = 0) {
-        super(parent, name, value, x, y, w, h);
-        this.gparms.fontFace = "serif";
-        this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
-        if (!w) this.w = this.bb.w;
-        if (!h) this.h = this.bb.h;
+export class _LabelItem extends Item { };
+export interface _LabelItem extends Draggable { };
+applyMixins(_LabelItem, [Draggable]);
+
+export class LabelItem extends _LabelItem {
+
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
+        super(name, parent, x, y, w, h, value);
+        this.Draggable();
+        this.Logger();
+        this.options.fontSize = h;
+        this.options.fontStyle = GfxParms.BOLD;
+        this._updateGparms();
     }
+
+    // --- Overrides --- //
     draw() {
         let gfx = this.playfield.gfx;
-        // this.bb = gfx.boundingBox(this.value(), this.gparms);
-        // this.w = this.bb.w;
-        // this.h = this.bb.h;
-        gfx.text(this.value(), this.x, this.y, this.gparms);
+        this._updateGparms();
+        this.gparms.borderColor = "";
+        let w = this.w;
+        let h = this.h;
+        let x = this.x;
+        let y = this.y;
+        gfx.clipRect(x, y, w, h, this.gparms);
+        gfx.textRect(this.value, x, y, w, h, this.gparms);
+        gfx.restore();
     }
 }

@@ -1,165 +1,93 @@
-import { Loggable } from "../Utils";
-import { Named, Tree, iTree, Rect, Base } from "../Mixins";
-import { Actor } from "./Actor";
-import { CanvasEventHandler } from "./EventHandlers/CanvasEventHandler";
-import { iFocusable, iDraggable, iSelectable, Drawable, iDrawable, Playable, iPlayable } from "./Capabilities";
-import { MouseEnabled, iMouseEnabled} from "./EventHandlers/Capabilities";
+import { Tile } from "./Tile";
+import { Rect, Logger, applyMixins } from "./Utils";
+import { Gfx, GfxParms } from "./Graphics";
+import { RootTile } from "./RootTile";
+import { EventQueue } from "./EventQueue";
 
-interface iAddable extends iPlayable, iDrawable, iTree {}
+/**
+ * Playfield is a graphic area for rendering
+ * And it collects human inputs and dispatches them to tiles
+ * A Playfield has a tree of Tiles (rectangles)
+ */
 
-const PlayfieldBase = MouseEnabled(Playable(Loggable(Drawable(Named(Tree(Rect(Base)))))));
-export class Playfield extends PlayfieldBase {
-    private _canvas: HTMLCanvasElement;
-    public _ctx: CanvasRenderingContext2D;
-    private _selectedObj: iSelectable; // mouse object
-    private _focusedObj: iFocusable; // keyboard object
-    private _dragObj: iDraggable;
-    private _grabX = 0;
-    private _grabY = 0;
-    private _body: any;
-    private _eventHandler: CanvasEventHandler;
+export class _Playfield { };
+export interface _Playfield extends Logger, Rect { };
+applyMixins(_Playfield, [Logger, Rect]);
 
-    constructor(canvasId: string) {
+export class Playfield extends _Playfield {
+    private _rootTile: RootTile;
+    private _gfx: Gfx;
+    private _gparms: GfxParms;
+    private _lastTime = 0;
+    private _delay = 0;
+    private _timerId = 0 as any;
+    private _eventQueue: EventQueue;
+
+    constructor(gfx: Gfx, eventQueue: EventQueue) {
         super();
-        this._canvas = document.querySelector(canvasId);
-        this._ctx = this._canvas.getContext("2d");
-        this.Named("_playfield");
-        this.Rect(0, 0, this._ctx.canvas.clientWidth, this._ctx.canvas.clientHeight);
-        this.Tree(null);
-        this.Loggable();
-        this.Drawable(this._ctx)
-        this.Playable(this);
-        this.MouseEnabled();
-        this._selectedObj = null;
-        this._focusedObj = null;
-        this._eventHandler = new CanvasEventHandler(this._canvas, this);
-        this._dragObj = null;
-        this._body = document.querySelector('body');
-        this._body.playfield = this;
+        this._gfx = gfx;
+        this._eventQueue = eventQueue;
+        this._gparms = new GfxParms();
+        this.Rect(0, 0, this._gfx.width, this._gfx.height);
+        this._rootTile = new RootTile(0, 0, this.w, this.h, this);
     }
-    get selectedObj() {
-        return this._selectedObj
+
+    // --- Public Methods --- //
+
+    clear() {
+        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
     }
-    set selectedObj(obj: iSelectable) {
-        this._selectedObj = obj;
+
+    redraw() {
+        this.clear();
+        this.tile.redraw();
     }
-    get focusedObj() :iFocusable {
-        return this._focusedObj
+
+    start(delay = 125) {
+        this._delay = delay;
+        this._lastTime = Date.now();
+        this.redraw();
+        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
-    set focusedObj(obj: iFocusable) {
-        this._focusedObj = obj;
+
+    // --- Private Methods --- //
+
+    _tick() {
+        clearTimeout(this._timerId);
+        let now = Date.now();
+        let extra = now - this._lastTime;
+        this._handleEvents();
+        this.tile.onTick(); // process all ticks
+        this.redraw(); // redraw the playfield
+        this._lastTime = Date.now();
+        let delta = this._lastTime - now;
+        if (this._delay && (delta > this._delay)) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
-    selectObj(obj: iSelectable) {
-        if (this._selectedObj) this._selectedObj.deselect();
-        this._selectedObj = obj;
-        if (obj !== null) obj.select();
-    }
-    focusObj(obj: iFocusable) {
-        if (this._focusedObj) this._focusedObj.defocus();
-        this.focusedObj = obj;
-        if (obj !== null) obj.focus();
-    }
-    add(obj: iAddable) {
-        super.add(obj);
-        obj.playfield = this;
-        obj.gfx = this.gfx;
-    }
-    grabObj(obj: iDraggable, x: number, y: number, toFront: boolean) {
-        if (obj && obj.isDraggable) {
-            this.dropObj();
-            if (toFront) this.toFront(obj);
-            else this.toBack(obj);
-            this._dragObj = obj;
-            this._grabX = x;
-            this._grabY = y;
-            obj.grab();
+
+    _handleEvents() {
+        let that = this;
+        for (let pfEvent = next(); pfEvent; pfEvent = next()) {
+            this._rootTile.onEvent(pfEvent);
+        }
+        function next() {
+            return that._eventQueue.getEvent();
         }
     }
-    dragObj(x: number, y: number) {
-        if (this._dragObj) {
-            let dx = x - this._grabX;
-            let dy = y - this._grabY;
-            this.info(dx, dy);
-            this._dragObj.drag(dx, dy);
-        }
+
+    // --- Accessors --- //
+
+    get playfield(): Playfield {
+        return this;
     }
-    dropObj() {
-        if (this._dragObj) this._dragObj.drop();
-        this._dragObj = null;
+    get tile(): Tile {
+        return this._rootTile;
     }
-    recompute() {
-        //for Actor compatibility
+    get gparms(): GfxParms {
+        return this._gparms;
     }
-    draw() {
-        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-        // for partial actor compatibility
-    }
-    drawObj(obj: Actor) {
-        // visitor method for drawAll()
-        obj.recompute();
-        obj.draw();
-    }
-    drawAll() {
-        this.dfs(this.drawObj);
-    }
-    findObjInBounds(x: number, y: number): any {
-        for (let i = this._children.length - 1; i >= 0; i--) {
-            let obj = this._children[i];
-            let found = obj.inBounds(x, y);
-            if (found) return found;
-        }
-        return null;
-    }
-    handleKeyDown(event: any) {
-        let playfield = event.srcElement.playfield as Playfield;
-        if (!playfield)
-            return this.error(
-                "ERROR: keydown not associated with a playfield"
-            );
-        if (playfield._selectedObj) playfield._selectedObj.any.keydown(event.key);
-    }
-    timer() {
-        this.goAll();
-        this.drawAll();
-    }
-    start() {
-        this.drawAll();
-        setInterval(this.timer.bind(this), 125, this);
-    }
-    goAll() {
-        for (let obj of this._children) obj.go();
-    }
-    collisions(theObj: Actor) {
-        let results = [];
-        for (let obj of this._children) {
-            if (theObj === obj) continue;
-            if (obj.inBounds(theObj.x, theObj.y) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y) ||
-                obj.inBounds(theObj.x, theObj.y + theObj.h) ||
-                obj.inBounds(theObj.x + theObj.w, theObj.y + theObj.h))
-                results.push(obj);
-        }
-        return results;
-    }
-    MouseMove(event: any): void {
-        this.dragObj(event.offsetX, event.offsetY);
-    }
-    MouseUp(event: any) {
-        this.dropObj();
-    }
-    MouseDown(event: any) {
-        let obj = this.findObjInBounds(event.offsetX, event.offsetY);
-        this.log("MouseDown", obj);
-        this.selectObj(obj);
-        if (obj) {
-            obj.click(event.offsetX, event.offsetY);
-            this.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
-        }
-    }
-    KeyDown(event: any) {
-        if (this.focusedObj) {
-            if ()
-        }
+    get gfx(): Gfx {
+        return this._gfx;
     }
 
 }

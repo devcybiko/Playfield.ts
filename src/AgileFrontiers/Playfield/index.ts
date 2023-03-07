@@ -1,4 +1,4 @@
-export {Actor} from "./Actor";
-export {Draggable} from "./Capabilities/Draggable";
-export {EventDispatcher} from "./EventHandlers/EventDispatcher";
 export {Playfield} from "./Playfield";
+export {Tile} from "./Tile";
+export {EventQueue} from "./EventQueue";
+export {PlayfieldEvent} from "./PlayfieldEvent";

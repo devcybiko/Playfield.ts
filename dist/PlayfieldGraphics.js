@@ -1,327 +1,18 @@
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-define("Graphics/GfxParms", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/Mixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxParms = void 0;
-    class GfxParms {
-        constructor() {
-            this.color = "black";
-            this.borderColor = "black";
-            this.fillColor = "white";
-            this.xOffset = 0;
-            this.yOffset = 0;
-            this.textAlign = "left";
-            this.textBaseline = "top";
-            this.fontSize = 24;
-            this.fontFace = "sans-serif";
-        }
-        clone() {
-            return Object.assign({}, this);
-        }
-        _updateFont() {
-            this._font = "" + this._fontSize + "px " + this._fontFace;
-        }
-        get font() {
-            return this._font;
-        }
-        get fontSize() {
-            return this._fontSize;
-        }
-        set fontSize(n) {
-            this._fontSize = n;
-            this._updateFont();
-        }
-        get fontFace() {
-            return this._fontFace;
-        }
-        set fontFace(n) {
-            this._fontFace = n;
-            this._updateFont();
-        }
+    exports.applyMixins = void 0;
+    function applyMixins(derivedCtor, constructors) {
+        constructors.forEach((baseCtor) => {
+            Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+                Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
+                    Object.create(null));
+            });
+        });
     }
-    exports.GfxParms = GfxParms;
+    exports.applyMixins = applyMixins;
 });
-define("Mixins/Mixin", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Mixins/Base", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Base = void 0;
-    class Base {
-        constructor() {
-            this._any = this;
-        }
-        get any() {
-            return this._any;
-        }
-        is(name) {
-            // synonym for isa()
-            return this.isa(name);
-        }
-        isa(name) {
-            if (typeof this.any[name] === "function") {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-    exports.Base = Base;
-});
-define("Mixins/Named", ["require", "exports", "Mixins/Base"], function (require, exports, Base_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Named = exports.NamedClass = exports.NamedBase = void 0;
-    exports.NamedBase = Named(Base_1.Base);
-    class NamedClass extends exports.NamedBase {
-    }
-    exports.NamedClass = NamedClass;
-    ;
-    function Named(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._name = null;
-            }
-            Named(name) {
-                this._name = name;
-            }
-            get name() {
-                return this._name;
-            }
-            set name(s) {
-                this._name = s;
-            }
-        };
-    }
-    exports.Named = Named;
-});
-define("Mixins/Tree", ["require", "exports", "Mixins/Base"], function (require, exports, Base_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Tree = exports.TreeClass = exports.TreeBase = void 0;
-    exports.TreeBase = Tree(Base_2.Base);
-    class TreeClass extends exports.TreeBase {
-    }
-    exports.TreeClass = TreeClass;
-    ;
-    function Tree(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._parent = null;
-                this._children = Array();
-            }
-            Tree(parent) {
-                this._parent = parent;
-            }
-            parent() {
-                return this._parent;
-            }
-            add(obj) {
-                obj._parent = this;
-                this._children.push(obj);
-            }
-            dfs(visit, ctx) {
-                let stop = visit(this, ctx);
-                if (stop)
-                    return stop;
-                for (let child of this._children) {
-                    stop = child.dfs(visit, ctx);
-                    if (stop)
-                        return stop;
-                }
-                return false;
-            }
-            toFront(obj) {
-                let i = this._children.indexOf(obj);
-                if (i === -1)
-                    return;
-                this._children.splice(i, 1);
-                this._children.push(obj);
-            }
-            toBack(obj) {
-                let i = this._children.indexOf(obj);
-                if (i === -1)
-                    return;
-                this._children.splice(i, 1);
-                this._children.splice(0, 0, obj);
-            }
-        };
-    }
-    exports.Tree = Tree;
-});
-define("Mixins/Rect", ["require", "exports", "Mixins/Base"], function (require, exports, Base_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Rect = exports.RectClass = exports.RectBase = void 0;
-    exports.RectBase = Rect(Base_3.Base);
-    class RectClass extends exports.RectBase {
-    }
-    exports.RectClass = RectClass;
-    ;
-    function Rect(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                // Mixins may not declare private/protected properties
-                // however, you can use ES2020 private fields
-                this._x = 0;
-                this._y = 0;
-                this._w = 0;
-                this._h = 0;
-            }
-            get x() {
-                return this._x;
-            }
-            set x(n) {
-                this._x = n;
-            }
-            get y() {
-                return this._y;
-            }
-            set y(n) {
-                this._y = n;
-            }
-            get w() {
-                return this._w;
-            }
-            set w(n) {
-                this._w = n;
-            }
-            get h() {
-                return this._h;
-            }
-            set h(n) {
-                this._h = n;
-            }
-            Rect(x, y, w, h) {
-                this._x = x;
-                this._y = y;
-                this._h = h;
-                this._w = w;
-            }
-        };
-    }
-    exports.Rect = Rect;
-});
-define("Mixins/index", ["require", "exports", "Mixins/Named", "Mixins/Tree", "Mixins/Rect", "Mixins/Base"], function (require, exports, Named_1, Tree_1, Rect_1, Base_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Base = exports.RectClass = exports.Rect = exports.TreeClass = exports.Tree = exports.NamedClass = exports.Named = void 0;
-    Object.defineProperty(exports, "Named", { enumerable: true, get: function () { return Named_1.Named; } });
-    Object.defineProperty(exports, "NamedClass", { enumerable: true, get: function () { return Named_1.NamedClass; } });
-    Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return Tree_1.Tree; } });
-    Object.defineProperty(exports, "TreeClass", { enumerable: true, get: function () { return Tree_1.TreeClass; } });
-    Object.defineProperty(exports, "Rect", { enumerable: true, get: function () { return Rect_1.Rect; } });
-    Object.defineProperty(exports, "RectClass", { enumerable: true, get: function () { return Rect_1.RectClass; } });
-    Object.defineProperty(exports, "Base", { enumerable: true, get: function () { return Base_4.Base; } });
-});
-define("Utils/Loggable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Loggable = exports.LoggableClass = exports.LoggableBase = void 0;
-    exports.LoggableBase = Loggable(Mixins_1.Base);
-    class LoggableClass extends exports.LoggableBase {
-    }
-    exports.LoggableClass = LoggableClass;
-    ;
-    function Loggable(_base) {
-        return class extends _base {
-            Loggable(logLevel = "error", uselink = true) {
-                this._level = logLevel;
-                this._uselink = uselink;
-            }
-            _source(depth = 0) {
-                let err = new Error("error");
-                let stack = err.stack.split("\n");
-                let source = stack[depth];
-                return source;
-            }
-            _module() {
-                let source = this._source(4).trim();
-                let words = source.split(" ");
-                let module = words[1];
-                this._link = words[2];
-                if (module === "new") {
-                    module = words[2] + ".new";
-                    this._link = words[3];
-                }
-                return module;
-            }
-            get logLevel() {
-                return this._level;
-            }
-            set logLevel(level) {
-                this._level = level;
-            }
-            format(level, module, ...args) {
-                let format = `${level}: ${module}: ${args.join(", ")}`;
-                if (this._uselink)
-                    format += "\n" + " ".repeat(level.length + 2) + this._link;
-                return format;
-            }
-            info(...args) {
-                // most verbose
-                if (["info"].includes(this._level))
-                    console.log(this.format("INFO", this._module()), ...args);
-            }
-            log(...args) {
-                // less verbose
-                if (["info", "log"].includes(this._level))
-                    console.log(this.format("LOG", this._module()), ...args);
-            }
-            warn(...args) {
-                // less verbose
-                if (["info", "log", "warn"].includes(this._level))
-                    console.log(this.format("WARN", this._module()), ...args);
-            }
-            error(...args) {
-                // always show errors
-                console.error(this.format("ERROR", this._module(), ...args));
-            }
-        };
-    }
-    exports.Loggable = Loggable;
-});
-define("Utils/Logger", ["require", "exports", "Utils/Loggable"], function (require, exports, Loggable_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Logger = void 0;
-    class Logger extends Loggable_1.LoggableClass {
-        constructor(logLevel = "warn", uselink = true) {
-            super();
-            this.Loggable(logLevel, uselink);
-        }
-    }
-    exports.Logger = Logger;
-});
-define("Utils/Functions", ["require", "exports"], function (require, exports) {
+define("Playfield/Utils/Functions", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
@@ -348,1169 +39,1705 @@ define("Utils/Functions", ["require", "exports"], function (require, exports) {
     }
     exports.snapTo = snapTo;
 });
-define("Utils/index", ["require", "exports", "Utils/Loggable", "Utils/Logger", "Utils/Functions"], function (require, exports, Loggable_2, Logger_1, Functions_1) {
+define("Playfield/Utils/RectMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.snapTo = exports.random = exports.inclusive = exports.between = exports.Logger = exports.LoggableClass = exports.Loggable = void 0;
-    Object.defineProperty(exports, "Loggable", { enumerable: true, get: function () { return Loggable_2.Loggable; } });
-    Object.defineProperty(exports, "LoggableClass", { enumerable: true, get: function () { return Loggable_2.LoggableClass; } });
-    Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return Logger_1.Logger; } });
+    exports.Rect = void 0;
+    class Rect {
+        constructor() {
+            this._x = 0;
+            this._y = 0;
+            this._w = 0;
+            this._h = 0;
+        }
+        Rect(x, y, w, h) {
+            this._x = x;
+            this._y = y;
+            this._w = w;
+            this._h = h;
+        }
+        // --- Public Methods --- //
+        move(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        rmove(dx, dy) {
+            this.x += dx;
+            this.y += dy;
+        }
+        size(w, h) {
+            this.w = w;
+            this.h = h;
+        }
+        rsize(dw, dh) {
+            this.w += dw;
+            this.h += dh;
+        }
+        // --- Accessors --- //
+        get x() {
+            return this._x;
+        }
+        set x(n) {
+            this._x = n;
+        }
+        get y() {
+            return this._y;
+        }
+        set y(n) {
+            this._y = n;
+        }
+        get w() {
+            return this._w;
+        }
+        set w(n) {
+            this._w = n;
+        }
+        get h() {
+            return this._h;
+        }
+        set h(n) {
+            this._h = n;
+        }
+    }
+    exports.Rect = Rect;
+});
+define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Tree = void 0;
+    class Tree {
+        Tree(name, parent) {
+            this._name = name;
+            this._children = [];
+            if (parent)
+                parent.add(this);
+        }
+        // --- Public Methods --- //
+        add(child) {
+            child._parent = this;
+            this._children.push(child);
+        }
+        dfs(visit, ctx) {
+            let stop = visit(this, ctx);
+            if (stop)
+                return stop;
+            for (let child of this._children) {
+                stop = child.dfs(visit, ctx);
+                if (stop)
+                    return stop;
+            }
+            return null;
+        }
+        toFront(obj) {
+            if (obj) {
+                let i = this._children.indexOf(obj);
+                if (i === -1)
+                    return;
+                this._children.splice(i, 1);
+                this._children.push(obj);
+            }
+            else {
+                this.parent.toFront(this);
+            }
+        }
+        toBack(obj) {
+            if (obj) {
+                let i = this._children.indexOf(obj);
+                if (i === -1)
+                    return;
+                this._children.splice(i, 1);
+                this._children.splice(0, 0, obj);
+            }
+            else {
+                this.parent.toBack(this);
+            }
+        }
+        // --- Accessors --- //
+        get parent() {
+            return this._parent;
+        }
+        get name() {
+            return this._name;
+        }
+        get children() {
+            // return a shallow copy
+            return [...this._children];
+        }
+    }
+    exports.Tree = Tree;
+});
+define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Logger = void 0;
+    class Logger {
+        // INFO ==> INFO, LOG, WARN, ERROR
+        // LOG  ==> LOG, WARN, ERROR
+        // WARN ==> WARN, ERROR
+        // ERROR==> ERROR
+        Logger(logLevel = "error", uselink = true) {
+            this._level = logLevel;
+            this._uselink = uselink;
+            return this;
+        }
+        // --- Public Methods --- //
+        info(...args) {
+            // most verbose
+            if (["info"].includes(this._level))
+                console.log(this._format("INFO", this._module()), ...args);
+        }
+        log(...args) {
+            // less verbose
+            if (["info", "log"].includes(this._level))
+                console.log(this._format("LOG", this._module()), ...args);
+        }
+        warn(...args) {
+            // less verbose
+            if (["info", "log", "warn"].includes(this._level))
+                console.log(this._format("WARN", this._module()), ...args);
+        }
+        error(...args) {
+            // always show errors
+            console.error(this._format("ERROR", this._module(), ...args));
+        }
+        // --- Private Methods --- //
+        _format(level, module, ...args) {
+            let format = `${level}: ${module}: ${args.join(", ")}`;
+            if (this._uselink)
+                format += "\n" + " ".repeat(level.length + 2) + this._link;
+            return format;
+        }
+        _source(depth = 0) {
+            let err = new Error("error");
+            let stack = err.stack.split("\n");
+            let source = stack[depth];
+            return source;
+        }
+        _module() {
+            let source = this._source(4).trim();
+            let words = source.split(" ");
+            let module = words[1];
+            this._link = words[2];
+            if (module === "new") {
+                module = words[2] + ".new";
+                this._link = words[3];
+            }
+            return module;
+        }
+        // --- Accessors --- //
+        get logLevel() {
+            return this._level;
+        }
+        set logLevel(level) {
+            this._level = level;
+        }
+    }
+    exports.Logger = Logger;
+});
+define("Playfield/Utils/index", ["require", "exports", "Playfield/Utils/Mixins", "Playfield/Utils/Functions", "Playfield/Utils/RectMixin", "Playfield/Utils/TreeMixin", "Playfield/Utils/LoggerMixin"], function (require, exports, Mixins_1, Functions_1, RectMixin_1, TreeMixin_1, LoggerMixin_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Logger = exports.Tree = exports.Rect = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
+    Object.defineProperty(exports, "applyMixins", { enumerable: true, get: function () { return Mixins_1.applyMixins; } });
     Object.defineProperty(exports, "between", { enumerable: true, get: function () { return Functions_1.between; } });
     Object.defineProperty(exports, "inclusive", { enumerable: true, get: function () { return Functions_1.inclusive; } });
     Object.defineProperty(exports, "random", { enumerable: true, get: function () { return Functions_1.random; } });
     Object.defineProperty(exports, "snapTo", { enumerable: true, get: function () { return Functions_1.snapTo; } });
+    Object.defineProperty(exports, "Rect", { enumerable: true, get: function () { return RectMixin_1.Rect; } });
+    Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return TreeMixin_1.Tree; } });
+    Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return LoggerMixin_1.Logger; } });
 });
-define("Graphics/Gfx", ["require", "exports", "Graphics/GfxParms", "Utils/index"], function (require, exports, GfxParms_1, Utils) {
+define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Gfx = void 0;
-    Utils = __importStar(Utils);
-    class Gfx {
-        constructor(ctx) {
-            this.logger = new Utils.Logger("log");
-            this.ctx = ctx;
-            this.gparms = new GfxParms_1.GfxParms();
-            this.ctx.fontKerning = "none";
-            this.ctx.letterSpacing = "1px";
-            this.ctx.textRendering = "geometricPrecision";
+    exports.GfxParms = void 0;
+    class GfxParms {
+        constructor() {
+            this.color = "black";
+            this.borderColor = "black";
+            this.fillColor = "white";
+            this.dx = 0;
+            this.dy = 0;
+            this.textAlign = GfxParms.LEFT;
+            this.textBaseline = GfxParms.TOP;
+            this.fontSize = 24;
+            this.fontFace = GfxParms.DEFAULT_FONT;
+            this.fontStyle = "";
         }
-        rect(x, y, w, h, gparms = this.gparms) {
-            if (gparms.fillColor) {
-                this.ctx.fillStyle = gparms.fillColor;
-                this.ctx.fillRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
-            }
-            if (gparms.borderColor) {
-                this.ctx.strokeStyle = gparms.borderColor;
-                this.ctx.strokeRect(gparms.xOffset + x, gparms.yOffset + y, w, h);
-            }
+        clone() {
+            let gfxparms = new GfxParms;
+            return Object.assign(gfxparms, this);
         }
-        ellipse(x, y, w, h, gparms = this.gparms) {
-            if (gparms.fillColor) {
-                this.ctx.beginPath();
-                this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this.ctx.fillStyle = gparms.fillColor;
-                this.ctx.fill();
-            }
-            if (gparms.borderColor) {
-                this.ctx.beginPath();
-                this.ctx.ellipse(gparms.xOffset + x + w / 2, gparms.yOffset + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-                this.ctx.strokeStyle = gparms.borderColor;
-                this.ctx.stroke();
-            }
+        _updateFont() {
+            this._font = (this._fontStyle + " " + this._fontSize + "px " + this._fontFace).trim();
         }
-        circle(x, y, r, gparms = this.gparms) {
-            this.ellipse(x - r, y - r, r, r, gparms);
+        get font() {
+            return this._font;
         }
-        line(x0, y0, x1, y1, gparms = this.gparms) {
-            this.logger.info("line", x0, y0, x1, y1);
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = gparms.color;
-            this.ctx.moveTo(gparms.xOffset + x0, gparms.yOffset + y0);
-            this.ctx.lineTo(gparms.xOffset + x1, gparms.yOffset + y1);
-            this.ctx.stroke();
+        get fontSize() {
+            return this._fontSize;
         }
-        text(msg, x = 0, y = 0, gparms = this.gparms) {
-            this.ctx.fillStyle = gparms.color;
-            this.ctx.font = gparms.font;
-            this.ctx.textAlign = gparms.textAlign;
-            this.ctx.textBaseline = gparms.textBaseline;
-            this.ctx.fillText(msg, gparms.xOffset + x, gparms.yOffset + y);
+        set fontSize(n) {
+            this._fontSize = n;
+            this._updateFont();
         }
-        textRect(msg, x = 0, y = 0, w, h, gparms = this.gparms) {
-            this.ctx.font = gparms.font;
-            let boundingBox = this.boundingBox(msg, gparms);
-            if (!w)
-                w = boundingBox.w;
-            if (!h)
-                h = boundingBox.h;
-            this.rect(x, y, w, h, gparms);
-            this.text(msg, x, y, gparms);
+        get fontFace() {
+            return this._fontFace;
         }
-        boundingBox(msg, gparms = this.gparms) {
-            this.ctx.font = gparms.font;
-            let boundingBox = this.ctx.measureText(msg);
-            return { w: Math.floor(boundingBox.width + 0.5), h: gparms.fontSize };
+        set fontFace(n) {
+            this._fontFace = n;
+            this._updateFont();
         }
-        clipRect(x = 0, y = 0, w = this.ctx.canvas.width, h = this.ctx.canvas.height, gparms = this.gparms) {
-            this.save();
-            let region = new Path2D();
-            region.rect(x + gparms.xOffset, y + gparms.yOffset, w, h);
-            this.ctx.clip(region);
+        get fontStyle() {
+            return this._fontStyle;
         }
-        save() {
-            this.ctx.save();
-        }
-        restore() {
-            this.ctx.restore();
+        set fontStyle(value) {
+            this._fontStyle = value;
+            this._updateFont();
         }
     }
-    exports.Gfx = Gfx;
+    exports.GfxParms = GfxParms;
+    GfxParms.SANS_SERIF = "sans-serif";
+    GfxParms.SERIF = "serif";
+    GfxParms.MONOSPACE = "monospace";
+    GfxParms.DEFAULT_FONT = "sans-serif";
+    GfxParms.BOLD = "bold";
+    GfxParms.ITALIC = "italic";
+    GfxParms.REGULAR = "";
+    GfxParms.LEFT = "left";
+    GfxParms.RIGHT = "right";
+    GfxParms.CENTER = "center";
+    GfxParms.TOP = "top";
+    GfxParms.MIDDLE = "middle";
+    GfxParms.BOTTOM = "bottom";
 });
-define("Graphics/index", ["require", "exports", "Graphics/Gfx", "Graphics/GfxParms"], function (require, exports, Gfx_1, GfxParms_2) {
+define("Playfield/Graphics/Gfx", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.GfxParms = exports.Gfx = void 0;
-    Object.defineProperty(exports, "Gfx", { enumerable: true, get: function () { return Gfx_1.Gfx; } });
-    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_2.GfxParms; } });
 });
-define("Playfield/Capabilities/Movable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_2) {
+define("Playfield/Graphics/index", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Movable = exports.MovableClass = exports.MovableBase = void 0;
-    exports.MovableBase = Movable(Mixins_2.Base);
-    class MovableClass extends exports.MovableBase {
+    exports.GfxParms = void 0;
+    Object.defineProperty(exports, "GfxParms", { enumerable: true, get: function () { return GfxParms_1.GfxParms; } });
+});
+define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index", "Playfield/Graphics/index"], function (require, exports, Utils_1, Graphics_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Tile = exports._Tile = void 0;
+    /**
+     * A Tile is a rectangular item on a Playfield.
+     * It can draw itself on the Playfield
+    * It has its own set of GfxParms (font, colors, x/y offset)`
+     * it can move around
+     * it is hierarcically organized so is drawn relative to its parent
+     */
+    class _Tile {
     }
-    exports.MovableClass = MovableClass;
+    exports._Tile = _Tile;
     ;
-    function Movable(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._x = 0;
-                this._y = 0;
-            }
-            Movable(x, y) {
-                this._x = x;
-                this._y = y;
-            }
-            get x() {
-                return this._x;
-            }
-            set x(n) {
-                this._x = n;
-            }
-            get y() {
-                return this._y;
-            }
-            set y(n) {
-                this._y = n;
-            }
-            move(x, y) {
-                this.x = x;
-                this.y = y;
-            }
-            rmove(dx, dy) {
-                this.x += dx;
-                this.y += dy;
-            }
-        };
-    }
-    exports.Movable = Movable;
-});
-define("Playfield/Capabilities/Draggable", ["require", "exports", "Utils/index", "Mixins/index"], function (require, exports, Utils, Mixins_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Draggable = exports.DraggableClass = exports.DraggleBase = void 0;
-    Utils = __importStar(Utils);
-    exports.DraggleBase = Draggable(Mixins_3.Base);
-    class DraggableClass extends exports.DraggleBase {
-    }
-    exports.DraggableClass = DraggableClass;
     ;
-    function Draggable(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._origX = 0; // original x
-                this._origY = 0; // original y
-                this._snap = 10;
-                this._isDraggable = true;
-            }
-            Dragabble(snap = 10) {
-                this._snap = snap;
-            }
-            get isDraggable() {
-                return this._isDraggable;
-            }
-            set isDraggable(b) {
-                this._isDraggable = b;
-            }
-            drag(dx, dy) {
-                let newX = Utils.snapTo(this._origX + dx, this._snap);
-                let newY = Utils.snapTo(this._origY + dy, this._snap);
-                this.any.move(newX, newY);
-            }
-            grab() {
-                this._origX = this.any.x;
-                this._origY = this.any.y;
-            }
-            drop() {
-            }
-        };
-    }
-    exports.Draggable = Draggable;
-});
-define("Playfield/Capabilities/Drawable", ["require", "exports", "Mixins/index", "Graphics/index"], function (require, exports, Mixins_4, Graphics_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Drawable = exports.DrawableClass = exports.DrawableBase = void 0;
-    exports.DrawableBase = Drawable(Mixins_4.Base);
-    class DrawableClass extends exports.DrawableBase {
-    }
-    exports.DrawableClass = DrawableClass;
+    (0, Utils_1.applyMixins)(_Tile, [Utils_1.Logger, Utils_1.Tree, Utils_1.Rect]);
     ;
-    function Drawable(_base) {
-        return class extends _base {
-            Drawable(ctx) {
-                this._gfx = new Graphics_1.Gfx(ctx);
-                this._gparms = new Graphics_1.GfxParms();
-            }
-            get gfx() {
-                return this._gfx;
-            }
-            set gfx(g) {
-                this._gfx = g;
-            }
-            get gparms() {
-                return this._gparms;
-            }
-            set gparms(g) {
-                this._gparms = g;
-            }
-        };
-    }
-    exports.Drawable = Drawable;
-});
-define("Playfield/Capabilities/Selectable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_5) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Selectable = exports.SelectableClass = exports.SelectableBase = void 0;
-    exports.SelectableBase = Selectable(Mixins_5.Base);
-    class SelectableClass extends exports.SelectableBase {
-    }
-    exports.SelectableClass = SelectableClass;
-    ;
-    function Selectable(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._isSelected = false;
-            }
-            Selectable() {
-            }
-            get isSelected() {
-                return this._isSelected;
-            }
-            set isSelected(n) {
-                this._isSelected = n;
-            }
-            select() {
-                this.isSelected = true;
-            }
-            deselect() {
-                this.isSelected = false;
-            }
-        };
-    }
-    exports.Selectable = Selectable;
-});
-define("Playfield/Capabilities/Clickable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_6) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Clickable = exports.ClickableClass = exports.ClickableBase = void 0;
-    exports.ClickableBase = Clickable(Mixins_6.Base);
-    class ClickableClass extends exports.ClickableBase {
-    }
-    exports.ClickableClass = ClickableClass;
-    ;
-    function Clickable(_base) {
-        return class extends _base {
-            Clickable() {
-            }
-            click(x, y) {
-                this.any.info("CLICK! " + this.any.name + ": " + x + "," + y);
-            }
-        };
-    }
-    exports.Clickable = Clickable;
-});
-define("Playfield/EventHandlers/EventDispatcher", ["require", "exports", "Utils/index"], function (require, exports, Utils_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.EventDispatcher = void 0;
-    class EventDispatcher {
-        constructor(obj, options = {}) {
-            this._doKeyDown = true;
-            this._doKeyUp = false;
-            this._obj = obj;
-            this._logger = new Utils_1.Logger("log");
-            this._doKeyDown = options.doKeyDown || this._doKeyDown;
-            this._doKeyUp = options.doKeyUp || this._doKeyUp;
-        }
-        dispatchEvent(event) {
-            if (event.button !== undefined)
-                return this.dispatchMouseEvent(event);
-            else if (event.key !== undefined)
-                return this.dispatchKeyboardEvent(event);
-            else
-                return this.dispatchUnknownEvent(event);
-        }
-        dispatchUnknownEvent(event) {
-            this._logger.error("dispatchUnknownEvent:", event);
-        }
-        dispatchMouseEvent(event) {
-            this._logger.info("dispatchMouseEvent:", event);
-            let obj = this._obj;
-            if (!obj)
-                return this._logger.error('ERROR: mousemove not associated with an object');
-            if (event.type === "mousedown") {
-                if (event.button === 0)
-                    return obj.MouseDown(event);
-                if (event.button === 1)
-                    return obj.MiddleDown(event);
-                if (event.button === 2)
-                    return obj.MenuDown(event);
-            }
-            else if (event.type === "mouseup") {
-                if (event.button === 0)
-                    return obj.MouseUp(event);
-                if (event.button === 1)
-                    return obj.MiddleUp(event);
-                if (event.button === 2)
-                    return obj.MenuUp(event);
-            }
-            else if (event.type === "mousemove") {
-                return obj.MouseMove(event);
-            }
-            else if (event.type === "wheel") {
-                if (event.wheelDelta >= 0)
-                    return obj.WheelDown(event, event.wheelDelta);
-                if (event.wheelDelta < 0)
-                    return obj.WheelUp(event, -event.wheelDelta);
-            }
-            else {
-                return this.dispatchUnknownEvent(event);
-            }
-        }
-        dispatchKeyboardEvent(event) {
-            this._logger.log("dispatchKeyboardEvent:", event);
-            let obj = this._obj;
-            let stop = false;
-            if (event.type === "keydown" && this._doKeyDown) {
-                stop = obj.KeyDown(event);
-                stop = this.dispatchMoreKeys(event);
-            }
-            if (!stop && event.type === "keyup" && this._doKeyUp) {
-                stop = obj.KeyUp(event);
-                stop = this.dispatchMoreKeys(event);
-            }
-        }
-        dispatchMoreKeys(event) {
-            this._logger.log("dispatchMoreKeys:", event);
-            let key = event.key;
-            let obj = this._obj;
-            let stop = false;
-            if (key.length > 1)
-                return obj.SpecialKey(event);
-            else if (key.length === 1 && event.ctrlKey)
-                return obj.ControlKey(event);
-            else if (key.length === 1 && event.metaKey)
-                return obj.MetaKey(event);
-            else if (key.length === 1 && event.altKey)
-                return obj.AltKey(event);
-            else if (key.length === 1)
-                return obj.OrdinaryKey(event);
-            else
-                return obj.defaultKey(event);
-        }
-        OrdinaryKey(event) {
-            this._logger.log("OrdinaryKey:", event);
-            let key = event.key;
-            let obj = this._obj;
-            if ((0, Utils_1.inclusive)("A", key, "Z"))
-                return obj.UpperCase(event);
-            else if ((0, Utils_1.inclusive)("a", key, "z"))
-                return obj.LowerCase(event);
-            else if ((0, Utils_1.inclusive)("0", key, "9"))
-                return obj.Digit(event);
-            else if ("!@#$%^&*()-_+={}[]|\:;\"'<>,.?/".includes(key))
-                return obj.Punctuation(event);
-            else
-                return obj.defaultKey(event);
-        }
-        SpecialKey(event) {
-            this._logger.log("SpecialKey:", event);
-            let key = event.key;
-            let obj = this._obj;
-            if (key === "ArrowUp")
-                return obj.ArrowUp(event);
-            else if (key === "ArrowDown")
-                return obj.ArrowDown(event);
-            else if (key === "ArrowLeft")
-                return obj.ArrowLeft(event);
-            else if (key === "ArrowRight")
-                return obj.ArrowRight(event);
-            else if (key === "ArrowLeft")
-                return obj.ArrowLeft(event);
-            else if (key === "Shift")
-                return obj.Shift(event);
-            else if (key === "Meta")
-                return obj.Meta(event);
-            else if (key === "Alt")
-                return obj.Alt(event);
-            else if (key === "Control")
-                return obj.Control(event);
-            else if (key === "Backspace")
-                return obj.Backspace(event);
-            else if (key[0] === "F")
-                return obj.FunctionKey(event);
-            else
-                return obj.defaultKey(event);
-        }
-    }
-    exports.EventDispatcher = EventDispatcher;
-});
-/**
-* Event Hierarchy
-- handleEvent
-- handleMouseEvent
-- MouseDown (left button only)
-- MouseUp (left button only)
-- MenuDown (right button only)
-- MenuUp (right button only)
-- MiddleDown (middle button only)
-- MiddleUp (middle button only)
-- WheelDown (wheel scrolling)
-- WheelUp (wheel scrolling)
-- handleMouseMove
-- handleKeyboardEvent
-- keydown:
-- SpecialKey (Shift, Meta, Alt, Control)
-- ArrowUp
-- ArrowDown
-- ArrowRight
-- ArrowLeft
-- Meta
-- Shift
-- Alt
-- Control
-- Backspace
-- FunctionKey
-- defaultKey
-- ControlKey (Control-xxx)
-- MetaKey (Meta-xxx)
-- AltKey (Alt-xxx)
-- OrdinaryKey (a-z, A-Z, etc...)
-- UpperCase
-- LowerCase
-- Digit
-- Punctuation
-- defaultKey
-- defaultKey (any others)
-- defaultKey (keyup, etc...)
-- handleUnknownEvent
-*
-*/
-define("Playfield/EventHandlers/CanvasEventHandler", ["require", "exports", "Utils/index", "Playfield/EventHandlers/EventDispatcher"], function (require, exports, Utils_2, EventDispatcher_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CanvasEventHandler = void 0;
-    class CanvasEventHandler {
-        constructor(canvas, obj) {
-            this._logger = new Utils_2.Logger("warn");
-            this._eventDispatcher = new EventDispatcher_1.EventDispatcher(obj);
-            this._registerEventHandlers(canvas);
-        }
-        _registerEventHandlers(canvas) {
-            canvas.addEventListener('mousedown', this._eventDispatcher.dispatchEvent.bind(this));
-            canvas.addEventListener('mousemove', this._eventDispatcher.dispatchEvent.bind(this));
-            canvas.addEventListener('mouseup', this._eventDispatcher.dispatchEvent.bind(this));
-            canvas.addEventListener('wheel', this._eventDispatcher.dispatchEvent.bind(this), false);
-            addEventListener("keydown", this._eventDispatcher.dispatchEvent.bind(this));
-            addEventListener("keyup", this._eventDispatcher.dispatchEvent.bind(this));
-        }
-    }
-    exports.CanvasEventHandler = CanvasEventHandler;
-});
-define("Playfield/EventHandlers/Capabilities/MouseEnabled", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_7) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MouseEnabled = exports.MouseEnabledClass = exports.MouseEnabledBase = void 0;
-    exports.MouseEnabledBase = MouseEnabled(Mixins_7.Base);
-    class MouseEnabledClass extends exports.MouseEnabledBase {
-    }
-    exports.MouseEnabledClass = MouseEnabledClass;
-    ;
-    function MouseEnabled(_base) {
-        return class extends _base {
-            MouseEnabled() {
-            }
-            MouseUp(event) {
-                this.any.log("MouseUp:", event);
-            }
-            MouseDown(event) {
-                this.any.log("MouseDown:", event);
-            }
-            MenuUp(event) {
-                this.any.log("MenuUp:", event);
-            }
-            MenuDown(event) {
-                this.any.log("MenuDown:", event);
-            }
-            MiddleUp(event) {
-                this.any.log("MiddleUp:", event);
-            }
-            MiddleDown(event) {
-                this.any.log("MiddleDown:", event);
-            }
-            WheelUp(event, delta) {
-                this.any.log("WheelUp:", delta, event);
-            }
-            WheelDown(event, delta) {
-                this.any.log("WheelDown:", delta, event);
-            }
-            MouseMove(event) {
-                this.any.log("MouseMove:", event);
-            }
-        };
-    }
-    exports.MouseEnabled = MouseEnabled;
-});
-define("Playfield/EventHandlers/Capabilities/KeyboardEnabled", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_8) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.KeyboardEnabled = exports.KeyboardEnabledClass = exports.KeyboardEnabledBase = void 0;
-    exports.KeyboardEnabledBase = KeyboardEnabled(Mixins_8.Base);
-    class KeyboardEnabledClass extends exports.KeyboardEnabledBase {
-    }
-    exports.KeyboardEnabledClass = KeyboardEnabledClass;
-    ;
-    function KeyboardEnabled(_base) {
-        return class extends _base {
-            KeyboardEnabled() {
-            }
-            KeyDown(event) {
-            }
-            KeyUp(event) {
-            }
-            OrdinaryKey(event) {
-            }
-            SpecialKey(event) {
-                this.any.log("SpecialKey:", event);
-            }
-            Shift(event) {
-                this.any.log("Shift:", event);
-            }
-            Meta(event) {
-                this.any.log("Meta:", event);
-            }
-            MetaKey(event) {
-                this.any.log("MetaKey:", event);
-            }
-            Alt(event) {
-                this.any.log("Alt:", event);
-            }
-            AltKey(event) {
-                this.any.log("AltKey:", event);
-            }
-            Control(event) {
-                this.any.log("Control:", event);
-            }
-            ControlKey(event) {
-                this.any.log("ControlKey:", event);
-            }
-            Backspace(event) {
-                this.any.log("Backspace:", event);
-            }
-            UpperCase(event) {
-                this.any.log("UpperCase:", event);
-            }
-            LowerCase(event) {
-                this.any.log("LowerCase:", event);
-            }
-            Digit(event) {
-                this.any.log("Digit:", event);
-            }
-            Punctuation(event) {
-                this.any.log("Punctuation:", event);
-            }
-            FunctionKey(event) {
-                this.any.log("FunctionKey:", event);
-            }
-            ArrowUp(event) {
-                this.any.log("ArrowUp:", event);
-            }
-            ArrowDown(event) {
-                this.any.log("ArrowDown:", event);
-            }
-            ArrowLeft(event) {
-                this.any.log("ArrowLeft:", event);
-            }
-            ArrowRight(event) {
-                this.any.log("ArrowRight:", event);
-            }
-            defaultKey(event) {
-                this.any.log("unknown keypress:", event.key, event);
-            }
-        };
-    }
-    exports.KeyboardEnabled = KeyboardEnabled;
-});
-define("Playfield/EventHandlers/Capabilities/index", ["require", "exports", "Playfield/EventHandlers/Capabilities/MouseEnabled", "Playfield/EventHandlers/Capabilities/KeyboardEnabled"], function (require, exports, MouseEnabled_1, KeyboardEnabled_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.KeyboardEnabledClass = exports.KeyboardEnabled = exports.MouseEnabledClass = exports.MouseEnabled = void 0;
-    Object.defineProperty(exports, "MouseEnabled", { enumerable: true, get: function () { return MouseEnabled_1.MouseEnabled; } });
-    Object.defineProperty(exports, "MouseEnabledClass", { enumerable: true, get: function () { return MouseEnabled_1.MouseEnabledClass; } });
-    Object.defineProperty(exports, "KeyboardEnabled", { enumerable: true, get: function () { return KeyboardEnabled_1.KeyboardEnabled; } });
-    Object.defineProperty(exports, "KeyboardEnabledClass", { enumerable: true, get: function () { return KeyboardEnabled_1.KeyboardEnabledClass; } });
-});
-define("Playfield/Playfield", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/EventHandlers/CanvasEventHandler", "Playfield/Capabilities/index", "Playfield/EventHandlers/Capabilities/index"], function (require, exports, Utils_3, Mixins_9, CanvasEventHandler_1, Capabilities_1, Capabilities_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Playfield = void 0;
-    const PlayfieldBase = (0, Capabilities_2.MouseEnabled)((0, Capabilities_1.Playable)((0, Utils_3.Loggable)((0, Capabilities_1.Drawable)((0, Mixins_9.Named)((0, Mixins_9.Tree)((0, Mixins_9.Rect)(Mixins_9.Base)))))));
-    class Playfield extends PlayfieldBase {
-        constructor(canvasId) {
+    class Tile extends _Tile {
+        constructor(name, parent, x, y, w, h, playfield = parent._playfield) {
             super();
-            this._grabX = 0;
-            this._grabY = 0;
-            this._canvas = document.querySelector(canvasId);
-            this._ctx = this._canvas.getContext("2d");
-            this.Named("_playfield");
-            this.Rect(0, 0, this._ctx.canvas.clientWidth, this._ctx.canvas.clientHeight);
-            this.Tree(null);
-            this.Loggable();
-            this.Drawable(this._ctx);
-            this.Playable(this);
-            this.MouseEnabled();
-            this._selectedObj = null;
-            this._focusedObj = null;
-            this._eventHandler = new CanvasEventHandler_1.CanvasEventHandler(this._canvas, this);
-            this._dragObj = null;
-            this._body = document.querySelector('body');
-            this._body.playfield = this;
+            this.Logger();
+            this.Tree(name, parent);
+            this.Rect(x, y, w, h);
+            this._gparms = new Graphics_1.GfxParms();
+            this._playfield = playfield;
+            this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
+            return this;
         }
-        get selectedObj() {
-            return this._selectedObj;
-        }
-        set selectedObj(obj) {
-            this._selectedObj = obj;
-        }
-        get focusedObj() {
-            return this._focusedObj;
-        }
-        set focusedObj(obj) {
-            this._focusedObj = obj;
-        }
-        selectObj(obj) {
-            if (this._selectedObj)
-                this._selectedObj.deselect();
-            this._selectedObj = obj;
-            if (obj !== null)
-                obj.select();
-        }
-        focusObj(obj) {
-            if (this._focusedObj)
-                this._focusedObj.defocus();
-            this.focusedObj = obj;
-            if (obj !== null)
-                obj.focus();
-        }
-        add(obj) {
-            super.add(obj);
-            obj.playfield = this;
-            obj.gfx = this.gfx;
-        }
-        grabObj(obj, x, y, toFront) {
-            if (obj && obj.isDraggable) {
-                this.dropObj();
-                if (toFront)
-                    this.toFront(obj);
-                else
-                    this.toBack(obj);
-                this._dragObj = obj;
-                this._grabX = x;
-                this._grabY = y;
-                obj.grab();
-            }
-        }
-        dragObj(x, y) {
-            if (this._dragObj) {
-                let dx = x - this._grabX;
-                let dy = y - this._grabY;
-                this.info(dx, dy);
-                this._dragObj.drag(dx, dy);
-            }
-        }
-        dropObj() {
-            if (this._dragObj)
-                this._dragObj.drop();
-            this._dragObj = null;
-        }
-        recompute() {
-            //for Actor compatibility
-        }
-        draw() {
-            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-            // for partial actor compatibility
-        }
-        drawObj(obj) {
-            // visitor method for drawAll()
-            obj.recompute();
-            obj.draw();
-        }
-        drawAll() {
-            this.dfs(this.drawObj);
-        }
-        findObjInBounds(x, y) {
-            for (let i = this._children.length - 1; i >= 0; i--) {
-                let obj = this._children[i];
-                let found = obj.inBounds(x, y);
+        // --- Public Methods --- //
+        inBounds(x, y) {
+            let result = (0, Utils_1.between)(this.X, x, this.X + this.w) &&
+                (0, Utils_1.between)(this.Y, y, this.Y + this.h);
+            if (result)
+                return this;
+            for (let child of this.children.reverse()) {
+                let found = child.inBounds(x, y);
                 if (found)
                     return found;
             }
             return null;
         }
-        handleKeyDown(event) {
-            let playfield = event.srcElement.playfield;
-            if (!playfield)
-                return this.error("ERROR: keydown not associated with a playfield");
-            if (playfield._selectedObj)
-                playfield._selectedObj.any.keydown(event.key);
-        }
-        timer() {
-            this.goAll();
-            this.drawAll();
-        }
-        start() {
-            this.drawAll();
-            setInterval(this.timer.bind(this), 125, this);
-        }
-        goAll() {
-            for (let obj of this._children)
-                obj.go();
-        }
-        collisions(theObj) {
-            let results = [];
-            for (let obj of this._children) {
-                if (theObj === obj)
-                    continue;
-                if (obj.inBounds(theObj.x, theObj.y) ||
-                    obj.inBounds(theObj.x + theObj.w, theObj.y) ||
-                    obj.inBounds(theObj.x, theObj.y + theObj.h) ||
-                    obj.inBounds(theObj.x + theObj.w, theObj.y + theObj.h))
-                    results.push(obj);
+        drawAll() {
+            this.redraw();
+            for (let child of this.children) {
+                child.drawAll();
             }
-            return results;
         }
-        MouseMove(event) {
-            this.dragObj(event.offsetX, event.offsetY);
+        redraw() {
+            this._recompute();
+            this.draw();
         }
-        MouseUp(event) {
-            this.dropObj();
+        redrawChildren() {
+            this.children.forEach(child => child.redraw());
         }
-        MouseDown(event) {
-            let obj = this.findObjInBounds(event.offsetX, event.offsetY);
-            this.log("MouseDown", obj);
-            this.selectObj(obj);
-            if (obj) {
-                obj.click(event.offsetX, event.offsetY);
-                this.grabObj(obj, event.offsetX, event.offsetY, !event.shiftKey);
+        draw() {
+            this.redrawChildren();
+        }
+        // --- OnActions --- //
+        onTick() {
+            this.children.forEach(child => child.onTick());
+            return true;
+        }
+        onEvent(pfEvent) {
+            this.children.forEach(child => child.onEvent(pfEvent));
+            return true;
+        }
+        // --- Private Methods --- //
+        _recompute() {
+            if (this.parent) {
+                this.gparms.dx = this.parent.X;
+                this.gparms.dy = this.parent.Y;
             }
+        }
+        // --- Accessors --- //
+        get gfx() {
+            return this._playfield.gfx;
+        }
+        get gparms() {
+            return this._gparms;
+        }
+        get X() {
+            return this.x + this.gparms.dx;
+        }
+        get Y() {
+            return this.y + this.gparms.dy;
+        }
+        get playfield() {
+            return this._playfield;
+        }
+        set playfield(value) {
+            this._playfield = value;
+        }
+    }
+    exports.Tile = Tile;
+});
+define("Playfield/Abilities/DraggableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Draggable = void 0;
+    class Draggable {
+        Draggable() {
+            this.isDraggable = true;
+            return this;
+        }
+        // --- onActions --- //
+        onGrab(pfEvent) {
+            return false;
+        }
+        onDrag(dx, dy, pfEvent) {
+            let that = this;
+            if (that.rmove)
+                that.rmove(dx, dy);
+            return true;
+        }
+        onDrop(pfEvent) {
+            return false;
+        }
+        // --- Accessors --- //
+        get isDraggable() {
+            return this._isDraggable;
+        }
+        set isDraggable(value) {
+            this._isDraggable = value;
+        }
+    }
+    exports.Draggable = Draggable;
+});
+define("Playfield/Abilities/DraggerMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Dragger = void 0;
+    ;
+    class Dragger {
+        Dragger() {
+            this._dragObj = null;
+            this._dragX = 0;
+            this._dragY = 0;
+            return this;
+        }
+        // --- Public Methods --- //
+        dragEvent(pfEvent, child) {
+            if (pfEvent.isMove)
+                return this._dragChild(pfEvent, child);
+            else if (pfEvent.isPress)
+                return this._grabChild(pfEvent, child);
+            else if (pfEvent.isRelease)
+                return this._dropChild(pfEvent, child);
+        }
+        // --- Private Methods --- //
+        _dragChild(pfEvent, child) {
+            if (this._dragObj) {
+                this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
+                this._dragX = pfEvent.x;
+                this._dragY = pfEvent.y;
+                return true;
+            }
+            return false;
+        }
+        _grabChild(pfEvent, child) {
+            let tileChild = child;
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+                this._dropChild(pfEvent, child);
+                this._dragObj = child;
+                this._dragX = pfEvent.x;
+                this._dragY = pfEvent.y;
+                child.onGrab(pfEvent);
+                return true;
+            }
+            return false;
+        }
+        _dropChild(pfEvent, child) {
+            if (this._dragObj) {
+                this._dragObj.onDrop(pfEvent);
+                this._dragObj = null;
+                return true;
+            }
+            return false;
+        }
+    }
+    exports.Dragger = Dragger;
+});
+define("Playfield/Abilities/SelectableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Selectable = void 0;
+    class Selectable {
+        Selectable() {
+            this._isSelected = false;
+            this._isSelectable = true;
+            return this;
+        }
+        // --- onActions --- //
+        onSelect() {
+            return false;
+        }
+        onUnselect() {
+            return false;
+        }
+        // --- Accessors --- //
+        get isSelected() {
+            return this._isSelected;
+        }
+        set isSelected(value) {
+            this._isSelected = value;
+        }
+        get isSelectable() {
+            return this._isSelectable;
+        }
+        set isSelectable(value) {
+            this._isSelectable = value;
+        }
+    }
+    exports.Selectable = Selectable;
+});
+define("Playfield/Abilities/SelecterMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Selecter = void 0;
+    ;
+    class Selecter {
+        Selecter() {
+            this._selectedObj = null;
+            return this;
+        }
+        // --- Public Methods --- //
+        selectEvent(pfEvent, child) {
+            let treeChild = child;
+            if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
+                if (pfEvent.isPress && this._selectedObj != child)
+                    this._selectChild(pfEvent, child);
+            }
+        }
+        // --- Private Methods --- //
+        _selectChild(pfEvent, child) {
+            this._unselectChild(pfEvent, child);
+            this._selectedObj = child;
+            child.isSelected = true;
+            child.onSelect();
+            return true;
+        }
+        _unselectChild(pfEvent, child) {
+            if (this._selectedObj) {
+                this._selectedObj.isSelected = false;
+                this._selectedObj.onUnselect();
+                this._selectedObj = null;
+                return true;
+            }
+            return false;
+        }
+        // --- Accessors --- //
+        get selectedObj() {
+            return this._selectedObj;
+        }
+    }
+    exports.Selecter = Selecter;
+});
+define("Playfield/Abilities/PressableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Pressable = void 0;
+    class Pressable {
+        Pressable() {
+            this.isPressed = false;
+            this.isPressable = true;
+            return this;
+        }
+        // --- onActions --- //
+        onPress(pfEvent) {
+            return false;
+        }
+        onRelease(pfEvent) {
+            return false;
+        }
+        // --- Accessors --- //
+        get isPressed() {
+            return this._isPressed;
+        }
+        set isPressed(value) {
+            this._isPressed = value;
+        }
+        get isPressable() {
+            return this._isPressable;
+        }
+        set isPressable(value) {
+            this._isPressable = value;
+        }
+    }
+    exports.Pressable = Pressable;
+});
+define("Playfield/Abilities/PresserMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Presser = void 0;
+    ;
+    class Presser {
+        Presser() {
+            return this;
+        }
+        // --- Public Methods --- //
+        pressEvent(pfEvent, child) {
+            let treeChild = child;
+            if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
+                if (pfEvent.isPress) {
+                    child.isPressed = true;
+                    child.onPress(pfEvent);
+                }
+            }
+            if (pfEvent.isRelease && child.isPressed) {
+                child.isPressed = false;
+                child.onRelease(pfEvent);
+            }
+        }
+    }
+    exports.Presser = Presser;
+});
+define("Playfield/Abilities/ClickableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Clickable = void 0;
+    class Clickable {
+        Clickable() {
+            this.isClickable = true;
+            return this;
+        }
+        // --- onActions --- //
+        onClick(pfEvent) {
+            return false;
+        }
+        // --- Accessors --- //
+        get isClickable() {
+            return this._isClickable;
+        }
+        set isClickable(value) {
+            this._isClickable = value;
+        }
+    }
+    exports.Clickable = Clickable;
+});
+define("Playfield/Abilities/ClickerMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Clicker = void 0;
+    ;
+    class Clicker {
+        Clicker() {
+            return this;
+        }
+        // --- Public Methods --- //
+        clickEvent(pfEvent, child) {
+            if (pfEvent.isPress) {
+                let tileChild = child;
+                if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+                    child.onClick(pfEvent);
+                }
+            }
+            return true;
+        }
+    }
+    exports.Clicker = Clicker;
+});
+define("Playfield/Abilities/HoverableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Hoverable = void 0;
+    class Hoverable {
+        Hoverable() {
+            this.isHovering = false;
+            this.isHoverable = true;
+            return this;
+        }
+        // --- onActions --- //
+        onHovering(pfEvent) {
+            return false;
+        }
+        onEnter(pfEvent) {
+            return false;
+        }
+        onExit(pfEvent) {
+            return false;
+        }
+        // --- Accessors --- //
+        get isHovering() {
+            return this._isHovering;
+        }
+        set isHovering(value) {
+            this._isHovering = value;
+        }
+        get isHoverable() {
+            return this._isHoverable;
+        }
+        set isHoverable(value) {
+            this._isHoverable = value;
+        }
+    }
+    exports.Hoverable = Hoverable;
+});
+define("Playfield/Abilities/HovererMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Hoverer = void 0;
+    ;
+    class Hoverer {
+        Hoverer() {
+            return this;
+        }
+        // --- Public Methods --- //
+        hoverEvent(pfEvent, child) {
+            let treeChild = child;
+            if (pfEvent.isMove) {
+                if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
+                    if (child.isHovering) {
+                        child.onHovering(pfEvent);
+                    }
+                    else {
+                        child.isHovering = true;
+                        child.onEnter(pfEvent);
+                    }
+                }
+                else {
+                    if (child.isHovering) {
+                        child.isHovering = false;
+                        child.onExit(pfEvent);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+    exports.Hoverer = Hoverer;
+});
+define("Playfield/Abilities/EditableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Editable = void 0;
+    class Editable {
+        Editable() {
+            this.isEditable = true;
+            this.isFocus = false;
+            this.isFocusable = true;
+            return this;
+        }
+        // --- onActons --- //
+        onKey(key, pfEvent) {
+            return true;
+        }
+        onArrowLeft(pfEvent) {
+            return true;
+        }
+        onArrowRight(pfEvent) {
+            return true;
+        }
+        onBackspace(pfEvent) {
+            return true;
+        }
+        onBackSpace(pfEvent) {
+            // this is the wrong method
+            // you should be using onBackspace(), above
+            // this is purposely mispelled with upper-case "S"
+            // to force a compile-time error
+            // if you attempt to override it.
+            return true;
+        }
+        onFocus() {
+            return true;
+        }
+        onUnfocus() {
+            return true;
+        }
+        // --- Accessors --- //
+        get isEditable() {
+            return this._isEditable;
+        }
+        set isEditable(value) {
+            this._isEditable = value;
+        }
+        get isFocusable() {
+            return this._isFocusable;
+        }
+        set isFocusable(value) {
+            this._isFocusable = value;
+        }
+        get isFocus() {
+            return this._isFocus;
+        }
+        set isFocus(value) {
+            this._isFocus = value;
+        }
+    }
+    exports.Editable = Editable;
+});
+define("Playfield/Abilities/EditorMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Editor = void 0;
+    ;
+    class Editor {
+        Editor() {
+            this._focusObj = null;
+            return this;
+        }
+        // --- Public Methods --- //
+        editorEvent(pfEvent, child) {
+            if (pfEvent.isPress)
+                return this._focusChild(pfEvent, child);
+            else if (pfEvent.isKeyDown)
+                return this._dispatchKey(pfEvent, child);
+        }
+        // --- Private Methods --- //
+        _focusChild(pfEvent, child) {
+            let tileChild = child;
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+                this._unfocusChild(pfEvent, child);
+                this._focusObj = child;
+                child.isFocus = true;
+                child.onFocus();
+                return true;
+            }
+        }
+        _unfocusChild(pfEvent, child) {
+            if (this._focusObj) {
+                this._focusObj.isFocus = false;
+                this._focusObj.onUnfocus();
+                this._focusObj = null;
+                return true;
+            }
+            return false;
+        }
+        _dispatchKey(pfEvent, child) {
+            if (child.isFocus) {
+                if (pfEvent.key.length === 1)
+                    child.onKey(pfEvent.key, pfEvent);
+                else if (pfEvent.key === "ArrowLeft")
+                    child.onArrowLeft(pfEvent);
+                else if (pfEvent.key === "ArrowRight")
+                    child.onArrowRight(pfEvent);
+                else if (pfEvent.key === "Backspace")
+                    child.onBackspace(pfEvent);
+                else if (pfEvent.key === "Tab" && !pfEvent.isShift)
+                    this._nextChild(1, pfEvent);
+                else if (pfEvent.key === "Tab" && pfEvent.isShift)
+                    this._nextChild(-1, pfEvent);
+                return true;
+            }
+            return false;
+        }
+        _nextChild(direction, pfEvent) {
+            if (!this._focusObj)
+                return true;
+            let focusObj = this._focusObj;
+            let children = focusObj.parent.children.sort((a, b) => direction * (a._tabOrder - b._tabOrder));
+            let i = children.indexOf(focusObj);
+            if (i === -1)
+                throw new Error("Focus Object Not Found");
+            let safety = children.length;
+            for (let j = i + 1; children[j] !== focusObj; j += 1) {
+                if (j >= children.length)
+                    j = 0;
+                let sibling = children[j];
+                if (sibling.isFocusable)
+                    return this._focusChild(pfEvent, sibling);
+                if (safety-- <= 0)
+                    break;
+            }
+            return false;
+        }
+        // -- Accessors --- //
+        get focusObj() {
+            return this._focusObj;
+        }
+    }
+    exports.Editor = Editor;
+});
+define("Playfield/Abilities/RepeatableMixin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Repeatable = void 0;
+    class Repeatable {
+        Repeatable(delay) {
+            this.isRepeatable = true;
+            this._delay = delay;
+            return this;
+        }
+        // --- Public Methods --- //
+        startRepeat(delay) {
+            if (delay !== undefined)
+                this._delay = delay;
+            this.stopRepeat();
+            this._timerId = setInterval(this.onRepeat.bind(this), this._delay, this);
+        }
+        stopRepeat() {
+            if (this._timerId)
+                clearInterval(this._timerId);
+            this._timerId = null;
+        }
+        // --- onActions --- //
+        onRepeat() {
+            return false;
+        }
+        // --- Accessors --- //
+        get isRepeatable() {
+            return this._isRepeatable;
+        }
+        set isRepeatable(value) {
+            this._isRepeatable = value;
+        }
+        get delay() {
+            return this._delay;
+        }
+        set delay(value) {
+            this._delay = value;
+        }
+    }
+    exports.Repeatable = Repeatable;
+});
+define("Playfield/Abilities/index", ["require", "exports", "Playfield/Abilities/DraggerMixin", "Playfield/Abilities/DraggableMixin", "Playfield/Abilities/SelectableMixin", "Playfield/Abilities/SelecterMixin", "Playfield/Abilities/PresserMixin", "Playfield/Abilities/PressableMixin", "Playfield/Abilities/ClickerMixin", "Playfield/Abilities/ClickableMixin", "Playfield/Abilities/HovererMixin", "Playfield/Abilities/HoverableMixin", "Playfield/Abilities/EditableMixin", "Playfield/Abilities/EditorMixin", "Playfield/Abilities/RepeatableMixin"], function (require, exports, DraggerMixin_1, DraggableMixin_1, SelectableMixin_1, SelecterMixin_1, PresserMixin_1, PressableMixin_1, ClickerMixin_1, ClickableMixin_1, HovererMixin_1, HoverableMixin_1, EditableMixin_1, EditorMixin_1, RepeatableMixin_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Repeatable = exports.Editor = exports.Editable = exports.Hoverable = exports.Hoverer = exports.Clickable = exports.Clicker = exports.Pressable = exports.Presser = exports.Selecter = exports.Selectable = exports.Draggable = exports.Dragger = void 0;
+    Object.defineProperty(exports, "Dragger", { enumerable: true, get: function () { return DraggerMixin_1.Dragger; } });
+    Object.defineProperty(exports, "Draggable", { enumerable: true, get: function () { return DraggableMixin_1.Draggable; } });
+    Object.defineProperty(exports, "Selectable", { enumerable: true, get: function () { return SelectableMixin_1.Selectable; } });
+    Object.defineProperty(exports, "Selecter", { enumerable: true, get: function () { return SelecterMixin_1.Selecter; } });
+    Object.defineProperty(exports, "Presser", { enumerable: true, get: function () { return PresserMixin_1.Presser; } });
+    Object.defineProperty(exports, "Pressable", { enumerable: true, get: function () { return PressableMixin_1.Pressable; } });
+    Object.defineProperty(exports, "Clicker", { enumerable: true, get: function () { return ClickerMixin_1.Clicker; } });
+    Object.defineProperty(exports, "Clickable", { enumerable: true, get: function () { return ClickableMixin_1.Clickable; } });
+    Object.defineProperty(exports, "Hoverer", { enumerable: true, get: function () { return HovererMixin_1.Hoverer; } });
+    Object.defineProperty(exports, "Hoverable", { enumerable: true, get: function () { return HoverableMixin_1.Hoverable; } });
+    Object.defineProperty(exports, "Editable", { enumerable: true, get: function () { return EditableMixin_1.Editable; } });
+    Object.defineProperty(exports, "Editor", { enumerable: true, get: function () { return EditorMixin_1.Editor; } });
+    Object.defineProperty(exports, "Repeatable", { enumerable: true, get: function () { return RepeatableMixin_1.Repeatable; } });
+});
+define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, Tile_1, Abilities_1, Utils_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.RootTile = exports._RootTile = void 0;
+    class _RootTile extends Tile_1.Tile {
+    }
+    exports._RootTile = _RootTile;
+    ;
+    ;
+    (0, Utils_2.applyMixins)(_RootTile, [Utils_2.Logger, Abilities_1.Clicker, Abilities_1.Presser, Abilities_1.Selecter, Abilities_1.Dragger, Abilities_1.Editor, Abilities_1.Hoverer]);
+    class RootTile extends _RootTile {
+        constructor(x, y, w, h, playfield) {
+            super("_root", null, x, y, w, h, playfield);
+            this.Logger();
+            this.Clicker();
+            this.Presser();
+            this.Selecter();
+            this.Dragger();
+            this.Editor();
+            this.Hoverer();
+        }
+        // --- Overrides --- //
+        draw() {
+            this.redrawChildren();
+        }
+        // --- onActions --- //
+        onEvent(pfEvent) {
+            let children = this.children.reverse();
+            for (let _child of children) {
+                let child = _child;
+                if (child.isHoverable)
+                    this.hoverEvent(pfEvent, child);
+                if (child.isDraggable)
+                    this.dragEvent(pfEvent, child);
+                if (child.isSelectable)
+                    this.selectEvent(pfEvent, child);
+                if (child.isClickable)
+                    this.clickEvent(pfEvent, child);
+                if (child.isPressable)
+                    this.pressEvent(pfEvent, child);
+                if (child.isFocusable)
+                    this.editorEvent(pfEvent, child);
+                child.onEvent(pfEvent);
+            }
+            return true;
+        }
+    }
+    exports.RootTile = RootTile;
+});
+define("Playfield/EventQueue", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.EventQueue = void 0;
+    class EventQueue {
+        constructor() {
+            this._eventQueue = [];
+        }
+        // --- Public Methods --- //
+        getEvent() {
+            return this._eventQueue.shift();
+        }
+        pushEvent(pfEvent) {
+            this._eventQueue.push(pfEvent);
+        }
+    }
+    exports.EventQueue = EventQueue;
+});
+define("Playfield/Playfield", ["require", "exports", "Playfield/Utils/index", "Playfield/Graphics/index", "Playfield/RootTile"], function (require, exports, Utils_3, Graphics_2, RootTile_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Playfield = exports._Playfield = void 0;
+    /**
+     * Playfield is a graphic area for rendering
+     * And it collects human inputs and dispatches them to tiles
+     * A Playfield has a tree of Tiles (rectangles)
+     */
+    class _Playfield {
+    }
+    exports._Playfield = _Playfield;
+    ;
+    ;
+    (0, Utils_3.applyMixins)(_Playfield, [Utils_3.Logger, Utils_3.Rect]);
+    class Playfield extends _Playfield {
+        constructor(gfx, eventQueue) {
+            super();
+            this._lastTime = 0;
+            this._delay = 0;
+            this._timerId = 0;
+            this._gfx = gfx;
+            this._eventQueue = eventQueue;
+            this._gparms = new Graphics_2.GfxParms();
+            this.Rect(0, 0, this._gfx.width, this._gfx.height);
+            this._rootTile = new RootTile_1.RootTile(0, 0, this.w, this.h, this);
+        }
+        // --- Public Methods --- //
+        clear() {
+            this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
+        }
+        redraw() {
+            this.clear();
+            this.tile.redraw();
+        }
+        start(delay = 125) {
+            this._delay = delay;
+            this._lastTime = Date.now();
+            this.redraw();
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
+        // --- Private Methods --- //
+        _tick() {
+            clearTimeout(this._timerId);
+            let now = Date.now();
+            let extra = now - this._lastTime;
+            this._handleEvents();
+            this.tile.onTick(); // process all ticks
+            this.redraw(); // redraw the playfield
+            this._lastTime = Date.now();
+            let delta = this._lastTime - now;
+            if (this._delay && (delta > this._delay))
+                console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
+        _handleEvents() {
+            let that = this;
+            for (let pfEvent = next(); pfEvent; pfEvent = next()) {
+                this._rootTile.onEvent(pfEvent);
+            }
+            function next() {
+                return that._eventQueue.getEvent();
+            }
+        }
+        // --- Accessors --- //
+        get playfield() {
+            return this;
+        }
+        get tile() {
+            return this._rootTile;
+        }
+        get gparms() {
+            return this._gparms;
+        }
+        get gfx() {
+            return this._gfx;
         }
     }
     exports.Playfield = Playfield;
 });
-define("Playfield/Capabilities/Playable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_10) {
+define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue"], function (require, exports, Playfield_1, Tile_2, EventQueue_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Playable = exports.PlayableClass = exports.PlayableBase = void 0;
-    ;
-    exports.PlayableBase = Playable(Mixins_10.Base);
-    class PlayableClass extends exports.PlayableBase {
-    }
-    exports.PlayableClass = PlayableClass;
-    ;
-    function Playable(_base) {
-        return class extends _base {
-            Playable(playfield) {
-                this.playfield = playfield;
-            }
-            get playfield() {
-                return this._playfield;
-            }
-            set playfield(p) {
-                this._playfield = p;
-            }
-        };
-    }
-    exports.Playable = Playable;
+    exports.EventQueue = exports.Tile = exports.Playfield = void 0;
+    Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
+    Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_2.Tile; } });
+    Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
 });
-define("Playfield/Capabilities/Focusable", ["require", "exports", "Mixins/index"], function (require, exports, Mixins_11) {
+define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Focusable = exports.FocusableClass = exports.FocusableBase = void 0;
-    exports.FocusableBase = Focusable(Mixins_11.Base);
-    class FocusableClass extends exports.FocusableBase {
+    exports.BrowserPlayfieldEvent = void 0;
+    class BrowserPlayfieldEvent {
+        constructor(event) {
+            this.event = event;
+            // this.type = event.type;
+            // mouse events
+            this.x = event.offsetX;
+            this.y = event.offsetY;
+            this.isMove = event.type === "mousemove";
+            this.isPress = event.type === "mousedown" && event.button === 0;
+            this.isRelease = event.type === "mouseup" && event.button === 0;
+            this.isMenu = event.type === "mousedown" && event.button === 2;
+            this.isMenuRelease = event.type === "mousedown" && event.button === 2;
+            // keyboard events
+            this.key = event.key;
+            this.isKeyDown = event.type === "keydown";
+            this.isKeyUp = event.type === "keyup";
+            this.isShift = event.shiftKey;
+            this.isControl = event.ctrlKey;
+            this.isAlt = event.altKey;
+            this.isOption = event.altKey;
+            this.isMeta = event.metaKey;
+            this.isCommand = event.metaKey;
+            // gestures
+            this.swipe = event.wheelDelta;
+            this.isSwipeLeft = event.wheelDelta < 0;
+            this.isSwipeRight = event.wheelDelta > 0;
+        }
+        // --- Accessors --- //
+        get event() {
+            return this._event;
+        }
+        set event(value) {
+            this._event = value;
+        }
+        get x() {
+            return this._x;
+        }
+        set x(value) {
+            this._x = value;
+        }
+        get y() {
+            return this._y;
+        }
+        set y(value) {
+            this._y = value;
+        }
+        get isMove() {
+            return this._isMove;
+        }
+        set isMove(value) {
+            this._isMove = value;
+        }
+        get isPress() {
+            return this._isPress;
+        }
+        set isPress(value) {
+            this._isPress = value;
+        }
+        get isRelease() {
+            return this._isRelease;
+        }
+        set isRelease(value) {
+            this._isRelease = value;
+        }
+        get isMenu() {
+            return this._isMenu;
+        }
+        set isMenu(value) {
+            this._isMenu = value;
+        }
+        get isMenuRelease() {
+            return this._isMenuRelease;
+        }
+        set isMenuRelease(value) {
+            this._isMenuRelease = value;
+        }
+        get key() {
+            return this._key;
+        }
+        set key(value) {
+            this._key = value;
+        }
+        get isKeyDown() {
+            return this._isKeyDown;
+        }
+        set isKeyDown(value) {
+            this._isKeyDown = value;
+        }
+        get isKeyUp() {
+            return this._isKeyUp;
+        }
+        set isKeyUp(value) {
+            this._isKeyUp = value;
+        }
+        get isShift() {
+            return this._isShift;
+        }
+        set isShift(value) {
+            this._isShift = value;
+        }
+        get isControl() {
+            return this._isControl;
+        }
+        set isControl(value) {
+            this._isControl = value;
+        }
+        get isAlt() {
+            return this._isAlt;
+        }
+        set isAlt(value) {
+            this._isAlt = value;
+        }
+        get isOption() {
+            return this._isOption;
+        }
+        set isOption(value) {
+            this._isOption = value;
+        }
+        get isMeta() {
+            return this._isMeta;
+        }
+        set isMeta(value) {
+            this._isMeta = value;
+        }
+        get isCommand() {
+            return this._isCommand;
+        }
+        set isCommand(value) {
+            this._isCommand = value;
+        }
+        get swipe() {
+            return this._swipe;
+        }
+        set swipe(value) {
+            this._swipe = value;
+        }
+        get isSwipeLeft() {
+            return this._isSwipeLeft;
+        }
+        set isSwipeLeft(value) {
+            this._isSwipeLeft = value;
+        }
+        get isSwipeRight() {
+            return this._isSwipeRight;
+        }
+        set isSwipeRight(value) {
+            this._isSwipeRight = value;
+        }
     }
-    exports.FocusableClass = FocusableClass;
+    exports.BrowserPlayfieldEvent = BrowserPlayfieldEvent;
+});
+define("Browser/BrowserEventPump", ["require", "exports", "Browser/BrowserPlayfieldEvent"], function (require, exports, BrowserPlayfieldEvent_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserEventPump = void 0;
+    class BrowserEventPump {
+        constructor(canvas, eventQueue) {
+            this._eventQueue = eventQueue;
+            this._registerEventHandlers(canvas);
+        }
+        // --- Private Methods --- //
+        _registerEventHandlers(canvas) {
+            canvas.addEventListener('mousedown', this._handler.bind(this));
+            canvas.addEventListener('mousemove', this._handler.bind(this));
+            canvas.addEventListener('mouseup', this._handler.bind(this));
+            canvas.addEventListener('wheel', this._handler.bind(this));
+            addEventListener("keydown", this._handler.bind(this));
+            addEventListener("keyup", this._handler.bind(this));
+        }
+        _handler(event) {
+            let pfEvent = new BrowserPlayfieldEvent_1.BrowserPlayfieldEvent(event);
+            this._eventQueue.pushEvent(pfEvent);
+        }
+    }
+    exports.BrowserEventPump = BrowserEventPump;
+});
+define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserGfx = void 0;
+    class BrowserGfx {
+        constructor(canvasId) {
+            this._canvas = document.querySelector(canvasId); // canvasId
+            this._ctx = this._canvas.getContext("2d");
+            this._gparms = new GfxParms_2.GfxParms();
+            this._ctx.fontKerning = "none";
+            this._ctx.letterSpacing = "1px";
+            this._ctx.textRendering = "geometricPrecision";
+        }
+        // --- Public Methods --- //
+        rect(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+            if (_gparms.borderColor) {
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            }
+        }
+        ellipse(x, y, w, h, _gparms = this._gparms) {
+            if (_gparms.fillColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.fillStyle = _gparms.fillColor;
+                this._ctx.fill();
+            }
+            if (_gparms.borderColor) {
+                this._ctx.beginPath();
+                this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+                this._ctx.strokeStyle = _gparms.borderColor;
+                this._ctx.stroke();
+            }
+        }
+        circle(x, y, r, _gparms = this._gparms) {
+            this.ellipse(x - r, y - r, r * 2, r * 2, _gparms);
+        }
+        line(x0, y0, x1, y1, _gparms0 = this._gparms, _gparms1 = _gparms0) {
+            this._ctx.beginPath();
+            this._ctx.strokeStyle = _gparms0.borderColor;
+            this._ctx.moveTo(_gparms0.dx + x0, _gparms0.dy + y0);
+            this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
+            this._ctx.stroke();
+        }
+        text(msg, x = 0, y = 0, _gparms = this._gparms, w) {
+            this._ctx.fillStyle = _gparms.color;
+            this._ctx.font = _gparms.font;
+            this._ctx.textAlign = _gparms.textAlign;
+            this._ctx.textBaseline = _gparms.textBaseline;
+            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
+        }
+        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let textX = x;
+            let textY = y;
+            let rectX = x;
+            let rectY = y;
+            let boundingBox = this.boundingBox(msg, _gparms);
+            if (!w)
+                w = boundingBox.w;
+            if (!h)
+                h = boundingBox.h;
+            if (_gparms.textAlign === GfxParms_2.GfxParms.LEFT) {
+                // do nothing
+            }
+            else if (_gparms.textAlign === GfxParms_2.GfxParms.RIGHT) {
+                textX += w;
+            }
+            else if (_gparms.textAlign === GfxParms_2.GfxParms.CENTER) {
+                textY += w / 2;
+            }
+            else {
+                throw new Error("Unknown textAlign: " + _gparms.textAlign);
+            }
+            if (_gparms.textBaseline === GfxParms_2.GfxParms.TOP) {
+                // do nothing
+            }
+            else if (_gparms.textBaseline === GfxParms_2.GfxParms.BOTTOM) {
+                textY += h;
+            }
+            else if (_gparms.textBaseline === GfxParms_2.GfxParms.MIDDLE) {
+                textY += h / 2;
+            }
+            else {
+                throw new Error("Unknown textAlign: " + _gparms.textAlign);
+            }
+            this.rect(rectX, rectY, w, h, _gparms);
+            this.text(msg, textX, textY, _gparms);
+        }
+        boundingBox(msg, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            let boundingBox = this._ctx.measureText(msg);
+            return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
+        }
+        clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
+            this.save();
+            let region = new Path2D();
+            region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
+            this._ctx.clip(region);
+        }
+        save() {
+            this._ctx.save();
+        }
+        restore() {
+            this._ctx.restore();
+        }
+        // --- Accessors --- //
+        get width() {
+            return this._canvas.width;
+        }
+        get height() {
+            return this._canvas.height;
+        }
+        get canvas() {
+            return this._canvas;
+        }
+    }
+    exports.BrowserGfx = BrowserGfx;
+});
+define("Browser/BrowserPlayfieldApp", ["require", "exports", "Playfield/index", "Browser/BrowserEventPump", "Browser/BrowserGfx"], function (require, exports, Playfield_2, BrowserEventPump_1, BrowserGfx_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserPlayfieldApp = void 0;
+    class BrowserPlayfieldApp {
+        constructor(canvasId = "#playfield") {
+            this._gfx = new BrowserGfx_1.BrowserGfx(canvasId);
+            this._eventQueue = new Playfield_2.EventQueue();
+            this._canvasEventPump = new BrowserEventPump_1.BrowserEventPump(this._gfx.canvas, this._eventQueue);
+            this._playfield = new Playfield_2.Playfield(this._gfx, this._eventQueue);
+        }
+        // --- Accessors --- //
+        get playfield() {
+            return this._playfield;
+        }
+        set playfield(value) {
+            this._playfield = value;
+        }
+        get gfx() {
+            return this._gfx;
+        }
+        set gfx(value) {
+            this._gfx = value;
+        }
+        get eventQueue() {
+            return this._eventQueue;
+        }
+        set eventQueue(value) {
+            this._eventQueue = value;
+        }
+        get canvasEventPump() {
+            return this._canvasEventPump;
+        }
+        set canvasEventPump(value) {
+            this._canvasEventPump = value;
+        }
+    }
+    exports.BrowserPlayfieldApp = BrowserPlayfieldApp;
+});
+define("Browser/index", ["require", "exports", "Browser/BrowserEventPump", "Browser/BrowserGfx", "Browser/BrowserPlayfieldApp", "Browser/BrowserPlayfieldEvent"], function (require, exports, BrowserEventPump_2, BrowserGfx_2, BrowserPlayfieldApp_1, BrowserPlayfieldEvent_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserPlayfieldEvent = exports.BrowserPlayfieldApp = exports.BrowserGfx = exports.BrowserEventPump = void 0;
+    Object.defineProperty(exports, "BrowserEventPump", { enumerable: true, get: function () { return BrowserEventPump_2.BrowserEventPump; } });
+    Object.defineProperty(exports, "BrowserGfx", { enumerable: true, get: function () { return BrowserGfx_2.BrowserGfx; } });
+    Object.defineProperty(exports, "BrowserPlayfieldApp", { enumerable: true, get: function () { return BrowserPlayfieldApp_1.BrowserPlayfieldApp; } });
+    Object.defineProperty(exports, "BrowserPlayfieldEvent", { enumerable: true, get: function () { return BrowserPlayfieldEvent_2.BrowserPlayfieldEvent; } });
+});
+define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ItemOptions = void 0;
+    class ItemOptions {
+        constructor() {
+            this.fontSize = 24;
+            this.fontFace = "sans-serif";
+            this.fontStyle = "";
+            this.text = "";
+            this.label = "";
+            this.textColor = "black";
+            this.borderColor = "black";
+            this.fillColor = "white";
+            this.selectColor = "red";
+            this.hoverColor = "#c88";
+            this.textAlign = "left";
+            this.textBaseline = "top";
+        }
+    }
+    exports.ItemOptions = ItemOptions;
+});
+define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions", "Playfield/Graphics/index"], function (require, exports, Playfield_3, Utils_4, Abilities_2, ItemOptions_1, Graphics_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Item = exports._Item = void 0;
+    class _Item extends Playfield_3.Tile {
+    }
+    exports._Item = _Item;
     ;
-    function Focusable(_base) {
-        return class extends _base {
-            constructor() {
-                super(...arguments);
-                this._hasFocus = false;
-            }
-            Focusable() {
-            }
-            get hasFocus() {
-                return this._hasFocus;
-            }
-            set hasFocus(n) {
-                this._hasFocus = n;
-            }
-            focus() {
-                this.hasFocus = true;
-            }
-            defocus() {
-                this.hasFocus = false;
-            }
-        };
-    }
-    exports.Focusable = Focusable;
-});
-define("Playfield/Capabilities/index", ["require", "exports", "Playfield/Capabilities/Draggable", "Playfield/Capabilities/Movable", "Playfield/Capabilities/Drawable", "Playfield/Capabilities/Selectable", "Playfield/Capabilities/Clickable", "Playfield/Capabilities/Playable", "Playfield/Capabilities/Focusable"], function (require, exports, Draggable_1, Movable_1, Drawable_1, Selectable_1, Clickable_1, Playable_1, Focusable_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.FocusableClass = exports.Focusable = exports.PlayableClass = exports.Playable = exports.ClickableClass = exports.Clickable = exports.SelectableClass = exports.Selectable = exports.DrawableClass = exports.Drawable = exports.MovableClass = exports.Movable = exports.DraggableClass = exports.Draggable = void 0;
-    Object.defineProperty(exports, "Draggable", { enumerable: true, get: function () { return Draggable_1.Draggable; } });
-    Object.defineProperty(exports, "DraggableClass", { enumerable: true, get: function () { return Draggable_1.DraggableClass; } });
-    Object.defineProperty(exports, "Movable", { enumerable: true, get: function () { return Movable_1.Movable; } });
-    Object.defineProperty(exports, "MovableClass", { enumerable: true, get: function () { return Movable_1.MovableClass; } });
-    Object.defineProperty(exports, "Drawable", { enumerable: true, get: function () { return Drawable_1.Drawable; } });
-    Object.defineProperty(exports, "DrawableClass", { enumerable: true, get: function () { return Drawable_1.DrawableClass; } });
-    Object.defineProperty(exports, "Selectable", { enumerable: true, get: function () { return Selectable_1.Selectable; } });
-    Object.defineProperty(exports, "SelectableClass", { enumerable: true, get: function () { return Selectable_1.SelectableClass; } });
-    Object.defineProperty(exports, "Clickable", { enumerable: true, get: function () { return Clickable_1.Clickable; } });
-    Object.defineProperty(exports, "ClickableClass", { enumerable: true, get: function () { return Clickable_1.ClickableClass; } });
-    Object.defineProperty(exports, "Playable", { enumerable: true, get: function () { return Playable_1.Playable; } });
-    Object.defineProperty(exports, "PlayableClass", { enumerable: true, get: function () { return Playable_1.PlayableClass; } });
-    Object.defineProperty(exports, "Focusable", { enumerable: true, get: function () { return Focusable_1.Focusable; } });
-    Object.defineProperty(exports, "FocusableClass", { enumerable: true, get: function () { return Focusable_1.FocusableClass; } });
-});
-define("Playfield/Actor", ["require", "exports", "Utils/index", "Mixins/index", "Playfield/Capabilities/index"], function (require, exports, Utils_4, Mixins_12, Capabilities_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Actor = void 0;
-    const ActorBase = (0, Capabilities_3.Focusable)((0, Capabilities_3.Playable)((0, Capabilities_3.Clickable)((0, Capabilities_3.Drawable)((0, Utils_4.Loggable)((0, Mixins_12.Named)((0, Mixins_12.Tree)((0, Mixins_12.Rect)((0, Capabilities_3.Movable)((0, Capabilities_3.Draggable)((0, Capabilities_3.Selectable)(Mixins_12.Base)))))))))));
-    class Actor extends ActorBase {
-        constructor(parent, name, x, y, w, h) {
-            super();
-            this.Named(name);
-            this.Rect(x, y, w, h);
-            this.Tree(null);
-            this.Movable(x, y);
-            this.Dragabble();
+    ;
+    (0, Utils_4.applyMixins)(_Item, [Abilities_2.Draggable, Abilities_2.Selectable]);
+    class Item extends _Item {
+        constructor(name, parent, x, y, w, h, value = "", text = "") {
+            super(name, parent, x, y, w, h);
+            this.Draggable();
             this.Selectable();
-            this.Focusable();
-            this.Loggable();
-            this.Playable(parent.playfield);
-            this.eventHandler = null;
-            this.Drawable(this.playfield._ctx);
-            parent.add(this);
-        }
-        X() {
-            return this.x + this.gparms.xOffset;
-        }
-        Y() {
-            return this.y + this.gparms.yOffset;
-        }
-        inBounds(x, y) {
-            let result = (0, Utils_4.between)(this.gparms.xOffset + this.x, x, this.gparms.xOffset + this.x + this.w) &&
-                (0, Utils_4.between)(this.gparms.yOffset + this.y, y, this.gparms.yOffset + this.y + this.h);
-            if (result)
-                return this;
-            for (let i = this._children.length - 1; i >= 0; i--) {
-                let obj = this._children[i];
-                let found = obj.inBounds(x, y);
-                if (found)
-                    return found;
+            this._value = value;
+            this._options = new ItemOptions_1.ItemOptions;
+            this._options.text = text || value;
+            this._options.fontSize = h;
+            if (w < 0) {
+                this._options.textAlign = Graphics_3.GfxParms.RIGHT;
+                this.w = -w;
             }
-            return null;
         }
-        keydown(key) {
-            if (key === "ArrowUp")
-                this.y = this.y - 10;
-            if (key === "ArrowDown")
-                this.y = this.y + 10;
-            if (key === "ArrowLeft")
-                this.x = this.x - 10;
-            if (key === "ArrowRight")
-                this.x = this.x + 10;
+        _updateGparms() {
+            this.gparms.fillColor = this.options.fillColor;
+            this.gparms.color = this.options.textColor;
+            this.gparms.borderColor = this.options.borderColor;
+            this.gparms.fontSize = this.options.fontSize;
+            this.gparms.fontFace = this.options.fontFace;
+            this.gparms.fontStyle = this.options.fontStyle;
+            this.gparms.textAlign = this.options.textAlign;
+            this.gparms.textBaseline = this.options.textBaseline;
         }
         go() {
+            throw Error("Unimplemented feature: 'go()';");
         }
-        recompute() {
-            let parentGparms = this.parent().gparms;
-            if (parentGparms) {
-                this.gparms.xOffset = this.parent().x + parentGparms.xOffset;
-                this.gparms.yOffset = this.parent().y + parentGparms.yOffset;
-            }
-        }
-        drawAll() {
-            this.draw();
-            for (let obj of this._children)
-                obj.drawAll();
-        }
-        draw() {
-        }
-    }
-    exports.Actor = Actor;
-});
-define("Playfield/index", ["require", "exports", "Playfield/Actor", "Playfield/Capabilities/Draggable", "Playfield/EventHandlers/EventDispatcher", "Playfield/Playfield"], function (require, exports, Actor_1, Draggable_2, EventDispatcher_2, Playfield_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Playfield = exports.EventDispatcher = exports.Draggable = exports.Actor = void 0;
-    Object.defineProperty(exports, "Actor", { enumerable: true, get: function () { return Actor_1.Actor; } });
-    Object.defineProperty(exports, "Draggable", { enumerable: true, get: function () { return Draggable_2.Draggable; } });
-    Object.defineProperty(exports, "EventDispatcher", { enumerable: true, get: function () { return EventDispatcher_2.EventDispatcher; } });
-    Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
-});
-define("Jed/Item", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Item = void 0;
-    class Item extends Playfield_2.Actor {
-        constructor(parent, name, value, x, y, w, h) {
-            super(parent, name, x, y, w, h);
-            this._value = value;
-        }
-        value(newValue) {
-            if (newValue !== undefined)
-                this._value = newValue;
+        // --- Accessors --- //
+        get value() {
             return this._value;
+        }
+        set value(_value) {
+            this._value = _value;
+        }
+        get options() {
+            return this._options;
         }
     }
     exports.Item = Item;
 });
-define("Jed/LabelItem", ["require", "exports", "Jed/Item"], function (require, exports, Item_1) {
+define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_1, Utils_5, Abilities_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.LabelItem = void 0;
-    class LabelItem extends Item_1.Item {
-        constructor(parent, name, value, x, y, w = 0, h = 0) {
-            super(parent, name, value, x, y, w, h);
-            this.gparms.fontFace = "serif";
-            this.bb = this.playfield.gfx.boundingBox(this.value(), this.gparms);
-            if (!w)
-                this.w = this.bb.w;
-            if (!h)
-                this.h = this.bb.h;
+    exports.ButtonItem = exports._ButtonItem = void 0;
+    class _ButtonItem extends Item_1.Item {
+    }
+    exports._ButtonItem = _ButtonItem;
+    ;
+    ;
+    (0, Utils_5.applyMixins)(_ButtonItem, [Abilities_3.Draggable, Abilities_3.Pressable, Abilities_3.Hoverable]);
+    class ButtonItem extends _ButtonItem {
+        constructor(name, parent, x, y, w, h, value = "", label = "") {
+            super(name, parent, x, y, w, h, value || name);
+            this._label = "";
+            this.Draggable();
+            this.Pressable();
+            this.Hoverable();
+            this.Logger("info", false);
+            this.isDraggable = false;
+            this._label = label || value || name;
+        }
+        // --- Overrides --- //
+        go() {
+            console.log(this.value);
+            return true;
         }
         draw() {
             let gfx = this.playfield.gfx;
-            // this.bb = gfx.boundingBox(this.value(), this.gparms);
-            // this.w = this.bb.w;
-            // this.h = this.bb.h;
-            gfx.text(this.value(), this.x, this.y, this.gparms);
+            this._updateGparms();
+            if (this.isHovering && this.isPressed)
+                this.gparms.fillColor = this.options.selectColor;
+            else if (this.isHovering && !this.isPressed)
+                this.gparms.fillColor = this.options.hoverColor;
+            else
+                this.gparms.fillColor = this.options.fillColor;
+            gfx.clipRect(this.x, this.y, this.w, this.h);
+            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.restore();
+        }
+        onPress() {
+            return true;
+        }
+        // --- onActions --- //
+        onRelease() {
+            if (this.isHovering)
+                this.go();
+            return true;
+        }
+        // --- Accessors --- //
+        get label() {
+            return this._label;
+        }
+        set label(value) {
+            this._label = value;
+        }
+    }
+    exports.ButtonItem = ButtonItem;
+});
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_2, Utils_6, Abilities_4, Graphics_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.LabelItem = exports._LabelItem = void 0;
+    class _LabelItem extends Item_2.Item {
+    }
+    exports._LabelItem = _LabelItem;
+    ;
+    ;
+    (0, Utils_6.applyMixins)(_LabelItem, [Abilities_4.Draggable]);
+    class LabelItem extends _LabelItem {
+        constructor(name, parent, x, y, w, h, value = "") {
+            super(name, parent, x, y, w, h, value);
+            this.Draggable();
+            this.Logger();
+            this.options.fontSize = h;
+            this.options.fontStyle = Graphics_4.GfxParms.BOLD;
+            this._updateGparms();
+        }
+        // --- Overrides --- //
+        draw() {
+            let gfx = this.playfield.gfx;
+            this._updateGparms();
+            this.gparms.borderColor = "";
+            let w = this.w;
+            let h = this.h;
+            let x = this.x;
+            let y = this.y;
+            gfx.clipRect(x, y, w, h, this.gparms);
+            gfx.textRect(this.value, x, y, w, h, this.gparms);
+            gfx.restore();
         }
     }
     exports.LabelItem = LabelItem;
 });
-define("Shapes/Box", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_3) {
+define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_7, Abilities_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Box = void 0;
-    class Box extends Playfield_3.Actor {
-        constructor(parent, name, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white") {
-            super(parent, name, x, y, w, h);
-            this.gparms.borderColor = borderColor;
-            this.gparms.fillColor = fillColor;
-        }
-        draw() {
-            super.draw();
-            this.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
-        }
+    exports.TextItem = exports._TextItem = void 0;
+    class _TextItem extends Item_3.Item {
     }
-    exports.Box = Box;
-});
-define("Shapes/XBox", ["require", "exports", "Shapes/Box"], function (require, exports, Box_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.XBox = void 0;
-    class XBox extends Box_1.Box {
-        constructor(parent, name, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
-            super(parent, name, x, y, w, h);
-            this.gparms.color = color;
+    exports._TextItem = _TextItem;
+    ;
+    ;
+    (0, Utils_7.applyMixins)(_TextItem, [Abilities_5.Draggable, Abilities_5.Editable, Abilities_5.Repeatable]);
+    class TextItem extends _TextItem {
+        constructor(name, parent, x, y, w, h, value = "") {
+            super(name, parent, x, y, w, h, value);
+            this._cursor = 0;
+            this._left = 0;
+            this._right = 0;
+            this._cursorOn = true;
+            this._cursorBlinkRate = 500;
+            this._nchars = 0;
+            this._nchars2 = 0;
+            this.Draggable();
+            this.Editable();
+            this.Logger();
+            this.Repeatable(this._cursorBlinkRate);
+            this.options.fontFace = "monospace";
+            this.options.fontSize = h;
+            this._updateGparms();
+            this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
+            this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
+            this._left = 0;
+            this._right = this._computeRight();
         }
-        select() {
-        }
-        deselect() {
-        }
+        // --- Overrides --- //
         draw() {
-            super.draw();
-            if (this.isSelected) {
-                this.gfx.line(this.x, this.y, this.x + this.w, this.y + this.h, this.gparms);
-                this.gfx.line(this.x + this.w, this.y, this.x, this.y + this.h, this.gparms);
-            }
-        }
-    }
-    exports.XBox = XBox;
-});
-define("Shapes/index", ["require", "exports", "Shapes/Box", "Shapes/XBox"], function (require, exports, Box_2, XBox_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.XBox = exports.Box = void 0;
-    Object.defineProperty(exports, "Box", { enumerable: true, get: function () { return Box_2.Box; } });
-    Object.defineProperty(exports, "XBox", { enumerable: true, get: function () { return XBox_1.XBox; } });
-});
-define("Jed/XBoxItem", ["require", "exports", "Jed/Item", "Shapes/index"], function (require, exports, Item_2, Shapes_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.XBoxItem = void 0;
-    class XBoxItem extends Item_2.Item {
-        constructor(parent, name, values, x, y, w = 0, h = 0, borderColor = "black", fillColor = "white", color = "black") {
-            super(parent, name, null, x, y, 0, 0);
-            this._values = ["on", "off"];
-            this._isChecked = false;
-            this.values(values);
-            this.xbox = new Shapes_1.XBox(parent, name, x, y, w, h, borderColor, fillColor, color);
-        }
-        click(x, y) {
-            super.click(x, y);
-            this._isChecked = !this._isChecked;
-            this.log(this.value());
-        }
-        isChecked(checked) {
-            return this.isSelected;
-        }
-        values(values) {
-            if (values === undefined)
-                return this._values;
-            if (typeof values === "string")
-                this._values = [values, null];
+            let gfx = this.playfield.gfx;
+            this._updateGparms();
+            if (this.isFocus)
+                this.gparms.color = this.options.selectColor;
             else
-                this._values = values;
+                this.gparms.color = this.options.textColor;
+            gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
+            let value = this.value.substring(this._left);
+            if (this.isFocus)
+                value = value.replaceAll(" ", '\uA788'); // \u00B7
+            gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
+            this._drawCursor();
+            gfx.restore();
         }
-        value(value) {
-            if (value !== undefined)
-                this._values = [value, null];
-            return this.isChecked() ? this._values[0] : this._values[1];
+        // --- onActions --- //
+        onRepeat() {
+            this._blink();
+            return true;
         }
-        draw() {
-            if (this.isChecked()) {
-                this.gfx.line(this.x, this.y, this.x + this.w, this.y + this.h, this.gparms);
-                this.gfx.line(this.x + this.w, this.y, this.x, this.y + this.h, this.gparms);
+        onArrowLeft() {
+            this._cursorInc(-1);
+            return true;
+        }
+        onArrowRight() {
+            this._cursorInc(+1);
+            return true;
+        }
+        onBackspace() {
+            if (this._cursor > 0) {
+                let c = this._cursor;
+                let left = this.value.substring(0, c - 1);
+                let right = this.value.substring(c);
+                this.value = left + right;
+                this._cursorInc(-1);
+                this.log(left, right, this._cursor, this.value);
+                return true;
             }
+            return false;
         }
-    }
-    exports.XBoxItem = XBoxItem;
-});
-define("Jed/CheckBoxItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "Jed/XBoxItem"], function (require, exports, Item_3, LabelItem_1, XBoxItem_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.CheckBoxItem = void 0;
-    class CheckBoxItem extends Item_3.Item {
-        constructor(parent, name, label, values, x, y, w = 0, h = 0, ww = 0, hh = 0, borderColor = "black", fillColor = "white", color = "black") {
-            super(parent, name, null, x, y, 0, 0);
-            this._values = ["on", "off"];
-            this.labelItem = new LabelItem_1.LabelItem(parent, name + "-label", label, 0, 0, ww, hh);
-            this.xboxItem = new XBoxItem_1.XBoxItem(parent, name + "-checkbox", values, this.labelItem.bb.w, 0, w, h, borderColor, fillColor, color);
-            this.values(values);
-            console.log("Hello", this);
-            this.log(this.w, this.h);
-            this.w = 0;
-            this.h = 0;
+        onKey(key) {
+            let c = this._cursor;
+            this.value = this.value.substring(0, c) + key + this.value.substring(c);
+            this._cursorInc(+1);
+            return true;
         }
-        click(x, y) {
-            super.click(x, y);
-            this.xboxItem.click(x, y);
+        onFocus() {
+            super.onFocus();
+            this.toFront();
+            this._startCursorBlinking();
+            return true;
         }
-        isChecked(checked) {
-            return this.xboxItem.isChecked(checked);
+        onUnfocus() {
+            this._stopCursorBlinking();
+            return true;
         }
-        values(values) {
-            if (values === undefined)
-                return this._values;
-            if (typeof values === "string")
-                this._values = [values, null];
-            else
-                this._values = values;
+        // --- Private Methods --- //
+        _blink() {
+            this._cursorOn = !this._cursorOn;
         }
-        value(value) {
-            return this.xboxItem.value(value);
+        _startCursorBlinking() {
+            this._cursorOn = true;
+            this.startRepeat(this._cursorBlinkRate);
         }
-    }
-    exports.CheckBoxItem = CheckBoxItem;
-});
-define("Jed/EditItemEventDispatcher", ["require", "exports", "Utils/index", "Playfield/EventHandlers/Capabilities/index", "Mixins/index"], function (require, exports, Utils_5, Capabilities_4, Mixins_13) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.EditItemEventDispatcher = void 0;
-    const DispatcherBase = (0, Capabilities_4.KeyboardEnabled)((0, Capabilities_4.MouseEnabled)((0, Utils_5.Loggable)(Mixins_13.Base)));
-    class EditItemEventDispatcher extends DispatcherBase {
-        constructor(editItem) {
-            super(editItem.playfield, editItem);
-            this.Loggable("log");
-            this.MouseEnabled();
+        _stopCursorBlinking() {
+            this._cursorOn = false;
+            this.stopRepeat();
         }
-        ArrowLeft(event, playfield, obj) {
-            obj.cursorInc(-1);
-        }
-        ArrowRight(event, playfield, obj) {
-            obj.cursorInc(+1);
-        }
-        Backspace(event, playfield, obj) {
-            this._logger.log(obj.cursor, obj._value);
-            if (obj.cursor > 0) {
-                let c = obj.cursor;
-                let left = obj._value.substring(0, c - 1);
-                let right = obj._value.substring(c);
-                obj.value(left + right);
-                obj.cursorInc(-1);
-                this._logger.log(left, right, obj.cursor, obj._value);
-            }
-        }
-        OrdinaryKey(event, playfield, obj) {
-            let c = obj.cursor;
-            obj.value(obj._value.substring(0, c) + event.key + obj._value.substring(c));
-            obj.cursorInc(+1);
-        }
-    }
-    exports.EditItemEventDispatcher = EditItemEventDispatcher;
-});
-define("Jed/EditItem", ["require", "exports", "Jed/Item", "Jed/EditItemEventDispatcher"], function (require, exports, Item_4, EditItemEventDispatcher_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.EditItem = void 0;
-    class EditItem extends Item_4.Item {
-        constructor(parent, name, value, x, y, w = 100, h = 24) {
-            super(parent, name, value, x, y, w, h);
-            this.cursor = 0;
-            this.left = 0;
-            this.right = 0;
-            this.cursorOn = true;
-            this.cursorBlinkRate = 500;
-            this.nchars = 0;
-            this.nchars2 = 0;
-            this.gparms.fontFace = "monospace";
-            this.eventHandler = new EditItemEventDispatcher_1.EditItemEventDispatcher(this);
-            this.nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
-            this.nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
-            this.left = 0;
-            this.right = this.computeRight();
-            this._setIntervalTimer();
-        }
-        _setIntervalTimer() {
-            this.cursorOn = true;
-            if (this.timerId)
-                clearInterval(this.timerId);
-            this.timerId = setInterval(this.blink.bind(this), this.cursorBlinkRate);
-        }
-        blink() {
-            this.cursorOn = !this.cursorOn;
-        }
-        click(x, y) {
-            this.playfield.focusObj(this);
-        }
-        drawCursor() {
-            if (!this.hasFocus)
+        _drawCursor() {
+            if (!this.isFocus)
                 return;
-            if (!this.cursorOn)
+            if (!this._cursorOn)
                 return;
             let gfx = this.playfield.gfx;
-            let valueBB = gfx.boundingBox(this.value().substring(this.left, this.cursor), this.gparms);
+            let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor), this.gparms);
             let dw = valueBB.w;
             if (dw <= 0)
                 dw = 1;
@@ -1525,111 +1752,438 @@ define("Jed/EditItem", ["require", "exports", "Jed/Item", "Jed/EditItemEventDisp
             gfx.line(x0, y0, x1, y1, this.gparms);
             gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
         }
-        draw() {
-            let gfx = this.playfield.gfx;
-            if (this.hasFocus)
-                this.gparms.color = "red";
-            else
-                this.gparms.color = "black";
-            gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            gfx.textRect(this.value().substring(this.left), this.x, this.y, this.w, this.h, this.gparms);
-            this.drawCursor();
-            gfx.restore();
-        }
-        computeRight() {
+        _computeRight() {
             // let gfx = this.playfield.gfx;
-            // let right = this.left;
-            // for(let i=this.left; i<=this._value.length; i++) {
-            //     let bb = gfx.boundingBox(this._value.substring(this.left, i));
+            // let right = this._left;
+            // for(let i=this._left; i<=this.value.length; i++) {
+            //     let bb = gfx.boundingBox(this.value.substring(this._left, i));
             //     right = i;
             //     if (bb.w > this.w) break;
             // }
-            let right = this.left + this.nchars2 * 2;
-            if (right >= this._value.length)
-                right = this._value.length - 1;
+            let right = this._left + this._nchars2 * 2;
+            if (right >= this.value.length)
+                right = this.value.length - 1;
             return right;
         }
-        computeLeft() {
+        _computeLeft() {
             // let gfx = this.playfield.gfx;
-            // let left = this.right;
-            // for(let i=this.right; i>=0; i--) {
-            //     let bb = gfx.boundingBox(this._value.substring(i, this.right));
+            // let left = this._right;
+            // for(let i=this._right; i>=0; i--) {
+            //     let bb = gfx.boundingBox(this.value.substring(i, this._right));
             //     if (bb.w > this.w) break;
             //     left = i;
             // }
-            let left = this.right - this.nchars2 * 2 + 1;
+            let left = this._right - this._nchars2 * 2 + 1;
             if (left < 0)
                 left = 0;
             return left;
         }
-        cursorInc(delta) {
-            this.cursor += delta;
-            this._setIntervalTimer();
-            this.cursorOn = true;
-            if (this.cursor < 0)
-                this.cursor = 0;
-            if (this.cursor > this._value.length)
-                this.cursor = this._value.length;
-            this.left = this.cursor - this.nchars2;
-            if (this.left < 0)
-                this.left = 0;
-            this.right = this.left + this.nchars;
-            if (this.right > this._value.length)
-                this.right = this._value.length;
-            if (this.right === this._value.length)
-                this.left = Math.max(this.right - this.nchars + 1, 0);
-            this.log(this.left, this.cursor, this.right, this.nchars, this.nchars2);
-        }
-    }
-    exports.EditItem = EditItem;
-});
-define("Jed/TextItem", ["require", "exports", "Jed/Item", "Jed/LabelItem", "Jed/EditItem"], function (require, exports, Item_5, LabelItem_2, EditItem_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.TextItem = void 0;
-    class TextItem extends Item_5.Item {
-        constructor(parent, name, label, value, x, y, w = 0, h = 0, ww = 0, hh = 0) {
-            super(parent, name, value, x, y, 0, 0);
-            this.cursorOn = true;
-            this.labelItem = new LabelItem_2.LabelItem(this, name + "-label", label, 0, 0, ww, hh);
-            this.editItem = new EditItem_1.EditItem(this, name + "-editor", value, this.labelItem.w + 2, 0, w, h);
-        }
-        click(x, y) {
-            this.playfield.focusObj(this.editItem);
-        }
-        labelBB() {
-            return this.labelItem.bb;
+        _cursorInc(delta) {
+            this._cursor += delta;
+            this._startCursorBlinking();
+            this._cursorOn = true;
+            if (this._cursor < 0)
+                this._cursor = 0;
+            if (this._cursor > this.value.length)
+                this._cursor = this.value.length;
+            this._left = this._cursor - this._nchars2;
+            if (this._left < 0)
+                this._left = 0;
+            this._right = this._left + this._nchars;
+            if (this._right > this.value.length)
+                this._right = this.value.length;
+            if (this._right === this.value.length)
+                this._left = Math.max(this._right - this._nchars + 1, 0);
+            this.log(this._left, this._cursor, this._right, this._nchars, this._nchars2);
         }
     }
     exports.TextItem = TextItem;
 });
-define("Jed/index", ["require", "exports", "Jed/CheckBoxItem", "Jed/EditItem", "Jed/EditItemEventDispatcher", "Jed/Item", "Jed/LabelItem", "Jed/TextItem"], function (require, exports, CheckBoxItem_1, EditItem_2, EditItemEventDispatcher_2, Item_6, LabelItem_3, TextItem_1) {
+define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_4, Utils_8, Abilities_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.TextItem = exports.LabelItem = exports.Item = exports.EditItemEventDispatcher = exports.EditItem = exports.CheckBoxItem = void 0;
-    Object.defineProperty(exports, "CheckBoxItem", { enumerable: true, get: function () { return CheckBoxItem_1.CheckBoxItem; } });
-    Object.defineProperty(exports, "EditItem", { enumerable: true, get: function () { return EditItem_2.EditItem; } });
-    Object.defineProperty(exports, "EditItemEventDispatcher", { enumerable: true, get: function () { return EditItemEventDispatcher_2.EditItemEventDispatcher; } });
-    Object.defineProperty(exports, "Item", { enumerable: true, get: function () { return Item_6.Item; } });
-    Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_3.LabelItem; } });
-    Object.defineProperty(exports, "TextItem", { enumerable: true, get: function () { return TextItem_1.TextItem; } });
-});
-define("Test/JedTest", ["require", "exports", "Jed/index", "Playfield/index"], function (require, exports, Jed, Playfield_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.JedTest = void 0;
-    Jed = __importStar(Jed);
-    class JedTest {
-        constructor() {
-            let playfield = new Playfield_4.Playfield("#my_canvas");
-            let TextItem1 = new Jed.TextItem(playfield, "first_name", "First Name:", "Gregory L. Smith", 10, 10, 75, 24);
-            let labelBB = TextItem1.labelBB();
-            new Jed.TextItem(playfield, "mi", "M.I.:", "Smith", 10, 40, 150, 24, labelBB.w, labelBB.h);
-            new Jed.TextItem(playfield, "last_name", "Last Name:", "Smith", 10, 70, 8, 24, labelBB.w, labelBB.h);
-            new Jed.CheckBoxItem(playfield, "email_signup", "Email Signup: ", ["yes", "no"], 10, 100, 30, 30, 0, 0, "black", "white", "red");
-            playfield.start();
+    exports.ToggleItem = exports._ToggleItem = void 0;
+    class _ToggleItem extends Item_4.Item {
+    }
+    exports._ToggleItem = _ToggleItem;
+    ;
+    ;
+    (0, Utils_8.applyMixins)(_ToggleItem, [Abilities_6.Draggable, Abilities_6.Clickable, Abilities_6.Hoverable]);
+    class ToggleItem extends _ToggleItem {
+        constructor(name, parent, x, y, w, h, value = "", label = "") {
+            super(name, parent, x, y, w, h, value || name);
+            this._label = "";
+            this._isOn = false;
+            this.Draggable();
+            this.Clickable();
+            this.Logger();
+            this.isDraggable = false;
+            this._label = label || value || name;
+        }
+        // --- Public Methods --- //
+        go() {
+            console.log(this.value);
+            return true;
+        }
+        // --- Overrides --- //
+        draw() {
+            let gfx = this.playfield.gfx;
+            this._updateGparms();
+            if (this.isOn)
+                this.gparms.fillColor = this.options.selectColor;
+            else if (this.isHovering)
+                this.gparms.fillColor = this.options.hoverColor;
+            else
+                this.gparms.fillColor = "white";
+            gfx.clipRect(this.x, this.y, this.w, this.h);
+            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.restore();
+        }
+        // --- onAcations --- //
+        onClick() {
+            this.isOn = !this.isOn;
+            this.go();
+            return true;
+        }
+        // --- Accessors --- //
+        get label() {
+            return this._label;
+        }
+        set label(value) {
+            this._label = value;
+        }
+        get isOn() {
+            return this._isOn;
+        }
+        set isOn(value) {
+            this._isOn = value;
+        }
+        get value() {
+            if (this.isOn)
+                return super.value;
+            else
+                return "";
+        }
+        set value(s) {
+            super.value = s;
         }
     }
-    exports.JedTest = JedTest;
+    exports.ToggleItem = ToggleItem;
+});
+define("Jed/index", ["require", "exports", "Jed/TextItem", "Jed/ButtonItem", "Jed/ToggleItem", "Jed/LabelItem"], function (require, exports, TextItem_1, ButtonItem_1, ToggleItem_1, LabelItem_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.LabelItem = exports.ToggleItem = exports.ButtonItem = exports.TextItem = void 0;
+    Object.defineProperty(exports, "TextItem", { enumerable: true, get: function () { return TextItem_1.TextItem; } });
+    Object.defineProperty(exports, "ButtonItem", { enumerable: true, get: function () { return ButtonItem_1.ButtonItem; } });
+    Object.defineProperty(exports, "ToggleItem", { enumerable: true, get: function () { return ToggleItem_1.ToggleItem; } });
+    Object.defineProperty(exports, "LabelItem", { enumerable: true, get: function () { return LabelItem_1.LabelItem; } });
+});
+define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ShapeTile = void 0;
+    class ShapeTile extends __1.Tile {
+        constructor(name, parent, x, y, w, h = w) {
+            super(name, parent, x, y, w, h);
+        }
+    }
+    exports.ShapeTile = ShapeTile;
+});
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_9, Abilities_7) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BoxTile = exports._BoxTile = void 0;
+    class _BoxTile extends ShapeTile_1.ShapeTile {
+    }
+    exports._BoxTile = _BoxTile;
+    ;
+    ;
+    (0, Utils_9.applyMixins)(_BoxTile, [Abilities_7.Draggable, Abilities_7.Selectable]);
+    class BoxTile extends _BoxTile {
+        constructor(name, parent, x, y, w, h) {
+            super(name, parent, x, y, w, h);
+            this._colors = ["red", "orange", "green", "blue", "indigo", "violet"];
+            this._color = 0;
+            this.Draggable();
+            this.Selectable();
+            this.gparms.fillColor = this._colors[2];
+        }
+        // --- Overrides ---//
+        draw() {
+            // if (this.isSelected) this.gparms.borderColor = "black";
+            // else this.gparms.borderColor = "";
+            // this.gparms.fillColor = this._colors[this._color];
+            this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        }
+        // --- onActions --- //
+        onGrab() {
+            this.toFront();
+            return true;
+        }
+        onClick() {
+            this._color = (this._color + 1) % this._colors.length;
+            this.warn(this._color);
+        }
+        onDrop() {
+            this.toFront();
+            return true;
+        }
+        onTick() {
+            return true;
+        }
+    }
+    exports.BoxTile = BoxTile;
+});
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, ShapeTile_2, Abilities_8, Utils_10) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CircleTile = exports._CircleTile = void 0;
+    class _CircleTile extends ShapeTile_2.ShapeTile {
+    }
+    exports._CircleTile = _CircleTile;
+    ;
+    ;
+    (0, Utils_10.applyMixins)(_CircleTile, [Abilities_8.Draggable, Abilities_8.Selectable]);
+    class CircleTile extends _CircleTile {
+        constructor(name, parent, x, y, w, h) {
+            super(name, parent, x, y, w, h);
+            this._dx = 0;
+            this._dy = 0;
+            this.Draggable();
+        }
+        // --- Overrides --- //
+        inBounds(x, y) {
+            let dx = this.X - x;
+            let dy = this.Y - y;
+            let dr = dx * dx + dy * dy;
+            let dw = this.w * this.w;
+            if (dr <= dw)
+                return this;
+            for (let child of this.children.reverse()) {
+                let found = child.inBounds(x, y);
+                if (found)
+                    return found;
+            }
+            return null;
+        }
+        draw() {
+            if (this.isSelected)
+                this.gparms.borderColor = "black";
+            else
+                this.gparms.borderColor = "";
+            this.gparms.fillColor = "gray";
+            this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+            if (this._dx && this._dy) {
+                let oldColor = this.gparms.fillColor;
+                this.gparms.fillColor = "red";
+                let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
+                this.playfield.gfx.circle(this.x, this.y, r, this.gparms);
+                this.gparms.fillColor = oldColor;
+            }
+        }
+        // --- onActions --- //
+        onGrab(event) {
+            this._dx = this.X - event.x;
+            this._dy = this.Y - event.y;
+            this.toFront();
+            return true;
+        }
+        onDrop() {
+            this.toFront();
+            this._dx = 0;
+            this._dy = 0;
+            return true;
+        }
+    }
+    exports.CircleTile = CircleTile;
+});
+define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTile", "Playfield/Shapes/CircleTile", "Playfield/Shapes/ShapeTile"], function (require, exports, BoxTile_1, CircleTile_1, ShapeTile_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ShapeTile = exports.CircleTile = exports.BoxTile = void 0;
+    Object.defineProperty(exports, "BoxTile", { enumerable: true, get: function () { return BoxTile_1.BoxTile; } });
+    Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
+    Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
+});
+define("Test/BoxTestTile", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BoxTestTile = void 0;
+    class BoxTestTile extends Playfield_4.Tile {
+        constructor(name, parent, x, y, w, h = w) {
+            super(name, parent, x, y, w, h);
+            this.gparms.borderColor = "red";
+            this.gparms.color = "blue";
+            this.gparms.fillColor = "green";
+        }
+        draw() {
+            this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        }
+        onTick() {
+            let obj = this;
+            this.rmove(obj.DX || 10, obj.DY || 10);
+            if (this.X > this.playfield.w || this.X <= 0) {
+                if (obj.DX === undefined)
+                    this.rmove(-this.x, 0);
+                else
+                    obj.DX = -obj.DX;
+            }
+            if (this.Y > this.playfield.h || this.Y <= 0) {
+                if (obj.DY === undefined)
+                    this.rmove(0, -this.y);
+                else
+                    obj.DY = -obj.DY;
+            }
+            // notice - does not move children
+            return true;
+        }
+        go() {
+            throw new Error("Method not implemented.");
+        }
+    }
+    exports.BoxTestTile = BoxTestTile;
+});
+define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], function (require, exports, BoxTestTile_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.CircleTestTile = void 0;
+    class CircleTestTile extends BoxTestTile_1.BoxTestTile {
+        constructor(name, parent, x, y, w, h = w) {
+            super(name, parent, x, y, w, h);
+            this.gparms.borderColor = "red";
+            this.gparms.color = "blue";
+            this.gparms.fillColor = "green";
+        }
+        draw() {
+            this.playfield.gfx.circle(this.x, this.y, this.w, this.gparms);
+        }
+    }
+    exports.CircleTestTile = CircleTestTile;
+});
+define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test/BoxTestTile", "Playfield/Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/index"], function (require, exports, CircleTestTile_1, BoxTestTile_2, Utils_11, Shapes_1, Jed_1, Browser_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayfieldTest = void 0;
+    class PlayfieldTest {
+        constructor() {
+            this._playfieldApp = new Browser_1.BrowserPlayfieldApp();
+            this._playfield = this._playfieldApp.playfield;
+        }
+        boxTest() {
+            this._playfield.gfx.rect(10, 10, 100, 100, this._playfield.gparms);
+        }
+        circleTestTile() {
+            let parent = this._playfield.tile;
+            let circleTile = new CircleTestTile_1.CircleTestTile("circle", parent, parent.w / 2, parent.h / 2, 50, 50);
+            this._playfield.start();
+        }
+        groupTestTile() {
+            let parent = this._playfield.tile;
+            let lcircle = new CircleTestTile_1.CircleTestTile("left", parent, -75, +75, 50);
+            let rcircle = new CircleTestTile_1.CircleTestTile("right", parent, +75, +75, 50);
+            lcircle.gparms.fillColor = "red";
+            rcircle.gparms.fillColor = "red";
+            let llcircle = new CircleTestTile_1.CircleTestTile("left", lcircle, -50, 50, 50, 50);
+            let lrcircle = new CircleTestTile_1.CircleTestTile("right", lcircle, +50, 50, 50, 50);
+            llcircle.gparms.fillColor = "blue";
+            lrcircle.gparms.fillColor = "blue";
+            let rlcircle = new CircleTestTile_1.CircleTestTile("left", rcircle, -50, 50, 50, 50);
+            let rrcircle = new CircleTestTile_1.CircleTestTile("right", rcircle, +50, 50, 50, 50);
+            rlcircle.gparms.fillColor = "green";
+            rrcircle.gparms.fillColor = "green";
+            this._playfield.start();
+        }
+        tenthousandTestTile() {
+            let parent = this._playfield.tile;
+            let max = 100;
+            for (let i = 0; i < max; i++) {
+                for (let j = 0; j < 1000; j++) {
+                    let x = (0, Utils_11.random)(0, this._playfield.w);
+                    let y = (0, Utils_11.random)(0, this._playfield.h);
+                    let r = (0, Utils_11.random)(10, 50);
+                    let DX = (0, Utils_11.random)(-10, 10);
+                    let DY = (0, Utils_11.random)(-10, 10);
+                    let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
+                    // circle.gparms.fillColor = null;
+                    circle.DX = DX;
+                    circle.DY = DY;
+                }
+            }
+            max *= 1000;
+            // let fps = 1;
+            // let delay = Math.floor(1000/fps);
+            let delay = 0;
+            let fps = 1000 / delay;
+            this._playfield.start(delay);
+            // note: processing 10,000 Circles stressed the app at 55 FPS
+            // note: processing 10,000 Boxes stressed the app at 142 FPS
+            // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
+            // note: at 30FPS, about 18,500 circles could be processed
+            // note: at 30FPS, about 20,000 boxes could be processed
+            // note: at 30FPS, about 45,000 empty boxes could be processed
+            // note: at 60FPS, about 8700 circles could be processed
+            // note: at 60FPS, about 20,000 boxes could be processed
+            // note: at 60FPS, about 28,000 empty boxes could be processed
+            // 5,000,000 empty boxes per second
+            // 2,000,000 filled boxes per second
+            // 1,428,571 empty circles per second
+            // 714,000 filled circles per second
+            // 1 fps: 16ms/62.5fps
+            // 2 fps: 16ms/62.5fps
+            // 4 fps: 16ms/62.5fps
+            // 8 fps: 13ms/77fps
+            // 15 fps: 7ms/143fps
+        }
+        shapeTest() {
+            let parent = this._playfield.tile;
+            // for (let i=0; i<10; i++) {
+            //     for(let j=0; j<1000; j++) {
+            //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
+            //     }
+            // }
+            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_11.random)(0, 1000), (0, Utils_11.random)(0, 1000), 50, 50);
+            let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
+            let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
+            let fps = 16;
+            this._playfield.start(Math.floor(1 / fps * 1000));
+        }
+        jedTest() {
+            let x = 110;
+            let y = 10;
+            let parent = this._playfield.tile;
+            let textItem1 = new Jed_1.TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
+            let labelItem1 = new Jed_1.LabelItem("Label-1", parent, x - 100, y, -100, 14, "Label-1: ");
+            let textItem2 = new Jed_1.TextItem("textitem-2", parent, x, y += 50, 100, 14, "Hello World 2");
+            let labelItem2 = new Jed_1.LabelItem("Label-2", parent, x - 100, y, -100, 14, "Label-2: ");
+            let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += 50, 100, 14, "Hello World 3");
+            let textItem4 = new Jed_1.TextItem("textitem-4", parent, x, y += 50, 100, 14, "Hello World 4 ");
+            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", parent, x, y += 50, 45, 14);
+            buttonItem1.label = "Hello World";
+            buttonItem1.value = "Greg Smith";
+            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", parent, x, y += 50, 45, 14, "Button Item 2");
+            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", parent, x, y += 50, 45, 14, "Button Item 3");
+            let toggleItem1 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+            toggleItem1.label = "goodbye friends";
+            toggleItem1.value = "gerg htims";
+            let toggleItem2 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+            let toggleItem3 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+            this._playfield.start(0);
+        }
+    }
+    exports.PlayfieldTest = PlayfieldTest;
 });
 //# sourceMappingURL=PlayfieldGraphics.js.map
+define(function (require) {
+    console.log("Main.js...");
+    var TestClass = require("Test/PlayfieldTest").PlayfieldTest;
+    console.log(TestClass);
+    let main = new TestClass();
+    // main.boxTest();
+    // main.circleTestTile();
+    // main.groupTestTile();
+    // main.tenthousandTestTile();
+    // main.shapeTest();
+    main.jedTest();
+});
+ 

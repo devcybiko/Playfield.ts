@@ -1,7 +1,4 @@
 {
-  "devDependencies": {
-    "typescript": "^4.9.5"
-  },
   "name": "playfield.ts",
   "description": "",
   "version": "1.0.0",
