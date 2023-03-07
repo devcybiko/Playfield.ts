@@ -1,6 +1,26 @@
+export interface hasGfxParms {
+    get gparms(): GfxParms;
+}
+
 export class GfxParms {
+    static SANS_SERIF = "sans-serif";
+    static SERIF = "serif";
+    static MONOSPACE = "monospace";
+    static DEFAULT_FONT = "sans-serif";
+    static BOLD = "bold";
+    static ITALIC = "italic";
+    static REGULAR = "";
+    static LEFT = "left" as CanvasTextAlign;
+    static RIGHT = "right" as CanvasTextAlign;
+    static CENTER = "center" as CanvasTextAlign;
+    static TOP = "top" as CanvasTextBaseline;
+    static MIDDLE = "middle" as CanvasTextBaseline;
+    static BOTTOM = "bottom" as CanvasTextBaseline;
+
     private _fontSize: number;
     private _fontFace: string;
+    private _fontStyle: string;
+
     color = "black";
     borderColor = "black";
     fillColor = "white";
@@ -11,28 +31,19 @@ export class GfxParms {
     private _font: string;
 
     constructor() {
-        this.textAlign = "left";
-        this.textBaseline = "top";
+        this.textAlign = GfxParms.LEFT;
+        this.textBaseline = GfxParms.TOP;
         this.fontSize = 24;
-        this.fontFace = "sans-serif"
+        this.fontFace = GfxParms.DEFAULT_FONT;
+        this.fontStyle = "";
     }
-
-    // --- Public Methods --- //
-
     public clone(): GfxParms {
-        // make a shallow copy
-        return { ...this } as GfxParms;
+        let gfxparms = new GfxParms;
+        return Object.assign(gfxparms, this);
     }
-
-    // --- Private Methods --- //
-
     private _updateFont() {
-        this._font = "" + this._fontSize + "px " + this._fontFace;
+        this._font = (this._fontStyle + " " + this._fontSize + "px " + this._fontFace).trim();
     }
-
-
-    // --- Accessors --- //
-
     public get font(): string {
         return this._font;
     }
@@ -50,4 +61,12 @@ export class GfxParms {
         this._fontFace = n;
         this._updateFont();
     }
+    public get fontStyle(): string {
+        return this._fontStyle;
+    }
+    public set fontStyle(value: string) {
+        this._fontStyle = value;
+        this._updateFont();
+    }
+
 }

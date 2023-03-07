@@ -258,21 +258,19 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.fillColor = "white";
             this.dx = 0;
             this.dy = 0;
-            this.textAlign = "left";
-            this.textBaseline = "top";
+            this.textAlign = GfxParms.LEFT;
+            this.textBaseline = GfxParms.TOP;
             this.fontSize = 24;
-            this.fontFace = "sans-serif";
+            this.fontFace = GfxParms.DEFAULT_FONT;
+            this.fontStyle = "";
         }
-        // --- Public Methods --- //
         clone() {
-            // make a shallow copy
-            return Object.assign({}, this);
+            let gfxparms = new GfxParms;
+            return Object.assign(gfxparms, this);
         }
-        // --- Private Methods --- //
         _updateFont() {
-            this._font = "" + this._fontSize + "px " + this._fontFace;
+            this._font = (this._fontStyle + " " + this._fontSize + "px " + this._fontFace).trim();
         }
-        // --- Accessors --- //
         get font() {
             return this._font;
         }
@@ -290,8 +288,28 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this._fontFace = n;
             this._updateFont();
         }
+        get fontStyle() {
+            return this._fontStyle;
+        }
+        set fontStyle(value) {
+            this._fontStyle = value;
+            this._updateFont();
+        }
     }
     exports.GfxParms = GfxParms;
+    GfxParms.SANS_SERIF = "sans-serif";
+    GfxParms.SERIF = "serif";
+    GfxParms.MONOSPACE = "monospace";
+    GfxParms.DEFAULT_FONT = "sans-serif";
+    GfxParms.BOLD = "bold";
+    GfxParms.ITALIC = "italic";
+    GfxParms.REGULAR = "";
+    GfxParms.LEFT = "left";
+    GfxParms.RIGHT = "right";
+    GfxParms.CENTER = "center";
+    GfxParms.TOP = "top";
+    GfxParms.MIDDLE = "middle";
+    GfxParms.BOTTOM = "bottom";
 });
 define("Playfield/Graphics/Gfx", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -576,10 +594,10 @@ define("Playfield/Abilities/PressableMixin", ["require", "exports"], function (r
         }
         // --- onActions --- //
         onPress(pfEvent) {
-            return true;
+            return false;
         }
         onRelease(pfEvent) {
-            return true;
+            return false;
         }
         // --- Accessors --- //
         get isPressed() {
@@ -617,7 +635,7 @@ define("Playfield/Abilities/PresserMixin", ["require", "exports"], function (req
             }
             if (pfEvent.isRelease && child.isPressed) {
                 child.isPressed = false;
-                child.onPress(pfEvent);
+                child.onRelease(pfEvent);
             }
         }
     }
@@ -1333,13 +1351,41 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         }
         textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
             this._ctx.font = _gparms.font;
+            let textX = x;
+            let textY = y;
+            let rectX = x;
+            let rectY = y;
             let boundingBox = this.boundingBox(msg, _gparms);
             if (!w)
                 w = boundingBox.w;
             if (!h)
                 h = boundingBox.h;
-            this.rect(x, y, w, h, _gparms);
-            this.text(msg, x, y, _gparms, w);
+            if (_gparms.textAlign === GfxParms_2.GfxParms.LEFT) {
+                // do nothing
+            }
+            else if (_gparms.textAlign === GfxParms_2.GfxParms.RIGHT) {
+                textX += w;
+            }
+            else if (_gparms.textAlign === GfxParms_2.GfxParms.CENTER) {
+                textY += w / 2;
+            }
+            else {
+                throw new Error("Unknown textAlign: " + _gparms.textAlign);
+            }
+            if (_gparms.textBaseline === GfxParms_2.GfxParms.TOP) {
+                // do nothing
+            }
+            else if (_gparms.textBaseline === GfxParms_2.GfxParms.BOTTOM) {
+                textY += h;
+            }
+            else if (_gparms.textBaseline === GfxParms_2.GfxParms.MIDDLE) {
+                textY += h / 2;
+            }
+            else {
+                throw new Error("Unknown textAlign: " + _gparms.textAlign);
+            }
+            this.rect(rectX, rectY, w, h, _gparms);
+            this.text(msg, textX, textY, _gparms);
         }
         boundingBox(msg, _gparms = this._gparms) {
             this._ctx.font = _gparms.font;
@@ -1427,6 +1473,7 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
         constructor() {
             this.fontSize = 24;
             this.fontFace = "sans-serif";
+            this.fontStyle = "";
             this.text = "";
             this.label = "";
             this.textColor = "black";
@@ -1440,7 +1487,7 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
     }
     exports.ItemOptions = ItemOptions;
 });
-define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions"], function (require, exports, Playfield_3, Utils_4, Abilities_2, ItemOptions_1) {
+define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions", "Playfield/Graphics/index"], function (require, exports, Playfield_3, Utils_4, Abilities_2, ItemOptions_1, Graphics_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Item = exports._Item = void 0;
@@ -1459,6 +1506,10 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/in
             this._options = new ItemOptions_1.ItemOptions;
             this._options.text = text || value;
             this._options.fontSize = h;
+            if (w < 0) {
+                this._options.textAlign = Graphics_3.GfxParms.RIGHT;
+                this.w = -w;
+            }
         }
         _updateGparms() {
             this.gparms.fillColor = this.options.fillColor;
@@ -1466,8 +1517,12 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/in
             this.gparms.borderColor = this.options.borderColor;
             this.gparms.fontSize = this.options.fontSize;
             this.gparms.fontFace = this.options.fontFace;
+            this.gparms.fontStyle = this.options.fontStyle;
             this.gparms.textAlign = this.options.textAlign;
             this.gparms.textBaseline = this.options.textBaseline;
+        }
+        go() {
+            throw Error("Unimplemented feature: 'go()';");
         }
         // --- Accessors --- //
         get value() {
@@ -1494,18 +1549,18 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
     (0, Utils_5.applyMixins)(_ButtonItem, [Abilities_3.Draggable, Abilities_3.Pressable, Abilities_3.Hoverable]);
     class ButtonItem extends _ButtonItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
-            super(name, parent, x, y, w, h, value);
+            super(name, parent, x, y, w, h, value || name);
             this._label = "";
             this.Draggable();
             this.Pressable();
             this.Hoverable();
-            this.Logger();
+            this.Logger("info", false);
             this.isDraggable = false;
-            this._label = label || value;
+            this._label = label || value || name;
         }
         // --- Overrides --- //
         go() {
-            window.alert(this.value);
+            console.log(this.value);
             return true;
         }
         draw() {
@@ -1520,6 +1575,9 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             gfx.clipRect(this.x, this.y, this.w, this.h);
             gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
             gfx.restore();
+        }
+        onPress() {
+            return true;
         }
         // --- onActions --- //
         onRelease() {
@@ -1537,7 +1595,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
     }
     exports.ButtonItem = ButtonItem;
 });
-define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_6, Abilities_4) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_2, Utils_6, Abilities_4, Graphics_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LabelItem = exports._LabelItem = void 0;
@@ -1548,38 +1606,26 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     ;
     (0, Utils_6.applyMixins)(_LabelItem, [Abilities_4.Draggable]);
     class LabelItem extends _LabelItem {
-        constructor(name, parent, x, y, w, h, value = "", label = "") {
+        constructor(name, parent, x, y, w, h, value = "") {
             super(name, parent, x, y, w, h, value);
             this.Draggable();
             this.Logger();
             this.options.fontSize = h;
+            this.options.fontStyle = Graphics_4.GfxParms.BOLD;
             this._updateGparms();
-            this._label = label;
         }
         // --- Overrides --- //
         draw() {
             let gfx = this.playfield.gfx;
             this._updateGparms();
+            this.gparms.borderColor = "";
             let w = this.w;
             let h = this.h;
             let x = this.x;
             let y = this.y;
-            if (w < 0) {
-                this.gparms.textAlign = "right";
-                w = -w;
-                x -= w;
-            }
             gfx.clipRect(x, y, w, h, this.gparms);
-            // gfx.rect(x, y, w, h);
-            gfx.text(this._label, this.x, y, this.gparms, w);
+            gfx.textRect(this.value, x, y, w, h, this.gparms);
             gfx.restore();
-        }
-        // --- Accessors --- //
-        get label() {
-            return this._label;
-        }
-        set label(value) {
-            this._label = value;
         }
     }
     exports.LabelItem = LabelItem;
@@ -1765,18 +1811,18 @@ define("Jed/ToggleItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
     (0, Utils_8.applyMixins)(_ToggleItem, [Abilities_6.Draggable, Abilities_6.Clickable, Abilities_6.Hoverable]);
     class ToggleItem extends _ToggleItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
-            super(name, parent, x, y, w, h, value);
+            super(name, parent, x, y, w, h, value || name);
             this._label = "";
             this._isOn = false;
             this.Draggable();
             this.Clickable();
             this.Logger();
             this.isDraggable = false;
-            this._label = label || value;
+            this._label = label || value || name;
         }
         // --- Public Methods --- //
         go() {
-            window.alert(this.value);
+            console.log(this.value);
             return true;
         }
         // --- Overrides --- //
@@ -2107,17 +2153,21 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             let y = 10;
             let parent = this._playfield.tile;
             let textItem1 = new Jed_1.TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
-            let lablItem1 = new Jed_1.LabelItem("Label-1", parent, x - 10, y, -100, 14, "Label-1", "Label-1");
+            let labelItem1 = new Jed_1.LabelItem("Label-1", parent, x - 100, y, -100, 14, "Label-1: ");
             let textItem2 = new Jed_1.TextItem("textitem-2", parent, x, y += 50, 100, 14, "Hello World 2");
-            let lablItem2 = new Jed_1.LabelItem("Label-2", parent, x - 100, y, 100, 14, "Label-2", "Label-2");
+            let labelItem2 = new Jed_1.LabelItem("Label-2", parent, x - 100, y, -100, 14, "Label-2: ");
             let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += 50, 100, 14, "Hello World 3");
             let textItem4 = new Jed_1.TextItem("textitem-4", parent, x, y += 50, 100, 14, "Hello World 4 ");
-            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem", parent, x, y += 50, 45, 14);
+            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", parent, x, y += 50, 45, 14);
             buttonItem1.label = "Hello World";
             buttonItem1.value = "Greg Smith";
-            let toggleItem = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
-            toggleItem.label = "goodbye friends";
-            toggleItem.value = "gerg htims";
+            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", parent, x, y += 50, 45, 14, "Button Item 2");
+            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", parent, x, y += 50, 45, 14, "Button Item 3");
+            let toggleItem1 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+            toggleItem1.label = "goodbye friends";
+            toggleItem1.value = "gerg htims";
+            let toggleItem2 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+            let toggleItem3 = new Jed_1.ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
             this._playfield.start(0);
         }
     }

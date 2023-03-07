@@ -6,6 +6,7 @@ import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
+import { GfxParms } from "../Playfield/Graphics";
 
 export class PlayfieldTest {
     _playfieldApp: BrowserPlayfieldApp;
@@ -109,17 +110,22 @@ export class PlayfieldTest {
         let y = 10;
         let parent = this._playfield.tile;
         let textItem1 = new TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
-        let lablItem1 = new LabelItem("Label-1", parent, x - 10, y, -100, 14, "Label-1", "Label-1");
+        let labelItem1 = new LabelItem("Label-1", parent, x - 100, y, -100, 14, "Label-1: ");
         let textItem2 = new TextItem("textitem-2", parent, x, y += 50, 100, 14, "Hello World 2");
-        let lablItem2 = new LabelItem("Label-2", parent, x - 100, y, 100, 14, "Label-2", "Label-2");
+        let labelItem2 = new LabelItem("Label-2", parent, x - 100, y, -100, 14, "Label-2: ");
         let textItem3 = new TextItem("textitem-3", parent, x, y += 50, 100, 14, "Hello World 3");
         let textItem4 = new TextItem("textitem-4", parent, x, y += 50, 100, 14, "Hello World 4 ");
-        let buttonItem1 = new ButtonItem("ButtonItem", parent, x, y += 50, 45, 14);
+        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += 50, 45, 14);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let toggleItem = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
-        toggleItem.label = "goodbye friends";
-        toggleItem.value = "gerg htims";
+        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += 50, 45, 14, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += 50, 45, 14, "Button Item 3");
+        let toggleItem1 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+        toggleItem1.label = "goodbye friends";
+        toggleItem1.value = "gerg htims";
+        let toggleItem2 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+        let toggleItem3 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+
 
         this._playfield.start(0);
     }

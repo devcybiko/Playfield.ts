@@ -96,12 +96,36 @@ export class BrowserGfx implements Gfx {
         _gparms = this._gparms
     ) {
         this._ctx.font = _gparms.font;
+        let textX = x;
+        let textY = y;
+        let rectX = x;
+        let rectY = y;
+
         let boundingBox = this.boundingBox(msg, _gparms);
         if (!w) w = boundingBox.w;
         if (!h) h = boundingBox.h;
-        this.rect(x, y, w, h, _gparms);
-        this.text(msg, x, y, _gparms, w);
+        if (_gparms.textAlign === GfxParms.LEFT) {
+            // do nothing
+        } else if (_gparms.textAlign === GfxParms.RIGHT) {
+            textX += w;
+        } else if (_gparms.textAlign === GfxParms.CENTER) {
+            textY += w / 2;
+        } else {
+            throw new Error("Unknown textAlign: " + _gparms.textAlign)
+        }
+        if (_gparms.textBaseline === GfxParms.TOP) {
+            // do nothing
+        } else if (_gparms.textBaseline === GfxParms.BOTTOM) {
+            textY += h;
+        } else if (_gparms.textBaseline === GfxParms.MIDDLE) {
+            textY += h / 2;
+        } else {
+            throw new Error("Unknown textAlign: " + _gparms.textAlign)
+        }
+        this.rect(rectX, rectY, w, h, _gparms);
+        this.text(msg, textX, textY, _gparms);
     }
+
 
     boundingBox(msg: string, _gparms = this._gparms): any {
         this._ctx.font = _gparms.font;
@@ -119,7 +143,7 @@ export class BrowserGfx implements Gfx {
     save() {
         this._ctx.save();
     }
-    
+
     restore() {
         this._ctx.restore();
     }

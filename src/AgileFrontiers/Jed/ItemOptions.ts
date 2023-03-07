@@ -1,6 +1,7 @@
 export class ItemOptions {
     fontSize = 24;
     fontFace = "sans-serif";
+    fontStyle = "";
     text = "";
     label = "";
     textColor = "black";

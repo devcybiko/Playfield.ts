@@ -2,6 +2,7 @@ import { Tile } from "../Playfield";
 import { applyMixins } from "../Playfield/Utils";
 import { Draggable, Selectable } from "../Playfield/Abilities";
 import {ItemOptions} from "./ItemOptions"
+import { GfxParms } from "../Playfield/Graphics";
 
 export class _Item extends Tile { };
 export interface _Item extends Draggable, Selectable { };
@@ -19,6 +20,10 @@ export class Item extends _Item {
         this._options = new ItemOptions;
         this._options.text = text || value;
         this._options.fontSize = h;
+        if (w < 0) {
+            this._options.textAlign = GfxParms.RIGHT;
+            this.w = -w;
+        }
     }
 
     public _updateGparms() {
@@ -27,9 +32,14 @@ export class Item extends _Item {
         this.gparms.borderColor = this.options.borderColor;
         this.gparms.fontSize = this.options.fontSize;
         this.gparms.fontFace = this.options.fontFace;
+        this.gparms.fontStyle = this.options.fontStyle;
         this.gparms.textAlign = this.options.textAlign;
         this.gparms.textBaseline = this.options.textBaseline;
     
+    }
+
+    public go() {
+        throw Error("Unimplemented feature: 'go()';");
     }
 
     // --- Accessors --- //

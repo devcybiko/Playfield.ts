@@ -20,7 +20,7 @@ export class Presser {
         }
         if (pfEvent.isRelease && child.isPressed) {
             child.isPressed = false;
-            child.onPress(pfEvent);
+            child.onRelease(pfEvent);
         }
     }
 }

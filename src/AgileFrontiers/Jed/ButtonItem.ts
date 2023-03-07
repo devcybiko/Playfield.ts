@@ -11,19 +11,19 @@ export class ButtonItem extends _ButtonItem {
     private _label = "";
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
-        super(name, parent, x, y, w, h, value);
+        super(name, parent, x, y, w, h, value || name);
         this.Draggable();
         this.Pressable();
         this.Hoverable();
-        this.Logger();
+        this.Logger("info", false);
         this.isDraggable = false;
-        this._label = label || value;
+        this._label = label || value || name;
     }
 
     // --- Overrides --- //
 
     go(): boolean {
-        window.alert(this.value);
+        console.log(this.value);
         return true;
     }
 
@@ -38,6 +38,9 @@ export class ButtonItem extends _ButtonItem {
         gfx.restore();
     }
 
+    onPress(): boolean { 
+        return true;
+    }
     // --- onActions --- //
     onRelease(): boolean {
         if (this.isHovering) this.go();

@@ -12,18 +12,18 @@ export class ToggleItem extends _ToggleItem {
     private _isOn = false;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
-        super(name, parent, x, y, w, h, value);
+        super(name, parent, x, y, w, h, value || name);
         this.Draggable();
         this.Clickable();
         this.Logger();
         this.isDraggable = false;
-        this._label = label || value;
+        this._label = label || value || name;
     }
     
     // --- Public Methods --- //
 
     go(): boolean {
-        window.alert(this.value);
+        console.log(this.value);
         return true;
     }
 
