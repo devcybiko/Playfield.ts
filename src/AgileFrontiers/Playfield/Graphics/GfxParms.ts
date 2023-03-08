@@ -24,6 +24,7 @@ export class GfxParms {
     color = "black";
     borderColor = "black";
     fillColor = "white";
+    borderRadius = 0;
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
     dx = 0;

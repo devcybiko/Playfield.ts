@@ -263,6 +263,7 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.color = "black";
             this.borderColor = "black";
             this.fillColor = "white";
+            this.borderRadius = 0;
             this.dx = 0;
             this.dy = 0;
             this.textAlign = GfxParms.LEFT;
@@ -1344,19 +1345,29 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             this._canvas = document.querySelector(canvasId); // canvasId
             this._ctx = this._canvas.getContext("2d");
             this._gparms = new GfxParms_2.GfxParms();
-            this._ctx.fontKerning = "none";
-            this._ctx.letterSpacing = "1px";
-            this._ctx.textRendering = "geometricPrecision";
+            // this._ctx.fontKerning = "none";
+            // (this._ctx as any).letterSpacing = "1px";
+            // (this._ctx as any).textRendering = "geometricPrecision";
         }
         // --- Public Methods --- //
         rect(x, y, w, h, _gparms = this._gparms) {
             if (_gparms.fillColor) {
                 this._ctx.fillStyle = _gparms.fillColor;
-                this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
+                this._ctx.beginPath();
+                if (_gparms.borderRadius)
+                    this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
+                else
+                    this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+                this._ctx.fill();
             }
             if (_gparms.borderColor) {
                 this._ctx.strokeStyle = _gparms.borderColor;
-                this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
+                this._ctx.beginPath();
+                if (_gparms.borderRadius)
+                    this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
+                else
+                    this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+                this._ctx.stroke();
             }
         }
         ellipse(x, y, w, h, _gparms = this._gparms) {
@@ -1383,31 +1394,20 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
             this._ctx.stroke();
         }
-        text(msg, x = 0, y = 0, _gparms = this._gparms, w) {
+        text(msg, x = 0, y = 0, _gparms = this._gparms, w, h) {
             this._ctx.fillStyle = _gparms.color;
             this._ctx.font = _gparms.font;
             this._ctx.textAlign = _gparms.textAlign;
             this._ctx.textBaseline = _gparms.textBaseline;
-            if (w) {
-                this.clipRect(x, y, w, _gparms.fontSize, _gparms);
-                this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
-                this.restore();
-            }
-            else {
-                this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
-            }
-        }
-        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
-            this._ctx.font = _gparms.font;
             let textX = x;
             let textY = y;
-            let rectX = x;
-            let rectY = y;
-            let boundingBox = this.boundingBox(msg, _gparms);
-            if (!w)
-                w = boundingBox.w;
-            if (!h)
-                h = boundingBox.h;
+            if (!w || !h) {
+                let boundingBox = this.boundingBox(msg, _gparms);
+                if (!w)
+                    w = boundingBox.w;
+                if (!h)
+                    h = boundingBox.h;
+            }
             if (_gparms.textAlign === GfxParms_2.GfxParms.LEFT) {
                 // do nothing
             }
@@ -1415,7 +1415,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 textX += w;
             }
             else if (_gparms.textAlign === GfxParms_2.GfxParms.CENTER) {
-                textY += w / 2;
+                textX += w / 2;
             }
             else {
                 throw new Error("Unknown textAlign: " + _gparms.textAlign);
@@ -1432,8 +1432,26 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             else {
                 throw new Error("Unknown textAlign: " + _gparms.textAlign);
             }
-            this.rect(rectX, rectY, w, h, _gparms);
-            this.text(msg, textX, textY, _gparms);
+            if (w) {
+                this.clipRect(x - 1, y - 1, w + 2, h + 2, _gparms);
+                this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+                this.restore();
+            }
+            else {
+                this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+            }
+        }
+        textRect(msg, x = 0, y = 0, w, h, _gparms = this._gparms) {
+            this._ctx.font = _gparms.font;
+            if (!w || !h) {
+                let boundingBox = this.boundingBox(msg, _gparms);
+                if (!w)
+                    w = boundingBox.w;
+                if (!h)
+                    h = boundingBox.h;
+            }
+            this.rect(x, y, w, h, _gparms);
+            this.text(msg, x + 1, y + 1, _gparms, w, h);
         }
         boundingBox(msg, _gparms = this._gparms) {
             this._ctx.font = _gparms.font;
@@ -1590,7 +1608,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/in
     }
     exports.Item = Item;
 });
-define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_1, Utils_5, Abilities_3) {
+define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_1, Utils_5, Abilities_3, Graphics_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ButtonItem = exports._ButtonItem = void 0;
@@ -1610,6 +1628,16 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
             this.Logger("info", false);
             this.isDraggable = false;
             this._label = label || value || name;
+            this.gparms.borderRadius = 10;
+            this.options.textAlign = Graphics_4.GfxParms.CENTER;
+            this.gparms.textAlign = Graphics_4.GfxParms.CENTER;
+            this.options.textBaseline = Graphics_4.GfxParms.MIDDLE;
+            this.gparms.textBaseline = Graphics_4.GfxParms.MIDDLE;
+            this.gparms.fontSize = 14;
+            this.options.fontSize = 14;
+            let bb = this.gfx.boundingBox(label, this.gparms);
+            this.w = this.w || bb.w;
+            this.h = this.h || bb.h;
         }
         // --- Overrides --- //
         go() {
@@ -1618,14 +1646,19 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
         draw() {
             let gfx = this.playfield.gfx;
             this._updateGparms();
+            let x = this.x;
+            let y = this.y;
+            let bb = this.gfx.boundingBox(this._label, this.gparms);
+            let w = this.w || bb.w;
+            let h = this.h || bb.h;
             if (this.isHovering && this.isPressed)
                 this.gparms.fillColor = this.options.selectColor;
             else if (this.isHovering && !this.isPressed)
                 this.gparms.fillColor = this.options.hoverColor;
             else
                 this.gparms.fillColor = this.options.fillColor;
-            gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.clipRect(x - 1, y - 1, w + 2, h + 2, this.gparms);
+            gfx.textRect(this._label, x, y, w, h, this.gparms);
             gfx.restore();
         }
         onPress() {
@@ -1835,7 +1868,7 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     }
     exports.GroupItem = GroupItem;
 });
-define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_3, Utils_7, Abilities_5) {
+define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_3, Utils_7, Abilities_5, Graphics_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CheckboxItem = exports._CheckboxItem = void 0;
@@ -1854,6 +1887,11 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
             this.Clickable();
             this.Logger();
             this._label = label || value || name;
+            this.options.fontSize = 14;
+            this.gparms.fontSize = 14;
+            let bb = this.gfx.boundingBox(label, this.gparms);
+            this.w = this.w || bb.w + 2 + this.options.fontSize;
+            this.h = this.h || bb.h + 2;
         }
         // --- Public Methods --- //
         go() {
@@ -1869,8 +1907,18 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
                 this.gparms.fillColor = this.options.hoverColor;
             else
                 this.gparms.fillColor = "white";
+            let boxX = this.x;
+            let boxY = this.y;
+            let boxW = this.gparms.fontSize;
+            let boxH = boxW;
+            let textX = boxX + boxW + 2;
+            let textY = boxY;
+            let textW = this.w - boxW - 2;
+            let textH = boxH + 2;
+            this.gparms.textBaseline = Graphics_5.GfxParms.BOTTOM;
             gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.rect(boxX, boxY, boxW, boxH, this.gparms);
+            gfx.text(this._label, textX, textY, this.gparms, textW, textH);
             gfx.restore();
         }
         // --- onActions  --- //
@@ -1907,7 +1955,7 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
     }
     exports.CheckboxItem = CheckboxItem;
 });
-define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_4, Utils_8, Abilities_6, Graphics_4) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_4, Utils_8, Abilities_6, Graphics_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LabelItem = exports._LabelItem = void 0;
@@ -1923,7 +1971,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             this.Draggable();
             this.Logger();
             this.options.fontSize = h;
-            this.options.fontStyle = Graphics_4.GfxParms.BOLD;
+            this.options.fontStyle = Graphics_6.GfxParms.BOLD;
             this._updateGparms();
         }
         // --- Overrides --- //
@@ -1942,7 +1990,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     }
     exports.LabelItem = LabelItem;
 });
-define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_5, Utils_9, Abilities_7) {
+define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_5, Utils_9, Abilities_7, Graphics_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RadioItem = exports._RadioItem = void 0;
@@ -1960,6 +2008,11 @@ define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             this.Selectable();
             this.Logger();
             this._label = label || value || name;
+            this.options.fontSize = 14;
+            this.gparms.fontSize = 14;
+            let bb = this.gfx.boundingBox(label, this.gparms);
+            this.w = this.w || bb.w + 2 + this.options.fontSize;
+            this.h = this.h || bb.h + 2;
         }
         // --- Public Methods --- //
         go() {
@@ -1975,8 +2028,19 @@ define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
                 this.gparms.fillColor = this.options.hoverColor;
             else
                 this.gparms.fillColor = "white";
+            let boxX = this.x + 1;
+            let boxY = this.y + 1;
+            let boxW = this.gparms.fontSize;
+            let boxH = boxW + 2;
+            let r = boxW / 2;
+            let textX = boxX + boxW + 2;
+            let textY = boxY;
+            let textW = this.w - boxW - 2;
+            let textH = boxH;
+            this.gparms.textBaseline = Graphics_7.GfxParms.BOTTOM;
             gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-            gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+            gfx.circle(boxX + r, boxY + r, r, this.gparms);
+            gfx.text(this._label, textX, textY, this.gparms, textW, textH);
             gfx.restore();
         }
         // --- onActions  --- //
@@ -2479,32 +2543,32 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             textGroup1.updateWidthHeight();
             let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += textGroup2.h + 10, 100, 14, "Hello World 3");
             let textItem4 = new Jed_1.TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
-            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", parent, x, y += dy, 45, 14);
+            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", parent, x, y += dy, 100, 0);
             buttonItem1.label = "Hello World";
             buttonItem1.value = "Greg Smith";
-            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", parent, x, y += dy, 45, 14, "Button Item 2");
-            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", parent, x, y += dy, 45, 14, "Button Item 3");
+            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", parent, x, y += dy, 100, 0, "Button Item 2");
+            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", parent, x, y += dy, 100, 0, "Button Item 3");
             buttonItem1.go = printGo.bind(buttonItem1);
             buttonItem2.go = printGo.bind(buttonItem2);
             buttonItem3.go = printGo.bind(buttonItem3);
-            let radioItem0 = new Jed_1.RadioItem("RadioItem-0", parent, x, y += dy, 100, 14);
-            let checkboxItem = new Jed_1.CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 14);
+            let radioItem0 = new Jed_1.RadioItem("RadioItem-0", parent, x, y += dy, 100, 0);
+            let checkboxItem = new Jed_1.CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 0);
             resultLabel = labelItem1 = new Jed_1.LabelItem("ResultLabel", parent, x, y += dy, 200, 14, "Result Label");
             let buttonGroup = new Jed_1.GroupItem("ButtonGroup", parent, x, y += 50, 0, 0, "Radio Buttons");
             x = 0;
             y = 0;
-            let radioItem1 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y, 45, 14, "R1", "Radio 1");
-            let radioItem2 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R2", "Radio 2");
-            let radioItem3 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R3", "Radio 3");
+            let radioItem1 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
+            let radioItem2 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R2", "Radio 2");
+            let radioItem3 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R3", "Radio 3");
             radioItem1.go = printValue.bind(radioItem1);
             radioItem2.go = printValue.bind(radioItem2);
             radioItem3.go = printValue.bind(radioItem3);
             let buttonGroup2 = new Jed_1.GroupItem("ButtonGroup2", parent, 10, y += 50, 0, 0, "CheckBoxes");
             x = 10;
             y = 0;
-            let checkbox1 = new Jed_1.CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 100, 14, "#1", "Number 1");
-            let checkbox2 = new Jed_1.CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
-            let checkbox3 = new Jed_1.CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
+            let checkbox1 = new Jed_1.CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
+            let checkbox2 = new Jed_1.CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 0, 0, "#2", "Number 2");
+            let checkbox3 = new Jed_1.CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 0, 0, "#3", "Number 3");
             checkbox1.go = printValue.bind(checkbox1);
             checkbox2.go = printValue.bind(checkbox2);
             checkbox3.go = printValue.bind(checkbox3);

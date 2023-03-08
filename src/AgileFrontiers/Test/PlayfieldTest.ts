@@ -141,26 +141,26 @@ export class PlayfieldTest {
 
         let textItem3 = new TextItem("textitem-3", parent, x, y += textGroup2.h + 10, 100, 14, "Hello World 3");
         let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
-        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += dy, 45, 14);
+        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += dy, 100, 0);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += dy, 45, 14, "Button Item 2");
-        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += dy, 45, 14, "Button Item 3");
+        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += dy, 100, 0, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += dy, 100, 0, "Button Item 3");
 
         buttonItem1.go = printGo.bind(buttonItem1);
         buttonItem2.go = printGo.bind(buttonItem2);
         buttonItem3.go = printGo.bind(buttonItem3);
 
-        let radioItem0 = new RadioItem("RadioItem-0", parent, x, y += dy, 100, 14);
-        let checkboxItem = new CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 14);
+        let radioItem0 = new RadioItem("RadioItem-0", parent, x, y += dy, 100, 0);
+        let checkboxItem = new CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 0);
         resultLabel = labelItem1 = new LabelItem("ResultLabel", parent, x, y += dy, 200, 14, "Result Label");
 
         let buttonGroup = new GroupItem("ButtonGroup", parent, x, y+=50, 0, 0, "Radio Buttons");
         x = 0;
         y = 0;
-        let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 45, 14,"R1", "Radio 1");
-        let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R2", "Radio 2");
-        let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R3", "Radio 3");
+        let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0,"R1", "Radio 1");
+        let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R2", "Radio 2");
+        let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R3", "Radio 3");
         radioItem1.go = printValue.bind(radioItem1);
         radioItem2.go = printValue.bind(radioItem2);
         radioItem3.go = printValue.bind(radioItem3);
@@ -168,9 +168,9 @@ export class PlayfieldTest {
         let buttonGroup2 = new GroupItem("ButtonGroup2", parent, 10, y+=50, 0, 0, "CheckBoxes");
         x = 10;
         y = 0;
-        let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 100, 14, "#1", "Number 1");
-        let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
-        let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
+        let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
+        let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 0, 0, "#2", "Number 2");
+        let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 0, 0, "#3", "Number 3");
         checkbox1.go = printValue.bind(checkbox1);
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);

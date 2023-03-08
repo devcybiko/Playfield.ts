@@ -2,6 +2,7 @@ import { Item } from "./Item";
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Playfield/Utils";
 import { Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
+import { GfxParms } from "../Playfield/Graphics";
 
 export class _ButtonItem extends Item { };
 export interface _ButtonItem extends Draggable, Pressable, Hoverable { };
@@ -18,6 +19,17 @@ export class ButtonItem extends _ButtonItem {
         this.Logger("info", false);
         this.isDraggable = false;
         this._label = label || value || name;
+        this.gparms.borderRadius = 10;
+        this.options.textAlign = GfxParms.CENTER;
+        this.gparms.textAlign = GfxParms.CENTER;
+        this.options.textBaseline = GfxParms.MIDDLE;
+        this.gparms.textBaseline = GfxParms.MIDDLE;
+        this.gparms.fontSize = 14;
+        this.options.fontSize = 14;
+        let bb = this.gfx.boundingBox(label, this.gparms);
+        this.w = this.w || bb.w;
+        this.h = this.h || bb.h;
+
     }
 
     // --- Overrides --- //
@@ -29,11 +41,16 @@ export class ButtonItem extends _ButtonItem {
     draw() {
         let gfx = this.playfield.gfx;
         this._updateGparms();
+        let x = this.x;
+        let y = this.y;
+        let bb = this.gfx.boundingBox(this._label, this.gparms);
+        let w = this.w || bb.w;
+        let h = this.h || bb.h;
         if (this.isHovering && this.isPressed) this.gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) this.gparms.fillColor = this.options.hoverColor;
         else this.gparms.fillColor = this.options.fillColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-        gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
+        gfx.clipRect(x-1, y-1, w+2, h+2, this.gparms);
+        gfx.textRect(this._label, x, y, w, h, this.gparms);
         gfx.restore();
     }
 

@@ -10,9 +10,9 @@ export class BrowserGfx implements Gfx {
         this._canvas = document.querySelector(canvasId); // canvasId
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
-        this._ctx.fontKerning = "none";
-        (this._ctx as any).letterSpacing = "1px";
-        (this._ctx as any).textRendering = "geometricPrecision";
+        // this._ctx.fontKerning = "none";
+        // (this._ctx as any).letterSpacing = "1px";
+        // (this._ctx as any).textRendering = "geometricPrecision";
     }
 
     // --- Public Methods --- //
@@ -26,11 +26,17 @@ export class BrowserGfx implements Gfx {
     ) {
         if (_gparms.fillColor) {
             this._ctx.fillStyle = _gparms.fillColor;
-            this._ctx.fillRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            this._ctx.beginPath();
+            if (_gparms.borderRadius) this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
+            else this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+            this._ctx.fill();
         }
         if (_gparms.borderColor) {
             this._ctx.strokeStyle = _gparms.borderColor;
-            this._ctx.strokeRect(_gparms.dx + x, _gparms.dy + y, w, h);
+            this._ctx.beginPath();
+            if (_gparms.borderRadius) this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
+            else this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+            this._ctx.stroke();
         }
     }
 
@@ -79,43 +85,25 @@ export class BrowserGfx implements Gfx {
         this._ctx.stroke();
     }
 
-    text(msg: string, x = 0, y = 0, _gparms = this._gparms, w?: number) {
+    text(msg: string, x = 0, y = 0, _gparms = this._gparms, w?: number, h?: number) {
         this._ctx.fillStyle = _gparms.color;
         this._ctx.font = _gparms.font;
         this._ctx.textAlign = _gparms.textAlign;
         this._ctx.textBaseline = _gparms.textBaseline;
-        if (w) {
-            this.clipRect(x, y, w, _gparms.fontSize, _gparms);
-            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
-            this.restore();
-        } else {
-            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
-        }
-    }
-
-    textRect(
-        msg: string,
-        x = 0,
-        y = 0,
-        w?: number,
-        h?: number,
-        _gparms = this._gparms
-    ) {
-        this._ctx.font = _gparms.font;
         let textX = x;
         let textY = y;
-        let rectX = x;
-        let rectY = y;
+        if (!w || !h) {
+            let boundingBox = this.boundingBox(msg, _gparms);
+            if (!w) w = boundingBox.w;
+            if (!h) h = boundingBox.h;
+        }
 
-        let boundingBox = this.boundingBox(msg, _gparms);
-        if (!w) w = boundingBox.w;
-        if (!h) h = boundingBox.h;
         if (_gparms.textAlign === GfxParms.LEFT) {
             // do nothing
         } else if (_gparms.textAlign === GfxParms.RIGHT) {
             textX += w;
         } else if (_gparms.textAlign === GfxParms.CENTER) {
-            textY += w / 2;
+            textX += w / 2;
         } else {
             throw new Error("Unknown textAlign: " + _gparms.textAlign)
         }
@@ -128,8 +116,32 @@ export class BrowserGfx implements Gfx {
         } else {
             throw new Error("Unknown textAlign: " + _gparms.textAlign)
         }
-        this.rect(rectX, rectY, w, h, _gparms);
-        this.text(msg, textX, textY, _gparms);
+
+        if (w) {
+            this.clipRect(x-1, y-1, w+2, h+2, _gparms);
+            this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+            this.restore();
+        } else {
+            this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+        }
+    }
+
+    textRect(
+        msg: string,
+        x = 0,
+        y = 0,
+        w?: number,
+        h?: number,
+        _gparms = this._gparms
+    ) {
+        this._ctx.font = _gparms.font;
+        if (!w || !h) {
+            let boundingBox = this.boundingBox(msg, _gparms);
+            if (!w) w = boundingBox.w;
+            if (!h) h = boundingBox.h;
+        }
+        this.rect(x, y, w, h, _gparms);
+        this.text(msg, x+1, y+1, _gparms, w, h);
     }
 
 
