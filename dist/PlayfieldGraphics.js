@@ -2354,8 +2354,9 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
+    let resultLabel = null;
     function printGo() {
-        console.log("GO!", this.name);
+        resultLabel.value = "Result Label: " + this.name;
     }
     class PlayfieldTest {
         constructor() {
@@ -2468,7 +2469,7 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             buttonItem3.go = printGo.bind(buttonItem3);
             let radioItem0 = new Jed_1.RadioItem("RadioItem-0", parent, x, y += dy, 100, 14);
             let checkboxItem = new Jed_1.CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 14);
-            let resultLabel = labelItem1 = new Jed_1.LabelItem("ResultLabel", parent, x, y += dy, 100, 14, "Result Label");
+            resultLabel = labelItem1 = new Jed_1.LabelItem("ResultLabel", parent, x, y += dy, 200, 14, "Result Label");
             let buttonGroup = new Jed_1.GroupItem("ButtonGroup", parent, x, y += 50, 0, 0, "Radio Buttons");
             x = 0;
             y = 0;
@@ -2482,7 +2483,6 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             let checkbox2 = new Jed_1.CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
             let checkbox3 = new Jed_1.CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
             // buttonGroup2.isBoxed = false;
-            this._playfield.resultLabel = resultLabel;
             this._playfield.start(0);
         }
     }

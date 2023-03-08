@@ -37,6 +37,7 @@ export class Editor {
     }
 
     _unfocusChild(child: any, ctx: any) {
+        // this is a function called by Tree.dfs()
         if (child._focusObj) {
             // we're PRETTY sure this is Editable...
             child._focusObj.isFocus = false;

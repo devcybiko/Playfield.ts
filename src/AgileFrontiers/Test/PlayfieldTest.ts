@@ -8,8 +8,10 @@ import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
 import { GfxParms } from "../Playfield/Graphics";
 
+let resultLabel = null as any;
+
 function printGo() {
-    console.log("GO!", this.name);
+    resultLabel.value = "Result Label: " + this.name;
 }
 
 export class PlayfieldTest {
@@ -142,7 +144,7 @@ export class PlayfieldTest {
 
         let radioItem0 = new RadioItem("RadioItem-0", parent, x, y += dy, 100, 14);
         let checkboxItem = new CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 14);
-        let resultLabel = labelItem1 = new LabelItem("ResultLabel", parent, x, y += dy, 100, 14, "Result Label");
+        resultLabel = labelItem1 = new LabelItem("ResultLabel", parent, x, y += dy, 200, 14, "Result Label");
 
         let buttonGroup = new GroupItem("ButtonGroup", parent, x, y+=50, 0, 0, "Radio Buttons");
         x = 0;
@@ -159,8 +161,6 @@ export class PlayfieldTest {
         let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
         // buttonGroup2.isBoxed = false;
 
-
-        (this._playfield as any).resultLabel = resultLabel;
         this._playfield.start(0);
     }
 }
