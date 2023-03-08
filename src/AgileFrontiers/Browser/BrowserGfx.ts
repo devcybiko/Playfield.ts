@@ -27,9 +27,9 @@ function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) 
 
 function createHiDPIFromCanvas(canvas: any, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
-    console.log(ratio);
 
     var can = canvas;
+    can._ratio = ratio;
     can.width = can.width * ratio;
     can.height = can.height * ratio;
     can.style.width = can.width + "px";
@@ -42,14 +42,12 @@ export class BrowserGfx implements Gfx {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
     private _gparms: GfxParms;
-    private _ratio = 1.0;
 
     constructor(canvasId: string) {
-        this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId), 1.0);
+        // this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
+        this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
-        // this._ratio = PIXEL_RATIO;
-        (this._canvas as any)._ratio = this._ratio;
         this._ctx.fontKerning = "none";
         (this._ctx as any).letterSpacing = "1px";
         (this._ctx as any).textRendering = "geometricPrecision";
