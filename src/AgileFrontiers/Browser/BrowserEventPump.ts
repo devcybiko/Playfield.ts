@@ -3,6 +3,7 @@ import { BrowserPlayfieldEvent } from "./BrowserPlayfieldEvent";
 
 export class BrowserEventPump {
     private _eventQueue: EventQueue;
+    private _ratio = 1.0;
 
     constructor(canvas: HTMLCanvasElement, eventQueue: EventQueue) {
         this._eventQueue = eventQueue;
@@ -19,11 +20,12 @@ export class BrowserEventPump {
         canvas.addEventListener('wheel', this._handler.bind(this));
         addEventListener("keydown", this._handler.bind(this));
         addEventListener("keyup", this._handler.bind(this));
+        this._ratio = (canvas as any)._ratio;
     }
 
     private _handler(event: any) {
         event.preventDefault();
-        let pfEvent = new BrowserPlayfieldEvent(event);
+        let pfEvent = new BrowserPlayfieldEvent(event, this._ratio);
         this._eventQueue.pushEvent(pfEvent);
     }
 }

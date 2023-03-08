@@ -26,13 +26,14 @@ export class BrowserPlayfieldEvent {
     private _isSwipeRight: boolean;
     private _isSwipeLeft: boolean;
 
-    constructor(event: any) {
+    constructor(event: any, ratio = 1.0) {
         this.event = event;
         // this.type = event.type;
 
         // mouse events
-        this.x = event.offsetX;
-        this.y = event.offsetY;
+        this.x = Math.floor(event.offsetX / ratio);
+        this.y = Math.floor(event.offsetY / ratio);
+
         this.isMove = event.type === "mousemove";
         this.isPress = event.type === "mousedown" && event.button === 0;
         this.isRelease = event.type === "mouseup" && event.button === 0;

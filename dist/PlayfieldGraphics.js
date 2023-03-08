@@ -1160,12 +1160,12 @@ define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (requir
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BrowserPlayfieldEvent = void 0;
     class BrowserPlayfieldEvent {
-        constructor(event) {
+        constructor(event, ratio = 1.0) {
             this.event = event;
             // this.type = event.type;
             // mouse events
-            this.x = event.offsetX;
-            this.y = event.offsetY;
+            this.x = Math.floor(event.offsetX / ratio);
+            this.y = Math.floor(event.offsetY / ratio);
             this.isMove = event.type === "mousemove";
             this.isPress = event.type === "mousedown" && event.button === 0;
             this.isRelease = event.type === "mouseup" && event.button === 0;
@@ -1316,6 +1316,7 @@ define("Browser/BrowserEventPump", ["require", "exports", "Browser/BrowserPlayfi
     exports.BrowserEventPump = void 0;
     class BrowserEventPump {
         constructor(canvas, eventQueue) {
+            this._ratio = 1.0;
             this._eventQueue = eventQueue;
             this._registerEventHandlers(canvas);
         }
@@ -1327,10 +1328,11 @@ define("Browser/BrowserEventPump", ["require", "exports", "Browser/BrowserPlayfi
             canvas.addEventListener('wheel', this._handler.bind(this));
             addEventListener("keydown", this._handler.bind(this));
             addEventListener("keyup", this._handler.bind(this));
+            this._ratio = canvas._ratio;
         }
         _handler(event) {
             event.preventDefault();
-            let pfEvent = new BrowserPlayfieldEvent_1.BrowserPlayfieldEvent(event);
+            let pfEvent = new BrowserPlayfieldEvent_1.BrowserPlayfieldEvent(event, this._ratio);
             this._eventQueue.pushEvent(pfEvent);
         }
     }
@@ -1340,14 +1342,50 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BrowserGfx = void 0;
+    var PIXEL_RATIO = (function () {
+        var ctx = document.createElement("canvas").getContext("2d"), dpr = window.devicePixelRatio || 1, bsr = ctx.webkitBackingStorePixelRatio ||
+            ctx.mozBackingStorePixelRatio ||
+            ctx.msBackingStorePixelRatio ||
+            ctx.oBackingStorePixelRatio ||
+            ctx.backingStorePixelRatio || 1;
+        return dpr / bsr;
+    })();
+    function createHiDPICanvas(w, h, canvas, ratio) {
+        if (!ratio) {
+            ratio = PIXEL_RATIO;
+        }
+        var can = canvas || document.createElement("canvas");
+        can.width = w * ratio;
+        can.height = h * ratio;
+        can.style.width = w + "px";
+        can.style.height = h + "px";
+        can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+        return can;
+    }
+    function createHiDPIFromCanvas(canvas, ratio) {
+        if (!ratio) {
+            ratio = PIXEL_RATIO;
+        }
+        console.log(ratio);
+        var can = canvas;
+        can.width = can.width * ratio;
+        can.height = can.height * ratio;
+        can.style.width = can.width + "px";
+        can.style.height = can.height + "px";
+        can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+        return can;
+    }
     class BrowserGfx {
         constructor(canvasId) {
-            this._canvas = document.querySelector(canvasId); // canvasId
+            this._ratio = 1.0;
+            this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId), 1.0);
             this._ctx = this._canvas.getContext("2d");
             this._gparms = new GfxParms_2.GfxParms();
-            // this._ctx.fontKerning = "none";
-            // (this._ctx as any).letterSpacing = "1px";
-            // (this._ctx as any).textRendering = "geometricPrecision";
+            // this._ratio = PIXEL_RATIO;
+            this._canvas._ratio = this._ratio;
+            this._ctx.fontKerning = "none";
+            this._ctx.letterSpacing = "1px";
+            this._ctx.textRendering = "geometricPrecision";
         }
         // --- Public Methods --- //
         rect(x, y, w, h, _gparms = this._gparms) {
