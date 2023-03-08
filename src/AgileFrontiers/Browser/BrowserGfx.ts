@@ -45,9 +45,9 @@ export class BrowserGfx implements Gfx {
         this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
-        // this._ctx.fontKerning = "none";
-        // (this._ctx as any).letterSpacing = "1px";
-        // (this._ctx as any).textRendering = "geometricPrecision";
+        this._ctx.fontKerning = "none";
+        (this._ctx as any).letterSpacing = "1px";
+        (this._ctx as any).textRendering = "geometricPrecision";
     }
 
     // --- Public Methods --- //
