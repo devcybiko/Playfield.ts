@@ -14,6 +14,7 @@ export class GroupItem extends _GroupItem {
     private _yMargin: number;
     private _label;
     private _isResizing: boolean;
+    private _isRoot: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label);
@@ -51,7 +52,7 @@ export class GroupItem extends _GroupItem {
     }
 
     onEvent(pfEvent: PlayfieldEvent): boolean {
-        this.children.forEach(child => (child as unknown as Draggable).isDraggable = false)
+        if (!this._isRoot) this.children.forEach(child => (child as unknown as Draggable).isDraggable = false)
         return this.dispatchEventToChildren(pfEvent);
     }
 
@@ -78,7 +79,7 @@ export class GroupItem extends _GroupItem {
     onDrop(pfEvent: PlayfieldEvent): boolean {
         super.onDrop(pfEvent);
         this._isResizing = false;
-        return true;    
+        return true;
     }
 
     updateWidthHeight() {
@@ -91,7 +92,7 @@ export class GroupItem extends _GroupItem {
         let w = super.w;
         let h = super.h;
 
-        if (w || h) return {w, h};
+        if (w || h) return { w, h };
 
         for (let child of this.children) {
             (child as unknown as Tile)._recompute();
@@ -122,7 +123,7 @@ export class GroupItem extends _GroupItem {
                 let labelH = this.gparms.fontSize;
                 let gparms = this.gparms.clone();
                 gparms.borderColor = "";
-                this.gfx.clipRect(labelX - 1, labelY, wh.w -  this.xMargin / 2, wh.h + this.gparms.fontSize / 2 - 1, gparms)
+                this.gfx.clipRect(labelX - 1, labelY, wh.w - this.xMargin / 2, wh.h + this.gparms.fontSize / 2 - 1, gparms)
                 this.gfx.rect(labelX - 1, labelY, labelW + 2, labelH, gparms);
                 this.gfx.text(this.label, labelX, labelY, gparms, labelW);
             }
@@ -186,6 +187,12 @@ export class GroupItem extends _GroupItem {
             }
         }
         return result;
+    }
+    public get isRoot(): boolean {
+        return this._isRoot;
+    }
+    public set isRoot(value: boolean) {
+        this._isRoot = value;
     }
 
 }

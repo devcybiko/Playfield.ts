@@ -14,6 +14,10 @@ function printGo() {
     resultLabel.value = "Result Label: " + this.name;
 }
 
+function printValue() {
+    (this.parent as unknown as GroupItem).label = (this.parent as unknown as GroupItem).value;
+}
+
 export class PlayfieldTest {
     _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;
@@ -116,17 +120,22 @@ export class PlayfieldTest {
         let y = 10;
         let dy = 25;
         
-        let parent = this._playfield.tile;
+        let root = this._playfield.tile;
+        let parent = new GroupItem("G0", root, 10, 10, 500-20, 500-20, "Playfield Example");
+        parent.isRoot = true;
+        parent.isDraggable = false;
+        (parent as unknown as any).onTick = () => {parent.toBack();}
+
         let textGroup1 = new GroupItem("G1", parent, 10, y, 0, 0, "Group 1");
         let textItem1 = new TextItem("textitem-1", textGroup1, 110, 0, 250, 14, "Hello World 1");
         let labelItem1 = new LabelItem("Label-1", textGroup1, 0, 0, -110, 14, "Label-1: ");
 
-        let textGroup2 = new GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 1");
+        let textGroup2 = new GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 2");
         let textItem2 = new TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
         let labelItem2 = new LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
-        textGroup2.isBoxed = false;
-        textGroup2.xMargin = 0;
-        textGroup2.yMargin = 0;
+        textGroup2.isBoxed = true;
+        textGroup2.xMargin = 10;
+        textGroup2.yMargin = 10;
         textGroup2.updateWidthHeight();
         textGroup1.updateWidthHeight();
 
@@ -152,14 +161,19 @@ export class PlayfieldTest {
         let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 45, 14,"R1", "Radio 1");
         let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R2", "Radio 2");
         let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R3", "Radio 3");
-
+        radioItem1.go = printValue.bind(radioItem1);
+        radioItem2.go = printValue.bind(radioItem2);
+        radioItem3.go = printValue.bind(radioItem3);
+        
         let buttonGroup2 = new GroupItem("ButtonGroup2", parent, 10, y+=50, 0, 0, "CheckBoxes");
         x = 10;
         y = 0;
         let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 100, 14, "#1", "Number 1");
         let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
         let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
-        // buttonGroup2.isBoxed = false;
+        checkbox1.go = printValue.bind(checkbox1);
+        checkbox2.go = printValue.bind(checkbox2);
+        checkbox3.go = printValue.bind(checkbox3);
 
         this._playfield.start(0);
     }

@@ -23,7 +23,6 @@ export class CheckboxItem extends _CheckboxItem {
     // --- Public Methods --- //
 
     go(): boolean {
-        (this.parent as unknown as GroupItem).label = (this.parent as unknown as GroupItem).value;
         return false;
     }
 

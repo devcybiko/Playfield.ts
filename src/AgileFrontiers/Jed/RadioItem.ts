@@ -22,7 +22,6 @@ export class RadioItem extends _RadioItem {
     // --- Public Methods --- //
 
     go(): boolean {
-        (this.parent as unknown as GroupItem).label = (this.parent as unknown as GroupItem).value;
         return false;
     }
 

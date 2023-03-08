@@ -1692,7 +1692,8 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             return super.inBounds(dx, dy);
         }
         onEvent(pfEvent) {
-            this.children.forEach(child => child.isDraggable = false);
+            if (!this._isRoot)
+                this.children.forEach(child => child.isDraggable = false);
             return this.dispatchEventToChildren(pfEvent);
         }
         onGrab(dx, dy, pfEvent) {
@@ -1825,6 +1826,12 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             }
             return result;
         }
+        get isRoot() {
+            return this._isRoot;
+        }
+        set isRoot(value) {
+            this._isRoot = value;
+        }
     }
     exports.GroupItem = GroupItem;
 });
@@ -1850,7 +1857,6 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
         }
         // --- Public Methods --- //
         go() {
-            this.parent.label = this.parent.value;
             return false;
         }
         // --- Overrides --- //
@@ -1957,7 +1963,6 @@ define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
         }
         // --- Public Methods --- //
         go() {
-            this.parent.label = this.parent.value;
             return false;
         }
         // --- Overrides --- //
@@ -2366,6 +2371,9 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
     function printGo() {
         resultLabel.value = "Result Label: " + this.name;
     }
+    function printValue() {
+        this.parent.label = this.parent.value;
+    }
     class PlayfieldTest {
         constructor() {
             this._playfieldApp = new Browser_1.BrowserPlayfieldApp();
@@ -2453,16 +2461,20 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             let x = 110;
             let y = 10;
             let dy = 25;
-            let parent = this._playfield.tile;
+            let root = this._playfield.tile;
+            let parent = new Jed_1.GroupItem("G0", root, 10, 10, 500 - 20, 500 - 20, "Playfield Example");
+            parent.isRoot = true;
+            parent.isDraggable = false;
+            parent.onTick = () => { parent.toBack(); };
             let textGroup1 = new Jed_1.GroupItem("G1", parent, 10, y, 0, 0, "Group 1");
             let textItem1 = new Jed_1.TextItem("textitem-1", textGroup1, 110, 0, 250, 14, "Hello World 1");
             let labelItem1 = new Jed_1.LabelItem("Label-1", textGroup1, 0, 0, -110, 14, "Label-1: ");
-            let textGroup2 = new Jed_1.GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 1");
+            let textGroup2 = new Jed_1.GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 2");
             let textItem2 = new Jed_1.TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
             let labelItem2 = new Jed_1.LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
-            textGroup2.isBoxed = false;
-            textGroup2.xMargin = 0;
-            textGroup2.yMargin = 0;
+            textGroup2.isBoxed = true;
+            textGroup2.xMargin = 10;
+            textGroup2.yMargin = 10;
             textGroup2.updateWidthHeight();
             textGroup1.updateWidthHeight();
             let textItem3 = new Jed_1.TextItem("textitem-3", parent, x, y += textGroup2.h + 10, 100, 14, "Hello World 3");
@@ -2484,13 +2496,18 @@ define("Test/PlayfieldTest", ["require", "exports", "Test/CircleTestTile", "Test
             let radioItem1 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y, 45, 14, "R1", "Radio 1");
             let radioItem2 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R2", "Radio 2");
             let radioItem3 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R3", "Radio 3");
+            radioItem1.go = printValue.bind(radioItem1);
+            radioItem2.go = printValue.bind(radioItem2);
+            radioItem3.go = printValue.bind(radioItem3);
             let buttonGroup2 = new Jed_1.GroupItem("ButtonGroup2", parent, 10, y += 50, 0, 0, "CheckBoxes");
             x = 10;
             y = 0;
             let checkbox1 = new Jed_1.CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 100, 14, "#1", "Number 1");
             let checkbox2 = new Jed_1.CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
             let checkbox3 = new Jed_1.CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
-            // buttonGroup2.isBoxed = false;
+            checkbox1.go = printValue.bind(checkbox1);
+            checkbox2.go = printValue.bind(checkbox2);
+            checkbox3.go = printValue.bind(checkbox3);
             this._playfield.start(0);
         }
     }
