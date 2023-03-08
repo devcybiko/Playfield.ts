@@ -111,8 +111,10 @@ export class GroupItem extends _GroupItem {
     draw() {
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
+            this.gfx.clipRect(this.x, this.y, wh.w, wh.h, this.gparms);
             this.gfx.rect(this.x, this.y, wh.w, wh.h, this.gparms);
             if (this.label) {
+                this.gfx.restore();
                 this.gparms.fontSize = 12;
                 let labelX = this.x + this.xMargin / 2;
                 let labelY = this.y - this.gparms.fontSize / 2;
@@ -120,11 +122,15 @@ export class GroupItem extends _GroupItem {
                 let labelH = this.gparms.fontSize;
                 let gparms = this.gparms.clone();
                 gparms.borderColor = "";
+                this.gfx.clipRect(labelX - 1, labelY, wh.w -  this.xMargin / 2, wh.h + this.gparms.fontSize / 2 - 1, gparms)
                 this.gfx.rect(labelX - 1, labelY, labelW + 2, labelH, gparms);
                 this.gfx.text(this.label, labelX, labelY, gparms, labelW);
             }
+            this.redrawChildren();
+            this.gfx.restore();
+        } else {
+            this.redrawChildren();
         }
-        this.redrawChildren();
     }
 
     // --- Accessors --- //
