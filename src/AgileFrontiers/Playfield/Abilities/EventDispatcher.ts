@@ -1,4 +1,5 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 export interface EventDispatcher { };
 export class EventDispatcher {
@@ -10,10 +11,9 @@ export class EventDispatcher {
     // --- Public Methods --- //
 
     dispatchEventToChildren(pfEvent: PlayfieldEvent): boolean {
-        let that = this as any;
-        let children = that.children.reverse();
+        let thisTile = this as unknown as Tile;
         let processed = false;
-        for (let _child of children) {
+        for (let _child of thisTile.children) {
             let child = _child as any;
             processed = this.dispatchEventToChild(pfEvent, child) || processed;
         }

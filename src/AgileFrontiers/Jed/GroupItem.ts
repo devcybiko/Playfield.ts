@@ -45,7 +45,7 @@ export class GroupItem extends _GroupItem {
             let wh = this._computeWidthHeight();
             let result =
                 between(this.X, dx, this.X + wh.w) &&
-                between(this.Y - this.gparms.fontSize / 2, dy, this.Y + wh.h);
+                between(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
             if (result) return this;
         }
         return super.inBounds(dx, dy);
@@ -112,20 +112,20 @@ export class GroupItem extends _GroupItem {
     draw() {
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
-            this.gfx.clipRect(this.x, this.y, wh.w, wh.h, this.gparms);
-            this.gfx.rect(this.x, this.y, wh.w, wh.h, this.gparms);
+            this.gfx.clipRect(this.x, this.y, wh.w, wh.h);
+            this.gfx.rect(this.x, this.y, wh.w, wh.h);
             if (this.label) {
                 this.gfx.restore();
-                this.gparms.fontSize = 12;
+                this.gfx.gparms.fontSize = 12;
                 let labelX = this.x + this.xMargin / 2;
-                let labelY = this.y - this.gparms.fontSize / 2;
-                let labelW = Math.min(this.gfx.boundingBox(this.label, this.gparms).w, wh.w - this.xMargin);
-                let labelH = this.gparms.fontSize;
-                let gparms = this.gparms.clone();
-                gparms.borderColor = "";
-                this.gfx.clipRect(labelX - 1, labelY, wh.w - this.xMargin / 2, wh.h + this.gparms.fontSize / 2 - 1, gparms)
-                this.gfx.rect(labelX - 1, labelY, labelW + 2, labelH, gparms);
-                this.gfx.text(this.label, labelX, labelY, gparms, labelW);
+                let labelY = this.y - this.gfx.gparms.fontSize / 2;
+                let labelW = Math.min(this.gfx.boundingBox(this.label).w, wh.w - this.xMargin);
+                let labelH = this.gfx.gparms.fontSize;
+                let gfx = this.gfx.clone();
+                gfx.gparms.borderColor = "";
+                this.gfx.clipRect(labelX - 1, labelY, wh.w - this.xMargin / 2, wh.h + this.gfx.gparms.fontSize / 2 - 1)
+                gfx.rect(labelX - 1, labelY, labelW + 2, labelH);
+                gfx.text(this.label, labelX, labelY, labelW);
             }
             this.redrawChildren();
             this.gfx.restore();

@@ -3,12 +3,12 @@ import { Tile } from "../Playfield";
 export class BoxTestTile extends Tile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h = w) {
         super(name, parent, x, y, w, h);
-        this.gparms.borderColor = "red";
-        this.gparms.color = "blue";
-        this.gparms.fillColor = "green";
+        this.gfx.gparms.borderColor = "red";
+        this.gfx.gparms.color = "blue";
+        this.gfx.gparms.fillColor = "green";
     }
     draw() {
-        this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        this.playfield.gfx.rect(this.x, this.y, this.w, this.h);
     }
     onTick(): boolean {
         let obj = this as any;

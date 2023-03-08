@@ -20,8 +20,8 @@ export class CheckboxItem extends _CheckboxItem {
         this.Logger();
         this._label = label || value || name;
         this.options.fontSize = 14;
-        this.gparms.fontSize = 14;
-        let bb = this.gfx.boundingBox(label, this.gparms);
+        this.gfx.gparms.fontSize = 14;
+        let bb = this.gfx.boundingBox(label);
         this.w = this.w || bb.w + 2 + this.options.fontSize;
         this.h = this.h || bb.h + 2;
     }
@@ -35,15 +35,15 @@ export class CheckboxItem extends _CheckboxItem {
     // --- Overrides --- //
 
     draw() {
-        let gfx = this.playfield.gfx;
+        let gparms = this.gfx.gparms;
         this._updateGparms();
-        if (this.isChecked) this.gparms.fillColor = this.options.selectColor;
-        else if (this.isHovering) this.gparms.fillColor = this.options.hoverColor;
-        else this.gparms.fillColor = "white";
+        if (this.isChecked) gparms.fillColor = this.options.selectColor;
+        else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
+        else gparms.fillColor = "white";
 
         let boxX = this.x;
         let boxY = this.y;
-        let boxW = this.gparms.fontSize;
+        let boxW = gparms.fontSize;
         let boxH = boxW;
 
         let textX = boxX + boxW + 2;
@@ -51,12 +51,12 @@ export class CheckboxItem extends _CheckboxItem {
         let textW = this.w - boxW - 2;
         let textH = boxH + 2;
 
-        this.gparms.textBaseline = GfxParms.BOTTOM;
+        gparms.textBaseline = GfxParms.BOTTOM;
 
-        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
-        gfx.rect(boxX, boxY, boxW, boxH, this.gparms);
-        gfx.text(this._label, textX, textY, this.gparms, textW, textH);
-        gfx.restore();
+        this.gfx.clipRect(this.x, this.y, this.w, this.h);
+        this.gfx.rect(boxX, boxY, boxW, boxH);
+        this.gfx.text(this._label, textX, textY, textW, textH);
+        this.gfx.restore();
     }
 
     // --- onActions  --- //

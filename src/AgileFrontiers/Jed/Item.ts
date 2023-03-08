@@ -26,15 +26,14 @@ export class Item extends _Item {
     }
 
     public _updateGparms() {
-        this.gparms.fillColor = this.options.fillColor;
-        this.gparms.color = this.options.textColor;
-        this.gparms.borderColor = this.options.borderColor;
-        this.gparms.fontSize = this.options.fontSize;
-        this.gparms.fontFace = this.options.fontFace;
-        this.gparms.fontStyle = this.options.fontStyle;
-        this.gparms.textAlign = this.options.textAlign;
-        this.gparms.textBaseline = this.options.textBaseline;
-
+        this.gfx.gparms.fillColor = this.options.fillColor;
+        this.gfx.gparms.color = this.options.textColor;
+        this.gfx.gparms.borderColor = this.options.borderColor;
+        this.gfx.gparms.fontSize = this.options.fontSize;
+        this.gfx.gparms.fontFace = this.options.fontFace;
+        this.gfx.gparms.fontStyle = this.options.fontStyle;
+        this.gfx.gparms.textAlign = this.options.textAlign;
+        this.gfx.gparms.textBaseline = this.options.textBaseline;
     }
 
     public go() {
@@ -43,8 +42,8 @@ export class Item extends _Item {
 
     _recompute() {
         if (this.parent) {
-            this.gparms.dx = (this.parent as Tile).X + ((this.parent as any).xMargin || 0);
-            this.gparms.dy = (this.parent as Tile).Y + ((this.parent as any).yMargin || 0);
+            this.gfx.gparms.dx = (this.parent as Tile).X + ((this.parent as any).xMargin || 0);
+            this.gfx.gparms.dy = (this.parent as Tile).Y + ((this.parent as any).yMargin || 0);
         }
     }
 

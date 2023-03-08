@@ -27,7 +27,6 @@ export class Playfield extends _Playfield {
         super();
         this._gfx = gfx;
         this._eventQueue = eventQueue;
-        this._gparms = new GfxParms();
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
         this._rootTile = new RootTile(0, 0, this.w, this.h, this);
     }
@@ -35,7 +34,7 @@ export class Playfield extends _Playfield {
     // --- Public Methods --- //
 
     clear() {
-        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height, this.gparms);
+        this.gfx.rect(0, 0, this._gfx.width, this._gfx.height);
     }
 
     redraw() {
@@ -82,9 +81,6 @@ export class Playfield extends _Playfield {
     }
     get tile(): Tile {
         return this._rootTile;
-    }
-    get gparms(): GfxParms {
-        return this._gparms;
     }
     get gfx(): Gfx {
         return this._gfx;

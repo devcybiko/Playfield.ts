@@ -25,24 +25,25 @@ export class TextItem extends _TextItem {
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
-        this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w);
-        this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m", this.gparms).w / 2);
+        this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w);
+        this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
         this._left = 0;
         this._right = this._computeRight();
+        
     }
 
     // --- Overrides --- //
 
     draw() {
         this._blink();
-        let gfx = this.playfield.gfx;
+        let gfx = this.gfx;
         this._updateGparms();
-        if (this.isFocus) this.gparms.color = this.options.selectColor;
-        else this.gparms.color = this.options.textColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
+        if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
+        else this.gfx.gparms.color = this.options.textColor;
+        gfx.clipRect(this.x, this.y, this.w, this.h);
         let value = this.value.substring(this._left)
         if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
-        gfx.textRect(value, this.x, this.y, this.w, this.h, this.gparms);
+        gfx.textRect(value, this.x, this.y, this.w, this.h);
         this._drawCursor();
         gfx.restore();
     }
@@ -105,8 +106,8 @@ export class TextItem extends _TextItem {
     _drawCursor() {
         if (!this.isFocus) return;
         if (!this._cursorOn) return;
-        let gfx = this.playfield.gfx;
-        let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor), this.gparms);
+        let gfx = this.gfx;
+        let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor));
         let dw = valueBB.w;
         if (dw <= 0) dw = 1;
         else if (dw >= this.w) dw = this.w - 1;
@@ -115,8 +116,8 @@ export class TextItem extends _TextItem {
         let x1 = x0;
         let y0 = this.y;
         let y1 = y0 + valueBB.h;
-        gfx.line(x0, y0, x1, y1, this.gparms);
-        gfx.line(x0 + 1, y0, x1 + 2, y1, this.gparms);
+        gfx.line(x0, y0, x1, y1);
+        gfx.line(x0 + 1, y0, x1 + 2, y1);
     }
 
     _computeRight() {

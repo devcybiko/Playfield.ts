@@ -25,10 +25,10 @@ function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) 
     return can;
 }
 
-function createHiDPIFromCanvas(canvas: any, ratio?: number,) {
+function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
 
-    var can = canvas;
+    var can = document.querySelector(canvasId) as any;
     can._ratio = ratio;
     can.width = can.width * ratio;
     can.height = can.height * ratio;
@@ -43,9 +43,13 @@ export class BrowserGfx implements Gfx {
     private _ctx: CanvasRenderingContext2D;
     private _gparms: GfxParms;
 
-    constructor(canvasId: string) {
-        // this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
-        this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
+    constructor(canvasId?: string) {
+        if (canvasId) this._init(canvasId);
+    }
+
+    private _init(canvasId: string) {
+        this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
+        // this._canvas = createHiDPIFromCanvas(canvasId);
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
         this._ctx.fontKerning = "none";
@@ -54,26 +58,31 @@ export class BrowserGfx implements Gfx {
     }
 
     // --- Public Methods --- //
-
+    clone(): Gfx {
+        let newGfx = new BrowserGfx();
+        newGfx._canvas = this._canvas;
+        newGfx._ctx = this._ctx;
+        newGfx._gparms = this.gparms.clone();
+        return newGfx;
+    }
     rect(
         x: number,
         y: number,
         w: number,
-        h: number,
-        _gparms = this._gparms
+        h: number
     ) {
-        if (_gparms.fillColor) {
-            this._ctx.fillStyle = _gparms.fillColor;
+        if (this.gparms.fillColor) {
+            this._ctx.fillStyle = this.gparms.fillColor;
             this._ctx.beginPath();
-            if (_gparms.borderRadius) this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
-            else this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+            if (this.gparms.borderRadius) this._ctx.roundRect(this.gparms.dx + x, this.gparms.dy + y, w, h, this.gparms.borderRadius);
+            else this._ctx.rect(this.gparms.dx + x, this.gparms.dy + y, w, h);
             this._ctx.fill();
         }
-        if (_gparms.borderColor) {
-            this._ctx.strokeStyle = _gparms.borderColor;
+        if (this.gparms.borderColor) {
+            this._ctx.strokeStyle = this.gparms.borderColor;
             this._ctx.beginPath();
-            if (_gparms.borderRadius) this._ctx.roundRect(_gparms.dx + x, _gparms.dy + y, w, h, _gparms.borderRadius);
-            else this._ctx.rect(_gparms.dx + x, _gparms.dy + y, w, h);
+            if (this.gparms.borderRadius) this._ctx.roundRect(this.gparms.dx + x, this.gparms.dy + y, w, h, this.gparms.borderRadius);
+            else this._ctx.rect(this.gparms.dx + x, this.gparms.dy + y, w, h);
             this._ctx.stroke();
         }
     }
@@ -82,19 +91,18 @@ export class BrowserGfx implements Gfx {
         x: number,
         y: number,
         w: number,
-        h: number,
-        _gparms = this._gparms
+        h: number
     ) {
-        if (_gparms.fillColor) {
+        if (this.gparms.fillColor) {
             this._ctx.beginPath();
-            this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-            this._ctx.fillStyle = _gparms.fillColor;
+            this._ctx.ellipse(this.gparms.dx + x + w / 2, this.gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this._ctx.fillStyle = this.gparms.fillColor;
             this._ctx.fill();
         }
-        if (_gparms.borderColor) {
+        if (this.gparms.borderColor) {
             this._ctx.beginPath();
-            this._ctx.ellipse(_gparms.dx + x + w / 2, _gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
-            this._ctx.strokeStyle = _gparms.borderColor;
+            this._ctx.ellipse(this.gparms.dx + x + w / 2, this.gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+            this._ctx.strokeStyle = this.gparms.borderColor;
             this._ctx.stroke();
         }
     }
@@ -102,65 +110,62 @@ export class BrowserGfx implements Gfx {
     circle(
         x: number,
         y: number,
-        r: number,
-        _gparms = this._gparms
+        r: number
     ) {
-        this.ellipse(x - r, y - r, r * 2, r * 2, _gparms);
+        this.ellipse(x - r, y - r, r * 2, r * 2);
     }
 
     line(
         x0: number,
         y0: number,
         x1: number,
-        y1: number,
-        _gparms0 = this._gparms,
-        _gparms1 = _gparms0
+        y1: number
     ) {
         this._ctx.beginPath();
-        this._ctx.strokeStyle = _gparms0.borderColor;
-        this._ctx.moveTo(_gparms0.dx + x0, _gparms0.dy + y0);
-        this._ctx.lineTo(_gparms1.dx + x1, _gparms1.dy + y1);
+        this._ctx.strokeStyle = this.gparms.borderColor;
+        this._ctx.moveTo(this.gparms.dx + x0, this.gparms.dy + y0);
+        this._ctx.lineTo(this.gparms.dx + x1, this.gparms.dy + y1);
         this._ctx.stroke();
     }
 
-    text(msg: string, x = 0, y = 0, _gparms = this._gparms, w?: number, h?: number) {
-        this._ctx.fillStyle = _gparms.color;
-        this._ctx.font = _gparms.font;
-        this._ctx.textAlign = _gparms.textAlign;
-        this._ctx.textBaseline = _gparms.textBaseline;
+    text(msg: string, x = 0, y = 0, w?: number, h?: number) {
+        this._ctx.fillStyle = this.gparms.color;
+        this._ctx.font = this.gparms.font;
+        this._ctx.textAlign = this.gparms.textAlign;
+        this._ctx.textBaseline = this.gparms.textBaseline;
         let textX = x;
         let textY = y;
         if (!w || !h) {
-            let boundingBox = this.boundingBox(msg, _gparms);
+            let boundingBox = this.boundingBox(msg);
             if (!w) w = boundingBox.w;
             if (!h) h = boundingBox.h;
         }
 
-        if (_gparms.textAlign === GfxParms.LEFT) {
+        if (this.gparms.textAlign === GfxParms.LEFT) {
             // do nothing
-        } else if (_gparms.textAlign === GfxParms.RIGHT) {
+        } else if (this.gparms.textAlign === GfxParms.RIGHT) {
             textX += w;
-        } else if (_gparms.textAlign === GfxParms.CENTER) {
+        } else if (this.gparms.textAlign === GfxParms.CENTER) {
             textX += w / 2;
         } else {
-            throw new Error("Unknown textAlign: " + _gparms.textAlign)
+            throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
-        if (_gparms.textBaseline === GfxParms.TOP) {
+        if (this.gparms.textBaseline === GfxParms.TOP) {
             // do nothing
-        } else if (_gparms.textBaseline === GfxParms.BOTTOM) {
+        } else if (this.gparms.textBaseline === GfxParms.BOTTOM) {
             textY += h;
-        } else if (_gparms.textBaseline === GfxParms.MIDDLE) {
+        } else if (this.gparms.textBaseline === GfxParms.MIDDLE) {
             textY += h / 2;
         } else {
-            throw new Error("Unknown textAlign: " + _gparms.textAlign)
+            throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
 
         if (w) {
-            this.clipRect(x-1, y-1, w+2, h+2, _gparms);
-            this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+            this.clipRect(x-1, y-1, w+2, h+2);
+            this._ctx.fillText(msg, this.gparms.dx + textX, this.gparms.dy + textY);
             this.restore();
         } else {
-            this._ctx.fillText(msg, _gparms.dx + textX, _gparms.dy + textY);
+            this._ctx.fillText(msg, this.gparms.dx + textX, this.gparms.dy + textY);
         }
     }
 
@@ -169,30 +174,29 @@ export class BrowserGfx implements Gfx {
         x = 0,
         y = 0,
         w?: number,
-        h?: number,
-        _gparms = this._gparms
+        h?: number
     ) {
-        this._ctx.font = _gparms.font;
+        this._ctx.font = this.gparms.font;
         if (!w || !h) {
-            let boundingBox = this.boundingBox(msg, _gparms);
+            let boundingBox = this.boundingBox(msg);
             if (!w) w = boundingBox.w;
             if (!h) h = boundingBox.h;
         }
-        this.rect(x, y, w, h, _gparms);
-        this.text(msg, x+1, y+1, _gparms, w, h);
+        this.rect(x, y, w, h);
+        this.text(msg, x+1, y+1, w, h);
     }
 
 
-    boundingBox(msg: string, _gparms = this._gparms): any {
-        this._ctx.font = _gparms.font;
+    boundingBox(msg: string): any {
+        this._ctx.font = this.gparms.font;
         let boundingBox = this._ctx.measureText(msg) as any;
-        return { w: Math.floor(boundingBox.width + 0.5), h: _gparms.fontSize };
+        return { w: Math.floor(boundingBox.width + 0.5), h: this.gparms.fontSize };
     }
 
-    clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height, _gparms = this._gparms) {
+    clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
         this.save();
         let region = new Path2D();
-        region.rect(x + _gparms.dx, y + _gparms.dy, w, h);
+        region.rect(x + this.gparms.dx, y + this.gparms.dy, w, h);
         this._ctx.clip(region);
     }
 
@@ -216,6 +220,9 @@ export class BrowserGfx implements Gfx {
 
     get canvas(): HTMLCanvasElement {
         return this._canvas;
+    }
+    public get gparms(): GfxParms {
+        return this._gparms;
     }
 
 }

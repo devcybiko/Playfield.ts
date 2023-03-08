@@ -21,15 +21,14 @@ export class LabelItem extends _LabelItem {
 
     // --- Overrides --- //
     draw() {
-        let gfx = this.playfield.gfx;
         this._updateGparms();
-        this.gparms.borderColor = "";
+        this.gfx.gparms.borderColor = "";
         let w = this.w;
         let h = this.h;
         let x = this.x;
         let y = this.y;
-        gfx.clipRect(x, y, w, h, this.gparms);
-        gfx.textRect(this.value, x, y, w, h, this.gparms);
-        gfx.restore();
+        this.gfx.clipRect(x, y, w, h);
+        this.gfx.textRect(this.value, x, y, w, h);
+        this.gfx.restore();
     }
 }

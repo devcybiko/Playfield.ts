@@ -1,5 +1,5 @@
 import { applyMixins, Tree, Rect, between, Logger } from "./Utils";
-import { Gfx, GfxParms } from "./Graphics";
+import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 
@@ -18,7 +18,7 @@ applyMixins(_Tile, [Logger, Tree, Rect]);
 export interface Tile { };
 export class Tile extends _Tile {
     private _playfield: Playfield;
-    private _gparms: GfxParms;
+    private _gfx: Gfx;
     private _logger: Logger;
     private _tabOrder: number;
 
@@ -27,8 +27,8 @@ export class Tile extends _Tile {
         this.Logger();
         this.Tree(name, parent);
         this.Rect(x, y, w, h);
-        this._gparms = new GfxParms();
         this._playfield = playfield;
+        this._gfx = playfield.gfx.clone();
         this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
         return this;
     }
@@ -82,24 +82,21 @@ export class Tile extends _Tile {
     
     _recompute() {
         if (this.parent) {
-            this.gparms.dx = (this.parent as Tile).X;
-            this.gparms.dy = (this.parent as Tile).Y;
+            this.gfx.gparms.dx = (this.parent as Tile).X;
+            this.gfx.gparms.dy = (this.parent as Tile).Y;
         }
     }
 
     // --- Accessors --- //
 
     get gfx(): Gfx {
-        return this._playfield.gfx;
-    }
-    get gparms(): GfxParms {
-        return this._gparms;
+        return this._gfx;
     }
     get X(): number {
-        return this.x + this.gparms.dx;
+        return this.x + this.gfx.gparms.dx;
     }
     get Y(): number {
-        return this.y + this.gparms.dy;
+        return this.y + this.gfx.gparms.dy;
     }
     public get playfield(): Playfield {
         return this._playfield;

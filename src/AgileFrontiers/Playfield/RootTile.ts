@@ -30,7 +30,6 @@ export class RootTile extends _RootTile {
     // --- onActions --- //
 
     onEvent(pfEvent: PlayfieldEvent): boolean {
-        let children = this.children.reverse();
         return this.dispatchEventToChildren(pfEvent);
     }
 }

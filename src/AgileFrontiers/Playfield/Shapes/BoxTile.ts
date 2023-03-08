@@ -15,17 +15,17 @@ export class BoxTile extends _BoxTile {
         super(name, parent, x, y, w, h);
         this.Draggable();
         this.Selectable();
-        this.gparms.fillColor = this._colors[2];
+        this.gfx.gparms.fillColor = this._colors[2];
 
     }
 
     // --- Overrides ---//
 
     draw() {
-        // if (this.isSelected) this.gparms.borderColor = "black";
-        // else this.gparms.borderColor = "";
-        // this.gparms.fillColor = this._colors[this._color];
-        this.playfield.gfx.rect(this.x, this.y, this.w, this.h, this.gparms);
+        // if (this.isSelected) this.gfx.gparms.borderColor = "black";
+        // else this.gfx.gparms.borderColor = "";
+        // this.gfx.gparms.fillColor = this._colors[this._color];
+        this.playfield.gfx.rect(this.x, this.y, this.w, this.h);
     }
 
     // --- onActions --- //

@@ -31,7 +31,7 @@ export class PlayfieldTest {
 
     }
     boxTest() {
-        this._playfield.gfx.rect(10, 10, 100, 100, this._playfield.gparms);
+        this._playfield.gfx.rect(10, 10, 100, 100);
     }
     circleTestTile() {
         let parent = this._playfield.tile;
@@ -42,18 +42,18 @@ export class PlayfieldTest {
         let parent = this._playfield.tile;
         let lcircle = new CircleTestTile("left", parent, -75, +75, 50);
         let rcircle = new CircleTestTile("right", parent, +75, +75, 50);
-        lcircle.gparms.fillColor = "red";
-        rcircle.gparms.fillColor = "red";
+        lcircle.gfx.gparms.fillColor = "red";
+        rcircle.gfx.gparms.fillColor = "red";
 
         let llcircle = new CircleTestTile("left", lcircle, -50, 50, 50, 50);
         let lrcircle = new CircleTestTile("right", lcircle, +50, 50, 50, 50);
-        llcircle.gparms.fillColor = "blue";
-        lrcircle.gparms.fillColor = "blue";
+        llcircle.gfx.gparms.fillColor = "blue";
+        lrcircle.gfx.gparms.fillColor = "blue";
 
         let rlcircle = new CircleTestTile("left", rcircle, -50, 50, 50, 50);
         let rrcircle = new CircleTestTile("right", rcircle, +50, 50, 50, 50);
-        rlcircle.gparms.fillColor = "green";
-        rrcircle.gparms.fillColor = "green";
+        rlcircle.gfx.gparms.fillColor = "green";
+        rrcircle.gfx.gparms.fillColor = "green";
 
         this._playfield.start();
     }
@@ -68,7 +68,7 @@ export class PlayfieldTest {
                 let DX = random(-10, 10);
                 let DY = random(-10, 10);
                 let circle = new BoxTestTile("circle", parent, x, y, r, r);
-                // circle.gparms.fillColor = null;
+                // circle.gfx.gparms.fillColor = null;
                 (circle as any).DX = DX;
                 (circle as any).DY = DY;
             }
