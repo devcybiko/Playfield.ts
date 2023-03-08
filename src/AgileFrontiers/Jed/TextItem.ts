@@ -117,7 +117,7 @@ export class TextItem extends _TextItem {
         let y0 = this.y;
         let y1 = y0 + valueBB.h;
         gfx.line(x0, y0, x1, y1);
-        gfx.line(x0 + 1, y0, x1 + 2, y1);
+        gfx.line(x0 + 1, y0, x1 + 1, y1);
     }
 
     _computeRight() {
