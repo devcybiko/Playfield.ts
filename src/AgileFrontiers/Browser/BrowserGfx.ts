@@ -1,13 +1,48 @@
 import { Gfx } from "../Playfield/Graphics/Gfx";
 import { GfxParms } from "../Playfield/Graphics/GfxParms";
 
+var PIXEL_RATIO = (function () {
+    var ctx = document.createElement("canvas").getContext("2d") as any,
+        dpr = window.devicePixelRatio || 1,
+        bsr = ctx.webkitBackingStorePixelRatio ||
+              ctx.mozBackingStorePixelRatio ||
+              ctx.msBackingStorePixelRatio ||
+              ctx.oBackingStorePixelRatio ||
+              ctx.backingStorePixelRatio || 1;
+
+    return dpr / bsr;
+})();
+
+
+function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) {
+    if (!ratio) { ratio = PIXEL_RATIO; }
+    var can = canvas || document.createElement("canvas");
+    can.width = w * ratio;
+    can.height = h * ratio;
+    can.style.width = w + "px";
+    can.style.height = h + "px";
+    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+    return can;
+}
+
+function createHiDPIFromCanvas(canvas: any, ratio?: number,) {
+    if (!ratio) { ratio = PIXEL_RATIO; }
+    var can = canvas;
+    can.width = can.width * ratio;
+    can.height = can.height * ratio;
+    can.style.width = can.width + "px";
+    can.style.height = can.height + "px";
+    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
+    return can;
+}
+
 export class BrowserGfx implements Gfx {
     private _canvas: HTMLCanvasElement;
     private _ctx: CanvasRenderingContext2D;
     private _gparms: GfxParms;
 
     constructor(canvasId: string) {
-        this._canvas = document.querySelector(canvasId); // canvasId
+        this._canvas = createHiDPIFromCanvas(document.querySelector(canvasId));
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
         // this._ctx.fontKerning = "none";
