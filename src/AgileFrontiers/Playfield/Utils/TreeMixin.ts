@@ -10,10 +10,19 @@ export class Tree {
     }
 
     // --- Public Methods --- //
-    
+
     add(child: Tree): void {
         child._parent = this;
         this._children.push(child);
+    }
+
+    root(): Tree {
+        let result = (this as unknown as Tree);
+        while (result.parent) {
+            result = result.parent;
+        }
+        return result;
+
     }
 
     dfs(visit: (obj: Tree, ctx: any) => any, ctx?: any): any {

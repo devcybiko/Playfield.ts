@@ -43,7 +43,9 @@ export class Dragger {
             this._dragObj = child;
             this._dragX = pfEvent.x;
             this._dragY = pfEvent.y;
-            child.onGrab(pfEvent);
+            let dx = this._dragX - tileChild.X;
+            let dy = this._dragY - tileChild.Y;
+            child.onGrab(dx, dy, pfEvent);
             return true;
         }
         return false;

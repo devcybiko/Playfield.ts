@@ -3,10 +3,14 @@ import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random } from "../Playfield/Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
-import { TextItem, ButtonItem, ToggleItem, LabelItem } from "../Jed";
+import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem } from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
 import { GfxParms } from "../Playfield/Graphics";
+
+function printGo() {
+    console.log("GO!", this.name);
+}
 
 export class PlayfieldTest {
     _playfieldApp: BrowserPlayfieldApp;
@@ -108,25 +112,55 @@ export class PlayfieldTest {
     jedTest() {
         let x = 110;
         let y = 10;
+        let dy = 25;
+        
         let parent = this._playfield.tile;
-        let textItem1 = new TextItem("textitem-1", parent, x, y, 250, 14, "Hello World 1");
-        let labelItem1 = new LabelItem("Label-1", parent, x - 100, y, -100, 14, "Label-1: ");
-        let textItem2 = new TextItem("textitem-2", parent, x, y += 50, 100, 14, "Hello World 2");
-        let labelItem2 = new LabelItem("Label-2", parent, x - 100, y, -100, 14, "Label-2: ");
-        let textItem3 = new TextItem("textitem-3", parent, x, y += 50, 100, 14, "Hello World 3");
-        let textItem4 = new TextItem("textitem-4", parent, x, y += 50, 100, 14, "Hello World 4 ");
-        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += 50, 45, 14);
+        let textGroup1 = new GroupItem("G1", parent, 10, y, 0, 0, "Group 1");
+        let textItem1 = new TextItem("textitem-1", textGroup1, 110, 0, 250, 14, "Hello World 1");
+        let labelItem1 = new LabelItem("Label-1", textGroup1, 0, 0, -110, 14, "Label-1: ");
+
+        let textGroup2 = new GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 1");
+        let textItem2 = new TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
+        let labelItem2 = new LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
+        textGroup2.isBoxed = false;
+        textGroup2.xMargin = 0;
+        textGroup2.yMargin = 0;
+        textGroup2.updateWidthHeight();
+        textGroup1.updateWidthHeight();
+
+        let textItem3 = new TextItem("textitem-3", parent, x, y += textGroup2.h + 10, 100, 14, "Hello World 3");
+        let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += dy, 45, 14);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += 50, 45, 14, "Button Item 2");
-        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += 50, 45, 14, "Button Item 3");
-        let toggleItem1 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
-        toggleItem1.label = "goodbye friends";
-        toggleItem1.value = "gerg htims";
-        let toggleItem2 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
-        let toggleItem3 = new ToggleItem("ToggleItem", parent, x, y += 50, 45, 14);
+        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += dy, 45, 14, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += dy, 45, 14, "Button Item 3");
+
+        buttonItem1.go = printGo.bind(buttonItem1);
+        buttonItem2.go = printGo.bind(buttonItem2);
+        buttonItem3.go = printGo.bind(buttonItem3);
+
+        let radioItem0 = new RadioItem("RadioItem-0", parent, x, y += dy, 100, 14);
+        let checkboxItem = new CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 14);
+        let resultLabel = labelItem1 = new LabelItem("ResultLabel", parent, x, y += dy, 100, 14, "Result Label");
+
+        let buttonGroup = new GroupItem("ButtonGroup", parent, x, y+=50, 0, 0, "Radio Buttons");
+        x = 0;
+        y = 0;
+        let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 45, 14,"R1", "Radio 1");
+        let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R2", "Radio 2");
+        let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 45, 14, "R3", "Radio 3");
+
+        let buttonGroup2 = new GroupItem("ButtonGroup2", parent, 10, y+=50, 0, 0, "CheckBoxes");
+        x = 10;
+        y = 0;
+        let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 100, 14, "#1", "Number 1");
+        let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 50, 14, "#2", "Number 2");
+        let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 75, 14, "#3", "Number 3");
+        // buttonGroup2.isBoxed = false;
 
 
+        (this._playfield as any).resultLabel = resultLabel;
         this._playfield.start(0);
     }
 }

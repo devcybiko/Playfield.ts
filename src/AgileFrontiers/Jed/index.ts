@@ -1,4 +1,6 @@
 export {TextItem} from "./TextItem";
 export {ButtonItem} from "./ButtonItem";
-export {ToggleItem} from "./ToggleItem";
+export {CheckboxItem} from "./CheckboxItem";
+export {RadioItem} from "./RadioItem";
 export {LabelItem} from "./LabelItem";
+export {GroupItem} from "./GroupItem";

@@ -1,12 +1,12 @@
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Playfield/Utils";
 import { Draggable, Selectable } from "../Playfield/Abilities";
-import {ItemOptions} from "./ItemOptions"
+import { ItemOptions } from "./ItemOptions"
 import { GfxParms } from "../Playfield/Graphics";
 
 export class _Item extends Tile { };
-export interface _Item extends Draggable, Selectable { };
-applyMixins(_Item, [Draggable, Selectable]);
+export interface _Item extends Draggable { };
+applyMixins(_Item, [Draggable]);
 
 export class Item extends _Item {
     private _value: string;
@@ -15,7 +15,6 @@ export class Item extends _Item {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", text = "") {
         super(name, parent, x, y, w, h);
         this.Draggable();
-        this.Selectable();
         this._value = value;
         this._options = new ItemOptions;
         this._options.text = text || value;
@@ -35,11 +34,18 @@ export class Item extends _Item {
         this.gparms.fontStyle = this.options.fontStyle;
         this.gparms.textAlign = this.options.textAlign;
         this.gparms.textBaseline = this.options.textBaseline;
-    
+
     }
 
     public go() {
         throw Error("Unimplemented feature: 'go()';");
+    }
+
+    _recompute() {
+        if (this.parent) {
+            this.gparms.dx = (this.parent as Tile).X + ((this.parent as any).xMargin || 0);
+            this.gparms.dy = (this.parent as Tile).Y + ((this.parent as any).yMargin || 0);
+        }
     }
 
     // --- Accessors --- //

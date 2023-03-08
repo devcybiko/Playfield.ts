@@ -47,7 +47,7 @@ export class CircleTile extends _CircleTile {
 
     // --- onActions --- //
 
-    onGrab(event: any) {
+    onGrab(dx: number, dy: number, event: any) {
         this._dx = this.X - event.x;
         this._dy = this.Y - event.y;
         this.toFront();

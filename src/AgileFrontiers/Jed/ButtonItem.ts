@@ -23,8 +23,7 @@ export class ButtonItem extends _ButtonItem {
     // --- Overrides --- //
 
     go(): boolean {
-        console.log(this.value);
-        return true;
+        return false;
     }
 
     draw() {
@@ -33,7 +32,7 @@ export class ButtonItem extends _ButtonItem {
         if (this.isHovering && this.isPressed) this.gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) this.gparms.fillColor = this.options.hoverColor;
         else this.gparms.fillColor = this.options.fillColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h);
+        gfx.clipRect(this.x, this.y, this.w, this.h, this.gparms);
         gfx.textRect(this._label, this.x, this.y, this.w, this.h, this.gparms);
         gfx.restore();
     }

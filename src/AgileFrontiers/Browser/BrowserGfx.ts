@@ -84,7 +84,13 @@ export class BrowserGfx implements Gfx {
         this._ctx.font = _gparms.font;
         this._ctx.textAlign = _gparms.textAlign;
         this._ctx.textBaseline = _gparms.textBaseline;
-        this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y, w);
+        if (w) {
+            this.clipRect(x, y, w, _gparms.fontSize, _gparms);
+            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
+            this.restore();
+        } else {
+            this._ctx.fillText(msg, _gparms.dx + x, _gparms.dy + y);
+        }
     }
 
     textRect(

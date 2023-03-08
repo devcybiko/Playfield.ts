@@ -1,11 +1,11 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Playfield/Utils";
-import { Draggable, Editable, Repeatable } from "../Playfield/Abilities";
+import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
 export class _TextItem extends Item { };
-export interface _TextItem extends Draggable, Editable, Repeatable { };
-applyMixins(_TextItem, [Draggable, Editable, Repeatable]);
+export interface _TextItem extends Draggable, Editable, Timer { };
+applyMixins(_TextItem, [Draggable, Editable, Timer]);
 
 export class TextItem extends _TextItem {
     private _cursor = 0;
@@ -21,7 +21,7 @@ export class TextItem extends _TextItem {
         this.Draggable();
         this.Editable();
         this.Logger();
-        this.Repeatable(this._cursorBlinkRate);
+        this.Timer(this._cursorBlinkRate);
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
@@ -34,6 +34,7 @@ export class TextItem extends _TextItem {
     // --- Overrides --- //
 
     draw() {
+        this._blink();
         let gfx = this.playfield.gfx;
         this._updateGparms();
         if (this.isFocus) this.gparms.color = this.options.selectColor;
@@ -48,10 +49,6 @@ export class TextItem extends _TextItem {
 
     // --- onActions --- //
 
-    onRepeat(): boolean {
-        this._blink();
-        return true;
-    }
     onArrowLeft(): boolean {
         this._cursorInc(-1);
         return true;
@@ -92,16 +89,17 @@ export class TextItem extends _TextItem {
     // --- Private Methods --- //
 
     _blink() {
+        if (!this.isTimedOut) return;
         this._cursorOn = !this._cursorOn;
+        this.startTimer(this._cursorBlinkRate);
     }
 
     _startCursorBlinking() {
         this._cursorOn = true;
-        this.startRepeat(this._cursorBlinkRate);
+        this.startTimer(this._cursorBlinkRate);
     }
     _stopCursorBlinking() {
         this._cursorOn = false;
-        this.stopRepeat();
     }
 
     _drawCursor() {

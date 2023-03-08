@@ -22,6 +22,7 @@ export class BrowserEventPump {
     }
 
     private _handler(event: any) {
+        event.preventDefault();
         let pfEvent = new BrowserPlayfieldEvent(event);
         this._eventQueue.pushEvent(pfEvent);
     }

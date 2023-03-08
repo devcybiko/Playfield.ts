@@ -11,7 +11,7 @@ export class Draggable {
 
     // --- onActions --- //
 
-    onGrab(pfEvent: PlayfieldEvent): boolean {
+    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         return false;
     }
     

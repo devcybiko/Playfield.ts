@@ -10,4 +10,5 @@ export {Hoverer} from "./HovererMixin";
 export {Hoverable} from "./HoverableMixin";
 export {Editable} from "./EditableMixin";
 export {Editor} from "./EditorMixin";
-export {Repeatable} from "./RepeatableMixin";
+export {Timer} from "./Timer";
+export {EventDispatcher} from "./EventDispatcher";

@@ -30,7 +30,7 @@ export class BoxTile extends _BoxTile {
 
     // --- onActions --- //
 
-    onGrab() {
+    onGrab(dx: number, dy: number) {
         this.toFront();
         return true;
     }

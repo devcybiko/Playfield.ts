@@ -24,7 +24,7 @@ export class Editor {
     _focusChild(pfEvent: PlayfieldEvent, child: Editable): boolean {
         let tileChild = child as unknown as Tile;
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
-            this._unfocusChild(pfEvent, child);
+            this._unfocusChildren(pfEvent, child);
             this._focusObj = child;
             child.isFocus = true;
             child.onFocus();
@@ -32,14 +32,24 @@ export class Editor {
         }
     }
 
-    _unfocusChild(pfEvent: PlayfieldEvent, child: Editable): boolean {
-        if (this._focusObj) {
-            this._focusObj.isFocus = false;
-            this._focusObj.onUnfocus();
-            this._focusObj = null;
-            return true;
+    _editorParent(): Editor {
+        return (this as unknown as Tile).parent as unknown as Editor;
+    }
+
+    _unfocusChild(child: any, ctx: any) {
+        if (child._focusObj) {
+            // we're PRETTY sure this is Editable...
+            child._focusObj.isFocus = false;
+            child._focusObj.onUnfocus();
         }
-        return false;
+    }
+
+    _unfocusChildren(pfEvent: PlayfieldEvent, child: Editable): boolean {
+        // we have to unfocus ALL the children in the tree
+        // otherwise, the keyboard events go to all currently inFocus items
+        let root = (this as unknown as Tree).root();
+        root.dfs(this._unfocusChild);
+        return true;
     }
 
     _dispatchKey(pfEvent: PlayfieldEvent, child: Editable): boolean {
