@@ -99,21 +99,18 @@ export class Slider extends _Slider {
         return false;
     }
 
+    forceRange(min: number, value: number, max: number) {
+        if (value < min) value = min;
+        if (value > max) value = max;
+        return value;
+    }
+
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
         let c = this._cursor;
         let limit = this._limit;
         let oldValue = this._value;
-        if (this._isVertical) {
-            let newY = c.y + dy;
-            if (newY < limit.y0) newY = limit.y0;
-            if (newY > limit.y1) newY = limit.y1;
-            c.y = newY;    
-        } else {
-            let newX = c.x + dx;
-            if (newX < limit.x0) newX = limit.x0;
-            if (newX > limit.x1) newX = limit.x1;
-            c.x = newX;
-        }
+        if (this._isVertical) c.y = this.forceRange(limit.y0, c.y + dy, limit.y1);
+        else c.x = this.forceRange(limit.x0, c.x + dx, limit.x1);
         this._updateValue();
         pfEvent.isActive = false;
         if (this._value !== oldValue) this.onChange(this._value);
