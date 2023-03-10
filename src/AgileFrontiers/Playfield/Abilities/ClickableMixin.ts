@@ -6,13 +6,11 @@ export class Clickable {
 
     Clickable() {
         this.isClickable = true;
-        return this;
     }
 
     // --- onActions --- //
     
-    onClick(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onClick(pfEvent: PlayfieldEvent) {
     }
 
     // --- Accessors --- //

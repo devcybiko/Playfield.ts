@@ -19,7 +19,7 @@ export class Playfield extends _Playfield {
     private _gfx: Gfx;
     private _gparms: GfxParms;
     private _lastTime = 0;
-    private _delay = 0;
+    private _delay = -1;
     private _timerId = 0 as any;
     private _eventQueue: EventQueue;
 
@@ -28,7 +28,8 @@ export class Playfield extends _Playfield {
         this._gfx = gfx;
         this._eventQueue = eventQueue;
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
-        this._rootTile = new RootTile(0, 0, this.w, this.h, this);
+        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w, this.h);
+        this._rootTile.playfield = this;
     }
 
     // --- Public Methods --- //
@@ -46,7 +47,11 @@ export class Playfield extends _Playfield {
         this._delay = delay;
         this._lastTime = Date.now();
         this.redraw();
-        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+    }
+
+    stop() {
+        this._delay = -1;
     }
 
     // --- Private Methods --- //

@@ -18,7 +18,7 @@ export class Dragger {
 
     // --- Public Methods --- //
 
-    dragEvent(pfEvent: PlayfieldEvent, child: Draggable): boolean {
+    dragEvent(pfEvent: PlayfieldEvent, child: Draggable) {
         if (pfEvent.isMove) return this._dragChild(pfEvent, child);
         else if (pfEvent.isPress) return this._grabChild(pfEvent, child);
         else if (pfEvent.isRelease) return this._dropChild(pfEvent, child);
@@ -26,38 +26,34 @@ export class Dragger {
 
     // --- Private Methods --- //
 
-    _dragChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
+    _dragChild(pfEvent: PlayfieldEvent, child: Draggable) {
         if (this._dragObj) {
             this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
             this._dragX = pfEvent.x;
             this._dragY = pfEvent.y;
-            return true;
         }
-        return false;
-    }
-    
-    _grabChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
-        let tileChild = child as unknown as Tile;
-        if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
-            this._dropChild(pfEvent, child);
-            this._dragObj = child;
-            this._dragX = pfEvent.x;
-            this._dragY = pfEvent.y;
-            let dx = this._dragX - tileChild.X;
-            let dy = this._dragY - tileChild.Y;
-            child.onGrab(dx, dy, pfEvent);
-            return true;
-        }
-        return false;
     }
 
-    _dropChild(pfEvent: PlayfieldEvent, child: Draggable): boolean {
+    _grabChild(pfEvent: PlayfieldEvent, child: Draggable) {
+        let tileChild = child as unknown as Tile;
+        if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+            let dx = pfEvent.x - tileChild.X;
+            let dy = pfEvent.y - tileChild.Y;
+            if (child.onGrab(dx, dy, pfEvent)) {
+                // if the child does not reject the "grab"
+                this._dropChild(pfEvent, child);
+                this._dragX = pfEvent.x;
+                this._dragY = pfEvent.y;
+                this._dragObj = child;
+            }
+        }
+    }
+
+    _dropChild(pfEvent: PlayfieldEvent, child: Draggable) {
         if (this._dragObj) {
             this._dragObj.onDrop(pfEvent);
             this._dragObj = null;
-            return true;
         }
-        return false;
     }
 
 }

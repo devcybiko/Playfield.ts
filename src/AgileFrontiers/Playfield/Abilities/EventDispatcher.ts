@@ -10,27 +10,24 @@ export class EventDispatcher {
 
     // --- Public Methods --- //
 
-    dispatchEventToChildren(pfEvent: PlayfieldEvent): boolean {
+    dispatchEventToChildren(pfEvent: PlayfieldEvent) {
         let thisTile = this as unknown as Tile;
-        let processed = false;
-        for (let _child of thisTile.children) {
+        for (let _child of thisTile.children.reverse()) {
             let child = _child as any;
-            processed = this.dispatchEventToChild(pfEvent, child) || processed;
+            if (pfEvent.isActive) this.dispatchEventToChild(pfEvent, child);
         }
-        return processed;
     }
 
-    dispatchEventToChild(pfEvent: PlayfieldEvent, child: any): boolean {
+    dispatchEventToChild(pfEvent: PlayfieldEvent, child: any) {
         let that = this as any;
-        let processed = false;
-        if (child.isHoverable) processed = that.hoverEvent(pfEvent, child) || processed;
-        if (child.isDraggable) processed = that.dragEvent(pfEvent, child) || processed;
-        if (child.isSelectable) processed = that.selectEvent(pfEvent, child) || processed;
-        if (child.isClickable) processed = that.clickEvent(pfEvent, child) || processed;
-        if (child.isPressable) processed = that.pressEvent(pfEvent, child) || processed;
-        if (child.isFocusable) processed = that.editorEvent(pfEvent, child) || processed;
-        processed = child.onEvent(pfEvent) || processed;
-        return processed;
-    }
+        child.onEvent(pfEvent, child);
+        if (!pfEvent.isActive) return;
+        if (child.isHoverable) that.hoverEvent(pfEvent, child);
+        if (child.isDraggable) that.dragEvent(pfEvent, child);
+        if (child.isSelectable) that.selectEvent(pfEvent, child);
+        if (child.isClickable) that.clickEvent(pfEvent, child);
+        if (child.isPressable) that.pressEvent(pfEvent, child);
+        if (child.isFocusable) that.editorEvent(pfEvent, child);
 
+    }
 }

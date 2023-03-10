@@ -15,3 +15,6 @@ export function snapTo(n: number, snap: number) {
     if (x === 0) return n;
     return Math.floor(n / snap) * snap;
 }
+export function int(n: number) {
+    return Math.floor(n);
+}

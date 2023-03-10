@@ -15,31 +15,24 @@ export class Editable {
 
     // --- onActons --- //
 
-    onKey(key: string, pfEvent: PlayfieldEvent): boolean {
-        return true;
+    onKey(key: string, pfEvent: PlayfieldEvent): void {
     }
-    onArrowLeft(pfEvent: PlayfieldEvent): boolean {
-        return true;
+    onArrowLeft(pfEvent: PlayfieldEvent): void {
     }
-    onArrowRight(pfEvent: PlayfieldEvent): boolean {
-        return true;
+    onArrowRight(pfEvent: PlayfieldEvent): void {
     }
-    onBackspace(pfEvent: PlayfieldEvent): boolean {
-        return true;
+    onBackspace(pfEvent: PlayfieldEvent): void {
     }
-    private onBackSpace(pfEvent: PlayfieldEvent): boolean {
+    private onBackSpace(pfEvent: PlayfieldEvent): void {
         // this is the wrong method
         // you should be using onBackspace(), above
         // this is purposely mispelled with upper-case "S"
         // to force a compile-time error
         // if you attempt to override it.
-        return true;
     }
-    onFocus(): boolean {
-        return true;
+    onFocus(pfEvent: PlayfieldEvent): void {
     }
-    onUnfocus(): boolean {
-        return true;
+    onUnfocus(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Accessors --- //

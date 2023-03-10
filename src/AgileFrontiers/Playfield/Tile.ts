@@ -17,34 +17,47 @@ applyMixins(_Tile, [Logger, Tree, Rect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
+    public static null = null as unknown as Tile;
+
     private _playfield: Playfield;
     private _gfx: Gfx;
     private _logger: Logger;
-    private _tabOrder: number;
+    private _tabOrder = 0;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, playfield = parent._playfield) {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super();
         this.Logger();
-        this.Tree(name, parent);
         this.Rect(x, y, w, h);
-        this._playfield = playfield;
-        this._gfx = playfield.gfx.clone();
-        this._tabOrder = this.parent ? this.parent.children.indexOf(this) : 0;
-        return this;
+        this.Tree(name, parent);
     }
 
+    // --- Overrides --- //
+
+    addChild(child: Tile) {
+        super.addChild(child);
+        child.playfield = this._playfield;
+        child._tabOrder = this.children.indexOf(child);
+    }
     // --- Public Methods --- //
 
+    inBoundsChildren(x: number, y: number): Tile {
+        let found = Tile.null;
+        for (let child of this.children.reverse()) {
+            let tileChild = child as Tile;
+            found = tileChild.inBoundsChildren(x, y);
+            if (found) break;
+        }
+        if (!found) found = this.inBounds(x, y);
+        return found;
+    }
+
     inBounds(x: number, y: number): Tile {
+        let found = Tile.null;
         let result =
             between(this.X, x, this.X + this.w) &&
             between(this.Y, y, this.Y + this.h);
-        if (result) return this;
-        for (let child of this.children.reverse()) {
-            let found = (child as Tile).inBounds(x, y);
-            if (found) return found;
-        }
-        return null;
+        if (result) found = this;
+        return found;
     }
 
     drawAll(): void {
@@ -68,18 +81,15 @@ export class Tile extends _Tile {
 
     // --- OnActions --- //
 
-    onTick(): boolean {
+    onTick() {
         this.children.forEach(child => (child as Tile).onTick());
-        return true;
     }
 
-    onEvent(pfEvent: PlayfieldEvent): boolean {
-        this.children.forEach(child => (child as Tile).onEvent(pfEvent));
-        return true;
+    onEvent(pfEvent: PlayfieldEvent) {
     }
 
     // --- Private Methods --- //
-    
+
     _recompute() {
         if (this.parent) {
             this.gfx.gparms.dx = (this.parent as Tile).X;
@@ -103,5 +113,12 @@ export class Tile extends _Tile {
     }
     public set playfield(value: Playfield) {
         this._playfield = value;
+        this._gfx = this._playfield.gfx.clone();
+    }
+    public get tabOrder() {
+        return this._tabOrder;
+    }
+    public set tabOrder(value) {
+        this._tabOrder = value;
     }
 }

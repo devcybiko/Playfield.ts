@@ -6,12 +6,12 @@ export class Tree {
     Tree(name: string, parent?: Tree) {
         this._name = name;
         this._children = [];
-        if (parent) parent.add(this);
+        if (parent) parent.addChild(this);
     }
 
     // --- Public Methods --- //
 
-    add(child: Tree): void {
+    addChild(child: Tree): void {
         child._parent = this;
         this._children.push(child);
     }

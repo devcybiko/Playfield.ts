@@ -13,14 +13,11 @@ export class Hoverable {
 
     // --- onActions --- //
     
-    onHovering(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onHovering(pfEvent: PlayfieldEvent) {
     }
-    onEnter(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onEnter(pfEvent: PlayfieldEvent) {
     }
-    onExit(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onExit(pfEvent: PlayfieldEvent) {
     }
 
     // --- Accessors --- //

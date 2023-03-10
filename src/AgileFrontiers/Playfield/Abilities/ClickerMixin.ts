@@ -11,13 +11,12 @@ export class Clicker {
 
     // --- Public Methods --- //
     
-    clickEvent(pfEvent: PlayfieldEvent, child: Clickable): boolean {
+    clickEvent(pfEvent: PlayfieldEvent, child: Clickable) {
         if (pfEvent.isPress) {
             let tileChild = child as unknown as Tile;
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 child.onClick(pfEvent);
             }
         }
-        return true;
     }
 }

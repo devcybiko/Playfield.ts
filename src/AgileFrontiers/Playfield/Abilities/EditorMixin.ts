@@ -21,14 +21,13 @@ export class Editor {
 
     // --- Private Methods --- //
     
-    _focusChild(pfEvent: PlayfieldEvent, child: Editable): boolean {
+    _focusChild(pfEvent: PlayfieldEvent, child: Editable) {
         let tileChild = child as unknown as Tile;
-        if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+        if (pfEvent.isKeyboardEvent || tileChild.inBounds(pfEvent.x, pfEvent.y)) {
             this._unfocusChildren(pfEvent, child);
             this._focusObj = child;
             child.isFocus = true;
-            child.onFocus();
-            return true;
+            child.onFocus(pfEvent);
         }
     }
 
@@ -45,15 +44,15 @@ export class Editor {
         }
     }
 
-    _unfocusChildren(pfEvent: PlayfieldEvent, child: Editable): boolean {
+    _unfocusChildren(pfEvent: PlayfieldEvent, child: Editable) {
         // we have to unfocus ALL the children in the tree
         // otherwise, the keyboard events go to all currently inFocus items
         let root = (this as unknown as Tree).root();
         root.dfs(this._unfocusChild);
-        return true;
     }
 
-    _dispatchKey(pfEvent: PlayfieldEvent, child: Editable): boolean {
+    _dispatchKey(pfEvent: PlayfieldEvent, child: Editable) {
+        if (pfEvent.isKeyDown) console.error(pfEvent.key);
         if (child.isFocus) {
             if (pfEvent.key.length === 1) child.onKey(pfEvent.key, pfEvent);
             else if (pfEvent.key === "ArrowLeft") child.onArrowLeft(pfEvent);
@@ -61,13 +60,11 @@ export class Editor {
             else if (pfEvent.key === "Backspace") child.onBackspace(pfEvent);
             else if (pfEvent.key === "Tab" && !pfEvent.isShift) this._nextChild(1, pfEvent);
             else if (pfEvent.key === "Tab" && pfEvent.isShift) this._nextChild(-1, pfEvent);
-            return true;
         }
-        return false;
     }
 
-    _nextChild(direction: number, pfEvent: PlayfieldEvent): boolean {
-        if (!this._focusObj) return true;
+    _nextChild(direction: number, pfEvent: PlayfieldEvent) {
+        if (!this._focusObj) return;
         let focusObj = this._focusObj as unknown as Tree;
         let children = focusObj.parent.children.sort((a: any, b: any) => direction * (a._tabOrder - b._tabOrder));
         let i = children.indexOf(focusObj);
@@ -79,7 +76,6 @@ export class Editor {
             if (sibling.isFocusable) return this._focusChild(pfEvent, sibling);
             if (safety-- <= 0) break;
         }
-        return false;
     }
 
     // -- Accessors --- //

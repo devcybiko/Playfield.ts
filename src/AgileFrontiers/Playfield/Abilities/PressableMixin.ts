@@ -13,11 +13,9 @@ export class Pressable {
 
     // --- onActions --- //
     
-    onPress(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onPress(pfEvent: PlayfieldEvent) {
     }
-    onRelease(pfEvent: PlayfieldEvent): boolean {
-        return false;
+    onRelease(pfEvent: PlayfieldEvent) {
     }
 
     // --- Accessors --- //

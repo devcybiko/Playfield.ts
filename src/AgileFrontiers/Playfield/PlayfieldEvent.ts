@@ -17,6 +17,8 @@ export interface PlayfieldEvent {
     set isMenu(value: boolean);
     get isMenuRelease(): boolean;
     set isMenuRelease(value: boolean);
+    get isMouseEvent(): boolean;
+    set isMouseEvent(value: boolean);
 
     get key(): string;
     set key(value: string);
@@ -36,10 +38,16 @@ export interface PlayfieldEvent {
     set isMeta(value: boolean);
     get isCommand(): boolean;
     set isCommand(value: boolean);
+    get isKeyboardEvent(): boolean;
+    set isKeyboardEvent(value: boolean);
+    
     get swipe(): number;
     set swipe(value: number);
     get isSwipeLeft(): boolean;
     set isSwipeLeft(value: boolean);
     get isSwipeRight(): boolean;
     set isSwipeRight(value: boolean);
+
+    get isActive(): boolean;
+    set isActive(value: boolean);
 }

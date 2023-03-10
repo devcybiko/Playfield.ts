@@ -1,4 +1,4 @@
-import { Playfield } from "../Playfield";
+import { Playfield, HSplit, VSplit } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random } from "../Playfield/Utils";
@@ -116,46 +116,44 @@ export class PlayfieldTest {
         this._playfield.start(Math.floor(1 / fps * 1000));
     }
     jedTest() {
-        let x = 110;
+        let x = 10;
         let y = 10;
         let dy = 25;
         
         let root = this._playfield.tile;
-        let parent = new GroupItem("G0", root, 10, 10, 500-20, 500-20, "Playfield Example");
-        parent.isRoot = true;
-        parent.isDraggable = false;
-        (parent as unknown as any).onTick = () => {parent.toBack();}
+        let vsplit = new VSplit("vsplit", root, 0.5);
+        let east = vsplit.east;
+        let west = vsplit.west;
 
-        let textGroup1 = new GroupItem("G1", parent, 10, y, 0, 0, "Group 1");
-        let textItem1 = new TextItem("textitem-1", textGroup1, 110, 0, 250, 14, "Hello World 1");
-        let labelItem1 = new LabelItem("Label-1", textGroup1, 0, 0, -110, 14, "Label-1: ");
+        let textItem1 = new TextItem("textitem-1", west, 19, 10, 250, 14, "Hello World 1");
 
-        let textGroup2 = new GroupItem("G2", textGroup1, 0, 25, 0, 0, "Group 2");
-        let textItem2 = new TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
-        let labelItem2 = new LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
-        textGroup2.isBoxed = true;
-        textGroup2.xMargin = 10;
-        textGroup2.yMargin = 10;
-        textGroup2.updateWidthHeight();
-        textGroup1.updateWidthHeight();
+        let hsplit = new HSplit("hsplit", east, 0.5);
+        let north = hsplit.north;
+        let south = hsplit.south;
 
-        let textItem3 = new TextItem("textitem-3", parent, x, y += textGroup2.h + 10, 100, 14, "Hello World 3");
-        let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
-        let buttonItem1 = new ButtonItem("ButtonItem1", parent, x, y += dy, 100, 0);
+        // let parent = new GroupItem("G0", north, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
+        // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
+        // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+
+        y = 10;
+        let buttonItem1 = new ButtonItem("ButtonItem1", south, x, y += dy, 100, 0);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let buttonItem2 = new ButtonItem("ButtonItem2", parent, x, y += dy, 100, 0, "Button Item 2");
-        let buttonItem3 = new ButtonItem("ButtonItem3", parent, x, y += dy, 100, 0, "Button Item 3");
-
+        let buttonItem2 = new ButtonItem("ButtonItem2", south, x, y += dy, 100, 0, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", south, x, y += dy, 100, 0, "Button Item 3");
         buttonItem1.go = printGo.bind(buttonItem1);
         buttonItem2.go = printGo.bind(buttonItem2);
         buttonItem3.go = printGo.bind(buttonItem3);
 
-        let radioItem0 = new RadioItem("RadioItem-0", parent, x, y += dy, 100, 0);
-        let checkboxItem = new CheckboxItem("CheckboxItem-0", parent, x, y += dy, 100, 0);
-        resultLabel = labelItem1 = new LabelItem("ResultLabel", parent, x, y += dy, 200, 14, "Result Label");
+        let zsplit = new VSplit("zsplit", north, 0.5);
+        let zeast = zsplit.east;
+        let zwest = zsplit.west;
 
-        let buttonGroup = new GroupItem("ButtonGroup", parent, x, y+=50, 0, 0, "Radio Buttons");
+        // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
+        // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
+        // resultLabel = new LabelItem("ResultLabel", east, x, y += dy, 200, 14, "Result Label");
+
+        let buttonGroup = new GroupItem("ButtonGroup", zeast, 10, 10, 0, 0, "Radio Buttons");
         x = 0;
         y = 0;
         let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0,"R1", "Radio 1");
@@ -165,7 +163,7 @@ export class PlayfieldTest {
         radioItem2.go = printValue.bind(radioItem2);
         radioItem3.go = printValue.bind(radioItem3);
         
-        let buttonGroup2 = new GroupItem("ButtonGroup2", parent, 10, y+=50, 0, 0, "CheckBoxes");
+        let buttonGroup2 = new GroupItem("ButtonGroup2", zwest, 10, 10, 0, 0, "CheckBoxes");
         x = 10;
         y = 0;
         let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
@@ -174,6 +172,19 @@ export class PlayfieldTest {
         checkbox1.go = printValue.bind(checkbox1);
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);
+
+
+        // let west = new GroupItem("G1", vsplit.west, 10, 10, 0, 0, "Group 1");
+        // let labelItem1 = new LabelItem("Label-1", west, 0, 0, -110, 14, "Label-1: ");
+        // let textGroup2 = new GroupItem("G2", west, 0, 25, 0, 0, "Group 2");
+        // let textItem2 = new TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
+        // let labelItem2 = new LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
+        // textGroup2.isBoxed = true;
+        // textGroup2.xMargin = 10;
+        // textGroup2.yMargin = 10;
+        // textGroup2.updateWidthHeight();
+        // west.updateWidthHeight();
+
 
         this._playfield.start(0);
     }

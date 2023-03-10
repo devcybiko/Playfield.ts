@@ -17,7 +17,7 @@ export class ButtonItem extends _ButtonItem {
         this.Pressable();
         this.Hoverable();
         this.Logger("info", false);
-        this.isDraggable = false;
+        this.isDraggable = true;
         this._label = label || value || name;
         this.gfx.gparms.borderRadius = 10;
         this.options.textAlign = GfxParms.CENTER;

@@ -1,5 +1,6 @@
 export class BrowserPlayfieldEvent {
     private _event: any;
+    private _isActive: boolean;
 
     // mouse events
     private _x: number;
@@ -9,6 +10,7 @@ export class BrowserPlayfieldEvent {
     private _isRelease: boolean;
     private _isMenu: boolean;
     private _isMenuRelease: boolean;
+    private _isMouseEvent: boolean;
 
     // keyboard events
     private _key: string;
@@ -20,6 +22,7 @@ export class BrowserPlayfieldEvent {
     private _isOption: boolean;
     private _isMeta: boolean;
     private _isCommand: boolean;
+    private _isKeyboardEvent: boolean;
 
     // gestures
     private _swipe: number;
@@ -28,9 +31,13 @@ export class BrowserPlayfieldEvent {
 
     constructor(event: any, ratio = 1.0) {
         this.event = event;
+        this._isActive = true;
         // this.type = event.type;
 
         // mouse events
+        this.isMouseEvent = event.type.startsWith("mouse") || event.type.startsWith("wheel");
+        this.isKeyboardEvent = event.type.startsWith("key");
+        
         this.x = Math.floor(event.offsetX / ratio);
         this.y = Math.floor(event.offsetY / ratio);
 
@@ -180,4 +187,23 @@ export class BrowserPlayfieldEvent {
     public set isSwipeRight(value: boolean) {
         this._isSwipeRight = value;
     }
+    public get isActive(): boolean {
+        return this._isActive;
+    }
+    public set isActive(value: boolean) {
+        this._isActive = value;
+    }
+    public get isMouseEvent(): boolean {
+        return this._isMouseEvent;
+    }
+    public set isMouseEvent(value: boolean) {
+        this._isMouseEvent = value;
+    }
+    public get isKeyboardEvent(): boolean {
+        return this._isKeyboardEvent;
+    }
+    public set isKeyboardEvent(value: boolean) {
+        this._isKeyboardEvent = value;
+    }
+
 }

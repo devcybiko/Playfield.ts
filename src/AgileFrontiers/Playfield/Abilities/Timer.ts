@@ -5,11 +5,11 @@ export class Timer {
     private _lastTime: number;
     private _timeout: number;
 
-    Timer(delay: number) {
+    Timer() {
         this.isTimer = true;
-        this._delay = delay;
+        this._delay = 0;
         this._lastTime = Date.now();
-        this._timeout = this._lastTime + this._delay;
+        this._timeout = 0;
         return this;
     }
 
@@ -30,6 +30,10 @@ export class Timer {
         if (delay !== undefined) this._delay = delay;
         this._lastTime = Date.now();
         this._timeout = this._lastTime + this._delay;
+    }
+
+    stopTimer() {
+        this._timeout = 0;
     }
 
     get isTimedOut(): boolean {

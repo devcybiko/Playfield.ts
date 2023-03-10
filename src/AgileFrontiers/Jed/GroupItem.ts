@@ -14,7 +14,6 @@ export class GroupItem extends _GroupItem {
     private _yMargin: number;
     private _label;
     private _isResizing: boolean;
-    private _isRoot: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label);
@@ -51,26 +50,22 @@ export class GroupItem extends _GroupItem {
         return super.inBounds(dx, dy);
     }
 
-    onEvent(pfEvent: PlayfieldEvent): boolean {
-        if (!this._isRoot) this.children.forEach(child => (child as unknown as Draggable).isDraggable = false)
-        return this.dispatchEventToChildren(pfEvent);
+    onEvent(pfEvent: PlayfieldEvent) {
+        this.dispatchEventToChildren(pfEvent);
     }
 
     onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         super.onGrab(dx, dy, pfEvent);
-        this.toFront();
         if (this.isBoxed && between(this.w - 10, dx, this.w + 10) && between(this.h - 10, dy, this.h + 10)) {
             this._isResizing = true;
         }
         return true;
     }
 
-    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
         if (this._isResizing) {
-            console.log("onResize", dx, dy);
             super.w = this.w + dx;
             super.h = this.h + dy;
-            return true;
         } else {
             return super.onDrag(dx, dy, pfEvent);
         }
@@ -188,11 +183,4 @@ export class GroupItem extends _GroupItem {
         }
         return result;
     }
-    public get isRoot(): boolean {
-        return this._isRoot;
-    }
-    public set isRoot(value: boolean) {
-        this._isRoot = value;
-    }
-
 }

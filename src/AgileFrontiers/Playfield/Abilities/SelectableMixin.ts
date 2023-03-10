@@ -11,12 +11,10 @@ export class Selectable {
 
     // --- onActions --- //
     
-    onSelect(): boolean {
-        return false;
+    onSelect() {
     }
 
-    onUnselect(): boolean {
-        return false;
+    onUnselect() {
     }
 
     // --- Accessors --- //

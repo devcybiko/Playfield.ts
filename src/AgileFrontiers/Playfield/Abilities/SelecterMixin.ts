@@ -28,22 +28,19 @@ export class Selecter {
 
     // --- Private Methods --- //
 
-    _selectChild(pfEvent: PlayfieldEvent, child: Selectable): boolean {
+    _selectChild(pfEvent: PlayfieldEvent, child: Selectable) {
         this._unselectChild(pfEvent, child);
         this._selectedObj = child;
         child.isSelected = true;
         child.onSelect();
-        return true;
     }
 
-    _unselectChild(pfEvent: PlayfieldEvent, child: Selectable): boolean {
+    _unselectChild(pfEvent: PlayfieldEvent, child: Selectable) {
         if (this._selectedObj) {
             this._selectedObj.isSelected = false;
             this._selectedObj.onUnselect();
             this._selectedObj = null;
-            return true;
         }
-        return false;
     }
 
     // --- Accessors --- //

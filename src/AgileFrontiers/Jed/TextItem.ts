@@ -1,5 +1,5 @@
 import { Item } from "./Item";
-import { Tile } from "../Playfield";
+import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Playfield/Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
@@ -21,7 +21,7 @@ export class TextItem extends _TextItem {
         this.Draggable();
         this.Editable();
         this.Logger();
-        this.Timer(this._cursorBlinkRate);
+        this.Timer();
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
@@ -29,7 +29,7 @@ export class TextItem extends _TextItem {
         this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
         this._left = 0;
         this._right = this._computeRight();
-        
+        this.isDraggable = true;
     }
 
     // --- Overrides --- //
@@ -50,15 +50,13 @@ export class TextItem extends _TextItem {
 
     // --- onActions --- //
 
-    onArrowLeft(): boolean {
+    onArrowLeft(): void {
         this._cursorInc(-1);
-        return true;
     }
-    onArrowRight(): boolean {
+    onArrowRight(): void {
         this._cursorInc(+1);
-        return true;
     }
-    onBackspace(): boolean {
+    onBackspace(): void {
         if (this._cursor > 0) {
             let c = this._cursor;
             let left = this.value.substring(0, c - 1);
@@ -66,27 +64,26 @@ export class TextItem extends _TextItem {
             this.value = left + right;
             this._cursorInc(-1);
             this.log(left, right, this._cursor, this.value);
-            return true;
         }
-        return false;
     }
-    onKey(key: string): boolean {
+    onKey(key: string): void {
         let c = this._cursor;
         this.value = this.value.substring(0, c) + key + this.value.substring(c);
         this._cursorInc(+1);
-        return true;
     }
-    onFocus(): boolean {
-        super.onFocus();
-        this.toFront();
+    onFocus(pfEvent: PlayfieldEvent): void {
+        super.onFocus(pfEvent);
         this._startCursorBlinking();
-        return true;
+        pfEvent.isActive = false;
     }
-    onUnfocus(): boolean {
+    onUnfocus(): void {
         this._stopCursorBlinking();
-        return true;
     }
 
+    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+        this.onFocus(pfEvent);
+        return super.onGrab(dx, dy, pfEvent);
+    }
     // --- Private Methods --- //
 
     _blink() {

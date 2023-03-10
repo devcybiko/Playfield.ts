@@ -40,7 +40,8 @@ export class GfxParms {
     }
     public clone(): GfxParms {
         let gfxparms = new GfxParms;
-        return Object.assign(gfxparms, this);
+        Object.assign(gfxparms, this);
+        return gfxparms;
     }
     private _updateFont() {
         this._font = (this._fontStyle + " " + this._fontSize + "px " + this._fontFace).trim();

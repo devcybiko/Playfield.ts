@@ -10,7 +10,7 @@ export class Hoverer {
 
     // --- Public Methods --- //
     
-    hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable): boolean {
+    hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable) {
         let treeChild = child as unknown as Tile;
         if (pfEvent.isMove) {
             if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
@@ -26,8 +26,6 @@ export class Hoverer {
                     child.onExit(pfEvent);
                 }
             }
-            return true;
         }
-        return false;
     }
 }
