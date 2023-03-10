@@ -2,7 +2,7 @@ import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
 import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editor, Hoverer } from "./Abilities";
 import { Draggable, Hoverable } from "./Abilities";
-import { applyMixins, Rect, Margins, Ratio, Tree, int, between } from "./Utils";
+import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "./Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 import { GfxParms } from "./Graphics";
@@ -34,12 +34,12 @@ export class Slider extends _Slider {
         if (this._isVertical) {
             c.x = this._margins.left;
             c.h = this._cursorSize;
-            c.w = this.w - this._margins.left - this._margins.right;    
+            c.w = this.w - this._margins.left - this._margins.right;
             this._ratio.Ratio(min, max, value, this._limit.y0, this._limit.y1);
         } else {
             c.y = this._margins.top;
             c.w = this._cursorSize;
-            c.h = this.h - this._margins.top - this._margins.bottom;    
+            c.h = this.h - this._margins.top - this._margins.bottom;
             this._ratio.Ratio(min, max, value, this._limit.x0, this._limit.x1);
         }
         this.value = value;
@@ -75,7 +75,7 @@ export class Slider extends _Slider {
             this.gfx.gparms.fillColor = "red";
         } else if (this.isHovering) {
             this.gfx.gparms.fillColor = "#c88";
-        }else {
+        } else {
             this.gfx.gparms.fillColor = oldColor;
         }
         this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
@@ -86,7 +86,7 @@ export class Slider extends _Slider {
         this.gfx.gparms.fillColor = oldColor;
     }
 
-    onChange(value: number) {
+    onChange(value: number, pfEvent: PlayfieldEvent) {
         console.log(value);
     }
 
@@ -99,21 +99,17 @@ export class Slider extends _Slider {
         return false;
     }
 
-    forceRange(min: number, value: number, max: number) {
-        if (value < min) value = min;
-        if (value > max) value = max;
-        return value;
-    }
-
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
         let c = this._cursor;
-        let limit = this._limit;
         let oldValue = this._value;
-        if (this._isVertical) c.y = this.forceRange(limit.y0, c.y + dy, limit.y1);
-        else c.x = this.forceRange(limit.x0, c.x + dx, limit.x1);
+        if (this._isVertical) {
+            c.y = limit(this._limit.y0, c.y + dy, this._limit.y1);
+        } else {
+            c.x = limit(this._limit.x0, c.x + dx, this._limit.x1);
+        }
         this._updateValue();
+        if (this._value !== oldValue) this.onChange(this._value, pfEvent);
         pfEvent.isActive = false;
-        if (this._value !== oldValue) this.onChange(this._value);
     }
     onDrop(pfEvent: PlayfieldEvent): void {
         super.onDrop(pfEvent);

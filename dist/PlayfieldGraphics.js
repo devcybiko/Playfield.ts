@@ -15,7 +15,7 @@ define("Playfield/Utils/Mixins", ["require", "exports"], function (require, expo
 define("Playfield/Utils/Functions", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
+    exports.limit = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
     function between(a, b, c) {
         let result = a < b && b < c;
         return result;
@@ -42,6 +42,14 @@ define("Playfield/Utils/Functions", ["require", "exports"], function (require, e
         return Math.floor(n);
     }
     exports.int = int;
+    function limit(min, value, max) {
+        if (value < min)
+            value = min;
+        if (value > max)
+            value = max;
+        return value;
+    }
+    exports.limit = limit;
 });
 define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -420,13 +428,14 @@ define("Playfield/Utils/RatioMixin", ["require", "exports", "Playfield/Utils/Fun
 define("Playfield/Utils/index", ["require", "exports", "Playfield/Utils/Mixins", "Playfield/Utils/Functions", "Playfield/Utils/LoggerMixin", "Playfield/Utils/TreeMixin", "Playfield/Utils/RectMixin", "Playfield/Utils/PointMixin", "Playfield/Utils/MarginsMixin", "Playfield/Utils/RatioMixin"], function (require, exports, Mixins_1, Functions_2, LoggerMixin_1, TreeMixin_1, RectMixin_1, PointMixin_2, MarginsMixin_1, RatioMixin_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Ratio = exports.Margins = exports.Point = exports.Rect = exports.Tree = exports.Logger = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
+    exports.Ratio = exports.Margins = exports.Point = exports.Rect = exports.Tree = exports.Logger = exports.limit = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
     Object.defineProperty(exports, "applyMixins", { enumerable: true, get: function () { return Mixins_1.applyMixins; } });
     Object.defineProperty(exports, "between", { enumerable: true, get: function () { return Functions_2.between; } });
     Object.defineProperty(exports, "inclusive", { enumerable: true, get: function () { return Functions_2.inclusive; } });
     Object.defineProperty(exports, "random", { enumerable: true, get: function () { return Functions_2.random; } });
     Object.defineProperty(exports, "snapTo", { enumerable: true, get: function () { return Functions_2.snapTo; } });
     Object.defineProperty(exports, "int", { enumerable: true, get: function () { return Functions_2.int; } });
+    Object.defineProperty(exports, "limit", { enumerable: true, get: function () { return Functions_2.limit; } });
     Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return LoggerMixin_1.Logger; } });
     Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return TreeMixin_1.Tree; } });
     Object.defineProperty(exports, "Rect", { enumerable: true, get: function () { return RectMixin_1.Rect; } });
@@ -1655,7 +1664,7 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
             this.gfx.restore();
             this.gfx.gparms.fillColor = oldColor;
         }
-        onChange(value) {
+        onChange(value, pfEvent) {
             console.log(value);
         }
         onGrab(dx, dy, pfEvent) {
@@ -1668,28 +1677,17 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
         }
         onDrag(dx, dy, pfEvent) {
             let c = this._cursor;
-            let limit = this._limit;
             let oldValue = this._value;
             if (this._isVertical) {
-                let newY = c.y + dy;
-                if (newY < limit.y0)
-                    newY = limit.y0;
-                if (newY > limit.y1)
-                    newY = limit.y1;
-                c.y = newY;
+                c.y = (0, Utils_6.limit)(this._limit.y0, c.y + dy, this._limit.y1);
             }
             else {
-                let newX = c.x + dx;
-                if (newX < limit.x0)
-                    newX = limit.x0;
-                if (newX > limit.x1)
-                    newX = limit.x1;
-                c.x = newX;
+                c.x = (0, Utils_6.limit)(this._limit.x0, c.x + dx, this._limit.x1);
             }
             this._updateValue();
-            pfEvent.isActive = false;
             if (this._value !== oldValue)
-                this.onChange(this._value);
+                this.onChange(this._value, pfEvent);
+            pfEvent.isActive = false;
         }
         onDrop(pfEvent) {
             super.onDrop(pfEvent);

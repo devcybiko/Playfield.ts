@@ -1,5 +1,5 @@
 export {applyMixins} from "./Mixins";
-export {between, inclusive, random, snapTo, int} from "./Functions";
+export {between, inclusive, random, snapTo, int, limit} from "./Functions";
 
 export {Logger} from "./LoggerMixin";
 export {Tree} from "./TreeMixin";
