@@ -44,6 +44,11 @@ export class Slider extends _Slider {
         }
         this.value = value;
         this._updateCursor();
+
+        this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
+        this.gfx.gparms.textAlign = GfxParms.CENTER;
+        this.gfx.gparms.fontSize = 12;
+
     }
 
     set value(v: number) {
@@ -68,7 +73,6 @@ export class Slider extends _Slider {
     draw() {
         let c = this._cursor;
         this.gfx.clipRect(this.x, this.y, this.w, this.h);
-        let oldColor = this.gfx.gparms.fillColor;
         this.gfx.gparms.fillColor = "white";
         this.gfx.rect(this.x, this.y, this.w, this.h);
         if (this.isDragging) {
@@ -76,14 +80,10 @@ export class Slider extends _Slider {
         } else if (this.isHovering) {
             this.gfx.gparms.fillColor = "#c88";
         } else {
-            this.gfx.gparms.fillColor = oldColor;
+            this.gfx.gparms.fillColor = "white";
         }
-        this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
-        this.gfx.gparms.textAlign = GfxParms.CENTER;
-        this.gfx.gparms.fontSize = 12;
         this.gfx.textRect("" + int(this._value), this.x + c.x, this.y + c.y, c.w, c.h);
         this.gfx.restore();
-        this.gfx.gparms.fillColor = oldColor;
     }
 
     onChange(value: number, pfEvent: PlayfieldEvent) {
