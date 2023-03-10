@@ -119,22 +119,25 @@ export class PlayfieldTest {
         let x = 10;
         let y = 10;
         let dy = 25;
-        
+
         let root = this._playfield.tile;
         let vsplit = new VSplit("vsplit", root, 0.5);
-        let east = vsplit.east;
-        let west = vsplit.west;
+        let veast = vsplit.east;
+        let vwest = vsplit.west;
 
-        let textItem1 = new TextItem("textitem-1", west, 19, 10, 250, 14, "Hello World 1");
-
-        let hsplit = new HSplit("hsplit", east, 0.5);
+        let hsplit = new HSplit("hsplit", veast, 0.5);
         let north = hsplit.north;
         let south = hsplit.south;
 
-        // let parent = new GroupItem("G0", north, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
-        // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
-        // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+        let zsplit = new HSplit("hsplit", vwest, 0.5);
+        let east = zsplit.north;
+        let west = zsplit.south;
 
+        // north
+        let textItem1 = new TextItem("textitem-1", north, x, y += dy, 250, 14, "Hello World 1");
+        resultLabel = new LabelItem("ResultLabel", north, x, y += dy, 200, 14, "Result Label");
+
+        // south
         y = 10;
         let buttonItem1 = new ButtonItem("ButtonItem1", south, x, y += dy, 100, 0);
         buttonItem1.label = "Hello World";
@@ -145,25 +148,21 @@ export class PlayfieldTest {
         buttonItem2.go = printGo.bind(buttonItem2);
         buttonItem3.go = printGo.bind(buttonItem3);
 
-        let zsplit = new VSplit("zsplit", north, 0.5);
-        let zeast = zsplit.east;
-        let zwest = zsplit.west;
 
-        // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
-        // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
-        // resultLabel = new LabelItem("ResultLabel", east, x, y += dy, 200, 14, "Result Label");
+        // east
 
-        let buttonGroup = new GroupItem("ButtonGroup", zeast, 10, 10, 0, 0, "Radio Buttons");
+        let buttonGroup = new GroupItem("ButtonGroup", east, 10, 10, 0, 0, "Radio Buttons");
         x = 0;
         y = 0;
-        let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0,"R1", "Radio 1");
+        let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
         let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R2", "Radio 2");
         let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R3", "Radio 3");
         radioItem1.go = printValue.bind(radioItem1);
         radioItem2.go = printValue.bind(radioItem2);
         radioItem3.go = printValue.bind(radioItem3);
-        
-        let buttonGroup2 = new GroupItem("ButtonGroup2", zwest, 10, 10, 0, 0, "CheckBoxes");
+
+        // west
+        let buttonGroup2 = new GroupItem("ButtonGroup2", west, 10, 10, 0, 0, "CheckBoxes");
         x = 10;
         y = 0;
         let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
@@ -173,6 +172,12 @@ export class PlayfieldTest {
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);
 
+
+        // let ysplit = new GroupItem("G0", zwest, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
+        // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
+        // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+        // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
+        // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
 
         // let west = new GroupItem("G1", vsplit.west, 10, 10, 0, 0, "Group 1");
         // let labelItem1 = new LabelItem("Label-1", west, 0, 0, -110, 14, "Label-1: ");

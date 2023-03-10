@@ -2837,15 +2837,18 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let dy = 25;
             let root = this._playfield.tile;
             let vsplit = new Playfield_5.VSplit("vsplit", root, 0.5);
-            let east = vsplit.east;
-            let west = vsplit.west;
-            let textItem1 = new Jed_1.TextItem("textitem-1", west, 19, 10, 250, 14, "Hello World 1");
-            let hsplit = new Playfield_5.HSplit("hsplit", east, 0.5);
+            let veast = vsplit.east;
+            let vwest = vsplit.west;
+            let hsplit = new Playfield_5.HSplit("hsplit", veast, 0.5);
             let north = hsplit.north;
             let south = hsplit.south;
-            // let parent = new GroupItem("G0", north, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
-            // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
-            // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+            let zsplit = new Playfield_5.HSplit("hsplit", vwest, 0.5);
+            let east = zsplit.north;
+            let west = zsplit.south;
+            // north
+            let textItem1 = new Jed_1.TextItem("textitem-1", north, x, y += dy, 250, 14, "Hello World 1");
+            resultLabel = new Jed_1.LabelItem("ResultLabel", north, x, y += dy, 200, 14, "Result Label");
+            // south
             y = 10;
             let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", south, x, y += dy, 100, 0);
             buttonItem1.label = "Hello World";
@@ -2855,13 +2858,8 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             buttonItem1.go = printGo.bind(buttonItem1);
             buttonItem2.go = printGo.bind(buttonItem2);
             buttonItem3.go = printGo.bind(buttonItem3);
-            let zsplit = new Playfield_5.VSplit("zsplit", north, 0.5);
-            let zeast = zsplit.east;
-            let zwest = zsplit.west;
-            // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
-            // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
-            // resultLabel = new LabelItem("ResultLabel", east, x, y += dy, 200, 14, "Result Label");
-            let buttonGroup = new Jed_1.GroupItem("ButtonGroup", zeast, 10, 10, 0, 0, "Radio Buttons");
+            // east
+            let buttonGroup = new Jed_1.GroupItem("ButtonGroup", east, 10, 10, 0, 0, "Radio Buttons");
             x = 0;
             y = 0;
             let radioItem1 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
@@ -2870,7 +2868,8 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             radioItem1.go = printValue.bind(radioItem1);
             radioItem2.go = printValue.bind(radioItem2);
             radioItem3.go = printValue.bind(radioItem3);
-            let buttonGroup2 = new Jed_1.GroupItem("ButtonGroup2", zwest, 10, 10, 0, 0, "CheckBoxes");
+            // west
+            let buttonGroup2 = new Jed_1.GroupItem("ButtonGroup2", west, 10, 10, 0, 0, "CheckBoxes");
             x = 10;
             y = 0;
             let checkbox1 = new Jed_1.CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
@@ -2879,6 +2878,11 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             checkbox1.go = printValue.bind(checkbox1);
             checkbox2.go = printValue.bind(checkbox2);
             checkbox3.go = printValue.bind(checkbox3);
+            // let ysplit = new GroupItem("G0", zwest, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
+            // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
+            // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
+            // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
+            // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
             // let west = new GroupItem("G1", vsplit.west, 10, 10, 0, 0, "Group 1");
             // let labelItem1 = new LabelItem("Label-1", west, 0, 0, -110, 14, "Label-1: ");
             // let textGroup2 = new GroupItem("G2", west, 0, 25, 0, 0, "Group 2");
