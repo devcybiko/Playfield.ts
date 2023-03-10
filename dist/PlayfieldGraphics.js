@@ -1621,6 +1621,9 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
             }
             this.value = value;
             this._updateCursor();
+            this.gfx.gparms.textBaseline = Graphics_1.GfxParms.MIDDLE;
+            this.gfx.gparms.textAlign = Graphics_1.GfxParms.CENTER;
+            this.gfx.gparms.fontSize = 12;
         }
         set value(v) {
             this._value = v;
@@ -1645,8 +1648,7 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
         draw() {
             let c = this._cursor;
             this.gfx.clipRect(this.x, this.y, this.w, this.h);
-            let oldColor = this.gfx.gparms.fillColor;
-            this.gfx.gparms.fillColor = "white";
+            this.gfx.gparms.fillColor = "#ccc";
             this.gfx.rect(this.x, this.y, this.w, this.h);
             if (this.isDragging) {
                 this.gfx.gparms.fillColor = "red";
@@ -1655,14 +1657,10 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
                 this.gfx.gparms.fillColor = "#c88";
             }
             else {
-                this.gfx.gparms.fillColor = oldColor;
+                this.gfx.gparms.fillColor = "white";
             }
-            this.gfx.gparms.textBaseline = Graphics_1.GfxParms.MIDDLE;
-            this.gfx.gparms.textAlign = Graphics_1.GfxParms.CENTER;
-            this.gfx.gparms.fontSize = 12;
             this.gfx.textRect("" + (0, Utils_6.int)(this._value), this.x + c.x, this.y + c.y, c.w, c.h);
             this.gfx.restore();
-            this.gfx.gparms.fillColor = oldColor;
         }
         onChange(value, pfEvent) {
             console.log(value);

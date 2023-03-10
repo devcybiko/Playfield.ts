@@ -73,7 +73,7 @@ export class Slider extends _Slider {
     draw() {
         let c = this._cursor;
         this.gfx.clipRect(this.x, this.y, this.w, this.h);
-        this.gfx.gparms.fillColor = "white";
+        this.gfx.gparms.fillColor = "#ccc";
         this.gfx.rect(this.x, this.y, this.w, this.h);
         if (this.isDragging) {
             this.gfx.gparms.fillColor = "red";
