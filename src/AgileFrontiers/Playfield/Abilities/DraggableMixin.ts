@@ -20,14 +20,14 @@ export class Draggable {
         return true;
     }
     
-    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
+    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
         if (this.isDragging) {
             let that = this as any;
             if (that.rmove) that.rmove(dx, dy);
             pfEvent.isActive = false;
         }
     }
-    onDrop(pfEvent: PlayfieldEvent) {
+    onDrop(pfEvent: PlayfieldEvent): void {
         if (this.isDragging) {
             this.isDragging = false;
             pfEvent.isActive = false;

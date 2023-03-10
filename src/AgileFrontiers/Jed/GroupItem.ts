@@ -118,8 +118,8 @@ export class GroupItem extends _GroupItem {
                 let labelH = this.gfx.gparms.fontSize;
                 let gfx = this.gfx.clone();
                 gfx.gparms.borderColor = "";
-                this.gfx.clipRect(labelX - 1, labelY, wh.w - this.xMargin / 2, wh.h + this.gfx.gparms.fontSize / 2 - 1)
-                gfx.rect(labelX - 1, labelY, labelW + 2, labelH);
+                this.gfx.clipRect(labelX, labelY, wh.w - this.xMargin / 2, wh.h + this.gfx.gparms.fontSize / 2)
+                gfx.rect(labelX, labelY, labelW, labelH);
                 gfx.text(this.label, labelX, labelY, labelW);
             }
             this.redrawChildren();

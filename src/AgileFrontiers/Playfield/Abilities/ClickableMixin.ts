@@ -10,7 +10,7 @@ export class Clickable {
 
     // --- onActions --- //
     
-    onClick(pfEvent: PlayfieldEvent) {
+    onClick(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Accessors --- //

@@ -5,11 +5,10 @@ var PIXEL_RATIO = (function () {
     var ctx = document.createElement("canvas").getContext("2d") as any,
         dpr = window.devicePixelRatio || 1,
         bsr = ctx.webkitBackingStorePixelRatio ||
-              ctx.mozBackingStorePixelRatio ||
-              ctx.msBackingStorePixelRatio ||
-              ctx.oBackingStorePixelRatio ||
-              ctx.backingStorePixelRatio || 1;
-
+            ctx.mozBackingStorePixelRatio ||
+            ctx.msBackingStorePixelRatio ||
+            ctx.oBackingStorePixelRatio ||
+            ctx.backingStorePixelRatio || 1;
     return dpr / bsr;
 })();
 
@@ -48,8 +47,8 @@ export class BrowserGfx implements Gfx {
     }
 
     private _init(canvasId: string) {
-        this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
-        // this._canvas = createHiDPIFromCanvas(canvasId);
+        // this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
+        this._canvas = createHiDPIFromCanvas(canvasId);
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
         this._ctx.fontKerning = "none";
@@ -161,7 +160,7 @@ export class BrowserGfx implements Gfx {
         }
 
         if (w) {
-            this.clipRect(x-1, y-1, w+2, h+2);
+            this.clipRect(x - 1, y - 1, w + 2, h + 2);
             this._ctx.fillText(msg, this.gparms.dx + textX, this.gparms.dy + textY);
             this.restore();
         } else {
@@ -183,7 +182,7 @@ export class BrowserGfx implements Gfx {
             if (!h) h = boundingBox.h;
         }
         this.rect(x, y, w, h);
-        this.text(msg, x+1, y+1, w, h);
+        this.text(msg, x + 1, y + 1, w, h);
     }
 
 
@@ -196,7 +195,7 @@ export class BrowserGfx implements Gfx {
     clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
         this.save();
         let region = new Path2D();
-        region.rect(x + this.gparms.dx, y + this.gparms.dy, w, h);
+        region.rect(x + this.gparms.dx - 1, y + this.gparms.dy - 2, w + 2, h + 2);
         this._ctx.clip(region);
     }
 

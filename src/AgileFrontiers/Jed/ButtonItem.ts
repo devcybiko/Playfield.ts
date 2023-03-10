@@ -49,7 +49,7 @@ export class ButtonItem extends _ButtonItem {
         if (this.isHovering && this.isPressed) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.fillColor;
-        this.gfx.clipRect(x-1, y-1, w+2, h+2);
+        this.gfx.clipRect(x, y, w, h);
         this.gfx.textRect(this._label, x, y, w, h);
         this.gfx.restore();
     }

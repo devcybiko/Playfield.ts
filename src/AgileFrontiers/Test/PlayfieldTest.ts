@@ -1,7 +1,7 @@
-import { Playfield, HSplit, VSplit } from "../Playfield";
+import { Playfield, HSplit, VSplit, Slider } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
-import { random } from "../Playfield/Utils";
+import { random, int } from "../Playfield/Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem } from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
@@ -9,6 +9,10 @@ import { EventQueue } from "../Playfield";
 import { GfxParms } from "../Playfield/Graphics";
 
 let resultLabel = null as any;
+
+function showValue(value: number) {
+    resultLabel.value = this.name + ": " + int(value);
+}
 
 function printGo() {
     resultLabel.value = "Result Label: " + this.name;
@@ -172,24 +176,10 @@ export class PlayfieldTest {
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);
 
-
-        // let ysplit = new GroupItem("G0", zwest, 10, 10, vsplit.w-10, vsplit.h-10, "Playfield Example");
-        // let textItem3 = new TextItem("textitem-3", parent, x, y += dy, 100, 14, "Hello World 3");
-        // let textItem4 = new TextItem("textitem-4", parent, x, y += dy, 100, 14, "Hello World 4 ");
-        // let radioItem0 = new RadioItem("RadioItem-0", zeast, x, y += dy, 100, 0);
-        // let checkboxItem = new CheckboxItem("CheckboxItem-0", east, x, y += dy, 100, 0);
-
-        // let west = new GroupItem("G1", vsplit.west, 10, 10, 0, 0, "Group 1");
-        // let labelItem1 = new LabelItem("Label-1", west, 0, 0, -110, 14, "Label-1: ");
-        // let textGroup2 = new GroupItem("G2", west, 0, 25, 0, 0, "Group 2");
-        // let textItem2 = new TextItem("textitem-2", textGroup2, 110, 0, 100, 14, "Hello World 2");
-        // let labelItem2 = new LabelItem("Label-2", textGroup2, 0, 0, -110, 14, "Label-2: ");
-        // textGroup2.isBoxed = true;
-        // textGroup2.xMargin = 10;
-        // textGroup2.yMargin = 10;
-        // textGroup2.updateWidthHeight();
-        // west.updateWidthHeight();
-
+        let hslider = new Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20, false, 0, 100, 50);
+        let vslider = new Slider("vslider", north, 1, 1, 20, north.h - 20 - 1, true, 0, 100, 50);
+        hslider.onChange = showValue.bind(hslider);
+        vslider.onChange = showValue.bind(vslider);
 
         this._playfield.start(0);
     }

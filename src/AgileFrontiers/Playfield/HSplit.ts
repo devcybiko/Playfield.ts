@@ -66,7 +66,7 @@ export class HSplit extends _HSplit {
 
     _drawChild(child: Tile) {
         child.gfx.rect(child.x, child.y, child.w, child.h);
-        child.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
+        child.gfx.clipRect(child.x, child.y, child.w, child.h);
         child.redraw();
         child.gfx.restore();
     }

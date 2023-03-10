@@ -13,9 +13,9 @@ export class Pressable {
 
     // --- onActions --- //
     
-    onPress(pfEvent: PlayfieldEvent) {
+    onPress(pfEvent: PlayfieldEvent): void {
     }
-    onRelease(pfEvent: PlayfieldEvent) {
+    onRelease(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Accessors --- //
