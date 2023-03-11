@@ -417,7 +417,7 @@ define("Playfield/Utils/RatioMixin", ["require", "exports", "Playfield/Utils/Fun
             this._value = value;
             let percent = (this._value - this._rmin) / this._rdelta;
             this._index = (0, Functions_1.int)(percent * this._idelta + this._imin);
-            console.log(this._value, percent, this._index);
+            console.log(percent, this._rmin, this._value, this._rmax, this._imin, this._index, this._imax);
         }
         get value() {
             return this._value;
@@ -1592,58 +1592,51 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
     ;
     ;
     (0, Utils_6.applyMixins)(_Slider, [Abilities_6.Draggable, Abilities_6.Hoverable]);
+    function inormalize(r, multiplier) {
+        if (r <= 1.0)
+            return (0, Utils_6.int)(r * multiplier);
+        return (0, Utils_6.int)(r);
+    }
     class Slider extends _Slider {
-        constructor(name, parent, x, y, w, h, isVertical = false, min = 0, max = 100, value = 0) {
+        constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
-            this._cursorSize = 20;
             this._margins = new Utils_6.Margins();
             this._cursor = new Utils_6.Rect();
-            this._limit = new Utils_6.Rect();
+            this._rcursor = new Utils_6.Rect();
             this._ratio = new Utils_6.Ratio();
+            this._vslide = true;
+            this._hslide = true;
+            this._text = "";
+            this._minW = 10;
+            this._minH = 10;
             this.Draggable();
             this.Hoverable();
-            this._cursor.Rect(0, 0, 0, 0);
             this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
-            this._isVertical = isVertical;
-            this._limit.RectXY(this._margins.left, this._margins.top, this.w - this._cursorSize - this._margins.right, this.h - this._cursorSize - this._margins.bottom);
-            let c = this._cursor;
-            if (this._isVertical) {
-                c.x = this._margins.left;
-                c.h = this._cursorSize;
-                c.w = this.w - this._margins.left - this._margins.right;
-                this._ratio.Ratio(min, max, value, this._limit.y0, this._limit.y1);
-            }
-            else {
-                c.y = this._margins.top;
-                c.w = this._cursorSize;
-                c.h = this.h - this._margins.top - this._margins.bottom;
-                this._ratio.Ratio(min, max, value, this._limit.x0, this._limit.x1);
-            }
-            this.value = value;
-            this._updateCursor();
+            this.cursorSize(0.5, 0.5);
+            this.cursorMove(0.5, 0.5);
             this.gfx.gparms.textBaseline = Graphics_1.GfxParms.MIDDLE;
             this.gfx.gparms.textAlign = Graphics_1.GfxParms.CENTER;
             this.gfx.gparms.fontSize = 12;
         }
-        set value(v) {
-            this._value = v;
-            console.log(this._ratio);
-            this._ratio.value = v;
-            this._updateCursor();
+        onChange(x, y, pfEvent) {
+            console.log(x, y);
         }
-        _updateValue() {
-            if (this._isVertical)
-                this._ratio.index = this._cursor.y;
-            else
-                this._ratio.index = this._cursor.x;
-            this._value = this._ratio.value;
+        cursorMove(rx, ry) {
+            let x = inormalize(rx, this.dw) + this._margins.top;
+            let y = inormalize(ry, this.dh) + this._margins.left;
+            this._cursor.move(x, y);
+            this._rcursor.move(rx, ry);
         }
-        _updateCursor() {
-            if (this._isVertical)
-                this._cursor.y = this._ratio.index;
-            else
-                this._cursor.x = this._ratio.index;
-            console.log(this._cursor);
+        cursorSize(rw, rh) {
+            let dw = this.w - this._margins.left - this._margins.right;
+            let dh = this.h - this._margins.top - this._margins.bottom;
+            let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
+            let h = inormalize(rh, dh) || this._cursor.h; // preserve old height if rh == 0
+            w = Math.max(w, this._minW);
+            h = Math.max(h, this._minH);
+            this._cursor.size(w, h);
+            this.cursorMove(this._rcursor.x, this._rcursor.y);
+            this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
         }
         draw() {
             let c = this._cursor;
@@ -1659,11 +1652,8 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
             else {
                 this.gfx.gparms.fillColor = "white";
             }
-            this.gfx.textRect("" + (0, Utils_6.int)(this._value), this.x + c.x, this.y + c.y, c.w, c.h);
+            this.gfx.textRect(this._text, this.x + c.x, this.y + c.y, c.w, c.h);
             this.gfx.restore();
-        }
-        onChange(value, pfEvent) {
-            console.log(value);
         }
         onGrab(dx, dy, pfEvent) {
             let c = this._cursor;
@@ -1675,20 +1665,65 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
         }
         onDrag(dx, dy, pfEvent) {
             let c = this._cursor;
-            let oldValue = this._value;
-            if (this._isVertical) {
-                c.y = (0, Utils_6.limit)(this._limit.y0, c.y + dy, this._limit.y1);
-            }
-            else {
-                c.x = (0, Utils_6.limit)(this._limit.x0, c.x + dx, this._limit.x1);
-            }
-            this._updateValue();
-            if (this._value !== oldValue)
-                this.onChange(this._value, pfEvent);
+            let xmax = this.dw + this._margins.left;
+            let ymax = this.dh + this._margins.top;
+            if (this._hslide)
+                c.x = (0, Utils_6.limit)(this._margins.left, c.x + dx, xmax);
+            if (this._vslide)
+                c.y = (0, Utils_6.limit)(this._margins.top, c.y + dy, ymax);
+            this._rcursor.move(this.rx, this.ry);
+            this.onChange(this.rx, this.ry, pfEvent);
             pfEvent.isActive = false;
         }
         onDrop(pfEvent) {
             super.onDrop(pfEvent);
+        }
+        // --- Accessors --- //
+        get text() {
+            return this._text;
+        }
+        set text(s) {
+            this._text = s;
+        }
+        get dw() {
+            return this.w - this._margins.left - this._margins.right - this._cursor.w;
+        }
+        get dh() {
+            return this.h - this._margins.top - this._margins.bottom - this._cursor.h;
+        }
+        get rx() {
+            if (this.dw === 0)
+                return this._rcursor.x;
+            return (this._cursor.x - this._margins.left) / this.dw;
+        }
+        get ry() {
+            if (this.dh === 0)
+                return this._rcursor.y;
+            return (this._cursor.y - this._margins.top) / this.dh;
+        }
+        get margins() {
+            return this._margins;
+        }
+        set margins(margins) {
+            this._margins = margins;
+        }
+        get cursor() {
+            return this._cursor;
+        }
+        set cursor(cursor) {
+            this._cursor = cursor;
+        }
+        get hslide() {
+            return this._hslide;
+        }
+        set hslide(value) {
+            this._hslide = value;
+        }
+        get vslide() {
+            return this._vslide;
+        }
+        set vslide(value) {
+            this._vslide = value;
         }
     }
     exports.Slider = Slider;
@@ -3038,8 +3073,21 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
     let resultLabel = null;
-    function showValue(value) {
-        resultLabel.value = this.name + ": " + (0, Utils_16.int)(value);
+    let slider = null;
+    let hslider = null;
+    let vslider = null;
+    function updateCursor(rx, ry, pfEvent) {
+        hslider.cursorSize(rx, 18);
+        vslider.cursorSize(0, ry);
+        slider.text = `(${(0, Utils_16.int)(slider.rx * 100)},${(0, Utils_16.int)(slider.ry * 100)})`;
+        hslider.text = `${(0, Utils_16.int)(hslider.rx * 100)}`;
+        console.log("slider", slider._rcursor);
+        console.log("hslider", hslider._rcursor);
+        console.log("vslider", vslider._rcursor);
+    }
+    function showValue(rx, ry, pfEvent) {
+        resultLabel.value = this.name + ": " + (0, Utils_16.int)(rx * 100);
+        hslider.text = `${(0, Utils_16.int)(hslider.rx * 100)}`;
     }
     function printGo() {
         resultLabel.value = "Result Label: " + this.name;
@@ -3177,10 +3225,13 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             checkbox1.go = printValue.bind(checkbox1);
             checkbox2.go = printValue.bind(checkbox2);
             checkbox3.go = printValue.bind(checkbox3);
-            let hslider = new Playfield_5.Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20, false, 0, 100, 50);
-            let vslider = new Playfield_5.Slider("vslider", north, 1, 1, 20, north.h - 20 - 1, true, 0, 100, 50);
+            slider = new Playfield_5.Slider("xxx", north, 30, 20, 200, 200);
+            slider.onChange = updateCursor.bind(slider);
+            hslider = new Playfield_5.Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20);
+            hslider.vslide = false;
             hslider.onChange = showValue.bind(hslider);
-            vslider.onChange = showValue.bind(vslider);
+            vslider = new Playfield_5.Slider("vslider", north, 1, 1, 20, north.h - 20 - 1);
+            vslider.hslide = false;
             this._playfield.start(0);
         }
     }

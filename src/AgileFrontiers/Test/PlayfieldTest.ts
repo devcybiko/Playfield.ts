@@ -1,4 +1,4 @@
-import { Playfield, HSplit, VSplit, Slider } from "../Playfield";
+import { Playfield, PlayfieldEvent, HSplit, VSplit, Slider } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random, int } from "../Playfield/Utils";
@@ -9,9 +9,20 @@ import { EventQueue } from "../Playfield";
 import { GfxParms } from "../Playfield/Graphics";
 
 let resultLabel = null as any;
+let slider = null as any;
+let hslider = null as any;
+let vslider = null as any;
 
-function showValue(value: number) {
-    resultLabel.value = this.name + ": " + int(value);
+function updateCursor(rx: number, ry: number, pfEvent: PlayfieldEvent) {
+    hslider.cursorSize(rx, 18);
+    vslider.cursorSize(0, ry);
+    slider.text = `(${int(slider.rx * 100)},${int(slider.ry*100)})`;
+    hslider.text = `${int(hslider.rx * 100)}`;
+}
+
+function showValue(rx: number, ry: number, pfEvent: PlayfieldEvent) {
+    resultLabel.value = this.name + ": " + int(rx * 100);
+    hslider.text = `${int(hslider.rx * 100)}`;
 }
 
 function printGo() {
@@ -176,10 +187,15 @@ export class PlayfieldTest {
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);
 
-        let hslider = new Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20, false, 0, 100, 50);
-        let vslider = new Slider("vslider", north, 1, 1, 20, north.h - 20 - 1, true, 0, 100, 50);
+        slider = new Slider("xxx", north, 30, 20, 200, 200);
+        slider.onChange = updateCursor.bind(slider);
+
+        hslider = new Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20);
+        hslider.vslide = false;
         hslider.onChange = showValue.bind(hslider);
-        vslider.onChange = showValue.bind(vslider);
+
+        vslider = new Slider("vslider", north, 1, 1, 20, north.h - 20 - 1);
+        vslider.hslide = false;
 
         this._playfield.start(0);
     }

@@ -95,7 +95,6 @@ export class HSplit extends _HSplit {
     }
 
     rsize(dx: number, dy: number) {
-        console.log("RSIZE", dx, dy);
         super.rsize(dx, dy);
         this._north.rsize(0, dy);
         this._south.rmove(0, dy);

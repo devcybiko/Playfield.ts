@@ -84,7 +84,6 @@ export class VSplit extends _VSplit {
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
         if (this.isDragging) {
             if (this._splitWidth + dx > this._gutter) {
-                console.log("onDrag", dx, dy)
                 this._east.rsize(dx, 0);
                 this._west.rmove(dx, 0);
                 this._west.rsize(-dx, 0);
@@ -94,7 +93,6 @@ export class VSplit extends _VSplit {
     }
 
     rsize(dx: number, dy: number) {
-        console.log("RSIZE", dx, dy);
         super.rsize(dx, dy);
         this._east.rsize(dx, 0);
         this._west.rmove(dx, 0);

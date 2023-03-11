@@ -1,73 +1,63 @@
-import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
-import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editor, Hoverer } from "./Abilities";
 import { Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "./Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
-import { RootTile } from "./RootTile";
 import { GfxParms } from "./Graphics";
 
 export class _Slider extends Tile { };
 export interface _Slider extends Draggable, Hoverable { };
 applyMixins(_Slider, [Draggable, Hoverable]);
 
+function inormalize(r: number, multiplier: number) {
+    if (r <= 1.0) return int(r * multiplier);
+    return int(r);
+}
+
 export class Slider extends _Slider {
 
-    _value: number;
-    _cursorSize = 20;
     _margins = new Margins();
     _cursor = new Rect();
-    _limit = new Rect();
-    _isVertical: boolean;
+    _rcursor = new Rect();
     _ratio = new Ratio();
+    _vslide = true;
+    _hslide = true;
+    _text = "";
+    _minW = 10;
+    _minH = 10;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, isVertical = false, min = 0, max = 100, value = 0) {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
         this.Draggable();
         this.Hoverable();
-        this._cursor.Rect(0, 0, 0, 0);
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
-        this._isVertical = isVertical;
-        this._limit.RectXY(this._margins.left, this._margins.top, this.w - this._cursorSize - this._margins.right, this.h - this._cursorSize - this._margins.bottom);
-
-        let c = this._cursor;
-        if (this._isVertical) {
-            c.x = this._margins.left;
-            c.h = this._cursorSize;
-            c.w = this.w - this._margins.left - this._margins.right;
-            this._ratio.Ratio(min, max, value, this._limit.y0, this._limit.y1);
-        } else {
-            c.y = this._margins.top;
-            c.w = this._cursorSize;
-            c.h = this.h - this._margins.top - this._margins.bottom;
-            this._ratio.Ratio(min, max, value, this._limit.x0, this._limit.x1);
-        }
-        this.value = value;
-        this._updateCursor();
-
+        this.cursorSize(0.5, 0.5);
+        this.cursorMove(0.5, 0.5);
         this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
         this.gfx.gparms.textAlign = GfxParms.CENTER;
         this.gfx.gparms.fontSize = 12;
-
     }
 
-    set value(v: number) {
-        this._value = v;
-        console.log(this._ratio);
-        this._ratio.value = v;
-        this._updateCursor();
+    onChange(x: number, y: number, pfEvent: PlayfieldEvent) {
+        console.log("OnChange", x, y);
     }
 
-    _updateValue() {
-        if (this._isVertical) this._ratio.index = this._cursor.y;
-        else this._ratio.index = this._cursor.x;
-        this._value = this._ratio.value;
+    cursorMove(rx: number, ry: number) {
+        let x = inormalize(rx, this.dw) + this._margins.top;
+        let y = inormalize(ry, this.dh) + this._margins.left;
+        this._cursor.move(x, y);
+        this._rcursor.move(rx, ry);
     }
 
-    _updateCursor() {
-        if (this._isVertical) this._cursor.y = this._ratio.index;
-        else this._cursor.x = this._ratio.index;
-        console.log(this._cursor);
+    cursorSize(rw: number, rh: number) {
+        let dw = this.w - this._margins.left - this._margins.right;
+        let dh = this.h - this._margins.top - this._margins.bottom;
+        let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
+        let h = inormalize(rh, dh) || this._cursor.h; // preserve old height if rh == 0
+        w = Math.max(w, this._minW);
+        h = Math.max(h, this._minH);
+        this._cursor.size(w, h);
+        this.cursorMove(this._rcursor.x, this._rcursor.y);
+        this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
     }
 
     draw() {
@@ -82,12 +72,8 @@ export class Slider extends _Slider {
         } else {
             this.gfx.gparms.fillColor = "white";
         }
-        this.gfx.textRect("" + int(this._value), this.x + c.x, this.y + c.y, c.w, c.h);
+        this.gfx.textRect(this._text, this.x + c.x, this.y + c.y, c.w, c.h);
         this.gfx.restore();
-    }
-
-    onChange(value: number, pfEvent: PlayfieldEvent) {
-        console.log(value);
     }
 
     onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
@@ -101,17 +87,77 @@ export class Slider extends _Slider {
 
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
         let c = this._cursor;
-        let oldValue = this._value;
-        if (this._isVertical) {
-            c.y = limit(this._limit.y0, c.y + dy, this._limit.y1);
-        } else {
-            c.x = limit(this._limit.x0, c.x + dx, this._limit.x1);
-        }
-        this._updateValue();
-        if (this._value !== oldValue) this.onChange(this._value, pfEvent);
+        let xmax = this.dw + this._margins.left;
+        let ymax = this.dh + this._margins.top;
+        if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
+        if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
+        this._rcursor.move(this.rx, this.ry);
+        this.onChange(this.rx, this.ry, pfEvent);
         pfEvent.isActive = false;
     }
+
     onDrop(pfEvent: PlayfieldEvent): void {
         super.onDrop(pfEvent);
     }
+
+    // --- Accessors --- //
+
+    get text(): string {
+        return this._text;
+    }
+
+    set text(s: string) {
+        this._text = s;
+    }
+
+    get dw(): number {
+        return this.w - this._margins.left - this._margins.right - this._cursor.w;
+    }
+
+    get dh(): number {
+        return this.h - this._margins.top - this._margins.bottom - this._cursor.h;
+    }
+
+    get rx(): number {
+        if (this.dw === 0) return this._rcursor.x;
+        return (this._cursor.x - this._margins.left) / this.dw;
+    }
+
+    get ry(): number {
+        if (this.dh === 0) return this._rcursor.y;
+        return (this._cursor.y - this._margins.top) / this.dh;
+    }
+    
+    get margins(): Margins {
+        return this._margins
+    }
+
+    set margins(margins: Margins) {
+        this._margins = margins;
+    }
+
+    get cursor(): Rect {
+        return this._cursor;
+    }
+
+    set cursor(cursor: Rect) {
+        this._cursor = cursor;
+    }
+
+    get hslide(): boolean {
+        return this._hslide;
+    }
+
+    set hslide(value: boolean) {
+        this._hslide = value;
+    }
+
+    get vslide(): boolean {
+        return this._vslide;
+    }
+
+    set vslide(value: boolean) {
+        this._vslide = value;
+    }
+
 }

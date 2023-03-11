@@ -52,7 +52,6 @@ export class Editor {
     }
 
     _dispatchKey(pfEvent: PlayfieldEvent, child: Editable) {
-        if (pfEvent.isKeyDown) console.error(pfEvent.key);
         if (child.isFocus) {
             if (pfEvent.key.length === 1) child.onKey(pfEvent.key, pfEvent);
             else if (pfEvent.key === "ArrowLeft") child.onArrowLeft(pfEvent);

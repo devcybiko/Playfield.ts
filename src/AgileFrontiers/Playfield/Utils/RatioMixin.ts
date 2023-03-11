@@ -35,7 +35,6 @@ export class Ratio {
         this._value = value;
         let percent = (this._value - this._rmin) / this._rdelta;
         this._index = int(percent * this._idelta + this._imin);
-        console.log(this._value, percent, this._index);
     }
 
     get value(): number {
