@@ -42,7 +42,7 @@ export class Tile extends _Tile {
 
     inBoundsChildren(x: number, y: number): Tile {
         let found = Tile.null;
-        for (let child of this.children.reverse()) {
+        for (let child of this.children) {
             let tileChild = child as Tile;
             found = tileChild.inBoundsChildren(x, y);
             if (found) break;

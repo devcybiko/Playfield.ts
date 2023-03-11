@@ -417,7 +417,6 @@ define("Playfield/Utils/RatioMixin", ["require", "exports", "Playfield/Utils/Fun
             this._value = value;
             let percent = (this._value - this._rmin) / this._rdelta;
             this._index = (0, Functions_1.int)(percent * this._idelta + this._imin);
-            console.log(percent, this._rmin, this._value, this._rmax, this._imin, this._index, this._imax);
         }
         get value() {
             return this._value;
@@ -558,7 +557,7 @@ define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index"], functi
         // --- Public Methods --- //
         inBoundsChildren(x, y) {
             let found = Tile.null;
-            for (let child of this.children.reverse()) {
+            for (let child of this.children) {
                 let tileChild = child;
                 found = tileChild.inBoundsChildren(x, y);
                 if (found)
@@ -1063,8 +1062,6 @@ define("Playfield/Abilities/EditorMixin", ["require", "exports"], function (requ
             root.dfs(this._unfocusChild);
         }
         _dispatchKey(pfEvent, child) {
-            if (pfEvent.isKeyDown)
-                console.error(pfEvent.key);
             if (child.isFocus) {
                 if (pfEvent.key.length === 1)
                     child.onKey(pfEvent.key, pfEvent);
@@ -1437,7 +1434,6 @@ define("Playfield/HSplit", ["require", "exports", "Playfield/Tile", "Playfield/A
             return false;
         }
         rsize(dx, dy) {
-            console.log("RSIZE", dx, dy);
             super.rsize(dx, dy);
             this._north.rsize(0, dy);
             this._south.rmove(0, dy);
@@ -1541,7 +1537,6 @@ define("Playfield/VSplit", ["require", "exports", "Playfield/Tile", "Playfield/A
         onDrag(dx, dy, pfEvent) {
             if (this.isDragging) {
                 if (this._splitWidth + dx > this._gutter) {
-                    console.log("onDrag", dx, dy);
                     this._east.rsize(dx, 0);
                     this._west.rmove(dx, 0);
                     this._west.rsize(-dx, 0);
@@ -1550,7 +1545,6 @@ define("Playfield/VSplit", ["require", "exports", "Playfield/Tile", "Playfield/A
             }
         }
         rsize(dx, dy) {
-            console.log("RSIZE", dx, dy);
             super.rsize(dx, dy);
             this._east.rsize(dx, 0);
             this._west.rmove(dx, 0);
@@ -1619,7 +1613,7 @@ define("Playfield/Slider", ["require", "exports", "Playfield/Tile", "Playfield/A
             this.gfx.gparms.fontSize = 12;
         }
         onChange(x, y, pfEvent) {
-            console.log(x, y);
+            console.log("OnChange", x, y);
         }
         cursorMove(rx, ry) {
             let x = inormalize(rx, this.dw) + this._margins.top;
@@ -3081,9 +3075,6 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
         vslider.cursorSize(0, ry);
         slider.text = `(${(0, Utils_16.int)(slider.rx * 100)},${(0, Utils_16.int)(slider.ry * 100)})`;
         hslider.text = `${(0, Utils_16.int)(hslider.rx * 100)}`;
-        console.log("slider", slider._rcursor);
-        console.log("hslider", hslider._rcursor);
-        console.log("vslider", vslider._rcursor);
     }
     function showValue(rx, ry, pfEvent) {
         resultLabel.value = this.name + ": " + (0, Utils_16.int)(rx * 100);
