@@ -1418,247 +1418,23 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.Playfield = Playfield;
 });
-define("Playfield/HSplit", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_4, Abilities_2, Abilities_3, Utils_4, RootTile_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.HSplit = exports._HSplit = void 0;
-    class _HSplit extends Tile_4.Tile {
-    }
-    exports._HSplit = _HSplit;
-    ;
-    ;
-    (0, Utils_4.applyMixins)(_HSplit, [Abilities_3.Draggable, Abilities_2.EventDispatcher, Utils_4.Logger, Abilities_2.Clicker, Abilities_2.Presser, Abilities_2.Selecter, Abilities_2.Dragger, Abilities_2.Editor, Abilities_2.Hoverer]);
-    class HSplit extends _HSplit {
-        constructor(name, parent, percent) {
-            super(name, parent, 0, 0, 0, 0);
-            this._margin = 0;
-            this._gutter = 4;
-            this._splitHeight = 0;
-            if (percent >= 1.0)
-                percent = percent / 100.0;
-            this.x = 0;
-            this.y = 0;
-            this.w = parent.w;
-            this.h = parent.h;
-            this.Logger();
-            this.Clicker();
-            this.Presser();
-            this.Selecter();
-            this.Dragger();
-            this.Editor();
-            this.Hoverer();
-            this.EventDispatcher();
-            this.Draggable();
-            let dh = this.h - this._margin * 2 - this._gutter;
-            this._splitHeight = (0, Utils_4.int)(dh * percent);
-            let nx = this._margin;
-            let ny = this._margin;
-            let nw = this.w - this._margin * 2;
-            let nh = this._splitHeight;
-            let sx = nx;
-            let sy = ny + nh + this._gutter / 2;
-            let sw = this.w - this._margin * 2;
-            let sh = dh - this._splitHeight;
-            this._north = new RootTile_2.RootTile("north", this, nx, ny, nw, nh);
-            this._south = new RootTile_2.RootTile("south", this, sx, sy, sw, sh);
-        }
-        // --- Overrides --- //
-        addChild(child) {
-            if (this.children.length < 2)
-                super.addChild(child);
-            else
-                throw new Error("You must use HSplit.north or HSplit.south");
-        }
-        draw() {
-            this._drawChild(this.north);
-            this._drawChild(this.south);
-        }
-        _drawChild(child) {
-            child.gfx.rect(child.x, child.y, child.w, child.h);
-            child.gfx.clipRect(child.x, child.y, child.w, child.h);
-            child.redraw();
-            child.gfx.restore();
-        }
-        // --- onActions --- //
-        onGrab(dx, dy, pfEvent) {
-            if ((0, Utils_4.between)(this._margin, dx, this.w - this._margin)
-                && (0, Utils_4.between)(this._margin + this._splitHeight, dy, this._margin + this._splitHeight + this._gutter)) {
-                return super.onGrab(dx, dy, pfEvent);
-            }
-            return false;
-        }
-        onDrag(dx, dy, pfEvent) {
-            if (this.isDragging) {
-                if (this._splitHeight + dy > this._gutter) {
-                    this._north.rsize(0, dy);
-                    this._south.rmove(0, dy);
-                    this._south.rsize(0, -dy);
-                    this._splitHeight += dy;
-                }
-                return true;
-            }
-            return false;
-        }
-        rsize(dx, dy) {
-            super.rsize(dx, dy);
-            this._north.rsize(0, dy);
-            this._south.rmove(0, dy);
-            this._south.rsize(0, -dy);
-            this._splitHeight += dy;
-        }
-        onEvent(pfEvent) {
-            if (this.inBounds(pfEvent.x, pfEvent.y)) {
-                if (!this.isDragging)
-                    this.dispatchEventToChildren(pfEvent);
-            }
-            else {
-                if (pfEvent.isKeyboardEvent)
-                    this.dispatchEventToChildren(pfEvent);
-            }
-        }
-        get north() {
-            return this._north;
-        }
-        set north(value) {
-            this._north = value;
-        }
-        get south() {
-            return this._south;
-        }
-        set south(value) {
-            this._south = value;
-        }
-    }
-    exports.HSplit = HSplit;
-});
-define("Playfield/VSplit", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_5, Abilities_4, Abilities_5, Utils_5, RootTile_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.VSplit = exports._VSplit = void 0;
-    class _VSplit extends Tile_5.Tile {
-    }
-    exports._VSplit = _VSplit;
-    ;
-    ;
-    (0, Utils_5.applyMixins)(_VSplit, [Abilities_5.Draggable, Abilities_4.EventDispatcher, Utils_5.Logger, Abilities_4.Clicker, Abilities_4.Presser, Abilities_4.Selecter, Abilities_4.Dragger, Abilities_4.Editor, Abilities_4.Hoverer]);
-    class VSplit extends _VSplit {
-        constructor(name, parent, percent) {
-            super(name, parent, 0, 0, 0, 0);
-            this._margin = 0;
-            this._gutter = 4;
-            this._splitWidth = 0;
-            if (percent >= 1.0)
-                percent = percent / 100.0;
-            this.x = 0;
-            this.y = 0;
-            this.w = parent.w;
-            this.h = parent.h;
-            this.Logger();
-            this.Clicker();
-            this.Presser();
-            this.Selecter();
-            this.Dragger();
-            this.Editor();
-            this.Hoverer();
-            this.EventDispatcher();
-            this.Draggable();
-            let dw = this.w - this._margin * 2 - this._gutter;
-            this._splitWidth = (0, Utils_5.int)(dw * percent);
-            let nx = this._margin;
-            let ny = this._margin;
-            let nh = this.h - this._margin * 2;
-            let nw = this._splitWidth;
-            let sy = ny;
-            let sx = nx + nw + this._gutter / 2;
-            let sh = this.h - this._margin * 2;
-            let sw = dw - this._splitWidth;
-            this._east = new RootTile_3.RootTile("east", this, nx, ny, nw, nh);
-            this._west = new RootTile_3.RootTile("west", this, sx, sy, sw, sh);
-        }
-        // --- Overrides --- //
-        addChild(child) {
-            if (this.children.length < 2)
-                super.addChild(child);
-            else
-                throw new Error("You must use VSplit.east or VSplit.west");
-        }
-        draw() {
-            this._drawChild(this.east);
-            this._drawChild(this.west);
-        }
-        _drawChild(child) {
-            child.gfx.rect(child.x, child.y, child.w, child.h);
-            child.gfx.clipRect(child.x, child.y, child.w, child.h);
-            child.redraw();
-            child.gfx.restore();
-        }
-        // --- onActions --- //
-        onGrab(dx, dy, pfEvent) {
-            if ((0, Utils_5.between)(this._margin, dy, this.h - this._margin)
-                && (0, Utils_5.between)(this._margin + this._splitWidth, dx, this._margin + this._splitWidth + this._gutter)) {
-                return super.onGrab(dx, dy, pfEvent);
-            }
-            return false;
-        }
-        onDrag(dx, dy, pfEvent) {
-            if (this.isDragging) {
-                if (this._splitWidth + dx > this._gutter) {
-                    this._east.rsize(dx, 0);
-                    this._west.rmove(dx, 0);
-                    this._west.rsize(-dx, 0);
-                    this._splitWidth += dx;
-                }
-            }
-        }
-        rsize(dx, dy) {
-            super.rsize(dx, dy);
-            this._east.rsize(dx, 0);
-            this._west.rmove(dx, 0);
-            this._west.rsize(-dx, 0);
-            this._splitWidth += dx;
-        }
-        onEvent(pfEvent) {
-            if (this.inBounds(pfEvent.x, pfEvent.y)) {
-                if (!this.isDragging)
-                    this.dispatchEventToChildren(pfEvent);
-            }
-            else {
-                if (pfEvent.isKeyboardEvent)
-                    this.dispatchEventToChildren(pfEvent);
-            }
-        }
-        get east() {
-            return this._east;
-        }
-        set east(value) {
-            this._east = value;
-        }
-        get west() {
-            return this._west;
-        }
-        set west(value) {
-            this._west = value;
-        }
-    }
-    exports.VSplit = VSplit;
-});
-define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_6, Abilities_6, Abilities_7, Utils_6, RootTile_4) {
+define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_4, Abilities_2, Abilities_3, Utils_4, RootTile_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Splitter = exports._Splitter = void 0;
-    class _Splitter extends Tile_6.Tile {
+    class _Splitter extends Tile_4.Tile {
     }
     exports._Splitter = _Splitter;
     ;
     ;
-    (0, Utils_6.applyMixins)(_Splitter, [Abilities_7.Resizable, Abilities_7.Hoverable, Abilities_7.Draggable, Abilities_6.EventDispatcher, Utils_6.Logger, Abilities_6.Clicker, Abilities_6.Presser, Abilities_6.Selecter, Abilities_6.Dragger, Abilities_6.Editor, Abilities_6.Hoverer]);
+    (0, Utils_4.applyMixins)(_Splitter, [Abilities_3.Resizable, Abilities_3.Hoverable, Abilities_3.Draggable, Abilities_2.EventDispatcher, Utils_4.Logger, Abilities_2.Clicker, Abilities_2.Presser, Abilities_2.Selecter, Abilities_2.Dragger, Abilities_2.Editor, Abilities_2.Hoverer]);
     class Splitter extends _Splitter {
         constructor(name, parent, topPercent = 0.5, leftPercent = 0.5) {
             super(name, parent, 0, 0, parent.w, parent.h);
             this._gutter = 6;
-            this._margins = new Utils_6.Margins();
-            this._hGutter = new Utils_6.Rect();
-            this._vGutter = new Utils_6.Rect();
+            this._margins = new Utils_4.Margins();
+            this._hGutter = new Utils_4.Rect();
+            this._vGutter = new Utils_4.Rect();
             this._hGutterHover = false;
             this._vGutterHover = false;
             this.Logger();
@@ -1673,10 +1449,10 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             this.Hoverable();
             this.Resizable();
             this._margins.Margins(0, 0, 0, 0);
-            this._ne = new RootTile_4.RootTile("ne", this, 0, 0, 0, 0);
-            this._nw = new RootTile_4.RootTile("nw", this, 0, 0, 0, 0);
-            this._se = new RootTile_4.RootTile("se", this, 0, 0, 0, 0);
-            this._sw = new RootTile_4.RootTile("sw", this, 0, 0, 0, 0);
+            this._ne = new RootTile_2.RootTile("ne", this, 0, 0, 0, 0);
+            this._nw = new RootTile_2.RootTile("nw", this, 0, 0, 0, 0);
+            this._se = new RootTile_2.RootTile("se", this, 0, 0, 0, 0);
+            this._sw = new RootTile_2.RootTile("sw", this, 0, 0, 0, 0);
             this._hGutterInit(topPercent);
             this._vGutterInit(leftPercent);
             this._resize();
@@ -1722,7 +1498,7 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             this._hGutter.Rect(x0, y0, this.w - this._margins.left - this._margins.right, this._gutter);
         }
         _hoverGutter(gutter, pfEvent) {
-            return (0, Utils_6.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_6.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
+            return (0, Utils_4.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_4.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
         }
         // --- Overrides --- //
         addChild(child) {
@@ -1784,7 +1560,7 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             return false;
         }
         onRelResize(dw, dh, pfEvent) {
-            let thisTile = Tile_6.Tile.cast(this);
+            let thisTile = Tile_4.Tile.cast(this);
             console.log("relResize", thisTile.fullName);
             if (dw) {
                 this._hGutter.rsize(dw, 0);
@@ -1870,16 +1646,348 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
     }
     exports.Splitter = Splitter;
 });
-define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/HSplit", "Playfield/VSplit", "Playfield/Splitter"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, HSplit_1, VSplit_1, Splitter_1) {
+define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_5, Abilities_4, Abilities_5, Utils_5, RootTile_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Splitter = exports.VSplit = exports.HSplit = exports.EventQueue = exports.Tile = exports.Playfield = void 0;
+    exports.HSplitter = exports._HSplitter = void 0;
+    class _HSplitter extends Tile_5.Tile {
+    }
+    exports._HSplitter = _HSplitter;
+    ;
+    ;
+    (0, Utils_5.applyMixins)(_HSplitter, [Abilities_5.Resizable, Abilities_5.Hoverable, Abilities_5.Draggable, Abilities_4.EventDispatcher, Utils_5.Logger, Abilities_4.Clicker, Abilities_4.Presser, Abilities_4.Selecter, Abilities_4.Dragger, Abilities_4.Editor, Abilities_4.Hoverer]);
+    class HSplitter extends _HSplitter {
+        constructor(name, parent, topPercent = 0.5) {
+            super(name, parent, 0, 0, parent.w, parent.h);
+            this._gutter = 6;
+            this._margins = new Utils_5.Margins();
+            this._hGutter = new Utils_5.Rect();
+            this._hGutterHover = false;
+            this.Logger();
+            this.Clicker();
+            this.Presser();
+            this.Selecter();
+            this.Dragger();
+            this.Editor();
+            this.Hoverer();
+            this.EventDispatcher();
+            this.Draggable();
+            this.Hoverable();
+            this.Resizable();
+            this._margins.Margins(0, 0, 0, 0);
+            this._north = new RootTile_3.RootTile("ne", this, 0, 0, 0, 0);
+            this._south = new RootTile_3.RootTile("se", this, 0, 0, 0, 0);
+            this._hGutterInit(topPercent);
+            this._resize();
+        }
+        _resize() {
+            this._northSize();
+            this._southSize();
+        }
+        _northSize() {
+            this._north.x = this._margins.left;
+            this._north.y = this._margins.top;
+            this._north.w = this.w - this._margins.left - this._margins.right;
+            this._north.h = this._hGutter.y0 - this.y0;
+        }
+        _southSize() {
+            this._south.x = this._margins.left;
+            this._south.y = this._hGutter.y1;
+            this._south.w = this.w - this._margins.left - this._margins.right;
+            this._south.h = this.h - this._margins.bottom - this._hGutter.y1;
+        }
+        _hGutterInit(topPercent) {
+            let x0 = this._margins.left;
+            let y0 = this.h * topPercent - this._gutter / 2;
+            this._hGutter.Rect(x0, y0, this.w - this._margins.left - this._margins.right, this._gutter);
+        }
+        _hoverGutter(gutter, pfEvent) {
+            return (0, Utils_5.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_5.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
+        }
+        // --- Overrides --- //
+        addChild(child) {
+            if (this.children.length < 2)
+                super.addChild(child);
+            else
+                throw new Error("You must use HSplitter.north or HSplitter.south");
+        }
+        _drawChild(child) {
+            this.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
+            child.redraw();
+            this.gfx.restore();
+        }
+        _drawGutter(gutterRect, hover) {
+            this.gfx.gparms.borderColor = "";
+            let oldColor = this.gfx.gparms.fillColor;
+            if (hover) {
+                this.gfx.gparms.fillColor = "black";
+                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w - 1, gutterRect.h - 1);
+            }
+            else {
+                this.gfx.gparms.fillColor = "black";
+                if (gutterRect.w > gutterRect.h) {
+                    // horizontal
+                    this.gfx.line(gutterRect.x0, gutterRect.y0 + gutterRect.h / 2, gutterRect.x0 + gutterRect.w, gutterRect.y0 + gutterRect.h / 2);
+                }
+                else {
+                    // vertical
+                    this.gfx.line(gutterRect.x0 + gutterRect.w / 2, gutterRect.y0, gutterRect.x0 + gutterRect.w / 2, gutterRect.y0 + gutterRect.h);
+                }
+            }
+            this.gfx.gparms.fillColor = oldColor;
+            this.gfx.gparms.borderColor = "black";
+        }
+        // --- Overrides --- //
+        relResize(dw, dh) {
+            console.log("relResize", this.name);
+            this._northSize();
+            this._southSize();
+        }
+        draw() {
+            this._drawGutter(this._hGutter, this._hGutterHover);
+            this.gfx.gparms.borderColor = "black";
+            this._drawChild(this.north);
+            this._drawChild(this.south);
+        }
+        // --- onActions --- //
+        onGrab(dx, dy, pfEvent) {
+            if (this._hGutterHover) {
+                this.isDragging = true;
+                pfEvent.isActive = false;
+                return true;
+            }
+            return false;
+        }
+        onRelResize(dw, dh, pfEvent) {
+            let thisTile = Tile_5.Tile.cast(this);
+            console.log("relResize", thisTile.fullName);
+            if (dw) {
+                this._hGutter.rsize(dw, 0);
+            }
+            if (dh) {
+                this._south.onRelResize(0, dh, pfEvent);
+            }
+        }
+        onDrop(pfEvent) {
+            this._hGutterHover = false;
+            super.onDrop(pfEvent);
+        }
+        onDrag(dx, dy, pfEvent) {
+            if (this._hGutterHover) {
+                this._hGutter.rmove(0, dy);
+                this._north.onRelResize(0, dy, pfEvent);
+                this._south.rmove(0, dy);
+                this._south.onRelResize(0, -dy, pfEvent);
+                pfEvent.isActive = false;
+            }
+        }
+        onEvent(pfEvent) {
+            pfEvent.isActive = true;
+            this.dispatchEventToChild(pfEvent, this, false);
+            this.dispatchEventToChildren(pfEvent);
+        }
+        onHovering(pfEvent) {
+            if (this.isDragging)
+                return;
+            this._hGutterHover = this._hoverGutter(this._hGutter, pfEvent);
+        }
+        onExit(pfEvent) {
+            if (this.isDragging)
+                return;
+            super.onExit(pfEvent);
+        }
+        // --- Accessors --- //
+        get north() {
+            return this._north;
+        }
+        set north(value) {
+            this._north = value;
+        }
+        get south() {
+            return this._south;
+        }
+        set south(value) {
+            this._south = value;
+        }
+    }
+    exports.HSplitter = HSplitter;
+});
+define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_6, Abilities_6, Abilities_7, Utils_6, RootTile_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.VSplitter = exports._VSplitter = void 0;
+    class _VSplitter extends Tile_6.Tile {
+    }
+    exports._VSplitter = _VSplitter;
+    ;
+    ;
+    (0, Utils_6.applyMixins)(_VSplitter, [Abilities_7.Resizable, Abilities_7.Hoverable, Abilities_7.Draggable, Abilities_6.EventDispatcher, Utils_6.Logger, Abilities_6.Clicker, Abilities_6.Presser, Abilities_6.Selecter, Abilities_6.Dragger, Abilities_6.Editor, Abilities_6.Hoverer]);
+    class VSplitter extends _VSplitter {
+        constructor(name, parent, leftPercent = 0.5) {
+            super(name, parent, 0, 0, parent.w, parent.h);
+            this._gutter = 6;
+            this._margins = new Utils_6.Margins();
+            this._vGutter = new Utils_6.Rect();
+            this._vGutterHover = false;
+            this.Logger();
+            this.Clicker();
+            this.Presser();
+            this.Selecter();
+            this.Dragger();
+            this.Editor();
+            this.Hoverer();
+            this.EventDispatcher();
+            this.Draggable();
+            this.Hoverable();
+            this.Resizable();
+            this._margins.Margins(0, 0, 0, 0);
+            this._east = new RootTile_4.RootTile("east", this, 0, 0, 0, 0);
+            this._west = new RootTile_4.RootTile("west", this, 0, 0, 0, 0);
+            this._vGutterInit(leftPercent);
+            this._resize();
+        }
+        _resize() {
+            this._eastSize();
+            this._westSize();
+        }
+        _eastSize() {
+            this._east.x = this._margins.left;
+            this._east.y = this._vGutter.y0;
+            this._east.w = this._vGutter.x0 - this.x0;
+            this._east.h = this.h - this._margins.bottom;
+        }
+        _westSize() {
+            this._west.x = this._vGutter.x1;
+            this._west.y = this._margins.top;
+            this._west.w = this.w - this._vGutter.x0 - this._margins.right;
+            this._west.h = this.h - this._margins.bottom;
+        }
+        _vGutterInit(leftPercent) {
+            let x0 = this.w * leftPercent - this._gutter / 2;
+            let y0 = this._margins.top;
+            this._vGutter.Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
+        }
+        _hoverGutter(gutter, pfEvent) {
+            return (0, Utils_6.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_6.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
+        }
+        // --- Overrides --- //
+        addChild(child) {
+            if (this.children.length < 2)
+                super.addChild(child);
+            else
+                throw new Error("You must use VSplitter.east or VSplitter.west");
+        }
+        _drawChild(child) {
+            this.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
+            child.redraw();
+            this.gfx.restore();
+        }
+        _drawGutter(gutterRect, hover) {
+            this.gfx.gparms.borderColor = "";
+            let oldColor = this.gfx.gparms.fillColor;
+            if (hover) {
+                this.gfx.gparms.fillColor = "black";
+                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w - 1, gutterRect.h - 1);
+            }
+            else {
+                this.gfx.gparms.fillColor = "black";
+                if (gutterRect.w > gutterRect.h) {
+                    // horizontal
+                    this.gfx.line(gutterRect.x0, gutterRect.y0 + gutterRect.h / 2, gutterRect.x0 + gutterRect.w, gutterRect.y0 + gutterRect.h / 2);
+                }
+                else {
+                    // vertical
+                    this.gfx.line(gutterRect.x0 + gutterRect.w / 2, gutterRect.y0, gutterRect.x0 + gutterRect.w / 2, gutterRect.y0 + gutterRect.h);
+                }
+            }
+            this.gfx.gparms.fillColor = oldColor;
+            this.gfx.gparms.borderColor = "black";
+        }
+        // --- Overrides --- //
+        relResize(dw, dh) {
+            console.log("relResize", this.name);
+            this._eastSize();
+            this._westSize();
+        }
+        draw() {
+            this._drawGutter(this._vGutter, this._vGutterHover);
+            this.gfx.gparms.borderColor = "black";
+            this._drawChild(this.east);
+            this._drawChild(this.west);
+        }
+        // --- onActions --- //
+        onGrab(dx, dy, pfEvent) {
+            if (this._vGutterHover) {
+                this.isDragging = true;
+                pfEvent.isActive = false;
+                return true;
+            }
+            return false;
+        }
+        onRelResize(dw, dh, pfEvent) {
+            let thisTile = Tile_6.Tile.cast(this);
+            console.log("relResize", thisTile.fullName);
+            if (dw) {
+                this._west.onRelResize(dw, 0, pfEvent);
+            }
+            if (dh) {
+                this._vGutter.rsize(0, dh);
+            }
+        }
+        onDrop(pfEvent) {
+            this._vGutterHover = false;
+            super.onDrop(pfEvent);
+        }
+        onDrag(dx, dy, pfEvent) {
+            if (this._vGutterHover) {
+                this._vGutter.rmove(dx, 0);
+                this._east.onRelResize(dx, 0, pfEvent);
+                this._west.rmove(dx, 0);
+                this._west.onRelResize(-dx, 0, pfEvent);
+                pfEvent.isActive = false;
+            }
+        }
+        onEvent(pfEvent) {
+            pfEvent.isActive = true;
+            this.dispatchEventToChild(pfEvent, this, false);
+            this.dispatchEventToChildren(pfEvent);
+        }
+        onHovering(pfEvent) {
+            if (this.isDragging)
+                return;
+            this._vGutterHover = this._hoverGutter(this._vGutter, pfEvent);
+        }
+        onExit(pfEvent) {
+            if (this.isDragging)
+                return;
+            super.onExit(pfEvent);
+        }
+        // --- Accessors --- //
+        get east() {
+            return this._east;
+        }
+        set east(value) {
+            this._east = value;
+        }
+        get west() {
+            return this._west;
+        }
+        set west(value) {
+            this._west = value;
+        }
+    }
+    exports.VSplitter = VSplitter;
+});
+define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, Splitter_1, HSplitter_1, VSplitter_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.VSplitter = exports.HSplitter = exports.Splitter = exports.EventQueue = exports.Tile = exports.Playfield = void 0;
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
     Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_7.Tile; } });
     Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
-    Object.defineProperty(exports, "HSplit", { enumerable: true, get: function () { return HSplit_1.HSplit; } });
-    Object.defineProperty(exports, "VSplit", { enumerable: true, get: function () { return VSplit_1.VSplit; } });
     Object.defineProperty(exports, "Splitter", { enumerable: true, get: function () { return Splitter_1.Splitter; } });
+    Object.defineProperty(exports, "HSplitter", { enumerable: true, get: function () { return HSplitter_1.HSplitter; } });
+    Object.defineProperty(exports, "VSplitter", { enumerable: true, get: function () { return VSplitter_1.VSplitter; } });
 });
 define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3504,11 +3612,13 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let dy = 25;
             let root = this._playfield.tile;
             let splitter = new Playfield_5.Splitter("splitter", root);
-            let sw = new Playfield_5.Splitter("splitter", splitter.sw, 1.0, 0.5);
+            let sw = new Playfield_5.VSplitter("vsplitter", splitter.sw, 0.5);
+            let se = new Playfield_5.HSplitter("hsplitter", splitter.se, 0.5);
             let sliders = splitter.ne;
-            let buttons = splitter.se;
-            let radios = sw.ne;
-            let status = sw.nw;
+            let buttons = se.north;
+            let buttons2 = se.south;
+            let radios = sw.east;
+            let status = sw.west;
             let checkboxes = splitter.nw;
             // sw
             let textItem1 = new Jed_1.TextItem("textitem-1", status, x, y += dy, 250, 14, "Hello World 1");
@@ -3518,8 +3628,8 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", buttons, x, y += dy, 100, 0);
             buttonItem1.label = "Hello World";
             buttonItem1.value = "Greg Smith";
-            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", buttons, x, y += dy, 100, 0, "Button Item 2");
-            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", buttons, x, y += dy, 100, 0, "Button Item 3");
+            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", buttons2, x, y += dy, 100, 0, "Button Item 2");
+            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", buttons2, x, y += dy, 100, 0, "Button Item 3");
             buttonItem1.go = printGo.bind(buttonItem1);
             buttonItem2.go = printGo.bind(buttonItem2);
             buttonItem3.go = printGo.bind(buttonItem3);

@@ -1,4 +1,4 @@
-import { Playfield, PlayfieldEvent, Splitter, VSplitter } from "../Playfield";
+import { Playfield, PlayfieldEvent, Splitter, VSplitter, HSplitter } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random, int } from "../Playfield/Utils";
@@ -136,10 +136,12 @@ export class PlayfieldTest {
 
         let root = this._playfield.tile;
         let splitter = new Splitter("splitter", root);
-        let sw = new VSplitter("vsplitter", splitter.sw, 1.0, 0.5);
+        let sw = new VSplitter("vsplitter", splitter.sw, 0.5);
+        let se = new HSplitter("hsplitter", splitter.se, 0.5);
 
         let sliders = splitter.ne;
-        let buttons = splitter.se;
+        let buttons = se.north;
+        let buttons2 = se.south;
         let radios = sw.east;
         let status = sw.west;
         let checkboxes = splitter.nw;
@@ -153,8 +155,8 @@ export class PlayfieldTest {
         let buttonItem1 = new ButtonItem("ButtonItem1", buttons, x, y += dy, 100, 0);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let buttonItem2 = new ButtonItem("ButtonItem2", buttons, x, y += dy, 100, 0, "Button Item 2");
-        let buttonItem3 = new ButtonItem("ButtonItem3", buttons, x, y += dy, 100, 0, "Button Item 3");
+        let buttonItem2 = new ButtonItem("ButtonItem2", buttons2, x, y += dy, 100, 0, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", buttons2, x, y += dy, 100, 0, "Button Item 3");
         buttonItem1.go = printGo.bind(buttonItem1);
         buttonItem2.go = printGo.bind(buttonItem2);
         buttonItem3.go = printGo.bind(buttonItem3);
