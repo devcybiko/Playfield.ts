@@ -31,7 +31,7 @@ export class HSplitter extends _HSplitter {
         this.Draggable();
         this.Hoverable();
         this.Resizable();
-        this._margins.Margins(0, 0, 0, 0);
+        this._margins.Margins(2, 2, 2, 2);
 
         this._north = new RootTile("ne", this, 0, 0, 0, 0);
         this._south = new RootTile("se", this, 0, 0, 0, 0);
