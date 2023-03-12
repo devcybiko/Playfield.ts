@@ -1,4 +1,4 @@
-import { Playfield, PlayfieldEvent, Splitter } from "../Playfield";
+import { Playfield, PlayfieldEvent, Splitter, VSplitter } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random, int } from "../Playfield/Utils";
@@ -136,12 +136,12 @@ export class PlayfieldTest {
 
         let root = this._playfield.tile;
         let splitter = new Splitter("splitter", root);
-        let sw = new Splitter("splitter", splitter.sw, 1.0, 0.5);
+        let sw = new VSplitter("vsplitter", splitter.sw, 1.0, 0.5);
 
         let sliders = splitter.ne;
         let buttons = splitter.se;
-        let radios = sw.ne;
-        let status = sw.nw;
+        let radios = sw.east;
+        let status = sw.west;
         let checkboxes = splitter.nw;
 
         // sw
