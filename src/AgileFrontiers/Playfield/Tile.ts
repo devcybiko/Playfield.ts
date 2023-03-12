@@ -17,7 +17,6 @@ applyMixins(_Tile, [Logger, Tree, Rect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
-    public static null = null as unknown as Tile;
 
     private _playfield: Playfield;
     private _gfx: Gfx;
@@ -29,6 +28,12 @@ export class Tile extends _Tile {
         this.Logger();
         this.Rect(x, y, w, h);
         this.Tree(name, parent);
+    }
+
+    // --- Static Members --- //
+    public static null = null as unknown as Tile;
+    public static cast(obj: any): Tile {
+        return obj as Tile;
     }
 
     // --- Overrides --- //

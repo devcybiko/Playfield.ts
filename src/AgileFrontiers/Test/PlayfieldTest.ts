@@ -1,12 +1,11 @@
-import { Playfield, PlayfieldEvent, HSplit, VSplit, Slider } from "../Playfield";
+import { Playfield, PlayfieldEvent, Splitter } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
 import { random, int } from "../Playfield/Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
-import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem } from "../Jed";
+import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem, Slider} from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
-import { GfxParms } from "../Playfield/Graphics";
 
 let resultLabel = null as any;
 let slider = null as any;
@@ -21,7 +20,7 @@ function updateCursor(rx: number, ry: number, pfEvent: PlayfieldEvent) {
 }
 
 function showValue(rx: number, ry: number, pfEvent: PlayfieldEvent) {
-    resultLabel.value = this.name + ": " + int(rx * 100);
+    resultLabel.value = this.name + ": " + int(rx * 100) + "," + int(ry * 100);
     hslider.text = `${int(hslider.rx * 100)}`;
 }
 
@@ -136,29 +135,26 @@ export class PlayfieldTest {
         let dy = 25;
 
         let root = this._playfield.tile;
-        let vsplit = new VSplit("vsplit", root, 0.5);
-        let veast = vsplit.east;
-        let vwest = vsplit.west;
+        let splitter = new Splitter("splitter", root);
+        let sw = new Splitter("splitter", splitter.sw, 1.0, 0.5);
 
-        let hsplit = new HSplit("hsplit", veast, 0.5);
-        let north = hsplit.north;
-        let south = hsplit.south;
+        let sliders = splitter.ne;
+        let buttons = splitter.se;
+        let radios = sw.ne;
+        let status = sw.nw;
+        let checkboxes = splitter.nw;
 
-        let zsplit = new HSplit("hsplit", vwest, 0.5);
-        let east = zsplit.north;
-        let west = zsplit.south;
-
-        // north
-        let textItem1 = new TextItem("textitem-1", north, x, y += dy, 250, 14, "Hello World 1");
-        resultLabel = new LabelItem("ResultLabel", north, x, y += dy, 200, 14, "Result Label");
+        // sw
+        let textItem1 = new TextItem("textitem-1", status, x, y += dy, 250, 14, "Hello World 1");
+        resultLabel = new LabelItem("ResultLabel", status, x, y += dy, 200, 14, "Result Label");
 
         // south
         y = 10;
-        let buttonItem1 = new ButtonItem("ButtonItem1", south, x, y += dy, 100, 0);
+        let buttonItem1 = new ButtonItem("ButtonItem1", buttons, x, y += dy, 100, 0);
         buttonItem1.label = "Hello World";
         buttonItem1.value = "Greg Smith";
-        let buttonItem2 = new ButtonItem("ButtonItem2", south, x, y += dy, 100, 0, "Button Item 2");
-        let buttonItem3 = new ButtonItem("ButtonItem3", south, x, y += dy, 100, 0, "Button Item 3");
+        let buttonItem2 = new ButtonItem("ButtonItem2", buttons, x, y += dy, 100, 0, "Button Item 2");
+        let buttonItem3 = new ButtonItem("ButtonItem3", buttons, x, y += dy, 100, 0, "Button Item 3");
         buttonItem1.go = printGo.bind(buttonItem1);
         buttonItem2.go = printGo.bind(buttonItem2);
         buttonItem3.go = printGo.bind(buttonItem3);
@@ -166,7 +162,7 @@ export class PlayfieldTest {
 
         // east
 
-        let buttonGroup = new GroupItem("ButtonGroup", east, 10, 10, 0, 0, "Radio Buttons");
+        let buttonGroup = new GroupItem("ButtonGroup", radios, 10, 10, 0, 0, "Radio Buttons");
         x = 0;
         y = 0;
         let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
@@ -177,9 +173,9 @@ export class PlayfieldTest {
         radioItem3.go = printValue.bind(radioItem3);
 
         // west
-        let buttonGroup2 = new GroupItem("ButtonGroup2", west, 10, 10, 0, 0, "CheckBoxes");
+        let buttonGroup2 = new GroupItem("ButtonGroup2", checkboxes, 10, 10, 0, 0, "CheckBoxes");
         x = 10;
-        y = 0;
+        y = 10;
         let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
         let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 0, 0, "#2", "Number 2");
         let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 0, 0, "#3", "Number 3");
@@ -187,15 +183,17 @@ export class PlayfieldTest {
         checkbox2.go = printValue.bind(checkbox2);
         checkbox3.go = printValue.bind(checkbox3);
 
-        slider = new Slider("xxx", north, 30, 20, 200, 200);
+        // north
+        slider = new Slider("xxx", sliders, 30, 20, 200, 200);
         slider.onChange = updateCursor.bind(slider);
 
-        hslider = new Slider("hslider", north, 20, north.h - 20, north.w - 20 - 1, 20);
+        hslider = new Slider("hslider", sliders, 20, sliders.h - 20, sliders.w - 20 - 1, 20);
         hslider.vslide = false;
         hslider.onChange = showValue.bind(hslider);
 
-        vslider = new Slider("vslider", north, 1, 1, 20, north.h - 20 - 1);
+        vslider = new Slider("vslider", sliders, 1, 1, 20, sliders.h - 20 - 1);
         vslider.hslide = false;
+        vslider.onChange = showValue.bind(vslider);
 
         this._playfield.start(0);
     }

@@ -12,3 +12,4 @@ export {Editable} from "./EditableMixin";
 export {Editor} from "./EditorMixin";
 export {Timer} from "./Timer";
 export {EventDispatcher} from "./EventDispatcher";
+export {Resizable} from "./Resizable";

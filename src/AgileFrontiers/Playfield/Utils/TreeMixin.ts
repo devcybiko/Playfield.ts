@@ -1,5 +1,6 @@
 export class Tree {
     private _name: string;
+    private _fullName: string;
     private _parent: Tree;
     private _children: Tree[];
 
@@ -7,6 +8,12 @@ export class Tree {
         this._name = name;
         this._children = [];
         if (parent) parent.addChild(this);
+        this._fullName = this._getFullName();
+    }
+
+    _getFullName(): string {
+        let parentFullName = this.parent ? this.parent._fullName + "." : "";
+        return parentFullName + this.name;
     }
 
     // --- Public Methods --- //
@@ -68,6 +75,9 @@ export class Tree {
     get children(): Array<Tree> {
         // return a shallow copy
         return [...this._children];
+    }
+    get fullName(): string {
+        return this._fullName;
     }
 
 }

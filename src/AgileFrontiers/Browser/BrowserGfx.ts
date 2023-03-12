@@ -1,6 +1,18 @@
 import { Gfx } from "../Playfield/Graphics/Gfx";
 import { GfxParms } from "../Playfield/Graphics/GfxParms";
 
+function xx(x: number) {
+    return Math.floor(x) + 0.5;
+}
+
+function yy(y: number) {
+    return Math.floor(y) + 0.5;
+}
+
+/**
+ * for documentation on why we add 0.5 to all x,y values see this
+ * https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
+ */
 var PIXEL_RATIO = (function () {
     var ctx = document.createElement("canvas").getContext("2d") as any,
         dpr = window.devicePixelRatio || 1,
@@ -28,12 +40,13 @@ function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
 
     var can = document.querySelector(canvasId) as any;
-    can._ratio = ratio;
+    // can._ratio = ratio;
+    can._ratio = 1.0;
+    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
     can.width = can.width * ratio;
     can.height = can.height * ratio;
     can.style.width = can.width + "px";
     can.style.height = can.height + "px";
-    can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
     return can;
 }
 
@@ -47,10 +60,11 @@ export class BrowserGfx implements Gfx {
     }
 
     private _init(canvasId: string) {
-        // this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
-        this._canvas = createHiDPIFromCanvas(canvasId);
+        this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
+        // this._canvas = createHiDPIFromCanvas(canvasId);
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
+        this._ctx.lineWidth = 1;
         this._ctx.fontKerning = "none";
         (this._ctx as any).letterSpacing = "1px";
         (this._ctx as any).textRendering = "geometricPrecision";
@@ -64,24 +78,40 @@ export class BrowserGfx implements Gfx {
         newGfx._gparms = this.gparms.clone();
         return newGfx;
     }
+    vline(x: number, y0:number, y1: number, moveTo = true) {
+        if (moveTo) this._ctx.moveTo(xx(this.gparms.dx + x), this.gparms.dy + y0);
+        this._ctx.lineTo(xx(this.gparms.dx + x), this.gparms.dy + y1);
+    }
+    hline(x0: number, x1: number, y:number, moveTo = true) {
+        if (moveTo) this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y));
+        this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y));
+    }
     rect(
         x: number,
         y: number,
         w: number,
         h: number
     ) {
+        this._ctx.beginPath();
+        if (this.gparms.borderRadius) this._ctx.roundRect(xx(this.gparms.dx + x - 1), yy(this.gparms.dy + y - 1), w, h, this.gparms.borderRadius);
+        else {
+            let x0 = x;
+            let y0 = y;
+            let x1 = x0 + w - 1;
+            let y1 = y0 + h - 1;
+            this.hline(x0, x1, y0, true);
+            this.vline(x1, y0, y1, false);
+            this.hline(x0, x1, y1, false);
+            this.vline(x0, y0, y1, false);
+        }
+        this._ctx.closePath();
+
         if (this.gparms.fillColor) {
             this._ctx.fillStyle = this.gparms.fillColor;
-            this._ctx.beginPath();
-            if (this.gparms.borderRadius) this._ctx.roundRect(this.gparms.dx + x, this.gparms.dy + y, w, h, this.gparms.borderRadius);
-            else this._ctx.rect(this.gparms.dx + x, this.gparms.dy + y, w, h);
             this._ctx.fill();
         }
         if (this.gparms.borderColor) {
             this._ctx.strokeStyle = this.gparms.borderColor;
-            this._ctx.beginPath();
-            if (this.gparms.borderRadius) this._ctx.roundRect(this.gparms.dx + x, this.gparms.dy + y, w, h, this.gparms.borderRadius);
-            else this._ctx.rect(this.gparms.dx + x, this.gparms.dy + y, w, h);
             this._ctx.stroke();
         }
     }
@@ -92,15 +122,15 @@ export class BrowserGfx implements Gfx {
         w: number,
         h: number
     ) {
+        this._ctx.beginPath();
+        this._ctx.ellipse(xx(this.gparms.dx + x + w / 2), yy(this.gparms.dy + y + h / 2), w / 2, h / 2, 0, 0, 2 * Math.PI);
+        this._ctx.closePath();
+
         if (this.gparms.fillColor) {
-            this._ctx.beginPath();
-            this._ctx.ellipse(this.gparms.dx + x + w / 2, this.gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this._ctx.fillStyle = this.gparms.fillColor;
             this._ctx.fill();
         }
         if (this.gparms.borderColor) {
-            this._ctx.beginPath();
-            this._ctx.ellipse(this.gparms.dx + x + w / 2, this.gparms.dy + y + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
             this._ctx.strokeStyle = this.gparms.borderColor;
             this._ctx.stroke();
         }
@@ -121,9 +151,17 @@ export class BrowserGfx implements Gfx {
         y1: number
     ) {
         this._ctx.beginPath();
+        if (x0 === x1) {
+            this.vline(x0, y0, y1);
+        } else if (y0 === y1) {
+            this.hline(x0, x1, y0);
+        } else {
+            this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y0));
+            this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y1));
+        }
+        this._ctx.closePath();
+
         this._ctx.strokeStyle = this.gparms.borderColor;
-        this._ctx.moveTo(this.gparms.dx + x0, this.gparms.dy + y0);
-        this._ctx.lineTo(this.gparms.dx + x1, this.gparms.dy + y1);
         this._ctx.stroke();
     }
 
@@ -185,7 +223,6 @@ export class BrowserGfx implements Gfx {
         this.text(msg, x + 1, y + 1, w, h);
     }
 
-
     boundingBox(msg: string): any {
         this._ctx.font = this.gparms.font;
         let boundingBox = this._ctx.measureText(msg) as any;
@@ -195,7 +232,7 @@ export class BrowserGfx implements Gfx {
     clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
         this.save();
         let region = new Path2D();
-        region.rect(x + this.gparms.dx - 1, y + this.gparms.dy - 2, w + 2, h + 2);
+        region.rect(x + this.gparms.dx - 1, y + this.gparms.dy - 1, w + 2, h + 2);
         this._ctx.clip(region);
     }
 

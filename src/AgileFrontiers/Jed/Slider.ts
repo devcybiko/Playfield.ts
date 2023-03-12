@@ -1,8 +1,8 @@
-import { Tile } from "./Tile";
-import { Draggable, Hoverable } from "./Abilities";
-import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "./Utils";
-import { PlayfieldEvent } from "./PlayfieldEvent";
-import { GfxParms } from "./Graphics";
+import { Tile } from "../Playfield/Tile";
+import { Draggable, Hoverable } from "../Playfield/Abilities";
+import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "../Playfield/Utils";
+import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
+import { GfxParms } from "../Playfield/Graphics";
 
 export class _Slider extends Tile { };
 export interface _Slider extends Draggable, Hoverable { };

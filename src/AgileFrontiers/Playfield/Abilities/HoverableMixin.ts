@@ -12,7 +12,14 @@ export class Hoverable {
     }
 
     // --- onActions --- //
-    
+
+    private onHover(pfEvent: PlayfieldEvent): void {
+        // this is the wrong method
+        // you should be using onHovering(), above
+        // this is purposely mispelled with upper-case "S"
+        // to force a compile-time error
+        // if you attempt to override it.
+    }
     onHovering(pfEvent: PlayfieldEvent): void {
     }
     onEnter(pfEvent: PlayfieldEvent): void {
