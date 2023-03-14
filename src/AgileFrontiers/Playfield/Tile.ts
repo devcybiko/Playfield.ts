@@ -1,7 +1,8 @@
-import { applyMixins, Tree, Rect, between, Logger } from "../Utils";
+import { applyMixins, Tree, Rect, between, Logger, Margins } from "../Utils";
 import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
+import { Options } from "./Options";
 
 /**
  * A Tile is a rectangular item on a Playfield.
@@ -11,15 +12,19 @@ import { PlayfieldEvent } from "./PlayfieldEvent";
  * it is hierarcically organized so is drawn relative to its parent
  */
 
+export class TileOptions extends Options {
+    margins = (new Margins).Margins(0,0,0,0);
+}
+
 export class _Tile { };
 export interface _Tile extends Logger, Tree, Rect { };
 applyMixins(_Tile, [Logger, Tree, Rect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
-
     private _playfield: Playfield;
     private _gfx: Gfx;
+    private _options = new TileOptions;
     private _logger: Logger;
     private _tabOrder = 0;
 
@@ -41,7 +46,7 @@ export class Tile extends _Tile {
     addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
-        child._tabOrder = this.children.indexOf(child);
+        child._tabOrder = this.children.length-1;
     }
     // --- Public Methods --- //
 
@@ -71,6 +76,7 @@ export class Tile extends _Tile {
             (child as Tile).drawAll();
         }
     }
+
     redraw() {
         this._recompute();
         this.draw();

@@ -555,10 +555,18 @@ define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Playfield/Tile", ["require", "exports", "Utils/index"], function (require, exports, Utils_1) {
+define("Playfield/Options", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Tile = exports._Tile = void 0;
+    exports.Options = void 0;
+    class Options {
+    }
+    exports.Options = Options;
+});
+define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Options"], function (require, exports, Utils_1, Options_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Tile = exports._Tile = exports.TileOptions = void 0;
     /**
      * A Tile is a rectangular item on a Playfield.
      * It can draw itself on the Playfield
@@ -566,6 +574,9 @@ define("Playfield/Tile", ["require", "exports", "Utils/index"], function (requir
      * it can move around
      * it is hierarcically organized so is drawn relative to its parent
      */
+    class TileOptions extends Options_1.Options {
+    }
+    exports.TileOptions = TileOptions;
     class _Tile {
     }
     exports._Tile = _Tile;
@@ -1364,15 +1375,18 @@ define("Playfield/EventQueue", ["require", "exports"], function (require, export
     }
     exports.EventQueue = EventQueue;
 });
-define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/index", "Playfield/RootTile"], function (require, exports, Tile_3, Utils_3, RootTile_1) {
+define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/index", "Playfield/RootTile", "Playfield/Options"], function (require, exports, Tile_3, Utils_3, RootTile_1, Options_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Playfield = exports._Playfield = void 0;
+    exports.Playfield = exports._Playfield = exports.PlayfieldOptions = void 0;
     /**
      * Playfield is a graphic area for rendering
      * And it collects human inputs and dispatches them to tiles
      * A Playfield has a tree of Tiles (rectangles)
      */
+    class PlayfieldOptions extends Options_2.Options {
+    }
+    exports.PlayfieldOptions = PlayfieldOptions;
     class _Playfield {
     }
     exports._Playfield = _Playfield;
@@ -1869,16 +1883,17 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.VSplitter = VSplitter;
 });
-define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, Splitter_3, HSplitter_1, VSplitter_1) {
+define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter", "Playfield/Options"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, Splitter_3, HSplitter_1, VSplitter_1, Options_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.VSplitter = exports.HSplitter = exports.Splitter = exports.EventQueue = exports.Tile = exports.Playfield = void 0;
+    exports.Options = exports.VSplitter = exports.HSplitter = exports.Splitter = exports.EventQueue = exports.Tile = exports.Playfield = void 0;
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
     Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_7.Tile; } });
     Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
     Object.defineProperty(exports, "Splitter", { enumerable: true, get: function () { return Splitter_3.Splitter; } });
     Object.defineProperty(exports, "HSplitter", { enumerable: true, get: function () { return HSplitter_1.HSplitter; } });
     Object.defineProperty(exports, "VSplitter", { enumerable: true, get: function () { return VSplitter_1.VSplitter; } });
+    Object.defineProperty(exports, "Options", { enumerable: true, get: function () { return Options_3.Options; } });
 });
 define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (require, exports) {
     "use strict";

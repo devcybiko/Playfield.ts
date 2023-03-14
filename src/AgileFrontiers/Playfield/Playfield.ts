@@ -3,12 +3,16 @@ import { Rect, Logger, applyMixins } from "../Utils";
 import { Gfx, GfxParms } from "./Graphics";
 import { RootTile } from "./RootTile";
 import { EventQueue } from "./EventQueue";
+import { Options } from "./Options";
 
 /**
  * Playfield is a graphic area for rendering
  * And it collects human inputs and dispatches them to tiles
  * A Playfield has a tree of Tiles (rectangles)
  */
+
+export class PlayfieldOptions extends Options {
+}
 
 export class _Playfield { };
 export interface _Playfield extends Logger, Rect { };
