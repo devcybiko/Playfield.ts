@@ -4,11 +4,12 @@ export class Margins {
     private _left = 0;
     private _right = 0;
 
-    Margins(top: number, right: number, bottom: number, left: number) {
+    Margins(top: number, right: number, bottom: number, left: number): Margins {
         this._top = top;
         this._bottom = bottom;
         this._left = left;
         this._right = right;
+        return this;
     }
 
     // --- Accessors --- //

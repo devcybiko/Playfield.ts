@@ -64,6 +64,17 @@ export class Tree {
         }
     }
 
+    depth(): number {
+        if (this.parent) return this.parent.depth() + 1;
+        return 0;
+    }
+    printMe(node: Tree, ctx: any) {
+        console.log(" | ".repeat(node.depth()), node.name);
+    }
+    printTree() {
+        this.dfs(this.printMe.bind(this), null);
+    }
+
     // --- Accessors --- //
 
     get parent(): Tree {

@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
-import { applyMixins } from "../Playfield/Utils";
+import { applyMixins } from "../Utils";
 import { Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 

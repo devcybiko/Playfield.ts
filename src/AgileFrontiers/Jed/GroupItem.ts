@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins, Logger, Rect, between, Tree } from "../Playfield/Utils";
+import { applyMixins, Logger, Rect, between, Tree } from "../Utils";
 import { Draggable, EventDispatcher, Clicker, Presser, Selecter, Dragger, Editor, Hoverer } from "../Playfield/Abilities";
 
 export class _GroupItem extends Item { };

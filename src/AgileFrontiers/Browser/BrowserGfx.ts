@@ -1,12 +1,13 @@
 import { Gfx } from "../Playfield/Graphics/Gfx";
 import { GfxParms } from "../Playfield/Graphics/GfxParms";
+import { int } from "../Utils";
 
 function xx(x: number) {
-    return Math.floor(x) + 0.5;
+    return int(x) + 0.5;
 }
 
 function yy(y: number) {
-    return Math.floor(y) + 0.5;
+    return int(y) + 0.5;
 }
 
 /**
@@ -40,8 +41,8 @@ function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
 
     var can = document.querySelector(canvasId) as any;
-    // can._ratio = ratio;
-    can._ratio = 1.0;
+    can._ratio = ratio;
+    // can._ratio = 1.0;
     can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
     can.width = can.width * ratio;
     can.height = can.height * ratio;
@@ -78,27 +79,30 @@ export class BrowserGfx implements Gfx {
         newGfx._gparms = this.gparms.clone();
         return newGfx;
     }
-    vline(x: number, y0:number, y1: number, moveTo = true) {
+    vline(x: number, y0:number, y1: number, moveTo = true, gparms = this.gparms) {
         if (moveTo) this._ctx.moveTo(xx(this.gparms.dx + x), this.gparms.dy + y0);
         this._ctx.lineTo(xx(this.gparms.dx + x), this.gparms.dy + y1);
     }
-    hline(x0: number, x1: number, y:number, moveTo = true) {
-        if (moveTo) this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y));
-        this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y));
+    hline(x0: number, x1: number, y:number, moveTo = true, gparms = this.gparms) {
+        if (moveTo) this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y));
+        this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y));
     }
     rect(
         x: number,
         y: number,
         w: number,
-        h: number
+        h: number,
+        gparms = this.gparms
     ) {
         this._ctx.beginPath();
-        if (this.gparms.borderRadius) this._ctx.roundRect(xx(this.gparms.dx + x - 1), yy(this.gparms.dy + y - 1), w, h, this.gparms.borderRadius);
+        if (gparms.borderRadius) {
+            this._ctx.roundRect(xx(gparms.dx + x - 1), yy(gparms.dy + y - 1), w, h, gparms.borderRadius);
+        }
         else {
             let x0 = x;
             let y0 = y;
-            let x1 = x0 + w - 1;
-            let y1 = y0 + h - 1;
+            let x1 = int(x0) +int(w - 1);
+            let y1 = int(y0) + int(h - 1);
             this.hline(x0, x1, y0, true);
             this.vline(x1, y0, y1, false);
             this.hline(x0, x1, y1, false);
@@ -106,12 +110,12 @@ export class BrowserGfx implements Gfx {
         }
         this._ctx.closePath();
 
-        if (this.gparms.fillColor) {
-            this._ctx.fillStyle = this.gparms.fillColor;
+        if (gparms.fillColor) {
+            this._ctx.fillStyle = gparms.fillColor;
             this._ctx.fill();
         }
-        if (this.gparms.borderColor) {
-            this._ctx.strokeStyle = this.gparms.borderColor;
+        if (gparms.borderColor) {
+            this._ctx.strokeStyle = gparms.borderColor;
             this._ctx.stroke();
         }
     }
@@ -148,7 +152,8 @@ export class BrowserGfx implements Gfx {
         x0: number,
         y0: number,
         x1: number,
-        y1: number
+        y1: number,
+        gparms = this.gparms
     ) {
         this._ctx.beginPath();
         if (x0 === x1) {
@@ -156,13 +161,15 @@ export class BrowserGfx implements Gfx {
         } else if (y0 === y1) {
             this.hline(x0, x1, y0);
         } else {
-            this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y0));
-            this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y1));
+            this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y0));
+            this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y1));
         }
         this._ctx.closePath();
 
-        this._ctx.strokeStyle = this.gparms.borderColor;
-        this._ctx.stroke();
+        if (gparms.borderColor) {
+            this._ctx.strokeStyle = gparms.borderColor;
+            this._ctx.stroke();
+        }
     }
 
     text(msg: string, x = 0, y = 0, w?: number, h?: number) {

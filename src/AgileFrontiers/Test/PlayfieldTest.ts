@@ -1,7 +1,7 @@
 import { Playfield, PlayfieldEvent, Splitter, VSplitter, HSplitter } from "../Playfield";
 import { CircleTestTile } from "./CircleTestTile";
 import { BoxTestTile } from "./BoxTestTile";
-import { random, int } from "../Playfield/Utils";
+import { random, int } from "../Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem, Slider} from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
@@ -197,6 +197,7 @@ export class PlayfieldTest {
         vslider.hslide = false;
         vslider.onChange = showValue.bind(vslider);
 
+        this._playfield.tile.printTree();
         this._playfield.start(0);
     }
 }

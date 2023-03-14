@@ -1,4 +1,4 @@
-define("Playfield/Utils/Mixins", ["require", "exports"], function (require, exports) {
+define("Utils/Mixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.applyMixins = void 0;
@@ -12,10 +12,10 @@ define("Playfield/Utils/Mixins", ["require", "exports"], function (require, expo
     }
     exports.applyMixins = applyMixins;
 });
-define("Playfield/Utils/Functions", ["require", "exports"], function (require, exports) {
+define("Utils/Functions", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.limit = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
+    exports.limit = exports.ceil = exports.round = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = void 0;
     function between(a, b, c) {
         let result = a < b && b < c;
         return result;
@@ -42,6 +42,14 @@ define("Playfield/Utils/Functions", ["require", "exports"], function (require, e
         return Math.floor(n);
     }
     exports.int = int;
+    function round(n) {
+        return Math.floor(n + 0.5);
+    }
+    exports.round = round;
+    function ceil(n) {
+        return Math.ceil(n);
+    }
+    exports.ceil = ceil;
     function limit(min, value, max) {
         if (value < min)
             value = min;
@@ -51,7 +59,7 @@ define("Playfield/Utils/Functions", ["require", "exports"], function (require, e
     }
     exports.limit = limit;
 });
-define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
+define("Utils/LoggerMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Logger = void 0;
@@ -119,7 +127,7 @@ define("Playfield/Utils/LoggerMixin", ["require", "exports"], function (require,
     }
     exports.Logger = Logger;
 });
-define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, exports) {
+define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Tree = void 0;
@@ -182,6 +190,17 @@ define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, e
                 this.parent.toBack(this);
             }
         }
+        depth() {
+            if (this.parent)
+                return this.parent.depth() + 1;
+            return 0;
+        }
+        printMe(node, ctx) {
+            console.log(" | ".repeat(node.depth()), node.name);
+        }
+        printTree() {
+            this.dfs(this.printMe.bind(this), null);
+        }
         // --- Accessors --- //
         get parent() {
             return this._parent;
@@ -199,7 +218,7 @@ define("Playfield/Utils/TreeMixin", ["require", "exports"], function (require, e
     }
     exports.Tree = Tree;
 });
-define("Playfield/Utils/PointMixin", ["require", "exports"], function (require, exports) {
+define("Utils/PointMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Point = void 0;
@@ -237,7 +256,7 @@ define("Playfield/Utils/PointMixin", ["require", "exports"], function (require, 
     }
     exports.Point = Point;
 });
-define("Playfield/Utils/RectMixin", ["require", "exports", "Playfield/Utils/PointMixin"], function (require, exports, PointMixin_1) {
+define("Utils/RectMixin", ["require", "exports", "Utils/PointMixin"], function (require, exports, PointMixin_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Rect = void 0;
@@ -256,12 +275,14 @@ define("Playfield/Utils/RectMixin", ["require", "exports", "Playfield/Utils/Poin
             this._y = y;
             this._w = w;
             this._h = h;
+            return this;
         }
         RectXY(x0, y0, x1, y1) {
             this.x0 = x0;
             this.y0 = y0;
             this.x1 = x1;
             this.y1 = y1;
+            return this;
         }
         // --- Public Methods --- //
         move(x, y) {
@@ -339,7 +360,7 @@ define("Playfield/Utils/RectMixin", ["require", "exports", "Playfield/Utils/Poin
         }
         set y1(y1) {
             // if y1 == y0 then h == 1
-            this._h = y1 - this._y + 1;
+            this._h = y1 - this.y0 + 1;
         }
         get p0() {
             let p0 = new PointMixin_1.Point();
@@ -353,8 +374,9 @@ define("Playfield/Utils/RectMixin", ["require", "exports", "Playfield/Utils/Poin
         }
     }
     exports.Rect = Rect;
+    Rect.xxx = 0;
 });
-define("Playfield/Utils/MarginsMixin", ["require", "exports"], function (require, exports) {
+define("Utils/MarginsMixin", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Margins = void 0;
@@ -370,6 +392,7 @@ define("Playfield/Utils/MarginsMixin", ["require", "exports"], function (require
             this._bottom = bottom;
             this._left = left;
             this._right = right;
+            return this;
         }
         // --- Accessors --- //
         get top() {
@@ -399,7 +422,7 @@ define("Playfield/Utils/MarginsMixin", ["require", "exports"], function (require
     }
     exports.Margins = Margins;
 });
-define("Playfield/Utils/RatioMixin", ["require", "exports", "Playfield/Utils/Functions"], function (require, exports, Functions_1) {
+define("Utils/RatioMixin", ["require", "exports", "Utils/Functions"], function (require, exports, Functions_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Ratio = void 0;
@@ -432,16 +455,18 @@ define("Playfield/Utils/RatioMixin", ["require", "exports", "Playfield/Utils/Fun
     }
     exports.Ratio = Ratio;
 });
-define("Playfield/Utils/index", ["require", "exports", "Playfield/Utils/Mixins", "Playfield/Utils/Functions", "Playfield/Utils/LoggerMixin", "Playfield/Utils/TreeMixin", "Playfield/Utils/RectMixin", "Playfield/Utils/PointMixin", "Playfield/Utils/MarginsMixin", "Playfield/Utils/RatioMixin"], function (require, exports, Mixins_1, Functions_2, LoggerMixin_1, TreeMixin_1, RectMixin_1, PointMixin_2, MarginsMixin_1, RatioMixin_1) {
+define("Utils/index", ["require", "exports", "Utils/Mixins", "Utils/Functions", "Utils/LoggerMixin", "Utils/TreeMixin", "Utils/RectMixin", "Utils/PointMixin", "Utils/MarginsMixin", "Utils/RatioMixin"], function (require, exports, Mixins_1, Functions_2, LoggerMixin_1, TreeMixin_1, RectMixin_1, PointMixin_2, MarginsMixin_1, RatioMixin_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Ratio = exports.Margins = exports.Point = exports.Rect = exports.Tree = exports.Logger = exports.limit = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
+    exports.Ratio = exports.Margins = exports.Point = exports.Rect = exports.Tree = exports.Logger = exports.limit = exports.ceil = exports.round = exports.int = exports.snapTo = exports.random = exports.inclusive = exports.between = exports.applyMixins = void 0;
     Object.defineProperty(exports, "applyMixins", { enumerable: true, get: function () { return Mixins_1.applyMixins; } });
     Object.defineProperty(exports, "between", { enumerable: true, get: function () { return Functions_2.between; } });
     Object.defineProperty(exports, "inclusive", { enumerable: true, get: function () { return Functions_2.inclusive; } });
     Object.defineProperty(exports, "random", { enumerable: true, get: function () { return Functions_2.random; } });
     Object.defineProperty(exports, "snapTo", { enumerable: true, get: function () { return Functions_2.snapTo; } });
     Object.defineProperty(exports, "int", { enumerable: true, get: function () { return Functions_2.int; } });
+    Object.defineProperty(exports, "round", { enumerable: true, get: function () { return Functions_2.round; } });
+    Object.defineProperty(exports, "ceil", { enumerable: true, get: function () { return Functions_2.ceil; } });
     Object.defineProperty(exports, "limit", { enumerable: true, get: function () { return Functions_2.limit; } });
     Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return LoggerMixin_1.Logger; } });
     Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return TreeMixin_1.Tree; } });
@@ -469,7 +494,7 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.fontStyle = "";
         }
         clone() {
-            let gfxparms = new GfxParms;
+            let gfxparms = new GfxParms();
             Object.assign(gfxparms, this);
             return gfxparms;
         }
@@ -530,7 +555,7 @@ define("Playfield/PlayfieldEvent", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Playfield/Tile", ["require", "exports", "Playfield/Utils/index"], function (require, exports, Utils_1) {
+define("Playfield/Tile", ["require", "exports", "Utils/index"], function (require, exports, Utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Tile = exports._Tile = void 0;
@@ -1230,7 +1255,6 @@ define("Playfield/Abilities/Resizable", ["require", "exports", "Playfield/Tile"]
         }
         onRelResize(dw, dh, pfEvent) {
             let thisTile = Tile_1.Tile.cast(this);
-            console.log("relResize", thisTile.fullName);
             this.relResize(dw, dh);
             this.onRelResizeChildren(dw, dh, pfEvent);
         }
@@ -1280,7 +1304,7 @@ define("Playfield/Abilities/index", ["require", "exports", "Playfield/Abilities/
     Object.defineProperty(exports, "EventDispatcher", { enumerable: true, get: function () { return EventDispatcher_1.EventDispatcher; } });
     Object.defineProperty(exports, "Resizable", { enumerable: true, get: function () { return Resizable_1.Resizable; } });
 });
-define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, Tile_2, Abilities_1, Utils_2) {
+define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, Tile_2, Abilities_1, Utils_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RootTile = exports._RootTile = void 0;
@@ -1305,7 +1329,10 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
         }
         // --- Overrides --- //
         draw() {
+            this.gfx.clipRect(this.x, this.y, this.w, this.h);
+            this.gfx.rect(this.x, this.y, this.w, this.h);
             this.redrawChildren();
+            this.gfx.restore();
         }
         // --- onActions --- //
         onEvent(pfEvent) {
@@ -1337,7 +1364,7 @@ define("Playfield/EventQueue", ["require", "exports"], function (require, export
     }
     exports.EventQueue = EventQueue;
 });
-define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_3, Utils_3, RootTile_1) {
+define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/index", "Playfield/RootTile"], function (require, exports, Tile_3, Utils_3, RootTile_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Playfield = exports._Playfield = void 0;
@@ -1418,7 +1445,7 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.Playfield = Playfield;
 });
-define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_4, Abilities_2, Abilities_3, Utils_4, RootTile_2) {
+define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Utils/index", "Playfield/RootTile"], function (require, exports, Tile_4, Abilities_2, Abilities_3, Utils_4, RootTile_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Splitter = exports._Splitter = void 0;
@@ -1431,12 +1458,6 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
     class Splitter extends _Splitter {
         constructor(name, parent, topPercent = 0.5, leftPercent = 0.5) {
             super(name, parent, 0, 0, parent.w, parent.h);
-            this._gutter = 6;
-            this._margins = new Utils_4.Margins();
-            this._hGutter = new Utils_4.Rect();
-            this._vGutter = new Utils_4.Rect();
-            this._hGutterHover = false;
-            this._vGutterHover = false;
             this.Logger();
             this.Clicker();
             this.Presser();
@@ -1448,14 +1469,23 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             this.Draggable();
             this.Hoverable();
             this.Resizable();
-            this._margins.Margins(0, 0, 0, 0);
-            this._ne = new RootTile_2.RootTile("ne", this, 0, 0, 0, 0);
-            this._nw = new RootTile_2.RootTile("nw", this, 0, 0, 0, 0);
-            this._se = new RootTile_2.RootTile("se", this, 0, 0, 0, 0);
-            this._sw = new RootTile_2.RootTile("sw", this, 0, 0, 0, 0);
-            this._hGutterInit(topPercent);
-            this._vGutterInit(leftPercent);
-            this._resize();
+            this._margins = new Utils_4.Margins().Margins(2, 2, 2, 2);
+            this._gutter = 7;
+            this._topPercent = topPercent;
+            this._leftPercent = leftPercent;
+        }
+        _initOnFirstCall() {
+            if (!this._ne) {
+                this._hGutterHover = false;
+                this._vGutterHover = false;
+                this._hGutterInit(this._topPercent);
+                this._vGutterInit(this._leftPercent);
+                this._ne = new RootTile_2.RootTile("ne", this, 0, 0, 0, 0);
+                this._nw = new RootTile_2.RootTile("nw", this, 0, 0, 0, 0);
+                this._se = new RootTile_2.RootTile("se", this, 0, 0, 0, 0);
+                this._sw = new RootTile_2.RootTile("sw", this, 0, 0, 0, 0);
+                this._resize();
+            }
         }
         _resize() {
             this._neSize();
@@ -1464,40 +1494,42 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             this._swSize();
         }
         _neSize() {
-            this._ne.x = this._margins.left;
-            this._ne.y = this._vGutter.y0;
-            this._ne.w = this._vGutter.x0 - this.x0;
-            this._ne.h = this._hGutter.y0 - this.y0;
+            this._ne.x0 = this._margins.left;
+            this._ne.y0 = this._margins.top;
+            this._ne.x1 = this._vGutter.x0 - 1;
+            this._ne.y1 = this._hGutter.y0 - 1;
         }
         _seSize() {
-            this._se.x = this._margins.left;
-            this._se.y = this._hGutter.y1;
-            this._se.w = this._vGutter.x0 - this.x0;
-            this._se.h = this._vGutter.x1 - this._margins.bottom;
+            this._se.x0 = this._margins.left;
+            this._se.y0 = this._hGutter.y1 + 1;
+            this._se.x1 = this._vGutter.x0 - 1;
+            this._se.y1 = this.y1 - this._margins.bottom;
         }
         _nwSize() {
-            this._nw.x = this._vGutter.x1;
-            this._nw.y = this._margins.top;
-            this._nw.w = this.w - this._vGutter.x0 - this._margins.right;
-            this._nw.h = this._hGutter.y0 - this.y0;
+            this._nw.x0 = this._vGutter.x1 + 1;
+            this._nw.y0 = this._margins.top;
+            this._nw.x1 = this.x1 - this._margins.right;
+            this._nw.y1 = this._hGutter.y0 - 1;
         }
         _swSize() {
-            this._sw.x = this._vGutter.x1;
-            this._sw.y = this._hGutter.y1;
-            this._sw.w = this.w - this._vGutter.x0 - this._margins.right;
-            this._sw.h = this.h - this._hGutter.y1 - this._margins.bottom;
+            this._sw.x0 = this._vGutter.x1 + 1;
+            this._sw.y0 = this._hGutter.y1 + 1;
+            this._sw.x1 = this.x1 - this._margins.right;
+            this._sw.y1 = this.y1 - this._margins.bottom;
         }
         _vGutterInit(leftPercent) {
-            let x0 = this.w * leftPercent - this._gutter / 2;
+            let x0 = (0, Utils_4.int)(this.w * leftPercent) - (0, Utils_4.int)(this._gutter / 2);
             let y0 = this._margins.top;
-            this._vGutter.Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
+            this._vGutter = (new Utils_4.Rect()).Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
         }
         _hGutterInit(topPercent) {
-            let x0 = this._margins.left;
-            let y0 = this.h * topPercent - this._gutter / 2;
-            this._hGutter.Rect(x0, y0, this.w - this._margins.left - this._margins.right, this._gutter);
+            let x0 = 0;
+            let y0 = (0, Utils_4.int)(this.h * topPercent) - (0, Utils_4.int)(this._gutter / 2);
+            this._hGutter = (new Utils_4.Rect()).Rect(x0, y0, this.w, this._gutter);
         }
         _hoverGutter(gutter, pfEvent) {
+            if (!gutter)
+                return;
             return (0, Utils_4.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_4.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
         }
         // --- Overrides --- //
@@ -1508,34 +1540,30 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
                 throw new Error("You must use Splitter.north or Splitter.south");
         }
         _drawChild(child) {
-            this.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
             child.redraw();
-            this.gfx.restore();
         }
         _drawGutter(gutterRect, hover) {
-            this.gfx.gparms.borderColor = "";
-            let oldColor = this.gfx.gparms.fillColor;
+            let gparms = this.gfx.gparms.clone();
+            gparms.borderColor = "";
             if (hover) {
-                this.gfx.gparms.fillColor = "black";
-                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w - 1, gutterRect.h - 1);
+                gparms.fillColor = "black";
+                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w, gutterRect.h, gparms);
             }
             else {
-                this.gfx.gparms.fillColor = "black";
+                gparms.fillColor = "";
+                gparms.borderColor = "green";
                 if (gutterRect.w > gutterRect.h) {
                     // horizontal
-                    this.gfx.line(gutterRect.x0, gutterRect.y0 + gutterRect.h / 2, gutterRect.x0 + gutterRect.w, gutterRect.y0 + gutterRect.h / 2);
+                    this.gfx.line(gutterRect.x0, gutterRect.y0 + (0, Utils_4.int)(gutterRect.h / 2), gutterRect.x0 + gutterRect.w, (0, Utils_4.int)(gutterRect.y0 + gutterRect.h / 2), gparms);
                 }
                 else {
                     // vertical
-                    this.gfx.line(gutterRect.x0 + gutterRect.w / 2, gutterRect.y0, gutterRect.x0 + gutterRect.w / 2, gutterRect.y0 + gutterRect.h);
+                    this.gfx.line(gutterRect.x0 + (0, Utils_4.int)(gutterRect.w / 2), gutterRect.y0, gutterRect.x0 + (gutterRect.w / 2), gutterRect.y0 + gutterRect.h, gparms);
                 }
             }
-            this.gfx.gparms.fillColor = oldColor;
-            this.gfx.gparms.borderColor = "black";
         }
         // --- Overrides --- //
         relResize(dw, dh) {
-            console.log("relResize", this.name);
             this._neSize();
             this._seSize();
             this._nwSize();
@@ -1561,7 +1589,6 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
         }
         onRelResize(dw, dh, pfEvent) {
             let thisTile = Tile_4.Tile.cast(this);
-            console.log("relResize", thisTile.fullName);
             if (dw) {
                 this._hGutter.rsize(dw, 0);
                 this._nw.onRelResize(dw, 0, pfEvent);
@@ -1580,7 +1607,6 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             super.onDrop(pfEvent);
         }
         onDrag(dx, dy, pfEvent) {
-            console.log(this._hGutterHover, this._vGutterHover);
             if (this._hGutterHover) {
                 this._hGutter.rmove(0, dy);
                 this._ne.onRelResize(0, dy, pfEvent);
@@ -1620,24 +1646,28 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
         }
         // --- Accessors --- //
         get ne() {
+            this._initOnFirstCall();
             return this._ne;
         }
         set ne(value) {
             this._ne = value;
         }
         get nw() {
+            this._initOnFirstCall();
             return this._nw;
         }
         set nw(value) {
             this._nw = value;
         }
         get se() {
+            this._initOnFirstCall();
             return this._se;
         }
         set se(value) {
             this._se = value;
         }
         get sw() {
+            this._initOnFirstCall();
             return this._sw;
         }
         set sw(value) {
@@ -1646,63 +1676,37 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
     }
     exports.Splitter = Splitter;
 });
-define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_5, Abilities_4, Abilities_5, Utils_5, RootTile_3) {
+define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfield/RootTile", "Playfield/Splitter"], function (require, exports, Tile_5, RootTile_3, Splitter_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.HSplitter = exports._HSplitter = void 0;
-    class _HSplitter extends Tile_5.Tile {
-    }
-    exports._HSplitter = _HSplitter;
-    ;
-    ;
-    (0, Utils_5.applyMixins)(_HSplitter, [Abilities_5.Resizable, Abilities_5.Hoverable, Abilities_5.Draggable, Abilities_4.EventDispatcher, Utils_5.Logger, Abilities_4.Clicker, Abilities_4.Presser, Abilities_4.Selecter, Abilities_4.Dragger, Abilities_4.Editor, Abilities_4.Hoverer]);
-    class HSplitter extends _HSplitter {
+    exports.HSplitter = void 0;
+    class HSplitter extends Splitter_1.Splitter {
         constructor(name, parent, topPercent = 0.5) {
-            super(name, parent, 0, 0, parent.w, parent.h);
-            this._gutter = 6;
-            this._margins = new Utils_5.Margins();
-            this._hGutter = new Utils_5.Rect();
-            this._hGutterHover = false;
-            this.Logger();
-            this.Clicker();
-            this.Presser();
-            this.Selecter();
-            this.Dragger();
-            this.Editor();
-            this.Hoverer();
-            this.EventDispatcher();
-            this.Draggable();
-            this.Hoverable();
-            this.Resizable();
-            this._margins.Margins(0, 0, 0, 0);
-            this._north = new RootTile_3.RootTile("ne", this, 0, 0, 0, 0);
-            this._south = new RootTile_3.RootTile("se", this, 0, 0, 0, 0);
-            this._hGutterInit(topPercent);
-            this._resize();
+            super(name, parent, topPercent, 0);
+        }
+        _initOnFirstCall() {
+            if (!this._north) {
+                this._hGutterInit(this._topPercent);
+                this._north = new RootTile_3.RootTile("ne", this, 0, 0, 0, 0);
+                this._south = new RootTile_3.RootTile("se", this, 0, 0, 0, 0);
+                this._resize();
+            }
         }
         _resize() {
             this._northSize();
             this._southSize();
         }
         _northSize() {
-            this._north.x = this._margins.left;
-            this._north.y = this._margins.top;
-            this._north.w = this.w - this._margins.left - this._margins.right;
-            this._north.h = this._hGutter.y0 - this.y0;
+            this._north.x0 = this._margins.left;
+            this._north.y0 = this._margins.top;
+            this._north.x1 = this.x1 - this._margins.right;
+            this._north.y1 = this._hGutter.y0;
         }
         _southSize() {
-            this._south.x = this._margins.left;
-            this._south.y = this._hGutter.y1;
-            this._south.w = this.w - this._margins.left - this._margins.right;
-            this._south.h = this.h - this._margins.bottom - this._hGutter.y1;
-        }
-        _hGutterInit(topPercent) {
-            let x0 = this._margins.left;
-            let y0 = this.h * topPercent - this._gutter / 2;
-            this._hGutter.Rect(x0, y0, this.w - this._margins.left - this._margins.right, this._gutter);
-        }
-        _hoverGutter(gutter, pfEvent) {
-            return (0, Utils_5.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_5.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
+            this._south.x0 = this._margins.left;
+            this._south.y0 = this._hGutter.y1;
+            this._south.x1 = this.x1 - this._margins.right;
+            this._south.y1 = this.y1 - this._margins.bottom;
         }
         // --- Overrides --- //
         addChild(child) {
@@ -1711,35 +1715,8 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             else
                 throw new Error("You must use HSplitter.north or HSplitter.south");
         }
-        _drawChild(child) {
-            this.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
-            child.redraw();
-            this.gfx.restore();
-        }
-        _drawGutter(gutterRect, hover) {
-            this.gfx.gparms.borderColor = "";
-            let oldColor = this.gfx.gparms.fillColor;
-            if (hover) {
-                this.gfx.gparms.fillColor = "black";
-                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w - 1, gutterRect.h - 1);
-            }
-            else {
-                this.gfx.gparms.fillColor = "black";
-                if (gutterRect.w > gutterRect.h) {
-                    // horizontal
-                    this.gfx.line(gutterRect.x0, gutterRect.y0 + gutterRect.h / 2, gutterRect.x0 + gutterRect.w, gutterRect.y0 + gutterRect.h / 2);
-                }
-                else {
-                    // vertical
-                    this.gfx.line(gutterRect.x0 + gutterRect.w / 2, gutterRect.y0, gutterRect.x0 + gutterRect.w / 2, gutterRect.y0 + gutterRect.h);
-                }
-            }
-            this.gfx.gparms.fillColor = oldColor;
-            this.gfx.gparms.borderColor = "black";
-        }
         // --- Overrides --- //
         relResize(dw, dh) {
-            console.log("relResize", this.name);
             this._northSize();
             this._southSize();
         }
@@ -1750,27 +1727,14 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             this._drawChild(this.south);
         }
         // --- onActions --- //
-        onGrab(dx, dy, pfEvent) {
-            if (this._hGutterHover) {
-                this.isDragging = true;
-                pfEvent.isActive = false;
-                return true;
-            }
-            return false;
-        }
         onRelResize(dw, dh, pfEvent) {
             let thisTile = Tile_5.Tile.cast(this);
-            console.log("relResize", thisTile.fullName);
             if (dw) {
                 this._hGutter.rsize(dw, 0);
             }
             if (dh) {
                 this._south.onRelResize(0, dh, pfEvent);
             }
-        }
-        onDrop(pfEvent) {
-            this._hGutterHover = false;
-            super.onDrop(pfEvent);
         }
         onDrag(dx, dy, pfEvent) {
             if (this._hGutterHover) {
@@ -1781,29 +1745,16 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
                 pfEvent.isActive = false;
             }
         }
-        onEvent(pfEvent) {
-            pfEvent.isActive = true;
-            this.dispatchEventToChild(pfEvent, this, false);
-            this.dispatchEventToChildren(pfEvent);
-        }
-        onHovering(pfEvent) {
-            if (this.isDragging)
-                return;
-            this._hGutterHover = this._hoverGutter(this._hGutter, pfEvent);
-        }
-        onExit(pfEvent) {
-            if (this.isDragging)
-                return;
-            super.onExit(pfEvent);
-        }
         // --- Accessors --- //
         get north() {
+            this._initOnFirstCall();
             return this._north;
         }
         set north(value) {
             this._north = value;
         }
         get south() {
+            this._initOnFirstCall();
             return this._south;
         }
         set south(value) {
@@ -1812,39 +1763,21 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.HSplitter = HSplitter;
 });
-define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/RootTile"], function (require, exports, Tile_6, Abilities_6, Abilities_7, Utils_6, RootTile_4) {
+define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfield/RootTile", "Playfield/Splitter"], function (require, exports, Tile_6, RootTile_4, Splitter_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.VSplitter = exports._VSplitter = void 0;
-    class _VSplitter extends Tile_6.Tile {
-    }
-    exports._VSplitter = _VSplitter;
-    ;
-    ;
-    (0, Utils_6.applyMixins)(_VSplitter, [Abilities_7.Resizable, Abilities_7.Hoverable, Abilities_7.Draggable, Abilities_6.EventDispatcher, Utils_6.Logger, Abilities_6.Clicker, Abilities_6.Presser, Abilities_6.Selecter, Abilities_6.Dragger, Abilities_6.Editor, Abilities_6.Hoverer]);
-    class VSplitter extends _VSplitter {
+    exports.VSplitter = void 0;
+    class VSplitter extends Splitter_2.Splitter {
         constructor(name, parent, leftPercent = 0.5) {
-            super(name, parent, 0, 0, parent.w, parent.h);
-            this._gutter = 6;
-            this._margins = new Utils_6.Margins();
-            this._vGutter = new Utils_6.Rect();
-            this._vGutterHover = false;
-            this.Logger();
-            this.Clicker();
-            this.Presser();
-            this.Selecter();
-            this.Dragger();
-            this.Editor();
-            this.Hoverer();
-            this.EventDispatcher();
-            this.Draggable();
-            this.Hoverable();
-            this.Resizable();
-            this._margins.Margins(0, 0, 0, 0);
-            this._east = new RootTile_4.RootTile("east", this, 0, 0, 0, 0);
-            this._west = new RootTile_4.RootTile("west", this, 0, 0, 0, 0);
-            this._vGutterInit(leftPercent);
-            this._resize();
+            super(name, parent, 0, leftPercent);
+        }
+        _initOnFirstCall() {
+            if (!this._east) {
+                this._vGutterInit(this._leftPercent);
+                this._east = new RootTile_4.RootTile("east", this, 0, 0, 0, 0);
+                this._west = new RootTile_4.RootTile("west", this, 0, 0, 0, 0);
+                this._resize();
+            }
         }
         _resize() {
             this._eastSize();
@@ -1862,14 +1795,6 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             this._west.w = this.w - this._vGutter.x0 - this._margins.right;
             this._west.h = this.h - this._margins.bottom;
         }
-        _vGutterInit(leftPercent) {
-            let x0 = this.w * leftPercent - this._gutter / 2;
-            let y0 = this._margins.top;
-            this._vGutter.Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
-        }
-        _hoverGutter(gutter, pfEvent) {
-            return (0, Utils_6.between)(gutter.x0, pfEvent.x - this.X, gutter.x1) && (0, Utils_6.between)(gutter.y0, pfEvent.y - this.Y, gutter.y1);
-        }
         // --- Overrides --- //
         addChild(child) {
             if (this.children.length < 2)
@@ -1877,35 +1802,8 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             else
                 throw new Error("You must use VSplitter.east or VSplitter.west");
         }
-        _drawChild(child) {
-            this.gfx.clipRect(child.x + 1, child.y + 1, child.w - 2, child.h - 2);
-            child.redraw();
-            this.gfx.restore();
-        }
-        _drawGutter(gutterRect, hover) {
-            this.gfx.gparms.borderColor = "";
-            let oldColor = this.gfx.gparms.fillColor;
-            if (hover) {
-                this.gfx.gparms.fillColor = "black";
-                this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w - 1, gutterRect.h - 1);
-            }
-            else {
-                this.gfx.gparms.fillColor = "black";
-                if (gutterRect.w > gutterRect.h) {
-                    // horizontal
-                    this.gfx.line(gutterRect.x0, gutterRect.y0 + gutterRect.h / 2, gutterRect.x0 + gutterRect.w, gutterRect.y0 + gutterRect.h / 2);
-                }
-                else {
-                    // vertical
-                    this.gfx.line(gutterRect.x0 + gutterRect.w / 2, gutterRect.y0, gutterRect.x0 + gutterRect.w / 2, gutterRect.y0 + gutterRect.h);
-                }
-            }
-            this.gfx.gparms.fillColor = oldColor;
-            this.gfx.gparms.borderColor = "black";
-        }
         // --- Overrides --- //
         relResize(dw, dh) {
-            console.log("relResize", this.name);
             this._eastSize();
             this._westSize();
         }
@@ -1916,17 +1814,8 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             this._drawChild(this.west);
         }
         // --- onActions --- //
-        onGrab(dx, dy, pfEvent) {
-            if (this._vGutterHover) {
-                this.isDragging = true;
-                pfEvent.isActive = false;
-                return true;
-            }
-            return false;
-        }
         onRelResize(dw, dh, pfEvent) {
             let thisTile = Tile_6.Tile.cast(this);
-            console.log("relResize", thisTile.fullName);
             if (dw) {
                 this._west.onRelResize(dw, 0, pfEvent);
             }
@@ -1964,12 +1853,14 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
         }
         // --- Accessors --- //
         get east() {
+            this._initOnFirstCall();
             return this._east;
         }
         set east(value) {
             this._east = value;
         }
         get west() {
+            this._initOnFirstCall();
             return this._west;
         }
         set west(value) {
@@ -1978,14 +1869,14 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.VSplitter = VSplitter;
 });
-define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, Splitter_1, HSplitter_1, VSplitter_1) {
+define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter"], function (require, exports, Playfield_1, Tile_7, EventQueue_1, Splitter_3, HSplitter_1, VSplitter_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.VSplitter = exports.HSplitter = exports.Splitter = exports.EventQueue = exports.Tile = exports.Playfield = void 0;
     Object.defineProperty(exports, "Playfield", { enumerable: true, get: function () { return Playfield_1.Playfield; } });
     Object.defineProperty(exports, "Tile", { enumerable: true, get: function () { return Tile_7.Tile; } });
     Object.defineProperty(exports, "EventQueue", { enumerable: true, get: function () { return EventQueue_1.EventQueue; } });
-    Object.defineProperty(exports, "Splitter", { enumerable: true, get: function () { return Splitter_1.Splitter; } });
+    Object.defineProperty(exports, "Splitter", { enumerable: true, get: function () { return Splitter_3.Splitter; } });
     Object.defineProperty(exports, "HSplitter", { enumerable: true, get: function () { return HSplitter_1.HSplitter; } });
     Object.defineProperty(exports, "VSplitter", { enumerable: true, get: function () { return VSplitter_1.VSplitter; } });
 });
@@ -2193,15 +2084,15 @@ define("Browser/BrowserEventPump", ["require", "exports", "Browser/BrowserPlayfi
     }
     exports.BrowserEventPump = BrowserEventPump;
 });
-define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms"], function (require, exports, GfxParms_2) {
+define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms", "Utils/index"], function (require, exports, GfxParms_2, Utils_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BrowserGfx = void 0;
     function xx(x) {
-        return Math.floor(x) + 0.5;
+        return (0, Utils_5.int)(x) + 0.5;
     }
     function yy(y) {
-        return Math.floor(y) + 0.5;
+        return (0, Utils_5.int)(y) + 0.5;
     }
     /**
      * for documentation on why we add 0.5 to all x,y values see this
@@ -2232,8 +2123,8 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             ratio = PIXEL_RATIO;
         }
         var can = document.querySelector(canvasId);
-        // can._ratio = ratio;
-        can._ratio = 1.0;
+        can._ratio = ratio;
+        // can._ratio = 1.0;
         can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
         can.width = can.width * ratio;
         can.height = can.height * ratio;
@@ -2264,37 +2155,38 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             newGfx._gparms = this.gparms.clone();
             return newGfx;
         }
-        vline(x, y0, y1, moveTo = true) {
+        vline(x, y0, y1, moveTo = true, gparms = this.gparms) {
             if (moveTo)
                 this._ctx.moveTo(xx(this.gparms.dx + x), this.gparms.dy + y0);
             this._ctx.lineTo(xx(this.gparms.dx + x), this.gparms.dy + y1);
         }
-        hline(x0, x1, y, moveTo = true) {
+        hline(x0, x1, y, moveTo = true, gparms = this.gparms) {
             if (moveTo)
-                this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y));
-            this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y));
+                this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y));
+            this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y));
         }
-        rect(x, y, w, h) {
+        rect(x, y, w, h, gparms = this.gparms) {
             this._ctx.beginPath();
-            if (this.gparms.borderRadius)
-                this._ctx.roundRect(xx(this.gparms.dx + x - 1), yy(this.gparms.dy + y - 1), w, h, this.gparms.borderRadius);
+            if (gparms.borderRadius) {
+                this._ctx.roundRect(xx(gparms.dx + x - 1), yy(gparms.dy + y - 1), w, h, gparms.borderRadius);
+            }
             else {
                 let x0 = x;
                 let y0 = y;
-                let x1 = x0 + w - 1;
-                let y1 = y0 + h - 1;
+                let x1 = (0, Utils_5.int)(x0) + (0, Utils_5.int)(w - 1);
+                let y1 = (0, Utils_5.int)(y0) + (0, Utils_5.int)(h - 1);
                 this.hline(x0, x1, y0, true);
                 this.vline(x1, y0, y1, false);
                 this.hline(x0, x1, y1, false);
                 this.vline(x0, y0, y1, false);
             }
             this._ctx.closePath();
-            if (this.gparms.fillColor) {
-                this._ctx.fillStyle = this.gparms.fillColor;
+            if (gparms.fillColor) {
+                this._ctx.fillStyle = gparms.fillColor;
                 this._ctx.fill();
             }
-            if (this.gparms.borderColor) {
-                this._ctx.strokeStyle = this.gparms.borderColor;
+            if (gparms.borderColor) {
+                this._ctx.strokeStyle = gparms.borderColor;
                 this._ctx.stroke();
             }
         }
@@ -2314,7 +2206,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         circle(x, y, r) {
             this.ellipse(x - r, y - r, r * 2, r * 2);
         }
-        line(x0, y0, x1, y1) {
+        line(x0, y0, x1, y1, gparms = this.gparms) {
             this._ctx.beginPath();
             if (x0 === x1) {
                 this.vline(x0, y0, y1);
@@ -2323,12 +2215,14 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 this.hline(x0, x1, y0);
             }
             else {
-                this._ctx.moveTo(xx(this.gparms.dx + x0), yy(this.gparms.dy + y0));
-                this._ctx.lineTo(xx(this.gparms.dx + x1), yy(this.gparms.dy + y1));
+                this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y0));
+                this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y1));
             }
             this._ctx.closePath();
-            this._ctx.strokeStyle = this.gparms.borderColor;
-            this._ctx.stroke();
+            if (gparms.borderColor) {
+                this._ctx.strokeStyle = gparms.borderColor;
+                this._ctx.stroke();
+            }
         }
         text(msg, x = 0, y = 0, w, h) {
             this._ctx.fillStyle = this.gparms.color;
@@ -2492,7 +2386,7 @@ define("Jed/ItemOptions", ["require", "exports"], function (require, exports) {
     }
     exports.ItemOptions = ItemOptions;
 });
-define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions", "Playfield/Graphics/index"], function (require, exports, Playfield_3, Utils_7, Abilities_8, ItemOptions_1, Graphics_1) {
+define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Playfield/Abilities/index", "Jed/ItemOptions", "Playfield/Graphics/index"], function (require, exports, Playfield_3, Utils_6, Abilities_4, ItemOptions_1, Graphics_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Item = exports._Item = void 0;
@@ -2501,7 +2395,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/in
     exports._Item = _Item;
     ;
     ;
-    (0, Utils_7.applyMixins)(_Item, [Abilities_8.Draggable]);
+    (0, Utils_6.applyMixins)(_Item, [Abilities_4.Draggable]);
     class Item extends _Item {
         constructor(name, parent, x, y, w, h, value = "", text = "") {
             super(name, parent, x, y, w, h);
@@ -2547,7 +2441,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Playfield/Utils/in
     }
     exports.Item = Item;
 });
-define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_1, Utils_8, Abilities_9, Graphics_2) {
+define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_1, Utils_7, Abilities_5, Graphics_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ButtonItem = exports._ButtonItem = void 0;
@@ -2556,7 +2450,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
     exports._ButtonItem = _ButtonItem;
     ;
     ;
-    (0, Utils_8.applyMixins)(_ButtonItem, [Abilities_9.Draggable, Abilities_9.Pressable, Abilities_9.Hoverable]);
+    (0, Utils_7.applyMixins)(_ButtonItem, [Abilities_5.Draggable, Abilities_5.Pressable, Abilities_5.Hoverable]);
     class ButtonItem extends _ButtonItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value || name);
@@ -2619,7 +2513,7 @@ define("Jed/ButtonItem", ["require", "exports", "Jed/Item", "Playfield/Utils/ind
     }
     exports.ButtonItem = ButtonItem;
 });
-define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_9, Abilities_10) {
+define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_2, Utils_8, Abilities_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.GroupItem = exports._GroupItem = void 0;
@@ -2628,7 +2522,7 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     exports._GroupItem = _GroupItem;
     ;
     ;
-    (0, Utils_9.applyMixins)(_GroupItem, [Abilities_10.EventDispatcher, Utils_9.Logger, Abilities_10.Clicker, Abilities_10.Presser, Abilities_10.Selecter, Abilities_10.Dragger, Abilities_10.Editor, Abilities_10.Hoverer]);
+    (0, Utils_8.applyMixins)(_GroupItem, [Abilities_6.EventDispatcher, Utils_8.Logger, Abilities_6.Clicker, Abilities_6.Presser, Abilities_6.Selecter, Abilities_6.Dragger, Abilities_6.Editor, Abilities_6.Hoverer]);
     class GroupItem extends _GroupItem {
         constructor(name, parent, x, y, w = 0, h = 0, label) {
             super(name, parent, x, y, w, h, label);
@@ -2656,8 +2550,8 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
             }
             if (this.isBoxed) {
                 let wh = this._computeWidthHeight();
-                let result = (0, Utils_9.between)(this.X, dx, this.X + wh.w) &&
-                    (0, Utils_9.between)(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
+                let result = (0, Utils_8.between)(this.X, dx, this.X + wh.w) &&
+                    (0, Utils_8.between)(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
                 if (result)
                     return this;
             }
@@ -2668,7 +2562,7 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
         }
         onGrab(dx, dy, pfEvent) {
             super.onGrab(dx, dy, pfEvent);
-            if (this.isBoxed && (0, Utils_9.between)(this.w - 10, dx, this.w + 10) && (0, Utils_9.between)(this.h - 10, dy, this.h + 10)) {
+            if (this.isBoxed && (0, Utils_8.between)(this.w - 10, dx, this.w + 10) && (0, Utils_8.between)(this.h - 10, dy, this.h + 10)) {
                 this._isResizing = true;
             }
             return true;
@@ -2796,7 +2690,7 @@ define("Jed/GroupItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     }
     exports.GroupItem = GroupItem;
 });
-define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_3, Utils_10, Abilities_11, Graphics_3) {
+define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_3, Utils_9, Abilities_7, Graphics_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CheckboxItem = exports._CheckboxItem = void 0;
@@ -2805,7 +2699,7 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
     exports._CheckboxItem = _CheckboxItem;
     ;
     ;
-    (0, Utils_10.applyMixins)(_CheckboxItem, [Abilities_11.Draggable, Abilities_11.Clickable, Abilities_11.Hoverable]);
+    (0, Utils_9.applyMixins)(_CheckboxItem, [Abilities_7.Draggable, Abilities_7.Clickable, Abilities_7.Hoverable]);
     class CheckboxItem extends _CheckboxItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value || name);
@@ -2883,7 +2777,7 @@ define("Jed/CheckboxItem", ["require", "exports", "Jed/Item", "Playfield/Utils/i
     }
     exports.CheckboxItem = CheckboxItem;
 });
-define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_4, Utils_11, Abilities_12, Graphics_4) {
+define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_4, Utils_10, Abilities_8, Graphics_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LabelItem = exports._LabelItem = void 0;
@@ -2892,7 +2786,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     exports._LabelItem = _LabelItem;
     ;
     ;
-    (0, Utils_11.applyMixins)(_LabelItem, [Abilities_12.Draggable]);
+    (0, Utils_10.applyMixins)(_LabelItem, [Abilities_8.Draggable]);
     class LabelItem extends _LabelItem {
         constructor(name, parent, x, y, w, h, value = "") {
             super(name, parent, x, y, w, h, value);
@@ -2917,7 +2811,7 @@ define("Jed/LabelItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     }
     exports.LabelItem = LabelItem;
 });
-define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_5, Utils_12, Abilities_13, Graphics_5) {
+define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index", "Playfield/Graphics/index"], function (require, exports, Item_5, Utils_11, Abilities_9, Graphics_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RadioItem = exports._RadioItem = void 0;
@@ -2926,7 +2820,7 @@ define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     exports._RadioItem = _RadioItem;
     ;
     ;
-    (0, Utils_12.applyMixins)(_RadioItem, [Abilities_13.Draggable, Abilities_13.Selectable, Abilities_13.Hoverable]);
+    (0, Utils_11.applyMixins)(_RadioItem, [Abilities_9.Draggable, Abilities_9.Selectable, Abilities_9.Hoverable]);
     class RadioItem extends _RadioItem {
         constructor(name, parent, x, y, w, h, value = "", label = "") {
             super(name, parent, x, y, w, h, value || name);
@@ -2993,7 +2887,7 @@ define("Jed/RadioItem", ["require", "exports", "Jed/Item", "Playfield/Utils/inde
     }
     exports.RadioItem = RadioItem;
 });
-define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Playfield/Utils/index", "Playfield/Graphics/index"], function (require, exports, Tile_8, Abilities_14, Utils_13, Graphics_6) {
+define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Utils/index", "Playfield/Graphics/index"], function (require, exports, Tile_8, Abilities_10, Utils_12, Graphics_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Slider = exports._Slider = void 0;
@@ -3002,19 +2896,19 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
     exports._Slider = _Slider;
     ;
     ;
-    (0, Utils_13.applyMixins)(_Slider, [Abilities_14.Draggable, Abilities_14.Hoverable]);
+    (0, Utils_12.applyMixins)(_Slider, [Abilities_10.Draggable, Abilities_10.Hoverable]);
     function inormalize(r, multiplier) {
         if (r <= 1.0)
-            return (0, Utils_13.int)(r * multiplier);
-        return (0, Utils_13.int)(r);
+            return (0, Utils_12.int)(r * multiplier);
+        return (0, Utils_12.int)(r);
     }
     class Slider extends _Slider {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
-            this._margins = new Utils_13.Margins();
-            this._cursor = new Utils_13.Rect();
-            this._rcursor = new Utils_13.Rect();
-            this._ratio = new Utils_13.Ratio();
+            this._margins = new Utils_12.Margins();
+            this._cursor = new Utils_12.Rect();
+            this._rcursor = new Utils_12.Rect();
+            this._ratio = new Utils_12.Ratio();
             this._vslide = true;
             this._hslide = true;
             this._text = "";
@@ -3068,7 +2962,7 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
         }
         onGrab(dx, dy, pfEvent) {
             let c = this._cursor;
-            if ((0, Utils_13.between)(c.x, dx, c.x + c.w) && (0, Utils_13.between)(c.y, dy, c.y + c.h)) {
+            if ((0, Utils_12.between)(c.x, dx, c.x + c.w) && (0, Utils_12.between)(c.y, dy, c.y + c.h)) {
                 super.onGrab(dx, dy, pfEvent);
                 return true;
             }
@@ -3079,9 +2973,9 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
             let xmax = this.dw + this._margins.left;
             let ymax = this.dh + this._margins.top;
             if (this._hslide)
-                c.x = (0, Utils_13.limit)(this._margins.left, c.x + dx, xmax);
+                c.x = (0, Utils_12.limit)(this._margins.left, c.x + dx, xmax);
             if (this._vslide)
-                c.y = (0, Utils_13.limit)(this._margins.top, c.y + dy, ymax);
+                c.y = (0, Utils_12.limit)(this._margins.top, c.y + dy, ymax);
             this._rcursor.move(this.rx, this.ry);
             this.onChange(this.rx, this.ry, pfEvent);
             pfEvent.isActive = false;
@@ -3139,7 +3033,7 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
     }
     exports.Slider = Slider;
 });
-define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_6, Utils_14, Abilities_15) {
+define("Jed/TextItem", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_6, Utils_13, Abilities_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TextItem = exports._TextItem = void 0;
@@ -3148,7 +3042,7 @@ define("Jed/TextItem", ["require", "exports", "Jed/Item", "Playfield/Utils/index
     exports._TextItem = _TextItem;
     ;
     ;
-    (0, Utils_14.applyMixins)(_TextItem, [Abilities_15.Draggable, Abilities_15.Editable, Abilities_15.Timer]);
+    (0, Utils_13.applyMixins)(_TextItem, [Abilities_11.Draggable, Abilities_11.Editable, Abilities_11.Timer]);
     class TextItem extends _TextItem {
         constructor(name, parent, x, y, w, h, value = "") {
             super(name, parent, x, y, w, h, value);
@@ -3328,7 +3222,7 @@ define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], 
     }
     exports.ShapeTile = ShapeTile;
 });
-define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_15, Abilities_16) {
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_14, Abilities_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTile = exports._BoxTile = void 0;
@@ -3337,7 +3231,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     exports._BoxTile = _BoxTile;
     ;
     ;
-    (0, Utils_15.applyMixins)(_BoxTile, [Abilities_16.Draggable, Abilities_16.Selectable]);
+    (0, Utils_14.applyMixins)(_BoxTile, [Abilities_12.Draggable, Abilities_12.Selectable]);
     class BoxTile extends _BoxTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -3373,7 +3267,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Playfield/Utils/index"], function (require, exports, ShapeTile_2, Abilities_17, Utils_16) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_13, Utils_15) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -3382,7 +3276,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
     exports._CircleTile = _CircleTile;
     ;
     ;
-    (0, Utils_16.applyMixins)(_CircleTile, [Abilities_17.Draggable, Abilities_17.Selectable]);
+    (0, Utils_15.applyMixins)(_CircleTile, [Abilities_13.Draggable, Abilities_13.Selectable]);
     class CircleTile extends _CircleTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -3499,7 +3393,7 @@ define("Test/CircleTestTile", ["require", "exports", "Test/BoxTestTile"], functi
     }
     exports.CircleTestTile = CircleTestTile;
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Playfield/Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/index"], function (require, exports, Playfield_5, CircleTestTile_1, BoxTestTile_2, Utils_17, Shapes_1, Jed_1, Browser_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/CircleTestTile", "Test/BoxTestTile", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/index"], function (require, exports, Playfield_5, CircleTestTile_1, BoxTestTile_2, Utils_16, Shapes_1, Jed_1, Browser_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
@@ -3510,12 +3404,12 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
     function updateCursor(rx, ry, pfEvent) {
         hslider.cursorSize(rx, 18);
         vslider.cursorSize(0, ry);
-        slider.text = `(${(0, Utils_17.int)(slider.rx * 100)},${(0, Utils_17.int)(slider.ry * 100)})`;
-        hslider.text = `${(0, Utils_17.int)(hslider.rx * 100)}`;
+        slider.text = `(${(0, Utils_16.int)(slider.rx * 100)},${(0, Utils_16.int)(slider.ry * 100)})`;
+        hslider.text = `${(0, Utils_16.int)(hslider.rx * 100)}`;
     }
     function showValue(rx, ry, pfEvent) {
-        resultLabel.value = this.name + ": " + (0, Utils_17.int)(rx * 100) + "," + (0, Utils_17.int)(ry * 100);
-        hslider.text = `${(0, Utils_17.int)(hslider.rx * 100)}`;
+        resultLabel.value = this.name + ": " + (0, Utils_16.int)(rx * 100) + "," + (0, Utils_16.int)(ry * 100);
+        hslider.text = `${(0, Utils_16.int)(hslider.rx * 100)}`;
     }
     function printGo() {
         resultLabel.value = "Result Label: " + this.name;
@@ -3557,11 +3451,11 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             let max = 100;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_17.random)(0, this._playfield.w);
-                    let y = (0, Utils_17.random)(0, this._playfield.h);
-                    let r = (0, Utils_17.random)(10, 50);
-                    let DX = (0, Utils_17.random)(-10, 10);
-                    let DY = (0, Utils_17.random)(-10, 10);
+                    let x = (0, Utils_16.random)(0, this._playfield.w);
+                    let y = (0, Utils_16.random)(0, this._playfield.h);
+                    let r = (0, Utils_16.random)(10, 50);
+                    let DX = (0, Utils_16.random)(-10, 10);
+                    let DY = (0, Utils_16.random)(-10, 10);
                     let circle = new BoxTestTile_2.BoxTestTile("circle", parent, x, y, r, r);
                     // circle.gfx.gparms.fillColor = null;
                     circle.DX = DX;
@@ -3600,7 +3494,7 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
             //     }
             // }
-            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_17.random)(0, 1000), (0, Utils_17.random)(0, 1000), 50, 50);
+            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_16.random)(0, 1000), (0, Utils_16.random)(0, 1000), 50, 50);
             let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
             let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
             let fps = 16;
@@ -3662,6 +3556,7 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Test/Cir
             vslider = new Jed_1.Slider("vslider", sliders, 1, 1, 20, sliders.h - 20 - 1);
             vslider.hslide = false;
             vslider.onChange = showValue.bind(vslider);
+            this._playfield.tile.printTree();
             this._playfield.start(0);
         }
     }

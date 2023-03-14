@@ -1,13 +1,15 @@
 import { Point } from "./PointMixin";
 
 export class Rect {
+    public static xxx = 0;
+
     private _x = 0;
     private _y = 0;
     private _w = 0; // w=1 is a single pixel
     private _h = 0; // h= 1 is a single pixel
 
     Rect(x: number, y: number, w: number, h: number) {
-        return this.RectWH(x,y,w,h);
+        return this.RectWH(x, y, w, h);
     }
 
     RectWH(x: number, y: number, w: number, h: number) {
@@ -15,6 +17,7 @@ export class Rect {
         this._y = y;
         this._w = w;
         this._h = h;
+        return this;
     }
 
     RectXY(x0: number, y0: number, x1: number, y1: number) {
@@ -22,6 +25,7 @@ export class Rect {
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
+        return this;
     }
 
     // --- Public Methods --- //
@@ -103,7 +107,7 @@ export class Rect {
     }
     set y1(y1: number) {
         // if y1 == y0 then h == 1
-        this._h = y1 - this._y + 1;
+        this._h = y1 - this.y0 + 1;
     }
     get p0(): Point {
         let p0 = new Point();

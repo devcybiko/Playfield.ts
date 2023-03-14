@@ -39,7 +39,7 @@ export class GfxParms {
         this.fontStyle = "";
     }
     public clone(): GfxParms {
-        let gfxparms = new GfxParms;
+        let gfxparms = new GfxParms();
         Object.assign(gfxparms, this);
         return gfxparms;
     }

@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins } from "../Playfield/Utils";
+import { applyMixins } from "../Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
 export class _TextItem extends Item { };

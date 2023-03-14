@@ -18,6 +18,12 @@ export function snapTo(n: number, snap: number) {
 export function int(n: number) {
     return Math.floor(n);
 }
+export function round(n: number) {
+    return Math.floor(n + 0.5);
+}
+export function ceil(n: number) {
+    return Math.ceil(n);
+}
 export function limit(min: number, value: number, max: number) {
     if (value < min) value = min;
     if (value > max) value = max;

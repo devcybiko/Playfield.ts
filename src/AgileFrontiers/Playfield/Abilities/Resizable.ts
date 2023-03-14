@@ -34,7 +34,6 @@ export class Resizable {
 
     onRelResize(dw: number, dh: number, pfEvent: PlayfieldEvent): void {
         let thisTile = Tile.cast(this);
-        console.log("relResize", thisTile.fullName)
         this.relResize(dw, dh);
         this.onRelResizeChildren(dw, dh, pfEvent);
     }

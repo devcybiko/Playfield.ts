@@ -1,7 +1,7 @@
 import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
 import { Resizable, EventDispatcher, Dragger, Selecter, Clicker, Presser, Editor, Hoverer } from "./Abilities";
-import { applyMixins, Logger } from "./Utils";
+import { applyMixins, Logger } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 
 export class _RootTile extends Tile { };
@@ -25,7 +25,10 @@ export class RootTile extends _RootTile {
     // --- Overrides --- //
 
     draw() {
+        this.gfx.clipRect(this.x, this.y, this.w, this.h);
+        this.gfx.rect(this.x, this.y, this.w, this.h);
         this.redrawChildren();
+        this.gfx.restore();
     }
 
     // --- onActions --- //
