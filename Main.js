@@ -1,14 +1,8 @@
 
 define(function (require) {
     console.log("Main.js...");
-    var TestClass = require("Test/PlayfieldTest").PlayfieldTest;
+    var {TestClass} = require("Test/Test02");
     console.log(TestClass);
     let main = new TestClass();
-    // main.boxTest();
-    // main.circleTestTile();
-    // main.groupTestTile();
-    // main.tenthousandTestTile();
-    // main.shapeTest();
-    main.jedTest();
+    main.run();
 });
- 

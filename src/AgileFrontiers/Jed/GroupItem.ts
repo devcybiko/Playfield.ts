@@ -38,14 +38,14 @@ export class GroupItem extends _GroupItem {
     inBounds(dx: number, dy: number): Tile {
         for (let _child of this.children.reverse()) {
             let tileChild = _child as unknown as Tile;
-            if (tileChild.inBounds(dx, dy)) return this;
+            if (tileChild.inBounds(dx, dy)) return Tile.cast(this);
         }
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
             let result =
                 between(this.X, dx, this.X + wh.w) &&
                 between(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
-            if (result) return this;
+            if (result) return Tile.cast(this);
         }
         return super.inBounds(dx, dy);
     }
@@ -90,7 +90,6 @@ export class GroupItem extends _GroupItem {
         if (w || h) return { w, h };
 
         for (let child of this.children) {
-            (child as unknown as Tile)._recompute();
             let rectChild = (child as unknown as Rect);
             let cx = rectChild.x;
             let cy = rectChild.y;
@@ -122,10 +121,10 @@ export class GroupItem extends _GroupItem {
                 gfx.rect(labelX, labelY, labelW, labelH);
                 gfx.text(this.label, labelX, labelY, labelW);
             }
-            this.redrawChildren();
+            this.drawChildren();
             this.gfx.restore();
         } else {
-            this.redrawChildren();
+            this.drawChildren();
         }
     }
 

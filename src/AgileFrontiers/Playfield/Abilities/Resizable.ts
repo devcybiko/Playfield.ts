@@ -13,13 +13,13 @@ export class Resizable {
         return obj as Resizable;
     }
 
-    resize(w: number, h: number) {
+    resize(w: number, h: number): void {
         let thisTile = Tile.cast(this);
         thisTile.w = w;
         thisTile.h = h;
     }
 
-    relResize(dw: number, dh: number) {
+    relResize(dw: number, dh: number): void {
         let thisTile = Tile.cast(this);
         thisTile.w += dw;
         thisTile.h += dh;

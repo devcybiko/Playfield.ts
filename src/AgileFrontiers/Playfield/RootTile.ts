@@ -9,8 +9,8 @@ export interface _RootTile extends Resizable, EventDispatcher, Logger, Clicker, 
 applyMixins(_RootTile, [Resizable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer]);
 
 export class RootTile extends _RootTile {
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
-        super(name, parent, x, y, w, h);
+    constructor(name: string, parent: Tile, x0: number, y0: number, x1: number, y1: number) {
+        super(name, parent, x0, y0, x1, y1);
         this.Logger();
         this.Clicker();
         this.Presser();
@@ -27,7 +27,7 @@ export class RootTile extends _RootTile {
     draw() {
         this.gfx.clipRect(this.x, this.y, this.w, this.h);
         this.gfx.rect(this.x, this.y, this.w, this.h);
-        this.redrawChildren();
+        this.drawChildren();
         this.gfx.restore();
     }
 

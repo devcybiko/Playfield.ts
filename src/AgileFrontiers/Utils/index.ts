@@ -4,6 +4,7 @@ export {between, inclusive, random, snapTo, int, round, ceil, limit} from "./Fun
 export {Logger} from "./LoggerMixin";
 export {Tree} from "./TreeMixin";
 export {Rect} from "./RectMixin";
+export {RelRect} from "./RelRectMixin";
 export {Point} from "./PointMixin";
 export {Margins} from "./MarginsMixin";
 export {Ratio} from "./RatioMixin";

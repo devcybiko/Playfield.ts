@@ -20,13 +20,13 @@ export class EventDispatcher {
 
     dispatchEventToChild(pfEvent: PlayfieldEvent, child: any, callOnEvent = true) {
         let that = this as any;
-        if (callOnEvent) child.onEvent(pfEvent, child);
-        if (!pfEvent.isActive) return;
         if (child.isHoverable) that.hoverEvent(pfEvent, child);
         if (child.isDraggable) that.dragEvent(pfEvent, child);
         if (child.isSelectable) that.selectEvent(pfEvent, child);
         if (child.isClickable) that.clickEvent(pfEvent, child);
         if (child.isPressable) that.pressEvent(pfEvent, child);
         if (child.isFocusable) that.editorEvent(pfEvent, child);
+        if (callOnEvent) child.onEvent(pfEvent, child);
+
     }
 }

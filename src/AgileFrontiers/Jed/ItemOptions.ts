@@ -1,4 +1,6 @@
-export class ItemOptions {
+import { TileOptions } from "../Playfield";
+
+export class ItemOptions extends TileOptions {
     fontSize = 24;
     fontFace = "sans-serif";
     fontStyle = "";

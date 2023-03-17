@@ -1,8 +1,8 @@
 import { Tile } from "../Playfield";
 
 export class BoxTestTile extends Tile {
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h = w) {
-        super(name, parent, x, y, w, h);
+    constructor(name: string, parent: Tile, x0: number, y0: number, x1: number, y1: number) {
+        super(name, parent, x0, y0, x1, y1);
         this.gfx.gparms.borderColor = "red";
         this.gfx.gparms.color = "blue";
         this.gfx.gparms.fillColor = "green";

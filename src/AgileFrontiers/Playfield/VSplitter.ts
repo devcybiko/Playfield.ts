@@ -28,15 +28,15 @@ export class VSplitter extends Splitter {
 
     _eastSize() {
         this._east.x = this._margins.left;
-        this._east.y = this._vGutter.y0;
-        this._east.w = this._vGutter.x0 - this.x0;
+        this._east.y = this._vGutter.y;
+        this._east.w = this._vGutter.x - this.x0;
         this._east.h = this.h - this._margins.bottom;
     }
 
     _westSize() {
-        this._west.x = this._vGutter.x1;
+        this._west.x = this._vGutter.x;
         this._west.y = this._margins.top;
-        this._west.w = this.w - this._vGutter.x0 - this._margins.right;
+        this._west.w = this.w - this._vGutter.x - this._margins.right;
         this._west.h = this.h - this._margins.bottom;
     }
 

@@ -13,7 +13,7 @@ export class Clicker {
     
     clickEvent(pfEvent: PlayfieldEvent, child: Clickable) {
         if (pfEvent.isPress) {
-            let tileChild = child as unknown as Tile;
+            let tileChild = Tile.cast(child);
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 child.onClick(pfEvent);
             }

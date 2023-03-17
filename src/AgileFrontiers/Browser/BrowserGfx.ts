@@ -79,13 +79,13 @@ export class BrowserGfx implements Gfx {
         newGfx._gparms = this.gparms.clone();
         return newGfx;
     }
-    vline(x: number, y0:number, y1: number, moveTo = true, gparms = this.gparms) {
-        if (moveTo) this._ctx.moveTo(xx(this.gparms.dx + x), this.gparms.dy + y0);
-        this._ctx.lineTo(xx(this.gparms.dx + x), this.gparms.dy + y1);
+    vline(x: number, y0:number, y1: number, moveTo = true) {
+        if (moveTo) this._ctx.moveTo(xx(x), y0);
+        this._ctx.lineTo(xx(x), y1);
     }
-    hline(x0: number, x1: number, y:number, moveTo = true, gparms = this.gparms) {
-        if (moveTo) this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y));
-        this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y));
+    hline(x0: number, x1: number, y:number, moveTo = true) {
+        if (moveTo) this._ctx.moveTo(xx(x0), yy(y));
+        this._ctx.lineTo(xx(x1), yy(y));
     }
     rect(
         x: number,
@@ -96,7 +96,7 @@ export class BrowserGfx implements Gfx {
     ) {
         this._ctx.beginPath();
         if (gparms.borderRadius) {
-            this._ctx.roundRect(xx(gparms.dx + x - 1), yy(gparms.dy + y - 1), w, h, gparms.borderRadius);
+            this._ctx.roundRect(xx(x - 1), yy(y - 1), w, h, gparms.borderRadius);
         }
         else {
             let x0 = x;
@@ -127,7 +127,7 @@ export class BrowserGfx implements Gfx {
         h: number
     ) {
         this._ctx.beginPath();
-        this._ctx.ellipse(xx(this.gparms.dx + x + w / 2), yy(this.gparms.dy + y + h / 2), w / 2, h / 2, 0, 0, 2 * Math.PI);
+        this._ctx.ellipse(xx(x + w / 2), yy(y + h / 2), w / 2, h / 2, 0, 0, 2 * Math.PI);
         this._ctx.closePath();
 
         if (this.gparms.fillColor) {
@@ -152,8 +152,7 @@ export class BrowserGfx implements Gfx {
         x0: number,
         y0: number,
         x1: number,
-        y1: number,
-        gparms = this.gparms
+        y1: number
     ) {
         this._ctx.beginPath();
         if (x0 === x1) {
@@ -161,13 +160,13 @@ export class BrowserGfx implements Gfx {
         } else if (y0 === y1) {
             this.hline(x0, x1, y0);
         } else {
-            this._ctx.moveTo(xx(gparms.dx + x0), yy(gparms.dy + y0));
-            this._ctx.lineTo(xx(gparms.dx + x1), yy(gparms.dy + y1));
+            this._ctx.moveTo(xx(x0), yy(y0));
+            this._ctx.lineTo(xx(x1), yy(y1));
         }
         this._ctx.closePath();
 
-        if (gparms.borderColor) {
-            this._ctx.strokeStyle = gparms.borderColor;
+        if (this.gparms.borderColor) {
+            this._ctx.strokeStyle = this.gparms.borderColor;
             this._ctx.stroke();
         }
     }
@@ -206,10 +205,10 @@ export class BrowserGfx implements Gfx {
 
         if (w) {
             this.clipRect(x - 1, y - 1, w + 2, h + 2);
-            this._ctx.fillText(msg, this.gparms.dx + textX, this.gparms.dy + textY);
+            this._ctx.fillText(msg, textX, textY);
             this.restore();
         } else {
-            this._ctx.fillText(msg, this.gparms.dx + textX, this.gparms.dy + textY);
+            this._ctx.fillText(msg, textX, textY);
         }
     }
 

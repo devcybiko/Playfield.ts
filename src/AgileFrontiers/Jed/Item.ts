@@ -10,17 +10,17 @@ applyMixins(_Item, [Draggable]);
 
 export class Item extends _Item {
     private _value: string;
-    private _options: ItemOptions;
+    private _item_options: ItemOptions;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", text = "") {
         super(name, parent, x, y, w, h);
         this.Draggable();
         this._value = value;
-        this._options = new ItemOptions;
-        this._options.text = text || value;
-        this._options.fontSize = h;
+        this._item_options = new ItemOptions();
+        this._item_options.text = text || value;
+        this._item_options.fontSize = h;
         if (w < 0) {
-            this._options.textAlign = GfxParms.RIGHT;
+            this._item_options.textAlign = GfxParms.RIGHT;
             this.w = -w;
         }
     }
@@ -56,6 +56,6 @@ export class Item extends _Item {
         this._value = _value;
     }
     public get options(): ItemOptions {
-        return this._options;
+        return this._item_options;
     }
 }

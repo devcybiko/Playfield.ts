@@ -48,12 +48,12 @@ export class PlayfieldTest {
         this._playfield.gfx.rect(10, 10, 100, 100);
     }
     circleTestTile() {
-        let parent = this._playfield.tile;
+        let parent = this._playfield.rootTile;
         let circleTile = new CircleTestTile("circle", parent, parent.w / 2, parent.h / 2, 50, 50);
         this._playfield.start();
     }
     groupTestTile() {
-        let parent = this._playfield.tile;
+        let parent = this._playfield.rootTile;
         let lcircle = new CircleTestTile("left", parent, -75, +75, 50);
         let rcircle = new CircleTestTile("right", parent, +75, +75, 50);
         lcircle.gfx.gparms.fillColor = "red";
@@ -72,7 +72,7 @@ export class PlayfieldTest {
         this._playfield.start();
     }
     tenthousandTestTile() {
-        let parent = this._playfield.tile;
+        let parent = this._playfield.rootTile;
         let max = 100;
         for (let i = 0; i < max; i++) {
             for (let j = 0; j < 1000; j++) {
@@ -117,7 +117,7 @@ export class PlayfieldTest {
         // 15 fps: 7ms/143fps
     }
     shapeTest() {
-        let parent = this._playfield.tile;
+        let parent = this._playfield.rootTile;
         // for (let i=0; i<10; i++) {
         //     for(let j=0; j<1000; j++) {
         //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
@@ -134,7 +134,7 @@ export class PlayfieldTest {
         let y = 10;
         let dy = 25;
 
-        let root = this._playfield.tile;
+        let root = this._playfield.rootTile;
         let splitter = new Splitter("splitter", root);
         let sw = new VSplitter("vsplitter", splitter.sw, 0.5);
         let se = new HSplitter("hsplitter", splitter.se, 0.5);
@@ -197,7 +197,7 @@ export class PlayfieldTest {
         vslider.hslide = false;
         vslider.onChange = showValue.bind(vslider);
 
-        this._playfield.tile.printTree();
+        this._playfield.rootTile.printTree();
         this._playfield.start(0);
     }
 }
