@@ -21,7 +21,6 @@ export class Selecter {
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
         let tileChild = Tile.cast(child);
-        console.log("SelectEvent", tileChild.name)
         if (pfEvent.isPress) {
             let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y);
             if (Tile.cast(this._selectedObj) !== foundChild) this._selectChild(pfEvent, child);

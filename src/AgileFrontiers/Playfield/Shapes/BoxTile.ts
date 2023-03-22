@@ -8,7 +8,7 @@ export interface _BoxTile extends Draggable, Selectable, Clickable { };
 applyMixins(_BoxTile, [Draggable, Selectable, Clickable]);
 
 export class BoxTile extends _BoxTile {
-    _colors = ["red", "orange", "green", "blue", "indigo", "violet"];
+    _colors = ["","red", "orange", "green", "blue", "indigo", "violet"];
     _color = 0;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
@@ -32,20 +32,20 @@ export class BoxTile extends _BoxTile {
 
     // --- onActions --- //
 
-    onGrab(dx: number, dy: number, event: any) {
+    onGrab(dx: number, dy: number, event: any): boolean {
         this.toFront();
         super.onGrab(dx, dy, event);
         return true;
     }
-    onClick() {
+    onClick(): void {
         this._color = (this._color + 1) % this._colors.length;
         this.warn(this._color);
     }
-    onDrop(event: any) {
+    onDrop(event: any): void {
         this.toFront();
-        return super.onDrop(event);
+        super.onDrop(event);
     }
-    onTick() {
-        return true;
+    onTick(): void {
+        console.log(this.name);
     }
 }

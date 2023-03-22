@@ -897,7 +897,6 @@ define("Playfield/Abilities/SelecterMixin", ["require", "exports", "Playfield/Ti
         // --- Public Methods --- //
         selectEvent(pfEvent, child) {
             let tileChild = Tile_2.Tile.cast(child);
-            console.log("SelectEvent", tileChild.name);
             if (pfEvent.isPress) {
                 let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y);
                 if (Tile_2.Tile.cast(this._selectedObj) !== foundChild)
@@ -3331,7 +3330,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     class BoxTile extends _BoxTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
-            this._colors = ["red", "orange", "green", "blue", "indigo", "violet"];
+            this._colors = ["", "red", "orange", "green", "blue", "indigo", "violet"];
             this._color = 0;
             this.Draggable();
             this.Selectable();
@@ -3360,10 +3359,10 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
         }
         onDrop(event) {
             this.toFront();
-            return super.onDrop(event);
+            super.onDrop(event);
         }
         onTick() {
-            return true;
+            console.log(this.name);
         }
     }
     exports.BoxTile = BoxTile;
@@ -3395,7 +3394,6 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
             console.log(this.name, this.X, this.Y, x, y);
             if (dr <= dw)
                 return this;
-            return this.inBoundsChildren(x, y, false);
         }
         draw() {
             this.gfx.gparms.borderColor = "black";
@@ -3436,7 +3434,7 @@ define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTil
     Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
     Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
 });
-define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Utils/index", "Playfield/Shapes/index", "Jed/index", "Browser/index"], function (require, exports, Playfield_6, Utils_16, Shapes_1, Jed_1, Browser_1) {
+define("Test/PlayfieldTest", ["require", "exports", "Utils/index", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Utils_16, Shapes_1, Browser_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayfieldTest = void 0;
@@ -3469,45 +3467,6 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Utils/in
             this._playfield.gfx.rect(10, 10, 100, 100);
         }
         tenthousandTestTile() {
-            let parent = this._playfield.rootTile;
-            let max = 100;
-            for (let i = 0; i < max; i++) {
-                for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_16.random)(0, this._playfield.w);
-                    let y = (0, Utils_16.random)(0, this._playfield.h);
-                    let r = (0, Utils_16.random)(10, 50);
-                    let DX = (0, Utils_16.random)(-10, 10);
-                    let DY = (0, Utils_16.random)(-10, 10);
-                    let circle = new Shapes_1.BoxTile("circle", parent, x, y, r, r);
-                    // circle.gfx.gparms.fillColor = null;
-                    circle.DX = DX;
-                    circle.DY = DY;
-                }
-            }
-            max *= 1000;
-            // let fps = 1;
-            // let delay = Math.floor(1000/fps);
-            let delay = 0;
-            let fps = 1000 / delay;
-            this._playfield.start(delay);
-            // note: processing 10,000 Circles stressed the app at 55 FPS
-            // note: processing 10,000 Boxes stressed the app at 142 FPS
-            // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
-            // note: at 30FPS, about 18,500 circles could be processed
-            // note: at 30FPS, about 20,000 boxes could be processed
-            // note: at 30FPS, about 45,000 empty boxes could be processed
-            // note: at 60FPS, about 8700 circles could be processed
-            // note: at 60FPS, about 20,000 boxes could be processed
-            // note: at 60FPS, about 28,000 empty boxes could be processed
-            // 5,000,000 empty boxes per second
-            // 2,000,000 filled boxes per second
-            // 1,428,571 empty circles per second
-            // 714,000 filled circles per second
-            // 1 fps: 16ms/62.5fps
-            // 2 fps: 16ms/62.5fps
-            // 4 fps: 16ms/62.5fps
-            // 8 fps: 13ms/77fps
-            // 15 fps: 7ms/143fps
         }
         shapeTest() {
             let parent = this._playfield.rootTile;
@@ -3521,65 +3480,6 @@ define("Test/PlayfieldTest", ["require", "exports", "Playfield/index", "Utils/in
             let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
             let fps = 16;
             this._playfield.start(Math.floor(1 / fps * 1000));
-        }
-        jedTest() {
-            let x = 10;
-            let y = 10;
-            let dy = 25;
-            let root = this._playfield.rootTile;
-            let splitter = new Playfield_6.Splitter("splitter", root);
-            let sw = new Playfield_6.VSplitter("vsplitter", splitter.sw, 0.5);
-            let se = new Playfield_6.HSplitter("hsplitter", splitter.se, 0.5);
-            let sliders = splitter.ne;
-            let buttons = se.north;
-            let buttons2 = se.south;
-            let radios = sw.east;
-            let status = sw.west;
-            let checkboxes = splitter.nw;
-            // sw
-            let textItem1 = new Jed_1.TextItem("textitem-1", status, x, y += dy, 250, 14, "Hello World 1");
-            resultLabel = new Jed_1.LabelItem("ResultLabel", status, x, y += dy, 200, 14, "Result Label");
-            // south
-            y = 10;
-            let buttonItem1 = new Jed_1.ButtonItem("ButtonItem1", buttons, x, y += dy, 100, 0);
-            buttonItem1.label = "Hello World";
-            buttonItem1.value = "Greg Smith";
-            let buttonItem2 = new Jed_1.ButtonItem("ButtonItem2", buttons2, x, y += dy, 100, 0, "Button Item 2");
-            let buttonItem3 = new Jed_1.ButtonItem("ButtonItem3", buttons2, x, y += dy, 100, 0, "Button Item 3");
-            buttonItem1.go = printGo.bind(buttonItem1);
-            buttonItem2.go = printGo.bind(buttonItem2);
-            buttonItem3.go = printGo.bind(buttonItem3);
-            // east
-            let buttonGroup = new Jed_1.GroupItem("ButtonGroup", radios, 10, 10, 0, 0, "Radio Buttons");
-            x = 0;
-            y = 0;
-            let radioItem1 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
-            let radioItem2 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R2", "Radio 2");
-            let radioItem3 = new Jed_1.RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R3", "Radio 3");
-            radioItem1.go = printValue.bind(radioItem1);
-            radioItem2.go = printValue.bind(radioItem2);
-            radioItem3.go = printValue.bind(radioItem3);
-            // west
-            let buttonGroup2 = new Jed_1.GroupItem("ButtonGroup2", checkboxes, 10, 10, 0, 0, "CheckBoxes");
-            x = 10;
-            y = 10;
-            let checkbox1 = new Jed_1.CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
-            let checkbox2 = new Jed_1.CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 0, 0, "#2", "Number 2");
-            let checkbox3 = new Jed_1.CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 0, 0, "#3", "Number 3");
-            checkbox1.go = printValue.bind(checkbox1);
-            checkbox2.go = printValue.bind(checkbox2);
-            checkbox3.go = printValue.bind(checkbox3);
-            // north
-            slider = new Jed_1.Slider("xxx", sliders, 30, 20, 200, 200);
-            slider.onChange = updateCursor.bind(slider);
-            hslider = new Jed_1.Slider("hslider", sliders, 20, sliders.h - 20, sliders.w - 20 - 1, 20);
-            hslider.vslide = false;
-            hslider.onChange = showValue.bind(hslider);
-            vslider = new Jed_1.Slider("vslider", sliders, 1, 1, 20, sliders.h - 20 - 1);
-            vslider.hslide = false;
-            vslider.onChange = showValue.bind(vslider);
-            this._playfield.rootTile.printTree();
-            this._playfield.start(0);
         }
     }
     exports.PlayfieldTest = PlayfieldTest;
@@ -3669,6 +3569,143 @@ define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
+define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/index", "Utils/index"], function (require, exports, Shapes_4, Browser_5, Utils_17) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TestClass = void 0;
+    function bounce() {
+        this.x += this.DX;
+        this.y += this.DY;
+        if (this.x > this.playfield.w || this.x < 0)
+            this.DX = -this.DX;
+        if (this.y > this.playfield.h || this.y < 0)
+            this.DY = -this.DY;
+    }
+    class TestClass {
+        constructor() {
+            this._playfieldApp = new Browser_5.BrowserPlayfieldApp();
+            this._playfield = this._playfieldApp.playfield;
+        }
+        tenthousandTestTile() {
+            let parent = this._playfield.rootTile;
+            let max = 1;
+            for (let i = 0; i < max; i++) {
+                for (let j = 0; j < 1000; j++) {
+                    let x = (0, Utils_17.random)(0, this._playfield.w);
+                    let y = (0, Utils_17.random)(0, this._playfield.h);
+                    let r = (0, Utils_17.random)(10, 50);
+                    let DX = (0, Utils_17.random)(-10, 10);
+                    let DY = (0, Utils_17.random)(-10, 10);
+                    let box = new Shapes_4.BoxTile("box", parent, x, y, r, r);
+                    box.onTick = bounce.bind(box);
+                    box.isSelected = true;
+                    box.DX = DX;
+                    box.DY = DY;
+                }
+            }
+            max *= 1000;
+            let fps = 60;
+            let delay = Math.floor(1000 / fps);
+            this._playfield.start(delay);
+            // note: processing 10,000 Circles stressed the app at 55 FPS
+            // note: processing 10,000 Boxes stressed the app at 142 FPS
+            // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
+            // note: at 30FPS, about 18,500 circles could be processed
+            // note: at 30FPS, about 20,000 boxes could be processed
+            // note: at 30FPS, about 45,000 empty boxes could be processed
+            // note: at 60FPS, about 8700 circles could be processed
+            // note: at 60FPS, about 20,000 boxes could be processed
+            // note: at 60FPS, about 28,000 empty boxes could be processed
+            // 5,000,000 empty boxes per second
+            // 2,000,000 filled boxes per second
+            // 1,428,571 empty circles per second
+            // 714,000 filled circles per second
+            // 1 fps: 16ms/62.5fps
+            // 2 fps: 16ms/62.5fps
+            // 4 fps: 16ms/62.5fps
+            // 8 fps: 13ms/77fps
+            // 15 fps: 7ms/143fps
+        }
+        run() {
+            this.tenthousandTestTile();
+        }
+    }
+    exports.TestClass = TestClass;
+});
+define("Test/Test05", ["require", "exports", "Browser/index"], function (require, exports, Browser_6) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TestClass = void 0;
+    class TestClass {
+        constructor() {
+            this._playfieldApp = new Browser_6.BrowserPlayfieldApp();
+            this._playfield = this._playfieldApp.playfield;
+        }
+        jedTest() {
+            let x = 10;
+            let y = 10;
+            let dy = 25;
+            let root = this._playfield.rootTile;
+            let splitter = new Splitter("splitter", root);
+            let sw = new VSplitter("vsplitter", splitter.sw, 0.5);
+            let se = new HSplitter("hsplitter", splitter.se, 0.5);
+            let sliders = splitter.ne;
+            let buttons = se.north;
+            let buttons2 = se.south;
+            let radios = sw.east;
+            let status = sw.west;
+            let checkboxes = splitter.nw;
+            // sw
+            let textItem1 = new TextItem("textitem-1", status, x, y += dy, 250, 14, "Hello World 1");
+            resultLabel = new LabelItem("ResultLabel", status, x, y += dy, 200, 14, "Result Label");
+            // south
+            y = 10;
+            let buttonItem1 = new ButtonItem("ButtonItem1", buttons, x, y += dy, 100, 0);
+            buttonItem1.label = "Hello World";
+            buttonItem1.value = "Greg Smith";
+            let buttonItem2 = new ButtonItem("ButtonItem2", buttons2, x, y += dy, 100, 0, "Button Item 2");
+            let buttonItem3 = new ButtonItem("ButtonItem3", buttons2, x, y += dy, 100, 0, "Button Item 3");
+            buttonItem1.go = printGo.bind(buttonItem1);
+            buttonItem2.go = printGo.bind(buttonItem2);
+            buttonItem3.go = printGo.bind(buttonItem3);
+            // east
+            let buttonGroup = new GroupItem("ButtonGroup", radios, 10, 10, 0, 0, "Radio Buttons");
+            x = 0;
+            y = 0;
+            let radioItem1 = new RadioItem("RadioItem", buttonGroup, x, y, 0, 0, "R1", "Radio 1");
+            let radioItem2 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R2", "Radio 2");
+            let radioItem3 = new RadioItem("RadioItem", buttonGroup, x, y += dy, 0, 0, "R3", "Radio 3");
+            radioItem1.go = printValue.bind(radioItem1);
+            radioItem2.go = printValue.bind(radioItem2);
+            radioItem3.go = printValue.bind(radioItem3);
+            // west
+            let buttonGroup2 = new GroupItem("ButtonGroup2", checkboxes, 10, 10, 0, 0, "CheckBoxes");
+            x = 10;
+            y = 10;
+            let checkbox1 = new CheckboxItem("CheckboxItem1", buttonGroup2, x, y, 0, 0, "#1", "Number 1");
+            let checkbox2 = new CheckboxItem("CheckboxItem2", buttonGroup2, x, y += dy, 0, 0, "#2", "Number 2");
+            let checkbox3 = new CheckboxItem("CheckboxItem3", buttonGroup2, x, y += dy, 0, 0, "#3", "Number 3");
+            checkbox1.go = printValue.bind(checkbox1);
+            checkbox2.go = printValue.bind(checkbox2);
+            checkbox3.go = printValue.bind(checkbox3);
+            // north
+            slider = new Slider("xxx", sliders, 30, 20, 200, 200);
+            slider.onChange = updateCursor.bind(slider);
+            hslider = new Slider("hslider", sliders, 20, sliders.h - 20, sliders.w - 20 - 1, 20);
+            hslider.vslide = false;
+            hslider.onChange = showValue.bind(hslider);
+            vslider = new Slider("vslider", sliders, 1, 1, 20, sliders.h - 20 - 1);
+            vslider.hslide = false;
+            vslider.onChange = showValue.bind(vslider);
+            this._playfield.rootTile.printTree();
+            this._playfield.start(0);
+        }
+        run() {
+            this.jedTest();
+        }
+    }
+    exports.TestClass = TestClass;
+});
 define("Utils/StylesMixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3716,10 +3753,3 @@ define("Utils/StylesMixins", ["require", "exports"], function (require, exports)
     exports.Styles = Styles;
 });
 //# sourceMappingURL=PlayfieldGraphics.js.map
-define(function (require) {
-    console.log("Main.js...");
-    var {TestClass} = require("Test/Test03");
-    console.log(TestClass);
-    let main = new TestClass();
-    main.run();
-});

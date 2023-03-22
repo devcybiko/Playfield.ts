@@ -75,17 +75,17 @@ export class Tile extends _Tile {
         this.children.forEach(child => (child as Tile).draw());
     }
 
-    draw() {
+    draw(): void {
         this.drawChildren();
     }
 
     // --- OnActions --- //
 
-    onTick() {
+    onTick(): void {
         this.children.forEach(child => (child as Tile).onTick());
     }
 
-    onEvent(pfEvent: PlayfieldEvent) {
+    onEvent(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Accessors --- //
