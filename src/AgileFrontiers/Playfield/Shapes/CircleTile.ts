@@ -25,7 +25,6 @@ export class CircleTile extends _CircleTile {
         let dw = this.w * this.w;
         console.log(this.name, this.X, this.Y, x, y)
         if (dr <= dw) return this;
-        return this.inBoundsChildren(x, y, false);
     }
 
     draw() {
