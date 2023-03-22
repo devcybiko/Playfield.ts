@@ -51,8 +51,10 @@ export class Tile extends _Tile {
     }
     // --- Public Methods --- //
 
-    inBoundsChildren(x: number, y: number): Tile {
+    inBoundsChildren(x: number, y: number, checkThis = true): Tile {
         let found = Tile.null;
+        if (checkThis) found = this.inBounds(x,y);
+        if (found) return found;
         for (let child of this.children) {
             let tileChild = Tile.cast(child);
             found = tileChild.inBoundsChildren(x, y);
@@ -62,12 +64,11 @@ export class Tile extends _Tile {
     }
 
     inBounds(x: number, y: number): Tile {
-        let found = Tile.null;
-        let result =
+        if (
             between(this.X, x, this.X + this.w) &&
-            between(this.Y, y, this.Y + this.h);
-        if (result) found = this;
-        return found;
+            between(this.Y, y, this.Y + this.h))
+            return this;
+        return Tile.null;
     }
 
     drawChildren() {

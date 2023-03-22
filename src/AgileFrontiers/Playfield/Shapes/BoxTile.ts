@@ -27,6 +27,7 @@ export class BoxTile extends _BoxTile {
         else this.gfx.gparms.borderColor = "";
         this.gfx.gparms.fillColor = this._colors[this._color];
         this.playfield.gfx.rect(this.x, this.y, this.w, this.h);
+        super.draw();
     }
 
     // --- onActions --- //

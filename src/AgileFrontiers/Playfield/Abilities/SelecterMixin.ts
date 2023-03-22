@@ -20,10 +20,12 @@ export class Selecter {
     // --- Public Methods --- //
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
-        let treeChild = child as unknown as Tile;
-        if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-            if (pfEvent.isPress && this._selectedObj != child) this._selectChild(pfEvent, child);
-        } 
+        let tileChild = Tile.cast(child);
+        console.log("SelectEvent", tileChild.name)
+        if (pfEvent.isPress) {
+            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y);
+            if (Tile.cast(this._selectedObj) !== foundChild) this._selectChild(pfEvent, child);
+        }
     }
 
     // --- Private Methods --- //

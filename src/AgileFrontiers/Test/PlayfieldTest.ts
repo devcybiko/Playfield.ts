@@ -1,6 +1,4 @@
 import { Playfield, PlayfieldEvent, Splitter, VSplitter, HSplitter } from "../Playfield";
-import { CircleTestTile } from "./CircleTestTile";
-import { BoxTestTile } from "./BoxTestTile";
 import { random, int } from "../Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
 import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem, Slider} from "../Jed";
@@ -47,30 +45,6 @@ export class PlayfieldTest {
     boxTest() {
         this._playfield.gfx.rect(10, 10, 100, 100);
     }
-    circleTestTile() {
-        let parent = this._playfield.rootTile;
-        let circleTile = new CircleTestTile("circle", parent, parent.w / 2, parent.h / 2, 50, 50);
-        this._playfield.start();
-    }
-    groupTestTile() {
-        let parent = this._playfield.rootTile;
-        let lcircle = new CircleTestTile("left", parent, -75, +75, 50);
-        let rcircle = new CircleTestTile("right", parent, +75, +75, 50);
-        lcircle.gfx.gparms.fillColor = "red";
-        rcircle.gfx.gparms.fillColor = "red";
-
-        let llcircle = new CircleTestTile("left", lcircle, -50, 50, 50, 50);
-        let lrcircle = new CircleTestTile("right", lcircle, +50, 50, 50, 50);
-        llcircle.gfx.gparms.fillColor = "blue";
-        lrcircle.gfx.gparms.fillColor = "blue";
-
-        let rlcircle = new CircleTestTile("left", rcircle, -50, 50, 50, 50);
-        let rrcircle = new CircleTestTile("right", rcircle, +50, 50, 50, 50);
-        rlcircle.gfx.gparms.fillColor = "green";
-        rrcircle.gfx.gparms.fillColor = "green";
-
-        this._playfield.start();
-    }
     tenthousandTestTile() {
         let parent = this._playfield.rootTile;
         let max = 100;
@@ -81,7 +55,7 @@ export class PlayfieldTest {
                 let r = random(10, 50);
                 let DX = random(-10, 10);
                 let DY = random(-10, 10);
-                let circle = new BoxTestTile("circle", parent, x, y, r, r);
+                let circle = new BoxTile("circle", parent, x, y, r, r);
                 // circle.gfx.gparms.fillColor = null;
                 (circle as any).DX = DX;
                 (circle as any).DY = DY;

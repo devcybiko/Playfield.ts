@@ -1,8 +1,14 @@
 import { Playfield } from "../Playfield";
 import { CircleTile, BoxTile } from "../Playfield/Shapes"
-
 import {BrowserPlayfieldApp} from "../Browser";
 
+/**
+ * basic test of the Root Tile and simple shape tiles.
+ * square changes color on click
+ * circle shows concentric inner circle on click
+ * - and has specialized inBounds method
+ * both are draggable
+ */
 export class TestClass {
     _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;

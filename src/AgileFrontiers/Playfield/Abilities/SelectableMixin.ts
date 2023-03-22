@@ -1,3 +1,5 @@
+import {Tile} from "../Tile";
+
 export interface Selectable { }
 export class Selectable {
     private _isSelected: boolean;
@@ -12,6 +14,7 @@ export class Selectable {
     // --- onActions --- //
     
     onSelect(): void {
+        console.log("onSelect", Tile.cast(this).name);
     }
 
     onUnselect(): void {

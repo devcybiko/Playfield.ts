@@ -13,6 +13,7 @@ export class CircleTile extends _CircleTile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
         this.Draggable();
+        this.Selectable();
     }
 
     // --- Overrides --- //
@@ -22,29 +23,30 @@ export class CircleTile extends _CircleTile {
         let dy = this.Y - y;
         let dr = dx * dx + dy * dy;
         let dw = this.w * this.w;
+        console.log(this.name, this.X, this.Y, x, y)
         if (dr <= dw) return this;
-        return this.inBoundsChildren(x, y);
+        return this.inBoundsChildren(x, y, false);
     }
 
     draw() {
-        if (this.isSelected) this.gfx.gparms.borderColor = "black";
-        else this.gfx.gparms.borderColor = "";
+        this.gfx.gparms.borderColor = "black";
         this.gfx.gparms.fillColor = "gray";
-        this.gfx.circle(this.x, this.y, this.w);
+        this.gfx.circle(this.X, this.Y, this.W);
 
-        if (this._dx && this._dy) {
+        if (this.isSelected && this._dx && this._dy) {
             let oldColor = this.gfx.gparms.fillColor;
-            this.gfx.gparms.borderColor = "black";
             this.gfx.gparms.fillColor = "red";
             let r = Math.floor(Math.sqrt(this._dx * this._dx + this._dy * this._dy));
-            this.playfield.gfx.circle(this.x, this.y, r);
+            this.playfield.gfx.circle(this.X, this.Y, r);
             this.gfx.gparms.fillColor = oldColor;
         }
+        super.draw();
     }
 
     // --- onActions --- //
 
     onGrab(dx: number, dy: number, event: any) {
+        console.log("onGrab", this.name);
         this._dx = this.X - event.x;
         this._dy = this.Y - event.y;
         this.toFront();
