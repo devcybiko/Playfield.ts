@@ -12,7 +12,6 @@ let bigSlider = null as any;
 let hslider = null as any;
 let vslider = null as any;
 
-
 export class TestClass {
     _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;

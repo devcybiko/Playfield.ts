@@ -2024,7 +2024,6 @@ define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (requir
     exports.BrowserPlayfieldEvent = void 0;
     class BrowserPlayfieldEvent {
         constructor(event, ratio = 1.0) {
-            console.log(ratio);
             this.event = event;
             this._isActive = true;
             // this.type = event.type;
