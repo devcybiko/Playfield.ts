@@ -8,8 +8,8 @@ export class BrowserPlayfieldApp {
     private _eventQueue: EventQueue;
     private _canvasEventPump: BrowserEventPump;
 
-    constructor(canvasId = "#playfield") {
-        this._gfx = new BrowserGfx(canvasId);
+    constructor(canvasId = "#playfield", ratio?: number) {
+        this._gfx = new BrowserGfx(canvasId, ratio);
         this._eventQueue = new EventQueue();
         this._canvasEventPump = new BrowserEventPump(this._gfx.canvas, this._eventQueue);
         this._playfield = new Playfield(this._gfx, this._eventQueue);

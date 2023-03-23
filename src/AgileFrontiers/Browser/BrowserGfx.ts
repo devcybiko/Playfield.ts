@@ -25,21 +25,33 @@ var PIXEL_RATIO = (function () {
     return dpr / bsr;
 })();
 
-
+function print_ratios() {
+    var ctx = document.createElement("canvas").getContext("2d") as any;
+        console.log("dpr", window.devicePixelRatio)
+        console.log("ctx.webkitBackingStorePixelRatio",ctx.webkitBackingStorePixelRatio);
+        console.log("ctx.mozBackingStorePixelRatio", ctx.mozBackingStorePixelRatio);
+        console.log("ctx.msBackingStorePixelRatio",ctx.msBackingStorePixelRatio);
+        console.log("ctx.oBackingStorePixelRatio",ctx.oBackingStorePixelRatio);
+        console.log("ctx.backingStorePixelRatio",ctx.backingStorePixelRatio);
+}
 function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
     console.log("pixel ratio = " + ratio);
     var can = canvas || document.createElement("canvas");
+    can.origWidth = w;
+    can.origHeight = h;
     can.width = w * ratio;
     can.height = h * ratio;
     can.style.width = w + "px";
     can.style.height = h + "px";
+    can._ratio = ratio;
     can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
     return can;
 }
 
-function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
+function createHiDPIFromCanvas(canvasId: string, ratio?: number) {
     if (!ratio) { ratio = PIXEL_RATIO; }
+    print_ratios();
     console.log("pixel ratio = " + ratio);
     var can = document.querySelector(canvasId) as any;
     let w = can.width;
@@ -48,8 +60,11 @@ function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
     can.origHeight = h;
     can.width = w * ratio;
     can.height = h * ratio;
-    can.style.width = w + "px";
-    can.style.height = h + "px";
+    can.style.width = can.height + "px";
+    can.style.height = can.height + "px";
+    // can.style.width = w + "px";
+    // can.style.height = h + "px";
+    can._ratio = ratio;
     can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
     return can;
 }
@@ -59,13 +74,13 @@ export class BrowserGfx implements Gfx {
     private _ctx: CanvasRenderingContext2D;
     private _gparms: GfxParms;
 
-    constructor(canvasId?: string) {
-        if (canvasId) this._init(canvasId);
+    constructor(canvasId?: string, ratio?: number) {
+        if (canvasId) this._init(canvasId, ratio);
     }
 
-    private _init(canvasId: string) {
-        // this._canvas = createHiDPICanvas(500, 500, document.querySelector(canvasId));
-        this._canvas = createHiDPIFromCanvas(canvasId);
+    private _init(canvasId: string, ratio?: number) {
+        // this._canvas = createHiDPICanvas(1000, 1000, document.querySelector(canvasId), 2.0);
+        this._canvas = createHiDPIFromCanvas(canvasId, ratio);
         // this._canvas = document.querySelector(canvasId) as any;
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
@@ -84,8 +99,8 @@ export class BrowserGfx implements Gfx {
         return newGfx;
     }
     vline(x: number, y0:number, y1: number, moveTo = true) {
-        if (moveTo) this._ctx.moveTo(xx(x), y0);
-        this._ctx.lineTo(xx(x), y1);
+        if (moveTo) this._ctx.moveTo(xx(x), yy(y0));
+        this._ctx.lineTo(xx(x), yy(y1));
     }
     hline(x0: number, x1: number, y:number, moveTo = true) {
         if (moveTo) this._ctx.moveTo(xx(x0), yy(y));

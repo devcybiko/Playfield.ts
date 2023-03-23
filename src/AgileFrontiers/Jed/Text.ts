@@ -39,9 +39,9 @@ export class Text extends _Text {
         gfx.clipRect(this.X, this.Y, this.W, this.H);
         let value = this.value.substring(this._left)
         if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
-        // gfx.rect(this.X, this.Y, this.W, this.H);
-        // gfx.text(value, this.X, this.Y-1, this.W, this.H);
-        gfx.textRect(value, this.X, this.Y, this.W, this.H);
+        gfx.rect(this.X, this.Y, this.W, this.H);
+        gfx.text(value, this.X, this.Y, this.W, this.H);
+        // gfx.textRect(value, this.X, this.Y, this.W, this.H);
         this._drawCursor();
         gfx.restore();
     }
@@ -103,6 +103,7 @@ export class Text extends _Text {
         if (!this._cursorOn) return;
         let gfx = this.gfx;
         let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor));
+        let charBB = gfx.boundingBox("M");
         let dw = valueBB.w;
         if (dw <= 0) dw = 1;
         else if (dw >= this.w) dw = this.w - 1;
@@ -111,8 +112,8 @@ export class Text extends _Text {
         let x1 = x0;
         let y0 = this.y;
         let y1 = y0 + valueBB.h;
-        gfx.line(x0, y0, x1, y1);
-        gfx.line(x0 + 1, y0, x1 + 1, y1);
+        // gfx.gparms.fillColor = "";
+        gfx.rect(x0-1, y0+1, 3, charBB.h-2);
     }
 
     _computeRight() {

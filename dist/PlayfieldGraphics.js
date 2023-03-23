@@ -1533,7 +1533,7 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/in
             this._gfx = gfx;
             this._eventQueue = eventQueue;
             this.Rect(0, 0, this._gfx.width, this._gfx.height);
-            this._rootTile = new RootTile_1.RootTile("_root", Tile_9.Tile.null, 0, 0, this.w - 1, this.h - 1);
+            this._rootTile = new RootTile_1.RootTile("_root", Tile_9.Tile.null, 0, 0, this.w, this.h);
             this._rootTile.playfield = this;
         }
         // --- Public Methods --- //
@@ -2024,6 +2024,7 @@ define("Browser/BrowserPlayfieldEvent", ["require", "exports"], function (requir
     exports.BrowserPlayfieldEvent = void 0;
     class BrowserPlayfieldEvent {
         constructor(event, ratio = 1.0) {
+            console.log(ratio);
             this.event = event;
             this._isActive = true;
             // this.type = event.type;
@@ -2244,16 +2245,28 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
             ctx.backingStorePixelRatio || 1;
         return dpr / bsr;
     })();
+    function print_ratios() {
+        var ctx = document.createElement("canvas").getContext("2d");
+        console.log("dpr", window.devicePixelRatio);
+        console.log("ctx.webkitBackingStorePixelRatio", ctx.webkitBackingStorePixelRatio);
+        console.log("ctx.mozBackingStorePixelRatio", ctx.mozBackingStorePixelRatio);
+        console.log("ctx.msBackingStorePixelRatio", ctx.msBackingStorePixelRatio);
+        console.log("ctx.oBackingStorePixelRatio", ctx.oBackingStorePixelRatio);
+        console.log("ctx.backingStorePixelRatio", ctx.backingStorePixelRatio);
+    }
     function createHiDPICanvas(w, h, canvas, ratio) {
         if (!ratio) {
             ratio = PIXEL_RATIO;
         }
         console.log("pixel ratio = " + ratio);
         var can = canvas || document.createElement("canvas");
+        can.origWidth = w;
+        can.origHeight = h;
         can.width = w * ratio;
         can.height = h * ratio;
         can.style.width = w + "px";
         can.style.height = h + "px";
+        can._ratio = ratio;
         can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
         return can;
     }
@@ -2261,6 +2274,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         if (!ratio) {
             ratio = PIXEL_RATIO;
         }
+        print_ratios();
         console.log("pixel ratio = " + ratio);
         var can = document.querySelector(canvasId);
         let w = can.width;
@@ -2269,19 +2283,22 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         can.origHeight = h;
         can.width = w * ratio;
         can.height = h * ratio;
-        can.style.width = w + "px";
-        can.style.height = h + "px";
+        can.style.width = can.height + "px";
+        can.style.height = can.height + "px";
+        // can.style.width = w + "px";
+        // can.style.height = h + "px";
+        can._ratio = ratio;
         can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
         return can;
     }
     class BrowserGfx {
-        constructor(canvasId) {
+        constructor(canvasId, ratio) {
             if (canvasId)
-                this._init(canvasId);
+                this._init(canvasId, ratio);
         }
-        _init(canvasId) {
-            // this._canvas = createHiDPICanvas(500, 500, document.querySelector(canvasId));
-            this._canvas = createHiDPIFromCanvas(canvasId);
+        _init(canvasId, ratio) {
+            // this._canvas = createHiDPICanvas(1000, 1000, document.querySelector(canvasId), 2.0);
+            this._canvas = createHiDPIFromCanvas(canvasId, ratio);
             // this._canvas = document.querySelector(canvasId) as any;
             this._ctx = this._canvas.getContext("2d");
             this._gparms = new GfxParms_2.GfxParms();
@@ -2300,8 +2317,8 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         }
         vline(x, y0, y1, moveTo = true) {
             if (moveTo)
-                this._ctx.moveTo(xx(x), y0);
-            this._ctx.lineTo(xx(x), y1);
+                this._ctx.moveTo(xx(x), yy(y0));
+            this._ctx.lineTo(xx(x), yy(y1));
         }
         hline(x0, x1, y, moveTo = true) {
             if (moveTo)
@@ -2464,8 +2481,8 @@ define("Browser/BrowserPlayfieldApp", ["require", "exports", "Playfield/index", 
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BrowserPlayfieldApp = void 0;
     class BrowserPlayfieldApp {
-        constructor(canvasId = "#playfield") {
-            this._gfx = new BrowserGfx_1.BrowserGfx(canvasId);
+        constructor(canvasId = "#playfield", ratio) {
+            this._gfx = new BrowserGfx_1.BrowserGfx(canvasId, ratio);
             this._eventQueue = new Playfield_2.EventQueue();
             this._canvasEventPump = new BrowserEventPump_1.BrowserEventPump(this._gfx.canvas, this._eventQueue);
             this._playfield = new Playfield_2.Playfield(this._gfx, this._eventQueue);
@@ -3199,9 +3216,9 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             let value = this.value.substring(this._left);
             if (this.isFocus)
                 value = value.replaceAll(" ", '\uA788'); // \u00B7
-            // gfx.rect(this.X, this.Y, this.W, this.H);
-            // gfx.text(value, this.X, this.Y-1, this.W, this.H);
-            gfx.textRect(value, this.X, this.Y, this.W, this.H);
+            gfx.rect(this.X, this.Y, this.W, this.H);
+            gfx.text(value, this.X, this.Y, this.W, this.H);
+            // gfx.textRect(value, this.X, this.Y, this.W, this.H);
             this._drawCursor();
             gfx.restore();
         }
@@ -3260,6 +3277,7 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
                 return;
             let gfx = this.gfx;
             let valueBB = gfx.boundingBox(this.value.substring(this._left, this._cursor));
+            let charBB = gfx.boundingBox("M");
             let dw = valueBB.w;
             if (dw <= 0)
                 dw = 1;
@@ -3271,8 +3289,8 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             let x1 = x0;
             let y0 = this.y;
             let y1 = y0 + valueBB.h;
-            gfx.line(x0, y0, x1, y1);
-            gfx.line(x0 + 1, y0, x1 + 1, y1);
+            // gfx.gparms.fillColor = "";
+            gfx.rect(x0 - 1, y0 + 1, 3, charBB.h - 2);
         }
         _computeRight() {
             // let gfx = this.playfield.gfx;
@@ -3644,7 +3662,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
     let vslider = null;
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_6.BrowserPlayfieldApp();
+            this._playfieldApp = new Browser_6.BrowserPlayfieldApp("#playfield", 2.0);
             this._playfield = this._playfieldApp.playfield;
         }
         jedTest() {

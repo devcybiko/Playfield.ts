@@ -31,7 +31,7 @@ export class Playfield extends _Playfield {
         this._gfx = gfx;
         this._eventQueue = eventQueue;
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
-        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w-1, this.h-1);
+        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w, this.h);
         this._rootTile.playfield = this;
     }
 

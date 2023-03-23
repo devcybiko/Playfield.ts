@@ -30,6 +30,7 @@ export class BrowserPlayfieldEvent {
     private _isSwipeLeft: boolean;
 
     constructor(event: any, ratio = 1.0) {
+        console.log(ratio);
         this.event = event;
         this._isActive = true;
         // this.type = event.type;
