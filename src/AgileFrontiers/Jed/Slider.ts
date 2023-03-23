@@ -35,6 +35,7 @@ export class Slider extends _Slider {
         this.options.textBaseline = GfxParms.MIDDLE;
         this.options.textAlign = GfxParms.CENTER;
         this.options.fontSize = 12;
+        this.isDraggable = true;
     }
 
     onChange(x: number, y: number, pfEvent: PlayfieldEvent) {

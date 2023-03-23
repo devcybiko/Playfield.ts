@@ -31,6 +31,7 @@ export class Dragger {
     // --- Private Methods --- //
 
     _dragChild(pfEvent: PlayfieldEvent, child: Draggable) {
+        if (!child.isDraggable) return;
         if (this._dragObj) {
             this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
             this._dragX = pfEvent.x;
@@ -39,7 +40,8 @@ export class Dragger {
     }
 
     _grabChild(pfEvent: PlayfieldEvent, child: Draggable) {
-        let tileChild = child as unknown as Tile;
+        if (!child.isDraggable) return;
+        let tileChild = Tile.cast(child);
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
             let dx = pfEvent.x - tileChild.X;
             let dy = pfEvent.y - tileChild.Y;
