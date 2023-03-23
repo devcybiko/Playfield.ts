@@ -2,10 +2,15 @@ import { Clickable } from "./ClickableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
+/** 
+ * can control Clickable
+ */
 export interface Clicker { };
 export class Clicker {
+    protected isClicker: boolean;
 
     Clicker() {
+        this.isClicker = true;
         return this;
     }
 
@@ -13,7 +18,7 @@ export class Clicker {
     
     clickEvent(pfEvent: PlayfieldEvent, child: Clickable) {
         if (pfEvent.isPress) {
-            let tileChild = child as unknown as Tile;
+            let tileChild = Tile.cast(child);
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 child.onClick(pfEvent);
             }

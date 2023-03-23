@@ -3,25 +3,21 @@ import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
-export class _TextItem extends Item { };
-export interface _TextItem extends Draggable, Editable, Timer { };
-applyMixins(_TextItem, [Draggable, Editable, Timer]);
+export class _Text extends Item { };
+export interface _Text extends Draggable, Editable, Timer { };
+applyMixins(_Text, [Draggable, Editable, Timer]);
 
-export class TextItem extends _TextItem {
-    private _cursor = 0;
-    private _left = 0;
-    private _right = 0;
-    private _cursorOn = true;
-    private _cursorBlinkRate = 500;
-    private _nchars = 0;
-    private _nchars2 = 0;
+export class Text extends _Text {
+    protected _cursor = 0;
+    protected _left = 0;
+    protected _right = 0;
+    protected _cursorOn = true;
+    protected _cursorBlinkRate = 500;
+    protected _nchars = 0;
+    protected _nchars2 = 0;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value);
-        this.Draggable();
-        this.Editable();
-        this.Logger();
-        this.Timer();
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
@@ -29,7 +25,6 @@ export class TextItem extends _TextItem {
         this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
         this._left = 0;
         this._right = this._computeRight();
-        this.isDraggable = true;
     }
 
     // --- Overrides --- //
@@ -40,10 +35,11 @@ export class TextItem extends _TextItem {
         this._updateGparms();
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h);
+
+        gfx.clipRect(this.X, this.Y, this.W, this.H);
         let value = this.value.substring(this._left)
         if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
-        gfx.textRect(value, this.x, this.y, this.w, this.h);
+        gfx.textRect(value, this.X, this.Y, this.W, this.H);
         this._drawCursor();
         gfx.restore();
     }
@@ -84,7 +80,7 @@ export class TextItem extends _TextItem {
         this.onFocus(pfEvent);
         return super.onGrab(dx, dy, pfEvent);
     }
-    // --- Private Methods --- //
+    // --- protected Methods --- //
 
     _blink() {
         if (!this.isTimedOut) return;

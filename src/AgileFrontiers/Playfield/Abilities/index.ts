@@ -9,7 +9,7 @@ export {Clickable} from "./ClickableMixin";
 export {Hoverer} from "./HovererMixin";
 export {Hoverable} from "./HoverableMixin";
 export {Editable} from "./EditableMixin";
-export {Editor} from "./EditorMixin";
+export {Editer} from "./EditerMixin";
 export {Timer} from "./Timer";
 export {EventDispatcher} from "./EventDispatcher";
 export {Resizable} from "./Resizable";

@@ -3,18 +3,23 @@ import { Tree } from "../../Utils";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
-export interface Editor { };
-export class Editor {
-    private _focusObj: Editable;
+/**
+ * can control Editable
+ */
+export interface Editer { };
+export class Editer {
+    protected isEditer: boolean;
+    protected _focusObj: Editable;
 
-    Editor() {
+    Editer() {
+        this.isEditer = true;
         this._focusObj = null;
         return this;
     }
 
     // --- Public Methods --- //
 
-    editorEvent(pfEvent: PlayfieldEvent, child: Editable) {
+    editerEvent(pfEvent: PlayfieldEvent, child: Editable) {
         if (pfEvent.isPress) return this._focusChild(pfEvent, child);
         else if (pfEvent.isKeyDown) return this._dispatchKey(pfEvent, child);
     }
@@ -31,8 +36,8 @@ export class Editor {
         }
     }
 
-    _editorParent(): Editor {
-        return (this as unknown as Tile).parent as unknown as Editor;
+    _editerParent(): Editer {
+        return (this as unknown as Tile).parent as unknown as Editer;
     }
 
     _unfocusChild(child: any, ctx: any) {

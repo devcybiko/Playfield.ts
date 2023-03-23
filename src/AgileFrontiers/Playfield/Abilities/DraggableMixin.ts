@@ -1,13 +1,15 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
-import { Tile } from "../Tile";
 
+/**
+ * can be dragged
+ */
 export interface Draggable { }
 export class Draggable {
-    private _isDraggable: boolean;
-    private _isDragging: boolean;
+    protected _isDraggable: boolean;
+    protected _isDragging: boolean;
 
     Draggable() {
-        this.isDraggable = true;
+        this.isDraggable = false;
         this.isDragging = false;
         return this;
     }

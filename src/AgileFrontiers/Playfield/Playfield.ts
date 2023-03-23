@@ -21,7 +21,6 @@ applyMixins(_Playfield, [Logger, Rect]);
 export class Playfield extends _Playfield {
     private _rootTile: RootTile;
     private _gfx: Gfx;
-    private _gparms: GfxParms;
     private _lastTime = 0;
     private _delay = -1;
     private _timerId = 0 as any;
@@ -32,7 +31,7 @@ export class Playfield extends _Playfield {
         this._gfx = gfx;
         this._eventQueue = eventQueue;
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
-        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w, this.h);
+        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w-1, this.h-1);
         this._rootTile.playfield = this;
     }
 
@@ -44,7 +43,7 @@ export class Playfield extends _Playfield {
 
     redraw() {
         this.clear();
-        this.tile.redraw();
+        this.rootTile.draw();
     }
 
     start(delay = 125) {
@@ -65,7 +64,7 @@ export class Playfield extends _Playfield {
         let now = Date.now();
         let extra = now - this._lastTime;
         this._handleEvents();
-        this.tile.onTick(); // process all ticks
+        this.rootTile.onTick(); // process all ticks
         this.redraw(); // redraw the playfield
         this._lastTime = Date.now();
         let delta = this._lastTime - now;
@@ -88,7 +87,7 @@ export class Playfield extends _Playfield {
     get playfield(): Playfield {
         return this;
     }
-    get tile(): Tile {
+    get rootTile(): Tile {
         return this._rootTile;
     }
     get gfx(): Gfx {

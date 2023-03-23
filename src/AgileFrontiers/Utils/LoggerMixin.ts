@@ -1,5 +1,6 @@
 export interface Logger { }
 export class Logger {
+    private _isLoggable: boolean;
     private _level: string;
     private _link: string;
     private _uselink: boolean;
@@ -9,6 +10,7 @@ export class Logger {
     // WARN ==> WARN, ERROR
     // ERROR==> ERROR
     Logger(logLevel = "error", uselink = true) {
+        this._isLoggable = true;
         this._level = logLevel;
         this._uselink = uselink;
         return this;

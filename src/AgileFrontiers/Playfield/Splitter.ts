@@ -1,13 +1,13 @@
 import { Tile } from "./Tile";
-import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editor, Hoverer } from "./Abilities";
+import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
 export class Splitter extends _Splitter {
 
@@ -27,16 +27,6 @@ export class Splitter extends _Splitter {
     constructor(name: string, parent: Tile, topPercent = 0.5, leftPercent = 0.5) {
         super(name, parent, 0, 0, parent.w, parent.h);
         this.Logger();
-        this.Clicker();
-        this.Presser();
-        this.Selecter();
-        this.Dragger();
-        this.Editor();
-        this.Hoverer();
-        this.EventDispatcher();
-        this.Draggable();
-        this.Hoverable();
-        this.Resizable();
         this._margins = new Margins().Margins(2, 2, 2, 2);
         this._gutter = 7;
         this._topPercent = topPercent;
@@ -66,26 +56,26 @@ export class Splitter extends _Splitter {
     _neSize() {
         this._ne.x0 = this._margins.left;
         this._ne.y0 = this._margins.top;
-        this._ne.x1 = this._vGutter.x0 - 1;
-        this._ne.y1 = this._hGutter.y0 - 1;
+        this._ne.x1 = this._vGutter.x - 1;
+        this._ne.y1 = this._hGutter.y - 1;
     }
 
     _seSize() {
         this._se.x0 = this._margins.left;
-        this._se.y0 = this._hGutter.y1 + 1;
-        this._se.x1 = this._vGutter.x0 - 1;
+        this._se.y0 = this._hGutter.y + 1;
+        this._se.x1 = this._vGutter.x - 1;
         this._se.y1 = this.y1 - this._margins.bottom;
     }
     _nwSize() {
-        this._nw.x0 = this._vGutter.x1 + 1;
+        this._nw.x0 = this._vGutter.x + 1;
         this._nw.y0 = this._margins.top;
         this._nw.x1 = this.x1 - this._margins.right;
-        this._nw.y1 = this._hGutter.y0 - 1;
+        this._nw.y1 = this._hGutter.y - 1;
     }
 
     _swSize() {
-        this._sw.x0 = this._vGutter.x1 + 1;
-        this._sw.y0 = this._hGutter.y1 + 1;
+        this._sw.x0 = this._vGutter.x + 1;
+        this._sw.y0 = this._hGutter.y + 1;
         this._sw.x1 = this.x1 - this._margins.right;
         this._sw.y1 = this.y1 - this._margins.bottom;
     }
@@ -104,7 +94,7 @@ export class Splitter extends _Splitter {
 
     _hoverGutter(gutter: Rect, pfEvent: PlayfieldEvent): boolean {
         if (!gutter) return;
-        return between(gutter.x0, pfEvent.x - this.X, gutter.x1) && between(gutter.y0, pfEvent.y - this.Y, gutter.y1);
+        return between(gutter.x, pfEvent.x - this.X, gutter.x) && between(gutter.y, pfEvent.y - this.Y, gutter.y);
     }
 
     // --- Overrides --- //
@@ -115,7 +105,7 @@ export class Splitter extends _Splitter {
     }
 
     _drawChild(child: RootTile) {
-        child.redraw();
+        child.draw();
     }
 
     _drawGutter(gutterRect: Rect, hover: boolean) {
@@ -123,16 +113,16 @@ export class Splitter extends _Splitter {
         gparms.borderColor = "";
         if (hover) {
             gparms.fillColor = "black";
-            this.gfx.rect(gutterRect.x0, gutterRect.y0, gutterRect.w, gutterRect.h, gparms);
+            this.gfx.rect(gutterRect.x, gutterRect.y, gutterRect.w, gutterRect.h, gparms);
         } else {
             gparms.fillColor = "";
             gparms.borderColor = "green";
             if (gutterRect.w > gutterRect.h) {
                 // horizontal
-                this.gfx.line(gutterRect.x0, gutterRect.y0 + int(gutterRect.h / 2), gutterRect.x0 + gutterRect.w, int(gutterRect.y0 + gutterRect.h / 2), gparms);
+                this.gfx.line(gutterRect.x, gutterRect.y + int(gutterRect.h / 2), gutterRect.x + gutterRect.w, int(gutterRect.y + gutterRect.h / 2), gparms);
             } else {
                 // vertical
-                this.gfx.line(gutterRect.x0 + int(gutterRect.w / 2), gutterRect.y0, gutterRect.x0 + (gutterRect.w / 2), gutterRect.y0 + gutterRect.h, gparms);
+                this.gfx.line(gutterRect.x + int(gutterRect.w / 2), gutterRect.y, gutterRect.x + (gutterRect.w / 2), gutterRect.y + gutterRect.h, gparms);
             }
         }
     }

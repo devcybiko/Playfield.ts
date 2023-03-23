@@ -1,4 +1,4 @@
-import { applyMixins, Tree, Rect, between, Logger, Margins } from "../Utils";
+import { applyMixins, Tree, Rect, RelRect, between, Logger, Margins } from "../Utils";
 import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
@@ -13,12 +13,12 @@ import { Options } from "./Options";
  */
 
 export class TileOptions extends Options {
-    margins = (new Margins).Margins(0,0,0,0);
+    margins = (new Margins).Margins(0, 0, 0, 0);
 }
 
 export class _Tile { };
-export interface _Tile extends Logger, Tree, Rect { };
-applyMixins(_Tile, [Logger, Tree, Rect]);
+export interface _Tile extends Logger, Tree, Rect, RelRect { };
+applyMixins(_Tile, [Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
@@ -28,10 +28,10 @@ export class Tile extends _Tile {
     private _logger: Logger;
     private _tabOrder = 0;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
+    constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
         super();
         this.Logger();
-        this.Rect(x, y, w, h);
+        this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
         this.Tree(name, parent);
     }
 
@@ -46,66 +46,73 @@ export class Tile extends _Tile {
     addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
-        child._tabOrder = this.children.length-1;
+        child._gfx = this._playfield.gfx;
+        child._tabOrder = this.children.length - 1;
+        let anyChild = child as any;
+        // is this a good idea? or should we enforce objects initizing within their constructors?
+        if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
+        if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
+        if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
+        if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
+        if (anyChild.Pressable && !anyChild.isPressable) anyChild.Pressable();
+        if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
+        if (anyChild.Selectable && !anyChild.isSelectable) anyChild.Selectable();
+
+        if (anyChild.Dragger && !anyChild.isDragger) anyChild.Dragger();
+        if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
+        if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
+        if (anyChild.Presser && !anyChild.isPresser) anyChild.Presser();
+        if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
+        if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
+
+        if (anyChild.EventDispatcher && !anyChild.isEventDispatcher) anyChild.EventDispatcher();
+        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+
+        if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
     // --- Public Methods --- //
 
-    inBoundsChildren(x: number, y: number): Tile {
+    inBoundsChildren(x: number, y: number, checkThis = true): Tile {
         let found = Tile.null;
+        if (checkThis) found = this.inBounds(x,y);
+        if (found) return found;
         for (let child of this.children) {
-            let tileChild = child as Tile;
+            let tileChild = Tile.cast(child);
             found = tileChild.inBoundsChildren(x, y);
             if (found) break;
         }
-        if (!found) found = this.inBounds(x, y);
         return found;
     }
 
     inBounds(x: number, y: number): Tile {
-        let found = Tile.null;
-        let result =
+        if (
             between(this.X, x, this.X + this.w) &&
-            between(this.Y, y, this.Y + this.h);
-        if (result) found = this;
-        return found;
+            between(this.Y, y, this.Y + this.h))
+            return this;
+        return Tile.null;
     }
 
-    drawAll(): void {
-        this.redraw();
-        for (let child of this.children) {
-            (child as Tile).drawAll();
-        }
+    drawChildren() {
+        this.children.forEach(child => (child as Tile).draw());
     }
 
-    redraw() {
-        this._recompute();
-        this.draw();
-    }
-
-    redrawChildren() {
-        this.children.forEach(child => (child as Tile).redraw());
-    }
-
-    draw() {
-        this.redrawChildren();
+    draw(): void {
+        this.drawChildren();
     }
 
     // --- OnActions --- //
 
-    onTick() {
+    onTick(): void {
         this.children.forEach(child => (child as Tile).onTick());
     }
 
-    onEvent(pfEvent: PlayfieldEvent) {
+    onEvent(pfEvent: PlayfieldEvent): void {
     }
 
-    // --- Private Methods --- //
+    // --- Overrides --- //
 
-    _recompute() {
-        if (this.parent) {
-            this.gfx.gparms.dx = (this.parent as Tile).X;
-            this.gfx.gparms.dy = (this.parent as Tile).Y;
-        }
+    override printMe(node: Tile, ctx: any) {
+        console.log(" | ".repeat(node.depth()), node.name, node.X, node.Y, node.W, node.H);
     }
 
     // --- Accessors --- //
@@ -114,10 +121,22 @@ export class Tile extends _Tile {
         return this._gfx;
     }
     get X(): number {
-        return this.x + this.gfx.gparms.dx;
+        // Absolute Screen coordinates
+        if (this.parent) return this.x + Tile.cast(this.parent).X;
+        return this.x;
     }
     get Y(): number {
-        return this.y + this.gfx.gparms.dy;
+        // Absolute Screen Coordinates
+        if (this.parent) return this.y + Tile.cast(this.parent).Y;
+        return this.y;
+    }
+    get W(): number {
+        // Absolute Screen Coordinates (kinda)
+        return this.w;
+    }
+    get H(): number {
+        // Absolute Screen Coordinates (kinda)
+        return this.h;
     }
     public get playfield(): Playfield {
         return this._playfield;

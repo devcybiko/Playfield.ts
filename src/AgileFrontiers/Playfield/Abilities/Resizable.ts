@@ -1,9 +1,12 @@
 import { PlayfieldEvent } from "../PlayfieldEvent"
 import { Tile } from "../Tile";
 
+/**
+ * can be Resized
+ */
 export interface Resizable { }
 export class Resizable {
-    private _isResizable: boolean;
+    protected _isResizable: boolean;
 
     Resizable() {
         this.isResizable = true;
@@ -13,13 +16,13 @@ export class Resizable {
         return obj as Resizable;
     }
 
-    resize(w: number, h: number) {
+    resize(w: number, h: number): void {
         let thisTile = Tile.cast(this);
         thisTile.w = w;
         thisTile.h = h;
     }
 
-    relResize(dw: number, dh: number) {
+    relResize(dw: number, dh: number): void {
         let thisTile = Tile.cast(this);
         thisTile.w += dw;
         thisTile.h += dh;

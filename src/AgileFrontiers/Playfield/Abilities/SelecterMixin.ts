@@ -3,6 +3,8 @@ import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 /**
+ * controls all Selectables
+ * 
  * a child can be the "selected" child under the parent
  * only one child may be selected at a time
  * selecting a new child must unselect the currently selected child
@@ -10,9 +12,11 @@ import { Tile } from "../Tile";
  */
 export interface Selecter { };
 export class Selecter {
-    private _selectedObj: Selectable;
+    protected isSelecter: boolean;
+    protected _selectedObj: Selectable;
 
     Selecter() {
+        this.isSelecter = true;
         this._selectedObj = null;
         return this;
     }
@@ -20,10 +24,12 @@ export class Selecter {
     // --- Public Methods --- //
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
-        let treeChild = child as unknown as Tile;
-        if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
-            if (pfEvent.isPress && this._selectedObj != child) this._selectChild(pfEvent, child);
-        } 
+        let tileChild = Tile.cast(child);
+        let selectedObj = Selectable.cast(this._selectedObj);
+        if (pfEvent.isPress) {
+            let foundChild = Selectable.cast(tileChild.inBoundsChildren(pfEvent.x, pfEvent.y));
+            if (foundChild && foundChild.isSelectable) this._selectChild(pfEvent, foundChild);
+        }
     }
 
     // --- Private Methods --- //

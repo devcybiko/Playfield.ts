@@ -3,8 +3,9 @@ import { Draggable, Hoverable } from "../Playfield/Abilities";
 import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "../Utils";
 import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
 import { GfxParms } from "../Playfield/Graphics";
+import { Item } from "./Item";
 
-export class _Slider extends Tile { };
+export class _Slider extends Item { };
 export interface _Slider extends Draggable, Hoverable { };
 applyMixins(_Slider, [Draggable, Hoverable]);
 
@@ -15,26 +16,26 @@ function inormalize(r: number, multiplier: number) {
 
 export class Slider extends _Slider {
 
-    _margins = new Margins();
-    _cursor = new Rect();
-    _rcursor = new Rect();
-    _ratio = new Ratio();
-    _vslide = true;
-    _hslide = true;
-    _text = "";
-    _minW = 10;
-    _minH = 10;
+    protected _margins = new Margins();
+    protected _cursor = new Rect();
+    protected _rcursor = new Rect();
+    protected _ratio = new Ratio();
+    protected _vslide = true;
+    protected _hslide = true;
+    protected _text = "";
+    protected _minW = 10;
+    protected _minH = 10;
+    protected _cursorBorderRadius = 10;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-        this.Draggable();
-        this.Hoverable();
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
         this.cursorMove(0.5, 0.5);
-        this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
-        this.gfx.gparms.textAlign = GfxParms.CENTER;
-        this.gfx.gparms.fontSize = 12;
+        this.options.textBaseline = GfxParms.MIDDLE;
+        this.options.textAlign = GfxParms.CENTER;
+        this.options.fontSize = 12;
+        this.isDraggable = true;
     }
 
     onChange(x: number, y: number, pfEvent: PlayfieldEvent) {
@@ -42,15 +43,15 @@ export class Slider extends _Slider {
     }
 
     cursorMove(rx: number, ry: number) {
-        let x = inormalize(rx, this.dw) + this._margins.top;
-        let y = inormalize(ry, this.dh) + this._margins.left;
+        let x = inormalize(rx, this.dw) + this._margins.left;
+        let y = inormalize(ry, this.dh) + this._margins.top;
         this._cursor.move(x, y);
         this._rcursor.move(rx, ry);
     }
 
     cursorSize(rw: number, rh: number) {
-        let dw = this.w - this._margins.left - this._margins.right;
-        let dh = this.h - this._margins.top - this._margins.bottom;
+        let dw = this.W - this._margins.left - this._margins.right;
+        let dh = this.H - this._margins.top - this._margins.bottom;
         let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
         let h = inormalize(rh, dh) || this._cursor.h; // preserve old height if rh == 0
         w = Math.max(w, this._minW);
@@ -60,19 +61,32 @@ export class Slider extends _Slider {
         this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
     }
 
-    draw() {
+    _drawContainer() {
+        this.gfx.gparms.fillColor = this.options.containerColor;
+        this.gfx.rect(this.X, this.Y, this.W, this.H);
+    }
+
+    _drawCursor() {
         let c = this._cursor;
-        this.gfx.clipRect(this.x, this.y, this.w, this.h);
-        this.gfx.gparms.fillColor = "#ccc";
-        this.gfx.rect(this.x, this.y, this.w, this.h);
         if (this.isDragging) {
-            this.gfx.gparms.fillColor = "red";
+            this.gfx.gparms.fillColor = this.options.selectColor;
         } else if (this.isHovering) {
-            this.gfx.gparms.fillColor = "#c88";
+            this.gfx.gparms.fillColor = this.options.hoverColor;
         } else {
-            this.gfx.gparms.fillColor = "white";
+            this.gfx.gparms.fillColor = this.options.backgroundColor;
         }
-        this.gfx.textRect(this._text, this.x + c.x, this.y + c.y, c.w, c.h);
+        if (this._vslide && !this._hslide) {
+            this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
+            this.gfx.gparms.textAlign = GfxParms.CENTER;    
+        }
+        this.gfx.gparms.borderRadius = this._cursorBorderRadius;
+        this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
+    }
+    draw() {
+        this._updateGparms();
+        this.gfx.clipRect(this.X, this.Y, this.W, this.H);
+        this._drawContainer();
+        this._drawCursor();
         this.gfx.restore();
     }
 

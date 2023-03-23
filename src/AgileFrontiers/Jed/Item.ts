@@ -9,24 +9,25 @@ export interface _Item extends Draggable { };
 applyMixins(_Item, [Draggable]);
 
 export class Item extends _Item {
-    private _value: string;
-    private _options: ItemOptions;
+    protected _value: string;
+    protected _label: string;
+    protected _itemOptions: ItemOptions;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", text = "") {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
-        this.Draggable();
         this._value = value;
-        this._options = new ItemOptions;
-        this._options.text = text || value;
-        this._options.fontSize = h;
+        this._label = label;
+        this._itemOptions = new ItemOptions();
+        this._itemOptions.fontSize = h;
         if (w < 0) {
-            this._options.textAlign = GfxParms.RIGHT;
+            // setting the width to a negative number forces right-aligned text
+            this._itemOptions.textAlign = GfxParms.RIGHT;
             this.w = -w;
         }
     }
 
     public _updateGparms() {
-        this.gfx.gparms.fillColor = this.options.fillColor;
+        this.gfx.gparms.fillColor = this.options.backgroundColor;
         this.gfx.gparms.color = this.options.textColor;
         this.gfx.gparms.borderColor = this.options.borderColor;
         this.gfx.gparms.fontSize = this.options.fontSize;
@@ -34,18 +35,13 @@ export class Item extends _Item {
         this.gfx.gparms.fontStyle = this.options.fontStyle;
         this.gfx.gparms.textAlign = this.options.textAlign;
         this.gfx.gparms.textBaseline = this.options.textBaseline;
+        this.gfx.gparms.borderRadius = this.options.borderRadius;
     }
 
     public go() {
         throw Error("Unimplemented feature: 'go()';");
     }
 
-    _recompute() {
-        if (this.parent) {
-            this.gfx.gparms.dx = (this.parent as Tile).X + ((this.parent as any).xMargin || 0);
-            this.gfx.gparms.dy = (this.parent as Tile).Y + ((this.parent as any).yMargin || 0);
-        }
-    }
 
     // --- Accessors --- //
 
@@ -55,7 +51,13 @@ export class Item extends _Item {
     set value(_value: string) {
         this._value = _value;
     }
+    public get label(): string {
+        return this._label;
+    }
+    public set label(value: string) {
+        this._label = value;
+    }
     public get options(): ItemOptions {
-        return this._options;
+        return this._itemOptions;
     }
 }

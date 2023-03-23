@@ -30,12 +30,12 @@ export class HSplitter extends Splitter {
         this._north.x0 = this._margins.left;
         this._north.y0 = this._margins.top;
         this._north.x1 = this.x1 - this._margins.right;
-        this._north.y1 = this._hGutter.y0;
+        this._north.y1 = this._hGutter.y;
     }
 
     _southSize() {
         this._south.x0 = this._margins.left;
-        this._south.y0 = this._hGutter.y1;
+        this._south.y0 = this._hGutter.y;
         this._south.x1 = this.x1 - this._margins.right;
         this._south.y1 = this.y1 - this._margins.bottom;
     }

@@ -1,8 +1,8 @@
 export class Tree {
-    private _name: string;
-    private _fullName: string;
-    private _parent: Tree;
-    private _children: Tree[];
+    protected _name: string;
+    protected _fullName: string;
+    protected _parent: Tree;
+    protected _children: Tree[];
 
     Tree(name: string, parent?: Tree) {
         this._name = name;

@@ -1,17 +1,25 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
+/**
+ * dispatches events to children
+ */
 export interface EventDispatcher { };
 export class EventDispatcher {
-
+    protected isEventDispatcher: boolean;
+    
     EventDispatcher() {
+        this.isEventDispatcher = true;
         return this;
     }
 
     // --- Public Methods --- //
 
     dispatchEventToChildren(pfEvent: PlayfieldEvent) {
-        let thisTile = this as unknown as Tile;
+        // Note: this passes the event to every immediate child
+        //       if the children have children it is the 
+        //       responsibility of the children to pass the event down
+        let thisTile = Tile.cast(this);
         for (let _child of thisTile.children.reverse()) {
             let child = _child as any;
             if (pfEvent.isActive) this.dispatchEventToChild(pfEvent, child);
@@ -20,13 +28,13 @@ export class EventDispatcher {
 
     dispatchEventToChild(pfEvent: PlayfieldEvent, child: any, callOnEvent = true) {
         let that = this as any;
-        if (callOnEvent) child.onEvent(pfEvent, child);
-        if (!pfEvent.isActive) return;
         if (child.isHoverable) that.hoverEvent(pfEvent, child);
-        if (child.isDraggable) that.dragEvent(pfEvent, child);
         if (child.isSelectable) that.selectEvent(pfEvent, child);
         if (child.isClickable) that.clickEvent(pfEvent, child);
         if (child.isPressable) that.pressEvent(pfEvent, child);
-        if (child.isFocusable) that.editorEvent(pfEvent, child);
+        if (child.isFocusable) that.editerEvent(pfEvent, child);
+        if (child.isDraggable) that.dragEvent(pfEvent, child);
+        if (callOnEvent) child.onEvent(pfEvent, child);
+
     }
 }

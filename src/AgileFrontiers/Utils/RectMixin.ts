@@ -1,8 +1,6 @@
 import { Point } from "./PointMixin";
 
 export class Rect {
-    public static xxx = 0;
-
     private _x = 0;
     private _y = 0;
     private _w = 0; // w=1 is a single pixel
@@ -20,14 +18,10 @@ export class Rect {
         return this;
     }
 
-    RectXY(x0: number, y0: number, x1: number, y1: number) {
-        this.x0 = x0;
-        this.y0 = y0;
-        this.x1 = x1;
-        this.y1 = y1;
-        return this;
+    // Static Methods -- //
+    public static cast(obj: any): Rect {
+        return obj as unknown as Rect;
     }
-
     // --- Public Methods --- //
 
     move(x: number, y: number) {
@@ -37,14 +31,6 @@ export class Rect {
     rmove(dx: number, dy: number) {
         this.x += dx;
         this.y += dy;
-    }
-    sizeXY(x1: number, y1: number) {
-        this.x1 = x1;
-        this.y1 = y1;
-    }
-    rsizeXY(dx: number, dy: number) {
-        this.x1 += dx;
-        this.y1 += dy;
     }
     size(w: number, h: number) {
         this.w = w;
@@ -81,42 +67,20 @@ export class Rect {
     set h(n: number) {
         this._h = n;
     }
-    get x0(): number {
+    get X(): number {
+        // placeholder for absolute screen X
         return this._x;
     }
-    set x0(n: number) {
-        this._x = n;
-    }
-    get y0(): number {
+    get Y(): number {
+        // placeholder for absolute screen Y
         return this._y;
     }
-    set y0(n: number) {
-        this._y = n;
+    get W(): number {
+        // placeholder for absolute absolute W
+        return this._w;
     }
-    get x1(): number {
-        // if w == 1 then x1 == x0
-        return this.x0 + this.w - 1;
-    }
-    set x1(x1: number) {
-        // if x1 == x0 then w == 1
-        this._w = x1 - this.x0 + 1;
-    }
-    get y1(): number {
-        // if h == 1 then y1 == y0
-        return this.y0 + this.h - 1;
-    }
-    set y1(y1: number) {
-        // if y1 == y0 then h == 1
-        this._h = y1 - this.y0 + 1;
-    }
-    get p0(): Point {
-        let p0 = new Point();
-        p0.Point(this.x0, this.y0);
-        return p0;
-    }
-    get p1(): Point {
-        let p1 = new Point();
-        p1.Point(this.x1, this.y1);
-        return p1;
+    get H(): number {
+        // placeholder for absolute absolute H
+        return this._h;
     }
 }

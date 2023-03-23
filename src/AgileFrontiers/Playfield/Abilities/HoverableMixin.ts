@@ -1,9 +1,12 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
 
+/**
+ * can be hovered over
+ */
 export interface Hoverable { }
 export class Hoverable {
-    private _isHovering: boolean;
-    private _isHoverable: boolean;
+    protected _isHoverable: boolean;
+    protected _isHovering: boolean;
 
     Hoverable() {
         this.isHovering = false;
