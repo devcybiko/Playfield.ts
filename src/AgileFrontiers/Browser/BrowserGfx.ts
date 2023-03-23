@@ -28,6 +28,7 @@ var PIXEL_RATIO = (function () {
 
 function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
+    console.log("pixel ratio = " + ratio);
     var can = canvas || document.createElement("canvas");
     can.width = w * ratio;
     can.height = h * ratio;
@@ -39,15 +40,17 @@ function createHiDPICanvas(w: number, h: number, canvas?: any, ratio?: number,) 
 
 function createHiDPIFromCanvas(canvasId: string, ratio?: number,) {
     if (!ratio) { ratio = PIXEL_RATIO; }
-
+    console.log("pixel ratio = " + ratio);
     var can = document.querySelector(canvasId) as any;
-    can._ratio = ratio;
-    // can._ratio = 1.0;
+    let w = can.width;
+    let h = can.height;
+    can.origWidth = w;
+    can.origHeight = h;
+    can.width = w * ratio;
+    can.height = h * ratio;
+    can.style.width = w + "px";
+    can.style.height = h + "px";
     can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
-    can.width = can.width * ratio;
-    can.height = can.height * ratio;
-    can.style.width = can.width + "px";
-    can.style.height = can.height + "px";
     return can;
 }
 
@@ -61,8 +64,9 @@ export class BrowserGfx implements Gfx {
     }
 
     private _init(canvasId: string) {
-        this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
-        // this._canvas = createHiDPIFromCanvas(canvasId);
+        // this._canvas = createHiDPICanvas(500, 500, document.querySelector(canvasId));
+        this._canvas = createHiDPIFromCanvas(canvasId);
+        // this._canvas = document.querySelector(canvasId) as any;
         this._ctx = this._canvas.getContext("2d");
         this._gparms = new GfxParms();
         this._ctx.lineWidth = 1;
@@ -194,11 +198,11 @@ export class BrowserGfx implements Gfx {
             throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
         if (this.gparms.textBaseline === GfxParms.TOP) {
-            // do nothing
+            textY -= 1;
         } else if (this.gparms.textBaseline === GfxParms.BOTTOM) {
             textY += h - 1;
         } else if (this.gparms.textBaseline === GfxParms.MIDDLE) {
-            textY += h / 2 - 1;
+            textY += int(h / 2);
         } else {
             throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
@@ -226,7 +230,7 @@ export class BrowserGfx implements Gfx {
             if (!h) h = boundingBox.h;
         }
         this.rect(x, y, w, h);
-        this.text(msg, x + 1, y + 1, w, h);
+        this.text(msg, x, y, w, h);
     }
 
     boundingBox(msg: string): any {
@@ -253,11 +257,11 @@ export class BrowserGfx implements Gfx {
     // --- Accessors --- //
 
     get width(): number {
-        return this._canvas.width;
+        return (this._canvas as any).origWidth;
     }
 
     get height(): number {
-        return this._canvas.height;
+        return (this._canvas as any).origHeight;
     }
 
     get canvas(): HTMLCanvasElement {

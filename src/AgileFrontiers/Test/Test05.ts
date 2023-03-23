@@ -1,6 +1,5 @@
 import { Playfield, PlayfieldEvent, Tile } from "../Playfield";
 import { BrowserPlayfieldApp } from "../Browser";
-import { Splitter, VSplitter, HSplitter } from "../Playfield";
 import { Text, Label, Button, Slider, Checkbox, Group, Radio } from "../Jed";
 import { int, random } from "../Utils";
 
@@ -33,7 +32,8 @@ export class TestClass {
             }
             function showValue(rx: number, ry: number, pfEvent: PlayfieldEvent) {
                 resultLabel.value = this.name + ": " + int(rx * 100) + "," + int(ry * 100);
-                hslider.text = `${int(hslider.rx * 100)}`;
+                if (this.name[0] === 'h') this.text = `${int(this.rx * 100)}`;
+                if (this.name[0] === 'v') this.text = `${int(this.ry * 100)}`;
             }
 
             let sliderW = 30;

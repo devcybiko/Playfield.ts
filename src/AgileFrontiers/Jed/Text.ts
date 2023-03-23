@@ -39,6 +39,8 @@ export class Text extends _Text {
         gfx.clipRect(this.X, this.Y, this.W, this.H);
         let value = this.value.substring(this._left)
         if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
+        // gfx.rect(this.X, this.Y, this.W, this.H);
+        // gfx.text(value, this.X, this.Y-1, this.W, this.H);
         gfx.textRect(value, this.X, this.Y, this.W, this.H);
         this._drawCursor();
         gfx.restore();

@@ -2248,6 +2248,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         if (!ratio) {
             ratio = PIXEL_RATIO;
         }
+        console.log("pixel ratio = " + ratio);
         var can = canvas || document.createElement("canvas");
         can.width = w * ratio;
         can.height = h * ratio;
@@ -2260,14 +2261,17 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         if (!ratio) {
             ratio = PIXEL_RATIO;
         }
+        console.log("pixel ratio = " + ratio);
         var can = document.querySelector(canvasId);
-        can._ratio = ratio;
-        // can._ratio = 1.0;
+        let w = can.width;
+        let h = can.height;
+        can.origWidth = w;
+        can.origHeight = h;
+        can.width = w * ratio;
+        can.height = h * ratio;
+        can.style.width = w + "px";
+        can.style.height = h + "px";
         can.getContext("2d").setTransform(ratio, 0, 0, ratio, 0, 0);
-        can.width = can.width * ratio;
-        can.height = can.height * ratio;
-        can.style.width = can.width + "px";
-        can.style.height = can.height + "px";
         return can;
     }
     class BrowserGfx {
@@ -2276,8 +2280,9 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 this._init(canvasId);
         }
         _init(canvasId) {
-            this._canvas = createHiDPIFromCanvas(canvasId, 1.0);
-            // this._canvas = createHiDPIFromCanvas(canvasId);
+            // this._canvas = createHiDPICanvas(500, 500, document.querySelector(canvasId));
+            this._canvas = createHiDPIFromCanvas(canvasId);
+            // this._canvas = document.querySelector(canvasId) as any;
             this._ctx = this._canvas.getContext("2d");
             this._gparms = new GfxParms_2.GfxParms();
             this._ctx.lineWidth = 1;
@@ -2389,13 +2394,13 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 throw new Error("Unknown textAlign: " + this.gparms.textAlign);
             }
             if (this.gparms.textBaseline === GfxParms_2.GfxParms.TOP) {
-                // do nothing
+                textY -= 1;
             }
             else if (this.gparms.textBaseline === GfxParms_2.GfxParms.BOTTOM) {
                 textY += h - 1;
             }
             else if (this.gparms.textBaseline === GfxParms_2.GfxParms.MIDDLE) {
-                textY += h / 2 - 1;
+                textY += (0, Utils_5.int)(h / 2);
             }
             else {
                 throw new Error("Unknown textAlign: " + this.gparms.textAlign);
@@ -2419,7 +2424,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                     h = boundingBox.h;
             }
             this.rect(x, y, w, h);
-            this.text(msg, x + 1, y + 1, w, h);
+            this.text(msg, x, y, w, h);
         }
         boundingBox(msg) {
             this._ctx.font = this.gparms.font;
@@ -2440,10 +2445,10 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         }
         // --- Accessors --- //
         get width() {
-            return this._canvas.width;
+            return this._canvas.origWidth;
         }
         get height() {
-            return this._canvas.height;
+            return this._canvas.origHeight;
         }
         get canvas() {
             return this._canvas;
@@ -3194,6 +3199,8 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             let value = this.value.substring(this._left);
             if (this.isFocus)
                 value = value.replaceAll(" ", '\uA788'); // \u00B7
+            // gfx.rect(this.X, this.Y, this.W, this.H);
+            // gfx.text(value, this.X, this.Y-1, this.W, this.H);
             gfx.textRect(value, this.X, this.Y, this.W, this.H);
             this._drawCursor();
             gfx.restore();
@@ -3651,7 +3658,10 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
                 }
                 function showValue(rx, ry, pfEvent) {
                     resultLabel.value = this.name + ": " + (0, Utils_18.int)(rx * 100) + "," + (0, Utils_18.int)(ry * 100);
-                    hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
+                    if (this.name[0] === 'h')
+                        this.text = `${(0, Utils_18.int)(this.rx * 100)}`;
+                    if (this.name[0] === 'v')
+                        this.text = `${(0, Utils_18.int)(this.ry * 100)}`;
                 }
                 let sliderW = 30;
                 bigSlider = new Jed_1.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
