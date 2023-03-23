@@ -1,13 +1,13 @@
 import { Tile } from "./Tile";
-import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editor, Hoverer } from "./Abilities";
+import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
 export class Splitter extends _Splitter {
 
@@ -27,16 +27,6 @@ export class Splitter extends _Splitter {
     constructor(name: string, parent: Tile, topPercent = 0.5, leftPercent = 0.5) {
         super(name, parent, 0, 0, parent.w, parent.h);
         this.Logger();
-        this.Clicker();
-        this.Presser();
-        this.Selecter();
-        this.Dragger();
-        this.Editor();
-        this.Hoverer();
-        this.EventDispatcher();
-        this.Draggable();
-        this.Hoverable();
-        this.Resizable();
         this._margins = new Margins().Margins(2, 2, 2, 2);
         this._gutter = 7;
         this._topPercent = topPercent;

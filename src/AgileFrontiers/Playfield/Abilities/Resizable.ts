@@ -1,9 +1,12 @@
 import { PlayfieldEvent } from "../PlayfieldEvent"
 import { Tile } from "../Tile";
 
+/**
+ * can be Resized
+ */
 export interface Resizable { }
 export class Resizable {
-    private _isResizable: boolean;
+    protected _isResizable: boolean;
 
     Resizable() {
         this.isResizable = true;

@@ -1,10 +1,13 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
 
+/**
+ * can be edited
+ */
 export interface Editable { }
 export class Editable {
-    private _isEditable: boolean;
-    private _isFocus: boolean;
-    private _isFocusable: boolean;
+    protected _isEditable: boolean;
+    protected _isFocus: boolean;
+    protected _isFocusable: boolean;
 
     Editable() {
         this.isEditable = true;

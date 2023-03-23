@@ -1,8 +1,11 @@
 import { PlayfieldEvent } from "../PlayfieldEvent"
 
+/**
+ * can be clicked - but not released
+ */
 export interface Clickable { }
 export class Clickable {
-    private _isClickable: boolean;
+    protected _isClickable: boolean;
 
     Clickable() {
         this.isClickable = true;

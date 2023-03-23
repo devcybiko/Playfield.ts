@@ -1,5 +1,4 @@
 import { int } from "./Functions";
-import { Point } from "./PointMixin";
 import { Rect } from "./RectMixin";
 
 export class RelRect {
@@ -42,47 +41,48 @@ export class RelRect {
         if (that.parent) that._parent as Rect;
         return (new Rect).Rect(0,0,0,0);
     }
-    get _rect(): Rect {
-        return (this as any) as Rect;
-    }
     set x0(x0: number) {
+        let thisRect = Rect.cast(this);
         this._x0 = x0;
         if (-1 < x0 && x0 < 1) {
-            if (x0 > 0) this._rect.x = int(this._parentRect.w * x0);
-            else this._rect.x = int(this._parentRect.w * (1+ x0));
+            if (x0 > 0) thisRect.x = int(this._parentRect.w * x0);
+            else thisRect.x = int(this._parentRect.w * (1+ x0));
         } else {
-            if (x0 >= 0) this._rect.x = x0;
-            else this._rect.x = this._parentRect.w + x0;
+            if (x0 >= 0) thisRect.x = x0;
+            else thisRect.x = this._parentRect.w + x0;
         }
     }
     set y0(y0: number) {
+        let thisRect = Rect.cast(this);
         this._y0 = y0;
         if (-1 < y0 && y0 < 1) {
-            if (y0 > 0) this._rect.y = int(this._parentRect.h * y0);
-            else this._rect.y = int(this._parentRect.h * (1 + y0));
+            if (y0 > 0) thisRect.y = int(this._parentRect.h * y0);
+            else thisRect.y = int(this._parentRect.h * (1 + y0));
         } else {
-            if (y0 >= 0) this._rect.y = y0;
-            else this._rect.y = this._parentRect.h + y0;
+            if (y0 >= 0) thisRect.y = y0;
+            else thisRect.y = this._parentRect.h + y0;
         }
     }
     set x1(x1: number) {
+        let thisRect = Rect.cast(this);
         this._x1 = x1;
         if (-1 < x1 && x1 < 1) {
-            if (x1 > 0) this._rect.w = int(this._parentRect.w * x1) + 1;
-            else this._rect.w = int(this._parentRect.w * (1 + x1)) + 1;
+            if (x1 > 0) thisRect.w = int(this._parentRect.w * x1) + 1;
+            else thisRect.w = int(this._parentRect.w * (1 + x1)) + 1;
         } else {
-            if (x1 >= 0) this._rect.w = x1 - this._rect.x + 1;
-            else this._rect.w = this._parentRect.w + x1 - this._rect.x + 1;
+            if (x1 >= 0) thisRect.w = x1 - thisRect.x + 1;
+            else thisRect.w = this._parentRect.w + x1 - thisRect.x + 1;
         }
     }
     set y1(y1: number) {
+        let thisRect = Rect.cast(this);
         this._y1 = y1;
         if (-1 < y1 && y1 < 1) {
-            if (y1 > 0) this._rect.h = int(this._parentRect.h * y1) + 1;
-            else this._rect.h = int(this._parentRect.h * (1 + y1)) + 1;
+            if (y1 > 0) thisRect.h = int(this._parentRect.h * y1) + 1;
+            else thisRect.h = int(this._parentRect.h * (1 + y1)) + 1;
         } else {
-            if (y1 >= 0) this._rect.h = y1 - this._rect.y + 1;
-            else this._rect.h = this._parentRect.h + y1 - this._rect.y + 1;
+            if (y1 >= 0) thisRect.h = y1 - thisRect.y + 1;
+            else thisRect.h = this._parentRect.h + y1 - thisRect.y + 1;
         }
     }
 }

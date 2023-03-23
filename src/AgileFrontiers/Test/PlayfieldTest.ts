@@ -1,34 +1,11 @@
 import { Playfield, PlayfieldEvent, Splitter, VSplitter, HSplitter } from "../Playfield";
 import { random, int } from "../Utils";
 import { CircleTile, BoxTile } from "../Playfield/Shapes";
-import { TextItem, ButtonItem, RadioItem, LabelItem, GroupItem, CheckboxItem, Slider} from "../Jed";
+import { Text, Button, Radio, Label, Group, Checkbox, Slider} from "../Jed";
 import { BrowserPlayfieldApp, BrowserGfx, BrowserEventPump } from "../Browser";
 import { EventQueue } from "../Playfield";
 
-let resultLabel = null as any;
-let slider = null as any;
-let hslider = null as any;
-let vslider = null as any;
 
-function updateCursor(rx: number, ry: number, pfEvent: PlayfieldEvent) {
-    hslider.cursorSize(rx, 18);
-    vslider.cursorSize(0, ry);
-    slider.text = `(${int(slider.rx * 100)},${int(slider.ry*100)})`;
-    hslider.text = `${int(hslider.rx * 100)}`;
-}
-
-function showValue(rx: number, ry: number, pfEvent: PlayfieldEvent) {
-    resultLabel.value = this.name + ": " + int(rx * 100) + "," + int(ry * 100);
-    hslider.text = `${int(hslider.rx * 100)}`;
-}
-
-function printGo() {
-    resultLabel.value = "Result Label: " + this.name;
-}
-
-function printValue() {
-    (this.parent as unknown as GroupItem).label = (this.parent as unknown as GroupItem).value;
-}
 
 export class PlayfieldTest {
     _playfieldApp: BrowserPlayfieldApp;

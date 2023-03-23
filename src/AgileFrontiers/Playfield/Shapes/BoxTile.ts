@@ -13,9 +13,6 @@ export class BoxTile extends _BoxTile {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-        this.Draggable();
-        this.Selectable();
-        this.Clickable();
         this.gfx.gparms.fillColor = this._colors[2];
 
     }
@@ -46,6 +43,5 @@ export class BoxTile extends _BoxTile {
         super.onDrop(event);
     }
     onTick(): void {
-        console.log(this.name);
     }
 }

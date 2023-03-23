@@ -2,10 +2,15 @@ import { Clickable } from "./ClickableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
+/** 
+ * can control Clickable
+ */
 export interface Clicker { };
 export class Clicker {
+    protected isClicker: boolean;
 
     Clicker() {
+        this.isClicker = true;
         return this;
     }
 

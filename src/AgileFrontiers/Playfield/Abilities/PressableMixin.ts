@@ -1,13 +1,16 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
 
+/**
+ * Pressable - can be pressed and released
+ */
 export interface Pressable { }
 export class Pressable {
-    private _isPressed: boolean;
-    private _isPressable: boolean;
+    protected _isPressable: boolean;
+    protected _isPressed: boolean;
 
     Pressable() {
-        this.isPressed = false;
         this.isPressable = true;
+        this.isPressed = false;
         return this;
     }
 

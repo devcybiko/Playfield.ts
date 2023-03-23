@@ -2,18 +2,24 @@ import { Hoverable } from "./HoverableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
+/**
+ * can control Hoverable
+ */
 export interface Hoveer { };
 export class Hoverer {
+    protected isHoverer: boolean;
+
     Hoverer() {
+        this.isHoverer = true;
         return this;
     }
 
     // --- Public Methods --- //
     
     hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable) {
-        let treeChild = child as unknown as Tile;
+        let tileChild = Tile.cast(child);
         if (pfEvent.isMove) {
-            if (treeChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 if (child.isHovering) {
                     child.onHovering(pfEvent);
                 } else {

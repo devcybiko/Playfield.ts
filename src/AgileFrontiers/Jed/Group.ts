@@ -1,35 +1,26 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Logger, Rect, between, Tree } from "../Utils";
-import { Draggable, EventDispatcher, Clicker, Presser, Selecter, Dragger, Editor, Hoverer } from "../Playfield/Abilities";
+import { Draggable, EventDispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
 
-export class _GroupItem extends Item { };
-export interface _GroupItem extends Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer { };
-applyMixins(_GroupItem, [EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editor, Hoverer]);
+export class _Group extends Item { };
+export interface _Group extends Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
+applyMixins(_Group, [EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
-export class GroupItem extends _GroupItem {
+export class Group extends _Group {
     private _isGroupItem: boolean;
     private _isBoxed: boolean;
     private _xMargin: number;
     private _yMargin: number;
-    private _label;
     private _isResizing: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label);
-        this.Logger("info", false);
-        this.Clicker();
-        this.Presser();
-        this.Selecter();
-        this.Dragger();
-        this.Editor();
-        this.Hoverer();
         this.EventDispatcher();
-        this.Draggable();
         this._isBoxed = true;
         this._xMargin = 10;
         this._yMargin = 10;
-        this._label = label;
+        this.label = label;
         this._isResizing = false;
     }
 
@@ -154,21 +145,20 @@ export class GroupItem extends _GroupItem {
     public set yMargin(value: number) {
         this._yMargin = value;
     }
-    public get label() {
-        return this._label;
-    }
-    public set label(value) {
-        this._label = value;
-    }
 
     public get w(): number {
         if (!super.w) return this._computeWidthHeight().w;
         else return super.w;
     }
-
+    public set w(n: number) {
+        super.w = n;
+    }
     public get h(): number {
         if (!super.h) return this._computeWidthHeight().h;
         else return super.h;
+    }
+    public set h(n: number) {
+        super.h = n;
     }
     public get value(): string {
         let result = "";

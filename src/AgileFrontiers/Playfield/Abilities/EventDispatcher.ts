@@ -1,10 +1,15 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
+/**
+ * dispatches events to children
+ */
 export interface EventDispatcher { };
 export class EventDispatcher {
-
+    protected isEventDispatcher: boolean;
+    
     EventDispatcher() {
+        this.isEventDispatcher = true;
         return this;
     }
 

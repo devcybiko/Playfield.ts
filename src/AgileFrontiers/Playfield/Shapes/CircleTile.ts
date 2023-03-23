@@ -12,8 +12,6 @@ export class CircleTile extends _CircleTile {
     _dy = 0;
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-        this.Draggable();
-        this.Selectable();
     }
 
     // --- Overrides --- //
@@ -23,7 +21,6 @@ export class CircleTile extends _CircleTile {
         let dy = this.Y - y;
         let dr = dx * dx + dy * dy;
         let dw = this.w * this.w;
-        console.log(this.name, this.X, this.Y, x, y)
         if (dr <= dw) return this;
     }
 
@@ -45,7 +42,6 @@ export class CircleTile extends _CircleTile {
     // --- onActions --- //
 
     onGrab(dx: number, dy: number, event: any) {
-        console.log("onGrab", this.name);
         this._dx = this.X - event.x;
         this._dy = this.Y - event.y;
         this.toFront();

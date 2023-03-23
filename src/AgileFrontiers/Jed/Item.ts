@@ -10,17 +10,18 @@ applyMixins(_Item, [Draggable]);
 
 export class Item extends _Item {
     private _value: string;
-    private _item_options: ItemOptions;
+    private _label: string;
+    private _itemOptions: ItemOptions;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", text = "") {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
-        this.Draggable();
         this._value = value;
-        this._item_options = new ItemOptions();
-        this._item_options.text = text || value;
-        this._item_options.fontSize = h;
+        this._label = label;
+        this._itemOptions = new ItemOptions();
+        this._itemOptions.fontSize = h;
         if (w < 0) {
-            this._item_options.textAlign = GfxParms.RIGHT;
+            // setting the width to a negative number forces right-aligned text
+            this._itemOptions.textAlign = GfxParms.RIGHT;
             this.w = -w;
         }
     }
@@ -34,18 +35,13 @@ export class Item extends _Item {
         this.gfx.gparms.fontStyle = this.options.fontStyle;
         this.gfx.gparms.textAlign = this.options.textAlign;
         this.gfx.gparms.textBaseline = this.options.textBaseline;
+        this.gfx.gparms.borderRadius = this.options.borderRadius;
     }
 
     public go() {
         throw Error("Unimplemented feature: 'go()';");
     }
 
-    _recompute() {
-        if (this.parent) {
-            this.gfx.gparms.dx = (this.parent as Tile).X + ((this.parent as any).xMargin || 0);
-            this.gfx.gparms.dy = (this.parent as Tile).Y + ((this.parent as any).yMargin || 0);
-        }
-    }
 
     // --- Accessors --- //
 
@@ -55,7 +51,13 @@ export class Item extends _Item {
     set value(_value: string) {
         this._value = _value;
     }
+    public get label(): string {
+        return this._label;
+    }
+    public set label(value: string) {
+        this._label = value;
+    }
     public get options(): ItemOptions {
-        return this._item_options;
+        return this._itemOptions;
     }
 }

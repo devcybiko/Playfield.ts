@@ -4,8 +4,6 @@ export class ItemOptions extends TileOptions {
     fontSize = 24;
     fontFace = "sans-serif";
     fontStyle = "";
-    text = "";
-    label = "";
     textColor = "black";
     borderColor = "black";
     fillColor = "white";
@@ -13,4 +11,5 @@ export class ItemOptions extends TileOptions {
     hoverColor = "#c88";
     textAlign = "left" as CanvasTextAlign;
     textBaseline = "top" as CanvasTextBaseline;
+    borderRadius = 0;
 }

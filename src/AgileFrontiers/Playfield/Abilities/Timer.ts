@@ -1,9 +1,20 @@
+/**
+ * can be timed.
+ * 
+ * This object has its own Timer
+ * It has its own _delay value
+ * you must .start() the timer
+ * and you may .stop() the timer
+ * but you muse poll the timer with isTimedOut() or timeRemaining()
+ * - this is not asynchronous and there is no callback
+ */
+
 export interface Timer { }
 export class Timer {
-    private _isTimer: boolean;
-    private _delay: number;
-    private _lastTime: number;
-    private _timeout: number;
+    protected isTimer: boolean;
+    protected _delay: number;
+    protected _lastTime: number;
+    protected _timeout: number;
 
     Timer() {
         this.isTimer = true;
@@ -13,12 +24,6 @@ export class Timer {
         return this;
     }
 
-    public get isTimer(): boolean {
-        return this._isTimer;
-    }
-    public set isTimer(value: boolean) {
-        this._isTimer = value;
-    }
     public get delay(): number {
         return this._delay;
     }
@@ -36,9 +41,13 @@ export class Timer {
         this._timeout = 0;
     }
 
-    get isTimedOut(): boolean {
+    timeRemaining() {
         this._lastTime = Date.now();
-        return this._lastTime > this._timeout;
+        return this._timeout - this._lastTime;
+    }
+
+    get isTimedOut(): boolean {
+        return this.timeRemaining() > 0;
     }
     
 }

@@ -48,6 +48,27 @@ export class Tile extends _Tile {
         child.playfield = this._playfield;
         child._gfx = this._playfield.gfx;
         child._tabOrder = this.children.length - 1;
+        let anyChild = child as any;
+        // is this a good idea? or should we enforce objects initizing within their constructors?
+        if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
+        if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
+        if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
+        if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
+        if (anyChild.Pressable && !anyChild.isPressable) anyChild.Pressable();
+        if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
+        if (anyChild.Selectable && !anyChild.isSelectable) anyChild.Selectable();
+
+        if (anyChild.Dragger && !anyChild.isDragger) anyChild.Dragger();
+        if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
+        if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
+        if (anyChild.Presser && !anyChild.isPresser) anyChild.Presser();
+        if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
+        if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
+
+        if (anyChild.EventDispatcher && !anyChild.isEventDispatcher) anyChild.EventDispatcher();
+        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+
+        if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
     // --- Public Methods --- //
 
@@ -86,6 +107,12 @@ export class Tile extends _Tile {
     }
 
     onEvent(pfEvent: PlayfieldEvent): void {
+    }
+
+    // --- Overrides --- //
+
+    override printMe(node: Tile, ctx: any) {
+        console.log(" | ".repeat(node.depth()), node.name, node.X, node.Y, node.W, node.H);
     }
 
     // --- Accessors --- //

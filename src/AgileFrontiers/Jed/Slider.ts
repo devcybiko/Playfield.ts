@@ -27,8 +27,6 @@ export class Slider extends _Slider {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-        this.Draggable();
-        this.Hoverable();
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
         this.cursorMove(0.5, 0.5);

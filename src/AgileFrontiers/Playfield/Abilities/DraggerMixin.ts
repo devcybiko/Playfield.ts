@@ -2,14 +2,18 @@ import { Draggable } from "./DraggableMixin";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
-
+/**
+ * can control Draggable
+ */
 export interface Dragger { };
 export class Dragger {
-    private _dragObj: Draggable;
-    private _dragX: number;
-    private _dragY: number;
+    protected isDragger: boolean;
+    protected _dragObj: Draggable;
+    protected _dragX: number;
+    protected _dragY: number;
 
     Dragger() {
+        this.isDragger = true;
         this._dragObj = null;
         this._dragX = 0;
         this._dragY = 0;

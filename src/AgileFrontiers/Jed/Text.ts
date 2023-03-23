@@ -3,11 +3,11 @@ import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
-export class _TextItem extends Item { };
-export interface _TextItem extends Draggable, Editable, Timer { };
-applyMixins(_TextItem, [Draggable, Editable, Timer]);
+export class _Text extends Item { };
+export interface _Text extends Draggable, Editable, Timer { };
+applyMixins(_Text, [Draggable, Editable, Timer]);
 
-export class TextItem extends _TextItem {
+export class Text extends _Text {
     private _cursor = 0;
     private _left = 0;
     private _right = 0;
@@ -18,10 +18,6 @@ export class TextItem extends _TextItem {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value);
-        this.Draggable();
-        this.Editable();
-        this.Logger();
-        this.Timer();
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
@@ -40,10 +36,11 @@ export class TextItem extends _TextItem {
         this._updateGparms();
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
-        gfx.clipRect(this.x, this.y, this.w, this.h);
+
+        gfx.clipRect(this.X, this.Y, this.W, this.H);
         let value = this.value.substring(this._left)
         if (this.isFocus) value = value.replaceAll(" ", '\uA788'); // \u00B7
-        gfx.textRect(value, this.x, this.y, this.w, this.h);
+        gfx.textRect(value, this.X, this.Y, this.W, this.H);
         this._drawCursor();
         gfx.restore();
     }

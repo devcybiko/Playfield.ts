@@ -18,6 +18,10 @@ export class Rect {
         return this;
     }
 
+    // Static Methods -- //
+    public static cast(obj: any): Rect {
+        return obj as unknown as Rect;
+    }
     // --- Public Methods --- //
 
     move(x: number, y: number) {

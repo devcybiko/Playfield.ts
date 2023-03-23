@@ -1,20 +1,26 @@
 import {Tile} from "../Tile";
 
+/**
+ * can be Selected (mutually exclusively with other Selectables)
+ */
 export interface Selectable { }
 export class Selectable {
-    private _isSelected: boolean;
-    private _isSelectable: boolean;
+    protected _isSelectable: boolean;
+    protected _isSelected: boolean;
 
     Selectable() {
-        this._isSelected = false;
         this._isSelectable = true;
+        this._isSelected = false;
         return this;
     }
 
+    // --- static methods --- //
+    static cast(obj: any): Selectable {
+        return obj as Selectable;
+    }
+
     // --- onActions --- //
-    
     onSelect(): void {
-        console.log("onSelect", Tile.cast(this).name);
     }
 
     onUnselect(): void {
