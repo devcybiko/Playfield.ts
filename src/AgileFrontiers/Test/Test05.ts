@@ -9,7 +9,7 @@ import { int, random } from "../Utils";
  */
 
 let resultLabel = null as any;
-let slider = null as any;
+let bigSlider = null as any;
 let hslider = null as any;
 let vslider = null as any;
 
@@ -26,31 +26,33 @@ export class TestClass {
         function makeSliders(parent: Tile, x=10, y=10, dy=25) {
             function updateCursor(rx: number, ry: number, pfEvent: PlayfieldEvent) {
                 hslider.cursorSize(rx, 18);
-                vslider.cursorSize(0, ry);
-                slider.text = `(${int(slider.rx * 100)},${int(slider.ry * 100)})`;
+                vslider.cursorSize(18, ry);
+                bigSlider.text = `(${int(bigSlider.rx * 100)},${int(bigSlider.ry * 100)})`;
                 hslider.text = `${int(hslider.rx * 100)}`;
+                vslider.text = `${int(vslider.ry * 100)}`;
             }
             function showValue(rx: number, ry: number, pfEvent: PlayfieldEvent) {
                 resultLabel.value = this.name + ": " + int(rx * 100) + "," + int(ry * 100);
                 hslider.text = `${int(hslider.rx * 100)}`;
             }
 
-            slider = new Slider("bigSlider", parent, 30, 20, 200, 200);
-            slider.onChange = updateCursor.bind(slider);
+            let sliderW = 30;
+            bigSlider = new Slider("bigSlider", parent, x + sliderW* 2, y, 200, 200);
+            bigSlider.onChange = updateCursor.bind(bigSlider);
 
-            hslider = new Slider("hslider", parent, 20, parent.h - 20, parent.w - 20 - 1, 20);
+            hslider = new Slider("hslider", parent, x + sliderW, parent.h - sliderW, parent.w - x -sliderW - 1, sliderW);
             hslider.vslide = false;
             hslider.onChange = showValue.bind(hslider);
 
-            vslider = new Slider("vslider", parent, 1, 1, 20, parent.h - 20 - 1);
+            vslider = new Slider("vslider", parent, x, y, sliderW, y - sliderW - 1);
             vslider.hslide = false;
             vslider.onChange = showValue.bind(vslider);
-            return { slider, hslider, vslider };
+            return { bigSlider, hslider, vslider };
         }
 
         function makeRadioButtons(parent: Tile, x=10, y=10, dy=25) {
             function printValue() {
-                console.log("Radio Value: " + this.name);
+                resultLabel.value = ("Radio Value: " + this.name);
             }
             // let buttonGroup = new Group("ButtonGroup", parent, 10, 10, 0, 0, "Radio Buttons");
             let buttonGroup = parent;
@@ -64,7 +66,7 @@ export class TestClass {
         }
         function makeOneButton(parent: Tile, x=10, y=10, dy=25) {
             function printGo() {
-                console.log("Button Value: " + this.name);
+                resultLabel.value = ("Button Value: " + this.name);
             }
             let button1 = new Button("Button1", parent, x, y, 100, 0);
             button1.label = "Hello World";
@@ -75,7 +77,7 @@ export class TestClass {
         }
         function makeTwoButtons(parent: Tile, x=10, y=10, dy=25) {
             function printGo() {
-                console.log("Button Value: " + this.name);
+                resultLabel.value = ("Button Value: " + this.name);
             }
             let button2 = new Button("Button2", parent, x, y, 100, 0, "Button  2");
             let button3 = new Button("Button3", parent, x, y += dy, 100, 0, "Button  3");
@@ -90,7 +92,7 @@ export class TestClass {
         }
         function makeCheckboxes(parent: Tile, x=10, y=10, dy=25) {
             function printValue() {
-                console.log("Checkbox Value: " + this.name, this.value);
+                resultLabel.value = ("Checkbox Value: " + this.name, this.value);
             }
             let buttonGroup2 = parent;
             // let buttonGroup2 = new Group("ButtonGroup2", parent, 10, 10, 0, 0, "CheckBoxes");
@@ -102,16 +104,12 @@ export class TestClass {
             checkbox3.go = printValue.bind(checkbox3);
         }
         let root = this._playfield.rootTile;
-        // let splitter = new Splitter("splitter", root);
-        // let sw = new VSplitter("vsplitter", splitter.sw, 0.5);
-        // let se = new HSplitter("hsplitter", splitter.se, 0.5);
-
-        // makeSliders(splitter.ne);
         makeRadioButtons(root, 10, 10);
         makeCheckboxes(root, 250, 10);
         makeOneButton(root, 10, 100);
         makeTwoButtons(root, 10, 125);
         makeStatus(root, 250, 125);
+        makeSliders(root, 0, 250);
 
         this._playfield.rootTile.printTree();
         this._playfield.start(0);

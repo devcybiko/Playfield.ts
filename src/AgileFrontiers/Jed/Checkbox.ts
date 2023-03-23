@@ -9,7 +9,7 @@ export interface _Checkbox extends Draggable, Hoverable, Clickable { };
 applyMixins(_Checkbox, [Draggable, Clickable, Hoverable]);
 
 export class Checkbox extends _Checkbox {
-    private _isChecked = false;
+    protected _isChecked = false;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
@@ -35,7 +35,7 @@ export class Checkbox extends _Checkbox {
         this._updateGparms();
         if (this.isChecked) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
-        else gparms.fillColor = this.options.fillColor
+        else gparms.fillColor = this.options.backgroundColor
 
         let boxX = this.X;
         let boxY = this.Y;

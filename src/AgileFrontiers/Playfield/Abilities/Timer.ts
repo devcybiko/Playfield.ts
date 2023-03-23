@@ -47,7 +47,7 @@ export class Timer {
     }
 
     get isTimedOut(): boolean {
-        return this.timeRemaining() > 0;
+        return this.timeRemaining() < 0;
     }
     
 }

@@ -32,7 +32,7 @@ export class EventDispatcher {
         if (child.isSelectable) that.selectEvent(pfEvent, child);
         if (child.isClickable) that.clickEvent(pfEvent, child);
         if (child.isPressable) that.pressEvent(pfEvent, child);
-        if (child.isFocusable) that.editorEvent(pfEvent, child);
+        if (child.isFocusable) that.editerEvent(pfEvent, child);
         if (child.isDraggable) that.dragEvent(pfEvent, child);
         if (callOnEvent) child.onEvent(pfEvent, child);
 

@@ -9,9 +9,9 @@ export interface _Item extends Draggable { };
 applyMixins(_Item, [Draggable]);
 
 export class Item extends _Item {
-    private _value: string;
-    private _label: string;
-    private _itemOptions: ItemOptions;
+    protected _value: string;
+    protected _label: string;
+    protected _itemOptions: ItemOptions;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
@@ -27,7 +27,7 @@ export class Item extends _Item {
     }
 
     public _updateGparms() {
-        this.gfx.gparms.fillColor = this.options.fillColor;
+        this.gfx.gparms.fillColor = this.options.backgroundColor;
         this.gfx.gparms.color = this.options.textColor;
         this.gfx.gparms.borderColor = this.options.borderColor;
         this.gfx.gparms.fontSize = this.options.fontSize;

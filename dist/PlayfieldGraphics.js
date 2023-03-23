@@ -563,8 +563,6 @@ define("Playfield/Graphics/GfxParms", ["require", "exports"], function (require,
             this.borderColor = "black";
             this.fillColor = "white";
             this.borderRadius = 0;
-            this.dx = 0;
-            this.dy = 0;
             this.textAlign = GfxParms.LEFT;
             this.textBaseline = GfxParms.TOP;
             this.fontSize = 24;
@@ -1329,7 +1327,7 @@ define("Playfield/Abilities/Timer", ["require", "exports"], function (require, e
             return this._timeout - this._lastTime;
         }
         get isTimedOut() {
-            return this.timeRemaining() > 0;
+            return this.timeRemaining() < 0;
         }
     }
     exports.Timer = Timer;
@@ -1367,7 +1365,7 @@ define("Playfield/Abilities/EventDispatcher", ["require", "exports", "Playfield/
             if (child.isPressable)
                 that.pressEvent(pfEvent, child);
             if (child.isFocusable)
-                that.editorEvent(pfEvent, child);
+                that.editerEvent(pfEvent, child);
             if (child.isDraggable)
                 that.dragEvent(pfEvent, child);
             if (callOnEvent)
@@ -2378,10 +2376,10 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 // do nothing
             }
             else if (this.gparms.textAlign === GfxParms_2.GfxParms.RIGHT) {
-                textX += w;
+                textX + textX + w - 1;
             }
             else if (this.gparms.textAlign === GfxParms_2.GfxParms.CENTER) {
-                textX += w / 2;
+                textX += w / 2 - 1;
             }
             else {
                 throw new Error("Unknown textAlign: " + this.gparms.textAlign);
@@ -2390,21 +2388,21 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
                 // do nothing
             }
             else if (this.gparms.textBaseline === GfxParms_2.GfxParms.BOTTOM) {
-                textY += h;
+                textY += h - 1;
             }
             else if (this.gparms.textBaseline === GfxParms_2.GfxParms.MIDDLE) {
-                textY += h / 2;
+                textY += h / 2 - 1;
             }
             else {
                 throw new Error("Unknown textAlign: " + this.gparms.textAlign);
             }
             if (w) {
-                this.clipRect(x - 1, y - 1, w + 2, h + 2);
-                this._ctx.fillText(msg, textX, textY);
+                this.clipRect(x, y, w, h);
+                this._ctx.fillText(msg, xx(textX), yy(textY));
                 this.restore();
             }
             else {
-                this._ctx.fillText(msg, textX, textY);
+                this._ctx.fillText(msg, xx(textX), yy(textY));
             }
         }
         textRect(msg, x = 0, y = 0, w, h) {
@@ -2427,7 +2425,7 @@ define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms
         clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
             this.save();
             let region = new Path2D();
-            region.rect(x + this.gparms.dx - 1, y + this.gparms.dy - 1, w + 2, h + 2);
+            region.rect(xx(x - 1), yy(y - 1), w + 2, h + 2);
             this._ctx.clip(region);
         }
         save() {
@@ -2510,9 +2508,11 @@ define("Jed/ItemOptions", ["require", "exports", "Playfield/index"], function (r
             this.fontSize = 24;
             this.fontFace = "sans-serif";
             this.fontStyle = "";
+            this.backgroundColor = "white";
+            this.foregroundColor = "black";
+            this.containerColor = "gray";
             this.textColor = "black";
             this.borderColor = "black";
-            this.fillColor = "white";
             this.selectColor = "red";
             this.hoverColor = "#c88";
             this.textAlign = "left";
@@ -2546,7 +2546,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
             }
         }
         _updateGparms() {
-            this.gfx.gparms.fillColor = this.options.fillColor;
+            this.gfx.gparms.fillColor = this.options.backgroundColor;
             this.gfx.gparms.color = this.options.textColor;
             this.gfx.gparms.borderColor = this.options.borderColor;
             this.gfx.gparms.fontSize = this.options.fontSize;
@@ -2619,7 +2619,7 @@ define("Jed/Button", ["require", "exports", "Jed/Item", "Utils/index", "Playfiel
             else if (this.isHovering && !this.isPressed)
                 gparms.fillColor = this.options.hoverColor;
             else
-                gparms.fillColor = this.options.fillColor;
+                gparms.fillColor = this.options.backgroundColor;
             this.gfx.clipRect(x, y, w, h);
             this.gfx.textRect(this.label, x, y, w, h);
             this.gfx.restore();
@@ -2678,7 +2678,7 @@ define("Jed/Checkbox", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
             else if (this.isHovering)
                 gparms.fillColor = this.options.hoverColor;
             else
-                gparms.fillColor = this.options.fillColor;
+                gparms.fillColor = this.options.backgroundColor;
             let boxX = this.X;
             let boxY = this.Y;
             let boxW = gparms.fontSize;
@@ -2889,6 +2889,9 @@ define("Jed/Label", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Label = exports._Label = void 0;
+    /**
+     * Label has a value and a label which are the same value
+     */
     class _Label extends Item_4.Item {
     }
     exports._Label = _Label;
@@ -2896,9 +2899,9 @@ define("Jed/Label", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
     ;
     (0, Utils_10.applyMixins)(_Label, [Abilities_8.Draggable]);
     class Label extends _Label {
-        constructor(name, parent, x, y, w, h, value = "", label = "") {
-            super(name, parent, x, y, w, h, value, label);
-            this.label = label || value;
+        constructor(name, parent, x, y, w, h, value = "") {
+            super(name, parent, x, y, w, h, value, value);
+            this.label = value;
             this.options.fontSize = h;
             this.options.fontStyle = Graphics_4.GfxParms.BOLD;
             this._updateGparms();
@@ -2914,6 +2917,20 @@ define("Jed/Label", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
             this.gfx.clipRect(x, y, w, h);
             this.gfx.textRect(this.value, x, y, w, h);
             this.gfx.restore();
+        }
+        get label() {
+            return super.label;
+        }
+        set label(s) {
+            super.label = s;
+            super.value = s;
+        }
+        get value() {
+            return super.value;
+        }
+        set value(s) {
+            super.label = s;
+            super.value = s;
         }
     }
     exports.Label = Label;
@@ -2951,7 +2968,7 @@ define("Jed/Radio", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
             else if (this.isHovering)
                 gparms.fillColor = this.options.hoverColor;
             else
-                gparms.fillColor = this.options.fillColor;
+                gparms.fillColor = this.options.backgroundColor;
             let boxX = this.X + 1;
             let boxY = this.Y + 1;
             let boxW = this.gfx.gparms.fontSize;
@@ -2974,11 +2991,11 @@ define("Jed/Radio", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
     }
     exports.Radio = Radio;
 });
-define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abilities/index", "Utils/index", "Playfield/Graphics/index"], function (require, exports, Tile_13, Abilities_10, Utils_12, Graphics_6) {
+define("Jed/Slider", ["require", "exports", "Playfield/Abilities/index", "Utils/index", "Playfield/Graphics/index", "Jed/Item"], function (require, exports, Abilities_10, Utils_12, Graphics_6, Item_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Slider = exports._Slider = void 0;
-    class _Slider extends Tile_13.Tile {
+    class _Slider extends Item_6.Item {
     }
     exports._Slider = _Slider;
     ;
@@ -3001,25 +3018,26 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
             this._text = "";
             this._minW = 10;
             this._minH = 10;
+            this._cursorBorderRadius = 10;
             this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
             this.cursorSize(0.5, 0.5);
             this.cursorMove(0.5, 0.5);
-            this.gfx.gparms.textBaseline = Graphics_6.GfxParms.MIDDLE;
-            this.gfx.gparms.textAlign = Graphics_6.GfxParms.CENTER;
-            this.gfx.gparms.fontSize = 12;
+            this.options.textBaseline = Graphics_6.GfxParms.MIDDLE;
+            this.options.textAlign = Graphics_6.GfxParms.CENTER;
+            this.options.fontSize = 12;
         }
         onChange(x, y, pfEvent) {
             console.log("OnChange", x, y);
         }
         cursorMove(rx, ry) {
-            let x = inormalize(rx, this.dw) + this._margins.top;
-            let y = inormalize(ry, this.dh) + this._margins.left;
+            let x = inormalize(rx, this.dw) + this._margins.left;
+            let y = inormalize(ry, this.dh) + this._margins.top;
             this._cursor.move(x, y);
             this._rcursor.move(rx, ry);
         }
         cursorSize(rw, rh) {
-            let dw = this.w - this._margins.left - this._margins.right;
-            let dh = this.h - this._margins.top - this._margins.bottom;
+            let dw = this.W - this._margins.left - this._margins.right;
+            let dh = this.H - this._margins.top - this._margins.bottom;
             let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
             let h = inormalize(rh, dh) || this._cursor.h; // preserve old height if rh == 0
             w = Math.max(w, this._minW);
@@ -3028,21 +3046,33 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
             this.cursorMove(this._rcursor.x, this._rcursor.y);
             this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
         }
-        draw() {
+        _drawContainer() {
+            this.gfx.gparms.fillColor = this.options.containerColor;
+            this.gfx.rect(this.X, this.Y, this.W, this.H);
+        }
+        _drawCursor() {
             let c = this._cursor;
-            this.gfx.clipRect(this.x, this.y, this.w, this.h);
-            this.gfx.gparms.fillColor = "#ccc";
-            this.gfx.rect(this.x, this.y, this.w, this.h);
             if (this.isDragging) {
-                this.gfx.gparms.fillColor = "red";
+                this.gfx.gparms.fillColor = this.options.selectColor;
             }
             else if (this.isHovering) {
-                this.gfx.gparms.fillColor = "#c88";
+                this.gfx.gparms.fillColor = this.options.hoverColor;
             }
             else {
-                this.gfx.gparms.fillColor = "white";
+                this.gfx.gparms.fillColor = this.options.backgroundColor;
             }
-            this.gfx.textRect(this._text, this.x + c.x, this.y + c.y, c.w, c.h);
+            if (this._vslide && !this._hslide) {
+                this.gfx.gparms.textBaseline = Graphics_6.GfxParms.MIDDLE;
+                this.gfx.gparms.textAlign = Graphics_6.GfxParms.CENTER;
+            }
+            this.gfx.gparms.borderRadius = this._cursorBorderRadius;
+            this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
+        }
+        draw() {
+            this._updateGparms();
+            this.gfx.clipRect(this.X, this.Y, this.W, this.H);
+            this._drawContainer();
+            this._drawCursor();
             this.gfx.restore();
         }
         onGrab(dx, dy, pfEvent) {
@@ -3118,11 +3148,11 @@ define("Jed/Slider", ["require", "exports", "Playfield/Tile", "Playfield/Abiliti
     }
     exports.Slider = Slider;
 });
-define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_6, Utils_13, Abilities_11) {
+define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index"], function (require, exports, Item_7, Utils_13, Abilities_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Text = exports._Text = void 0;
-    class _Text extends Item_6.Item {
+    class _Text extends Item_7.Item {
     }
     exports._Text = _Text;
     ;
@@ -3145,7 +3175,6 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
             this._left = 0;
             this._right = this._computeRight();
-            this.isDraggable = true;
         }
         // --- Overrides --- //
         draw() {
@@ -3198,7 +3227,7 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             this.onFocus(pfEvent);
             return super.onGrab(dx, dy, pfEvent);
         }
-        // --- Private Methods --- //
+        // --- protected Methods --- //
         _blink() {
             if (!this.isTimedOut)
                 return;
@@ -3598,7 +3627,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
      * Jed Test
      */
     let resultLabel = null;
-    let slider = null;
+    let bigSlider = null;
     let hslider = null;
     let vslider = null;
     class TestClass {
@@ -3610,27 +3639,29 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
             function makeSliders(parent, x = 10, y = 10, dy = 25) {
                 function updateCursor(rx, ry, pfEvent) {
                     hslider.cursorSize(rx, 18);
-                    vslider.cursorSize(0, ry);
-                    slider.text = `(${(0, Utils_18.int)(slider.rx * 100)},${(0, Utils_18.int)(slider.ry * 100)})`;
+                    vslider.cursorSize(18, ry);
+                    bigSlider.text = `(${(0, Utils_18.int)(bigSlider.rx * 100)},${(0, Utils_18.int)(bigSlider.ry * 100)})`;
                     hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
+                    vslider.text = `${(0, Utils_18.int)(vslider.ry * 100)}`;
                 }
                 function showValue(rx, ry, pfEvent) {
                     resultLabel.value = this.name + ": " + (0, Utils_18.int)(rx * 100) + "," + (0, Utils_18.int)(ry * 100);
                     hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
                 }
-                slider = new Jed_1.Slider("bigSlider", parent, 30, 20, 200, 200);
-                slider.onChange = updateCursor.bind(slider);
-                hslider = new Jed_1.Slider("hslider", parent, 20, parent.h - 20, parent.w - 20 - 1, 20);
+                let sliderW = 30;
+                bigSlider = new Jed_1.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
+                bigSlider.onChange = updateCursor.bind(bigSlider);
+                hslider = new Jed_1.Slider("hslider", parent, x + sliderW, parent.h - sliderW, parent.w - x - sliderW - 1, sliderW);
                 hslider.vslide = false;
                 hslider.onChange = showValue.bind(hslider);
-                vslider = new Jed_1.Slider("vslider", parent, 1, 1, 20, parent.h - 20 - 1);
+                vslider = new Jed_1.Slider("vslider", parent, x, y, sliderW, y - sliderW - 1);
                 vslider.hslide = false;
                 vslider.onChange = showValue.bind(vslider);
-                return { slider, hslider, vslider };
+                return { bigSlider, hslider, vslider };
             }
             function makeRadioButtons(parent, x = 10, y = 10, dy = 25) {
                 function printValue() {
-                    console.log("Radio Value: " + this.name);
+                    resultLabel.value = ("Radio Value: " + this.name);
                 }
                 // let buttonGroup = new Group("ButtonGroup", parent, 10, 10, 0, 0, "Radio Buttons");
                 let buttonGroup = parent;
@@ -3644,7 +3675,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
             }
             function makeOneButton(parent, x = 10, y = 10, dy = 25) {
                 function printGo() {
-                    console.log("Button Value: " + this.name);
+                    resultLabel.value = ("Button Value: " + this.name);
                 }
                 let button1 = new Jed_1.Button("Button1", parent, x, y, 100, 0);
                 button1.label = "Hello World";
@@ -3654,7 +3685,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
             }
             function makeTwoButtons(parent, x = 10, y = 10, dy = 25) {
                 function printGo() {
-                    console.log("Button Value: " + this.name);
+                    resultLabel.value = ("Button Value: " + this.name);
                 }
                 let button2 = new Jed_1.Button("Button2", parent, x, y, 100, 0, "Button  2");
                 let button3 = new Jed_1.Button("Button3", parent, x, y += dy, 100, 0, "Button  3");
@@ -3669,7 +3700,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
             }
             function makeCheckboxes(parent, x = 10, y = 10, dy = 25) {
                 function printValue() {
-                    console.log("Checkbox Value: " + this.name, this.value);
+                    resultLabel.value = ("Checkbox Value: " + this.name, this.value);
                 }
                 let buttonGroup2 = parent;
                 // let buttonGroup2 = new Group("ButtonGroup2", parent, 10, 10, 0, 0, "CheckBoxes");
@@ -3681,15 +3712,12 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
                 checkbox3.go = printValue.bind(checkbox3);
             }
             let root = this._playfield.rootTile;
-            // let splitter = new Splitter("splitter", root);
-            // let sw = new VSplitter("vsplitter", splitter.sw, 0.5);
-            // let se = new HSplitter("hsplitter", splitter.se, 0.5);
-            // makeSliders(splitter.ne);
             makeRadioButtons(root, 10, 10);
             makeCheckboxes(root, 250, 10);
             makeOneButton(root, 10, 100);
             makeTwoButtons(root, 10, 125);
-            // makeStatus(sw.west);
+            makeStatus(root, 250, 125);
+            makeSliders(root, 0, 250);
             this._playfield.rootTile.printTree();
             this._playfield.start(0);
         }

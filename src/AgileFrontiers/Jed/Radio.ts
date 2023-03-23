@@ -33,7 +33,7 @@ export class Radio extends _Radio {
         this._updateGparms();
         if (this.isSelected) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
-        else gparms.fillColor = this.options.fillColor
+        else gparms.fillColor = this.options.backgroundColor
 
         let boxX = this.X + 1;
         let boxY = this.Y + 1 ;

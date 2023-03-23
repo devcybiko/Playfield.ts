@@ -41,7 +41,7 @@ export class Button extends _Button {
         let h = this.H || bb.h;
         if (this.isHovering && this.isPressed) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) gparms.fillColor = this.options.hoverColor;
-        else gparms.fillColor = this.options.fillColor;
+        else gparms.fillColor = this.options.backgroundColor;
 
         this.gfx.clipRect(x, y, w, h);
         this.gfx.textRect(this.label, x, y, w, h);

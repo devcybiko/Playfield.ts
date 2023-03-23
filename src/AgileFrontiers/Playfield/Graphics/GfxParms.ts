@@ -27,8 +27,6 @@ export class GfxParms {
     borderRadius = 0;
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
-    dx = 0;
-    dy = 0;
     private _font: string;
 
     constructor() {

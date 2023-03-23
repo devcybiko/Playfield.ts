@@ -8,11 +8,11 @@ export interface _Group extends Draggable, EventDispatcher, Logger, Clicker, Pre
 applyMixins(_Group, [EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
 export class Group extends _Group {
-    private _isGroupItem: boolean;
-    private _isBoxed: boolean;
-    private _xMargin: number;
-    private _yMargin: number;
-    private _isResizing: boolean;
+    protected _isGroupItem: boolean;
+    protected _isBoxed: boolean;
+    protected _xMargin: number;
+    protected _yMargin: number;
+    protected _isResizing: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label);

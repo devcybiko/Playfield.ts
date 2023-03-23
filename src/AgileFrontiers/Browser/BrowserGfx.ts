@@ -187,28 +187,28 @@ export class BrowserGfx implements Gfx {
         if (this.gparms.textAlign === GfxParms.LEFT) {
             // do nothing
         } else if (this.gparms.textAlign === GfxParms.RIGHT) {
-            textX += w;
+            textX + textX + w - 1;
         } else if (this.gparms.textAlign === GfxParms.CENTER) {
-            textX += w / 2;
+            textX += w / 2 - 1;
         } else {
             throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
         if (this.gparms.textBaseline === GfxParms.TOP) {
             // do nothing
         } else if (this.gparms.textBaseline === GfxParms.BOTTOM) {
-            textY += h;
+            textY += h - 1;
         } else if (this.gparms.textBaseline === GfxParms.MIDDLE) {
-            textY += h / 2;
+            textY += h / 2 - 1;
         } else {
             throw new Error("Unknown textAlign: " + this.gparms.textAlign)
         }
 
         if (w) {
-            this.clipRect(x - 1, y - 1, w + 2, h + 2);
-            this._ctx.fillText(msg, textX, textY);
+            this.clipRect(x, y, w, h);
+            this._ctx.fillText(msg, xx(textX), yy(textY));
             this.restore();
         } else {
-            this._ctx.fillText(msg, textX, textY);
+            this._ctx.fillText(msg, xx(textX), yy(textY));
         }
     }
 
@@ -238,7 +238,7 @@ export class BrowserGfx implements Gfx {
     clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
         this.save();
         let region = new Path2D();
-        region.rect(x + this.gparms.dx - 1, y + this.gparms.dy - 1, w + 2, h + 2);
+        region.rect(xx(x - 1), yy(y - 1), w + 2, h + 2);
         this._ctx.clip(region);
     }
 

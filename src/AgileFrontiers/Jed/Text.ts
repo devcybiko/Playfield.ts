@@ -8,13 +8,13 @@ export interface _Text extends Draggable, Editable, Timer { };
 applyMixins(_Text, [Draggable, Editable, Timer]);
 
 export class Text extends _Text {
-    private _cursor = 0;
-    private _left = 0;
-    private _right = 0;
-    private _cursorOn = true;
-    private _cursorBlinkRate = 500;
-    private _nchars = 0;
-    private _nchars2 = 0;
+    protected _cursor = 0;
+    protected _left = 0;
+    protected _right = 0;
+    protected _cursorOn = true;
+    protected _cursorBlinkRate = 500;
+    protected _nchars = 0;
+    protected _nchars2 = 0;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value);
@@ -25,7 +25,6 @@ export class Text extends _Text {
         this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
         this._left = 0;
         this._right = this._computeRight();
-        this.isDraggable = true;
     }
 
     // --- Overrides --- //
@@ -81,7 +80,7 @@ export class Text extends _Text {
         this.onFocus(pfEvent);
         return super.onGrab(dx, dy, pfEvent);
     }
-    // --- Private Methods --- //
+    // --- protected Methods --- //
 
     _blink() {
         if (!this.isTimedOut) return;
