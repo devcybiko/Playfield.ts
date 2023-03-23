@@ -111,7 +111,7 @@ export class TestClass {
         makeCheckboxes(root, 250, 10);
         makeOneButton(root, 10, 100);
         makeTwoButtons(root, 10, 125);
-        // makeStatus(sw.west);
+        makeStatus(root, 250, 125);
 
         this._playfield.rootTile.printTree();
         this._playfield.start(0);
