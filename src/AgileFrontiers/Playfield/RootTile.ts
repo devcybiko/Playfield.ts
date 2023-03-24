@@ -13,9 +13,14 @@ export class RootTile extends _RootTile {
         super(name, parent, x0, y0, x1, y1);
     }
 
+    // -- static members --- //
+    public static cast(obj: any): RootTile {
+        return obj as RootTile;
+    }
     // --- Overrides --- //
 
     draw() {
+        this._updateGparms();
         this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         this.gfx.rect(this.X, this.Y, this.W, this.H);
         this.drawChildren();

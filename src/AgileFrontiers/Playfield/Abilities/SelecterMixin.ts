@@ -32,19 +32,25 @@ export class Selecter {
         }
     }
 
+    selectChild(child: Selectable) {
+        this._selectChild(null, child);
+    }
+    unselectChild(child: Selectable) {
+        this._unselectChild(null, child);
+    }
     // --- Private Methods --- //
 
-    _selectChild(pfEvent: PlayfieldEvent, child: Selectable) {
+    _selectChild(pfEvent: PlayfieldEvent | null, child: Selectable) {
         this._unselectChild(pfEvent, child);
         this._selectedObj = child;
         child.isSelected = true;
-        child.onSelect();
+        child.onSelect(pfEvent);
     }
 
-    _unselectChild(pfEvent: PlayfieldEvent, child: Selectable) {
+    _unselectChild(pfEvent: PlayfieldEvent | null, child: Selectable) {
         if (this._selectedObj) {
             this._selectedObj.isSelected = false;
-            this._selectedObj.onUnselect();
+            this._selectedObj.onUnselect(pfEvent);
             this._selectedObj = null;
         }
     }

@@ -1,12 +1,12 @@
 import { Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
-import { Draggable, Selectable } from "../Playfield/Abilities";
+import { Draggable, Selectable, Clickable } from "../Playfield/Abilities";
 import { ItemOptions } from "./ItemOptions"
 import { GfxParms } from "../Playfield/Graphics";
 
 export class _Item extends Tile { };
-export interface _Item extends Draggable { };
-applyMixins(_Item, [Draggable]);
+export interface _Item extends Draggable, Clickable { };
+applyMixins(_Item, [Draggable, Clickable]);
 
 export class Item extends _Item {
     protected _value: string;
@@ -16,15 +16,20 @@ export class Item extends _Item {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
         this._value = value;
-        this._label = label;
+        this._label = label || value || name;
         this._itemOptions = new ItemOptions();
         if (w < 0) {
             // setting the width to a negative number forces right-aligned text
             this._itemOptions.textAlign = GfxParms.RIGHT;
             this.w = -w;
         }
+        this._updateGparms();
+        this._autoLabelWidthHeight();
     }
 
+    public static cast(obj: any): Item {
+        return obj as Item;
+    }
     public _updateGparms() {
         this.gfx.gparms.fillColor = this.options.backgroundColor;
         this.gfx.gparms.color = this.options.textColor;
@@ -37,6 +42,12 @@ export class Item extends _Item {
         this.gfx.gparms.borderRadius = this.options.borderRadius;
     }
 
+    public _autoLabelWidthHeight() {
+        this._updateGparms();
+        let bb = this.gfx.boundingBox(this.label);
+        this.w = this.w || bb.w + 2 + this.options.fontSize;
+        this.h = this.h || bb.h + 2;
+    }
     public go() {
         throw Error("Unimplemented feature: 'go()';");
     }

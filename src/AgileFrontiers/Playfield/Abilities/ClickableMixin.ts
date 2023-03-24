@@ -15,6 +15,8 @@ export class Clickable {
     
     onClick(pfEvent: PlayfieldEvent): void {
     }
+    onMenu(pfEvent: PlayfieldEvent): void {
+    }
 
     // --- Accessors --- //
 

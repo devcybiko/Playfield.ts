@@ -13,10 +13,6 @@ export class Checkbox extends _Checkbox {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
-        this.label = label || value || name;
-        let bb = this.gfx.boundingBox(label);
-        this.w = this.w || bb.w + 2 + this.options.fontSize;
-        this.h = this.h || bb.h + 2;
     }
     
     // --- Public Methods --- //
@@ -64,7 +60,7 @@ export class Checkbox extends _Checkbox {
     public get isChecked() {
         return this._isChecked;
     }
-    public set isChecked(value) {
+    public set isChecked(value: boolean) {
         this._isChecked = value;
     }
     override get value(): string {

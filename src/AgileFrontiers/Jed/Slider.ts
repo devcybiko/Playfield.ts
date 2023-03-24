@@ -26,9 +26,10 @@ export class Slider extends _Slider {
     protected _minW = 10;
     protected _minH = 10;
     protected _cursorBorderRadius = 10;
+    protected _isSliding = false;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
-        super(name, parent, x, y, w, h);
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value="", label="") {
+        super(name, parent, x, y, w, h, value, label);
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
         this.cursorMove(0.5, 0.5);
@@ -91,25 +92,32 @@ export class Slider extends _Slider {
     onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let c = this._cursor;
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
+            this._isSliding = true;
             super.onGrab(dx, dy, pfEvent);
             return true;
         }
-        return false;
+        this._isSliding = false;
+        return super.onGrab(dx, dy, pfEvent);
     }
 
     onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
-        let c = this._cursor;
-        let xmax = this.dw + this._margins.left;
-        let ymax = this.dh + this._margins.top;
-        if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
-        if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
-        this._rcursor.move(this.rx, this.ry);
-        this.onSlide(this.rx, this.ry, pfEvent);
-        pfEvent.isActive = false;
+        if (this._isSliding) {
+            let c = this._cursor;
+            let xmax = this.dw + this._margins.left;
+            let ymax = this.dh + this._margins.top;
+            if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
+            if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
+            this._rcursor.move(this.rx, this.ry);
+            this.onSlide(this.rx, this.ry, pfEvent);
+            pfEvent.isActive = false;
+        } else {
+            super.onDrag(dx, dy, pfEvent);
+        }
     }
 
     onDrop(pfEvent: PlayfieldEvent): void {
         super.onDrop(pfEvent);
+        this._isSliding = false;
     }
 
     // --- Accessors --- //

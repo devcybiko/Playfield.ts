@@ -14,6 +14,7 @@ import { Dispatchable } from "./Abilities";
 
 export class TileOptions extends Options {
     margins = (new Margins).Margins(0, 0, 0, 0);
+    backgroundColor = "white";
 }
 
 export class _Tile { };
@@ -22,15 +23,17 @@ applyMixins(_Tile, [Dispatchable, Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
-    private _playfield: Playfield;
-    private _gfx: Gfx;
-    private _options = new TileOptions;
-    private _tabOrder = 0;
+    protected _playfield: Playfield;
+    protected _gfx: Gfx;
+    protected _options = new TileOptions;
+    protected _tabOrder = 0;
+    protected _data: any;
 
     constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
         super();
         this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
         this.Tree(name, parent);
+        this._data = null;
     }
 
     // --- Static Members --- //
@@ -71,6 +74,7 @@ export class Tile extends _Tile {
     }
 
     _updateGparms() {
+        this.gfx.gparms.fillColor = this._options.backgroundColor;
     }
     // --- Public Methods --- //
 
@@ -99,6 +103,7 @@ export class Tile extends _Tile {
     }
 
     draw(): void {
+        this._updateGparms();
         this.drawChildren();
     }
 
@@ -150,4 +155,17 @@ export class Tile extends _Tile {
     public set tabOrder(value) {
         this._tabOrder = value;
     }
+    public get data(): any {
+        return this._data;
+    }
+    public set data(value: any) {
+        this._data = value;
+    }
+    public get options() {
+        return this._options;
+    }
+    public set options(value) {
+        this._options = value;
+    }
+
 }

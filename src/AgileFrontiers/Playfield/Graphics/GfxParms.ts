@@ -32,7 +32,7 @@ export class GfxParms {
     constructor() {
         this.textAlign = GfxParms.LEFT;
         this.textBaseline = GfxParms.TOP;
-        this.fontSize = 24;
+        this.fontSize = 16;
         this.fontFace = GfxParms.DEFAULT_FONT;
         this.fontStyle = "";
     }

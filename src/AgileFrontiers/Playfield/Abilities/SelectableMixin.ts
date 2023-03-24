@@ -1,3 +1,4 @@
+import { PlayfieldEvent } from "../PlayfieldEvent";
 import {Tile} from "../Tile";
 
 /**
@@ -20,10 +21,10 @@ export class Selectable {
     }
 
     // --- onActions --- //
-    onSelect(): void {
+    onSelect(pfEvent: PlayfieldEvent): void {
     }
 
-    onUnselect(): void {
+    onUnselect(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Accessors --- //

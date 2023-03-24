@@ -17,11 +17,6 @@ export class Button extends _Button {
         this.options.textAlign = GfxParms.CENTER;
         this.options.textBaseline = GfxParms.MIDDLE;
         this.options.borderRadius = 10;
-        let bb = this.gfx.boundingBox(label);
-        this.w = this.w || bb.w;
-        this.h = this.h || bb.h;
-
-        this.isDraggable = false;
     }
 
     // --- Overrides --- //
@@ -48,9 +43,6 @@ export class Button extends _Button {
     }
 
     // --- onActions --- //
-    log(msg: string) {
-        console.log(msg, this.name, this.isHovering ? "isHovering" : "not isHovering", this.isPressed ? "isPressed" : "not isPressed");
-    }
     onEnter() {
     }
     onExit() {

@@ -9,13 +9,10 @@ export interface _Radio extends Draggable, Hoverable, Selectable { };
 applyMixins(_Radio, [Draggable, Selectable, Hoverable]);
 
 export class Radio extends _Radio {
+    protected _isChecked = false;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
-        this.label = label || value || name;
-        let bb = this.gfx.boundingBox(label);
-        this.w = this.w || bb.w + 2 + this.options.fontSize;
-        this.h = this.h || bb.h + 2;
     }
     
     // --- Public Methods --- //
@@ -57,4 +54,12 @@ export class Radio extends _Radio {
     override onSelect(): boolean {
         return this.go();
     }
+    public get isChecked() {
+        return this._isChecked;
+    }
+    public set isChecked(value: boolean) {
+        this._isChecked = value;
+        this.isSelected = value;
+    }
+
 }

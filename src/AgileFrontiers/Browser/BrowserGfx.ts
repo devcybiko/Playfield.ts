@@ -206,7 +206,7 @@ export class BrowserGfx implements Gfx {
         if (this.gparms.textAlign === GfxParms.LEFT) {
             // do nothing
         } else if (this.gparms.textAlign === GfxParms.RIGHT) {
-            textX + textX + w - 1;
+            textX += w - 1;
         } else if (this.gparms.textAlign === GfxParms.CENTER) {
             textX += w / 2 - 1;
         } else {

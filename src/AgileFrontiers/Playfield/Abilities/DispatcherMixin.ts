@@ -38,7 +38,7 @@ export class Dispatcher {
     }
 
     onEvent(pfEvent: PlayfieldEvent) {
-        Dispatchable.cast(this).dispatchEvent(pfEvent, Tile.cast(this).parent);
         this.dispatchEventToChildren(pfEvent);
+        Dispatchable.cast(this).dispatchEvent(pfEvent, Tile.cast(this).parent);
     }
 }

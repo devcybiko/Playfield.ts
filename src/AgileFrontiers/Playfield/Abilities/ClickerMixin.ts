@@ -22,6 +22,11 @@ export class Clicker {
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 child.onClick(pfEvent);
             }
+        } else if (pfEvent.isMenu) {
+            let tileChild = Tile.cast(child);
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+                child.onMenu(pfEvent);
+            }
         }
     }
 }

@@ -15,20 +15,23 @@ export class Group extends _Group {
     protected _isResizing: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
-        super(name, parent, x, y, w, h, label);
+        super(name, parent, x, y, w, h, label, label);
         this._isBoxed = true;
         this._xMargin = 10;
         this._yMargin = 10;
         this.label = label;
         this._isResizing = false;
         this.options.fontSize -= 2;
+        this.isDraggable = true;
+        this.updateWidthHeight();
     }
 
     // --- Overrides --- //
 
     inBounds(dx: number, dy: number): Tile {
-        for (let _child of this.children.reverse()) {
-            let tileChild = _child as unknown as Tile;
+        this._updateGparms();
+        for (let child of this.children.reverse()) {
+            let tileChild = Tile.cast(child);
             if (tileChild.inBounds(dx, dy)) return Tile.cast(this);
         }
         if (this.isBoxed) {
@@ -41,12 +44,13 @@ export class Group extends _Group {
         return super.inBounds(dx, dy);
     }
 
-    onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEventToChildren(pfEvent);
-    }
+    // onEvent(pfEvent: PlayfieldEvent) {
+    //     this.dispatchEventToChildren(pfEvent);
+    // }
 
     onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         super.onGrab(dx, dy, pfEvent);
+        pfEvent.isActive = true;
         if (this.isBoxed && between(this.w - 10, dx, this.w + 10) && between(this.h - 10, dy, this.h + 10)) {
             this._isResizing = true;
         }
@@ -78,10 +82,10 @@ export class Group extends _Group {
         let w = super.w;
         let h = super.h;
 
-        if (w || h) return { w, h };
+        // if (w || h) return { w, h };
 
         for (let child of this.children) {
-            let rectChild = (child as unknown as Rect);
+            let rectChild = Rect.cast(child);
             let cx = rectChild.x;
             let cy = rectChild.y;
             let cw = rectChild.w;
@@ -90,23 +94,27 @@ export class Group extends _Group {
             let newH = cy + ch + this.yMargin * 2;
             if (newW > w) w = newW;
             if (newH > h) h = newH;
+            if (this.label.includes("greg")) console.log(newW, newH, w, h);
         }
         return { w, h };
     }
 
     draw() {
+        this._updateGparms();
+        this.updateWidthHeight();
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
-            this.gfx.clipRect(this.x, this.y, wh.w, wh.h);
-            this.gfx.rect(this.x, this.y, wh.w, wh.h);
+           this.gfx.clipRect(this.X, this.Y, wh.w, wh.h);
+            this.gfx.rect(this.X, this.Y, wh.w, wh.h);
             if (this.label) {
                 this.gfx.restore();
-                let labelX = this.x + this.xMargin / 2;
-                let labelY = this.y - this.gfx.gparms.fontSize / 2;
+                let labelX = this.X + this.xMargin / 2;
+                let labelY = this.Y - this.gfx.gparms.fontSize / 2;
                 let labelW = Math.min(this.gfx.boundingBox(this.label).w, wh.w - this.xMargin);
                 let labelH = this.gfx.gparms.fontSize;
                 let gfx = this.gfx.clone();
                 gfx.gparms.borderColor = "";
+                gfx.gparms.fillColor = this.options.backgroundColor;
                 this.gfx.clipRect(labelX, labelY, wh.w - this.xMargin / 2, wh.h + this.gfx.gparms.fontSize / 2)
                 gfx.rect(labelX, labelY, labelW, labelH);
                 gfx.text(this.label, labelX, labelY, labelW);
@@ -117,7 +125,7 @@ export class Group extends _Group {
             this.drawChildren();
         }
     }
-
+    
     // --- Accessors --- //
 
     public get isGroupItem(): boolean {

@@ -16,13 +16,13 @@ export class Text extends _Text {
     protected _nchars = 0;
     protected _nchars2 = 0;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
-        super(name, parent, x, y, w, h, value);
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
+        super(name, parent, x, y, w, h, value, label);
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this._updateGparms();
-        this._nchars = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w);
-        this._nchars2 = Math.ceil(this.w / this.playfield.gfx.boundingBox("m").w / 2);
+        this._nchars = Math.ceil(this.w / this.gfx.boundingBox("m").w);
+        this._nchars2 = Math.ceil(this.w / this.gfx.boundingBox("m").w / 2);
         this._left = 0;
         this._right = this._computeRight();
     }

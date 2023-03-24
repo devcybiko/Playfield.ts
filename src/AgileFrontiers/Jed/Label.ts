@@ -13,15 +13,11 @@ applyMixins(_Label, [Draggable]);
 
 export class Label extends _Label {
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
-        super(name, parent, x, y, w, h, value, value);
-        this.label = value;
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
+        super(name, parent, x, y, w, h, value, label);
         this.options.fontStyle = GfxParms.BOLD;
-        this._updateGparms();
-        let bb = this.gfx.boundingBox(this.label);
-        if (!w) this.w = bb.w;
-        if (!h) this.h = bb.h;
-        this.options.borderColor = "red";
+        this.options.textBaseline = "bottom";
+        this.options.borderColor = "";
     }
 
     // --- Overrides --- //
@@ -31,8 +27,17 @@ export class Label extends _Label {
         let y = this.Y;
         let w = this.W;
         let h = this.H;
-        this.gfx.clipRect(x, y, w, h);
-        this.gfx.textRect(this.label, x, y, w, h);
+        let rectX = x;
+        let rectY = y;
+        if (this.options.textAlign === "center") {
+            rectX -= w / 2;
+        } else if (this.options.textAlign === "right") {
+            rectX -= w;
+        }
+        this.gfx.clipRect(rectX, rectY, w, h);
+        // this.gfx.rect(rectX, rectY, w, h);
+        // this.gfx.text(this.label, rectX, y, w, h);
+        this.gfx.textRect(this.label, rectX, rectY, w, h);
         this.gfx.restore();
     }
 
