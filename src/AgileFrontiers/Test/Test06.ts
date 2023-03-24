@@ -1,10 +1,10 @@
-import { Playfield, PlayfieldEvent, Tile } from "../Playfield";
+import { Playfield, PlayfieldEvent, Tile, Splitter } from "../Playfield";
 import { BrowserPlayfieldApp } from "../Browser";
 import { Text, Label, Button, Slider, Checkbox, Group, Radio } from "../Jed";
 import { int, random } from "../Utils";
 
 /**
- * Jed Test
+ * Jed Test with Splitters and Relative Positioning
  */
 
 let resultLabel = null as any;
@@ -17,11 +17,49 @@ export class TestClass {
     _playfield: Playfield;
 
     constructor() {
-        this._playfieldApp = new BrowserPlayfieldApp("#playfield", 2.0);
+        this._playfieldApp = new BrowserPlayfieldApp("#playfield", 1.0);
         this._playfield = this._playfieldApp.playfield;
     }
     jedTest() {
-        function makeSliders(parent: Tile, x=10, y=10, dy=25) {
+        function fourLabels(name: string, parent: Splitter) {
+            new Label(name + ".NE", parent.ne, 10, 10, 0, 0, name + ".NE");
+            new Label(name + ".NW", parent.nw, 10, 10, 0, 0, name + ".NW");
+            new Label(name + ".SE", parent.se, 10, 10, 0, 0, name + ".SE");
+            new Label(name + ".SW", parent.sw, 10, 10, 0, 0, name + ".SW");
+        }
+        function makeSplitter(parent: Tile) {
+            let splitter = new Splitter("splitter", parent);
+            let splitterNE = new Splitter("splitterNE", splitter.ne);
+            let splitterNW = new Splitter("splitterNw", splitter.nw);
+            let splitterSE = new Splitter("splitterSE", splitter.se);
+            let splitterSW = new Splitter("splitterSW", splitter.sw);
+            fourLabels("label.NE", splitterNE);
+            fourLabels("label.NW", splitterNW);
+            fourLabels("label.SE", splitterSE);
+            fourLabels("label.SW", splitterSW);
+            return;
+            // new Label("label", splitterNE.ne, 0, 0, 0, 0, "Lable.NE.NE");
+            // new Label("label", splitterNE.nw, 0, 0, 0, 0, "Lable.NE.NW");
+            // new Label("label", splitterNE.se, 0, 0, 0, 0, "Lable.NE.SE");
+            // new Label("label", splitterNE.sw, 0, 0, 0, 0, "Lable.SE.SW");
+
+            // new Label("label", splitterSE.ne, 0, 0, 0, 0, "Lable.SE.NE");
+            // new Label("label", splitterSE.nw, 0, 0, 0, 0, "Lable.SE.NW");
+            // new Label("label", splitterSE.se, 0, 0, 0, 0, "Lable.SE.SE");
+            // new Label("label", splitterSE.sw, 0, 0, 0, 0, "Lable.SE.SW");
+
+            // new Label("label", splitterNW.ne, 0, 0, 0, 0, "Lable.NW.NE");
+            // new Label("label", splitterNW.nw, 0, 0, 0, 0, "Lable.NW.NW");
+            // new Label("label", splitterNW.se, 0, 0, 0, 0, "Lable.NW.SE");
+            // new Label("label", splitterNW.sw, 0, 0, 0, 0, "Lable.SW.SW");
+
+            // new Label("label", splitterSW.ne, 0, 0, 0, 0, "Lable.SW.NE");
+            // new Label("label", splitterSW.nw, 0, 0, 0, 0, "Lable.SW.NW");
+            // new Label("label", splitterSW.se, 0, 0, 0, 0, "Lable.SW.SE");
+            // new Label("label", splitterSW.sw, 0, 0, 0, 0, "Lable.SW.SW");
+
+        }
+        function makeSliders(parent: Tile, x = 10, y = 10, dy = 25) {
             function updateCursor(rx: number, ry: number, pfEvent: PlayfieldEvent) {
                 hslider.cursorSize(rx, 18);
                 vslider.cursorSize(18, ry);
@@ -36,10 +74,10 @@ export class TestClass {
             }
 
             let sliderW = 30;
-            bigSlider = new Slider("bigSlider", parent, x + sliderW* 2, y, 200, 200);
+            bigSlider = new Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
             bigSlider.onSlide = updateCursor.bind(bigSlider);
 
-            hslider = new Slider("hslider", parent, x + sliderW, parent.h - sliderW, parent.w - x -sliderW - 1, sliderW);
+            hslider = new Slider("hslider", parent, x + sliderW, parent.h - sliderW, parent.w - x - sliderW - 1, sliderW);
             hslider.vslide = false;
             hslider.onSlide = showValue.bind(hslider);
 
@@ -49,7 +87,7 @@ export class TestClass {
             return { bigSlider, hslider, vslider };
         }
 
-        function makeRadioButtons(parent: Tile, x=10, y=10, dy=25) {
+        function makeRadioButtons(parent: Tile, x = 10, y = 10, dy = 25) {
             function printValue() {
                 resultLabel.value = ("Radio Value: " + this.name);
             }
@@ -63,7 +101,7 @@ export class TestClass {
             radio3.go = printValue.bind(radio3);
             return buttonGroup;
         }
-        function makeOneButton(parent: Tile, x=10, y=10, dy=25) {
+        function makeOneButton(parent: Tile, x = 10, y = 10, dy = 25) {
             function printGo() {
                 resultLabel.value = ("Button Value: " + this.name);
             }
@@ -74,7 +112,7 @@ export class TestClass {
 
             button1.go = printGo.bind(button1);
         }
-        function makeTwoButtons(parent: Tile, x=10, y=10, dy=25) {
+        function makeTwoButtons(parent: Tile, x = 10, y = 10, dy = 25) {
             function printGo() {
                 resultLabel.value = ("Button Value: " + this.name);
             }
@@ -85,11 +123,11 @@ export class TestClass {
             button3.go = printGo.bind(button3);
             button4.go = printGo.bind(button4);
         }
-        function makeStatus(parent: Tile, x=10, y=10, dy=25) {
+        function makeStatus(parent: Tile, x = 10, y = 10, dy = 25) {
             let text1 = new Text("textitem-1", parent, x, y, 250, 14, "Hello World 1");
             resultLabel = new Label("ResultLabel", parent, x, y += dy, 200, 14, "Result Value");
         }
-        function makeCheckboxes(parent: Tile, x=10, y=10, dy=25) {
+        function makeCheckboxes(parent: Tile, x = 10, y = 10, dy = 25) {
             function printValue() {
                 resultLabel.value = ("Checkbox Value: " + this.name, this.value);
             }
@@ -103,12 +141,13 @@ export class TestClass {
             checkbox3.go = printValue.bind(checkbox3);
         }
         let root = this._playfield.rootTile;
-        makeRadioButtons(root, 10, 10);
-        makeCheckboxes(root, 250, 10);
-        makeOneButton(root, 10, 100);
-        makeTwoButtons(root, 10, 125);
-        makeStatus(root, 250, 125);
-        makeSliders(root, 0, 250);
+        // makeRadioButtons(root, 10, 10);
+        // makeCheckboxes(root, 250, 10);
+        // makeOneButton(root, 10, 100);
+        // makeTwoButtons(root, 10, 125);
+        // makeStatus(root, 250, 125);
+        // makeSliders(root, 0, 250);
+        makeSplitter(root);
 
         this._playfield.rootTile.printTree();
         this._playfield.start(0);

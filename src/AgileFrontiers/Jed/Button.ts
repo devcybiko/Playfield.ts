@@ -16,7 +16,6 @@ export class Button extends _Button {
         this.gfx.gparms.borderRadius = 10;
         this.options.textAlign = GfxParms.CENTER;
         this.options.textBaseline = GfxParms.MIDDLE;
-        this.options.fontSize = 14;
         this.options.borderRadius = 10;
         let bb = this.gfx.boundingBox(label);
         this.w = this.w || bb.w;

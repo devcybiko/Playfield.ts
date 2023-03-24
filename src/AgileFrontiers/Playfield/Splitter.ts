@@ -1,13 +1,13 @@
 import { Tile } from "./Tile";
-import { EventDispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
+import { Dispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
 export class Splitter extends _Splitter {
 
@@ -17,10 +17,10 @@ export class Splitter extends _Splitter {
     private _sw: RootTile;
     protected _gutter: number;
     protected _margins: Margins;
-    protected _hGutter: Rect;
-    protected _vGutter: Rect;
-    protected _hGutterHover: boolean;
-    protected _vGutterHover: boolean;
+    protected _hGutterRect: Rect;
+    protected _vGutterRect: Rect;
+    protected _isHGutterHovering: boolean;
+    protected _isVGutterHovering: boolean;
     protected _topPercent: number;
     protected _leftPercent: number;
 
@@ -31,15 +31,18 @@ export class Splitter extends _Splitter {
         this._gutter = 7;
         this._topPercent = topPercent;
         this._leftPercent = leftPercent;
+        this._initOnFirstCall();
+        this.Logger("log", false);
+        this.isDraggable = true;
     }
 
     _initOnFirstCall() {
         if (!this._ne) {
-            this._hGutterHover = false;
-            this._vGutterHover = false;
+            this._isHGutterHovering = false;
+            this._isVGutterHovering = false;
             this._hGutterInit(this._topPercent);
             this._vGutterInit(this._leftPercent);
-                this._ne = new RootTile("ne", this, 0, 0, 0, 0);
+            this._ne = new RootTile("ne", this, 0, 0, 0, 0);
             this._nw = new RootTile("nw", this, 0, 0, 0, 0);
             this._se = new RootTile("se", this, 0, 0, 0, 0);
             this._sw = new RootTile("sw", this, 0, 0, 0, 0);
@@ -56,26 +59,26 @@ export class Splitter extends _Splitter {
     _neSize() {
         this._ne.x0 = this._margins.left;
         this._ne.y0 = this._margins.top;
-        this._ne.x1 = this._vGutter.x - 1;
-        this._ne.y1 = this._hGutter.y - 1;
+        this._ne.x1 = this._vGutterRect.x - 1;
+        this._ne.y1 = this._hGutterRect.y - 1;
     }
 
     _seSize() {
         this._se.x0 = this._margins.left;
-        this._se.y0 = this._hGutter.y + 1;
-        this._se.x1 = this._vGutter.x - 1;
+        this._se.y0 = this._hGutterRect.y + 1;
+        this._se.x1 = this._vGutterRect.x - 1;
         this._se.y1 = this.y1 - this._margins.bottom;
     }
     _nwSize() {
-        this._nw.x0 = this._vGutter.x + 1;
+        this._nw.x0 = this._vGutterRect.x + 1;
         this._nw.y0 = this._margins.top;
         this._nw.x1 = this.x1 - this._margins.right;
-        this._nw.y1 = this._hGutter.y - 1;
+        this._nw.y1 = this._hGutterRect.y - 1;
     }
 
     _swSize() {
-        this._sw.x0 = this._vGutter.x + 1;
-        this._sw.y0 = this._hGutter.y + 1;
+        this._sw.x0 = this._vGutterRect.x + 1;
+        this._sw.y0 = this._hGutterRect.y + 1;
         this._sw.x1 = this.x1 - this._margins.right;
         this._sw.y1 = this.y1 - this._margins.bottom;
     }
@@ -83,46 +86,42 @@ export class Splitter extends _Splitter {
     _vGutterInit(leftPercent: number) {
         let x0 = int(this.w * leftPercent) - int(this._gutter / 2);
         let y0 = this._margins.top;
-        this._vGutter = (new Rect()).Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
+        this._vGutterRect = (new Rect()).Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
     }
 
     _hGutterInit(topPercent: number) {
         let x0 = 0;
         let y0 = int(this.h * topPercent) - int(this._gutter / 2);
-        this._hGutter = (new Rect()).Rect(x0, y0, this.w, this._gutter);
+        this._hGutterRect = (new Rect()).Rect(x0, y0, this.w, this._gutter);
     }
 
     _hoverGutter(gutter: Rect, pfEvent: PlayfieldEvent): boolean {
         if (!gutter) return;
-        return between(gutter.x, pfEvent.x - this.X, gutter.x) && between(gutter.y, pfEvent.y - this.Y, gutter.y);
+        return between(gutter.x, pfEvent.x - this.X, gutter.x + gutter.w) && between(gutter.y, pfEvent.y - this.Y, gutter.y + gutter.h);
     }
 
     // --- Overrides --- //
 
     addChild(child: Tile) {
         if (this.children.length < 4) super.addChild(child);
-        else throw new Error("You must use Splitter.north or Splitter.south");
-    }
-
-    _drawChild(child: RootTile) {
-        child.draw();
+        else throw new Error("You must use Splitter.ne, Splitter.nw, Splitter.se or Splitter.sw");
     }
 
     _drawGutter(gutterRect: Rect, hover: boolean) {
-        let gparms = this.gfx.gparms.clone();
+        let gparms = this.gfx.gparms;
         gparms.borderColor = "";
         if (hover) {
             gparms.fillColor = "black";
-            this.gfx.rect(gutterRect.x, gutterRect.y, gutterRect.w, gutterRect.h, gparms);
+            this.gfx.rect(this.X + gutterRect.x, this.Y + gutterRect.y, gutterRect.w, gutterRect.h);
         } else {
             gparms.fillColor = "";
             gparms.borderColor = "green";
             if (gutterRect.w > gutterRect.h) {
                 // horizontal
-                this.gfx.line(gutterRect.x, gutterRect.y + int(gutterRect.h / 2), gutterRect.x + gutterRect.w, int(gutterRect.y + gutterRect.h / 2), gparms);
+                this.gfx.line(this.X + gutterRect.x, this.Y + gutterRect.y + int(gutterRect.h / 2), this.X + gutterRect.x + gutterRect.w, this.Y + int(gutterRect.y + gutterRect.h / 2));
             } else {
                 // vertical
-                this.gfx.line(gutterRect.x + int(gutterRect.w / 2), gutterRect.y, gutterRect.x + (gutterRect.w / 2), gutterRect.y + gutterRect.h, gparms);
+                this.gfx.line(this.X + gutterRect.x + int(gutterRect.w / 2), this.Y + gutterRect.y, this.X + gutterRect.x + (gutterRect.w / 2), this.Y + gutterRect.y + gutterRect.h);
             }
         }
     }
@@ -138,35 +137,27 @@ export class Splitter extends _Splitter {
 
     override draw() {
 
-        this._drawGutter(this._hGutter, this._hGutterHover);
-        this._drawGutter(this._vGutter, this._vGutterHover);
+        this._drawGutter(this._hGutterRect, this._isHGutterHovering);
+        this._drawGutter(this._vGutterRect, this._isVGutterHovering);
 
         this.gfx.gparms.borderColor = "black";
-        this._drawChild(this.ne);
-        this._drawChild(this.se);
-        this._drawChild(this.nw);
-        this._drawChild(this.sw);
+        this.gfx.gparms.fillColor = "";
+        this.ne.draw();
+        this.se.draw();
+        this.nw.draw();
+        this.sw.draw();
     }
 
     // --- onActions --- //
 
-    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
-        if (this._hGutterHover || this._vGutterHover) {
-            this.isDragging = true;
-            pfEvent.isActive = false;
-            return true;
-        }
-        return false;
-    }
-
     override onRelResize(dw: number, dh: number, pfEvent: PlayfieldEvent) {
         let thisTile = Tile.cast(this);
         if (dw) {
-            this._hGutter.rsize(dw, 0);
+            this._hGutterRect.rsize(dw, 0);
             this._nw.onRelResize(dw, 0, pfEvent);
         }
         if (dh) {
-            this._vGutter.rsize(0, dh);
+            this._vGutterRect.rsize(0, dh);
             this._se.onRelResize(0, dh, pfEvent);
         }
         if (dw || dh) {
@@ -174,15 +165,26 @@ export class Splitter extends _Splitter {
         }
     }
 
+    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+        this.log("onGrab")
+        if (this._isHGutterHovering || this._isVGutterHovering) {
+            this.isDragging = true;
+            pfEvent.isActive = false;
+            return true;
+        }
+        return false;
+    }
+
     override onDrop(pfEvent: PlayfieldEvent) {
-        this._hGutterHover = false;
-        this._vGutterHover = false;
+        this.log("onDrop")
+        this._isHGutterHovering = false;
+        this._isVGutterHovering = false;
         super.onDrop(pfEvent);
     }
 
     override onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
-        if (this._hGutterHover) {
-            this._hGutter.rmove(0, dy);
+        if (this._isHGutterHovering) {
+            this._hGutterRect.rmove(0, dy);
             this._ne.onRelResize(0, dy, pfEvent);
             this._nw.onRelResize(0, dy, pfEvent);
             this._se.rmove(0, dy);
@@ -191,8 +193,8 @@ export class Splitter extends _Splitter {
             this._sw.onRelResize(0, -dy, pfEvent);
             pfEvent.isActive = false;
         }
-        if (this._vGutterHover) {
-            this._vGutter.rmove(dx, 0);
+        if (this._isVGutterHovering) {
+            this._vGutterRect.rmove(dx, 0);
             this._ne.onRelResize(dx, 0, pfEvent);
             this._se.onRelResize(dx, 0, pfEvent);
             this._nw.rmove(dx, 0);
@@ -204,18 +206,17 @@ export class Splitter extends _Splitter {
     }
 
     override onEvent(pfEvent: PlayfieldEvent) {
-        pfEvent.isActive = true;
-        this.dispatchEventToChild(pfEvent, this, false);
-        this.dispatchEventToChildren(pfEvent);
+        this.dispatchEvent(pfEvent, this.parent);
+        if (pfEvent.isActive) this.dispatchEventToChildren(pfEvent);
     }
 
     override onHovering(pfEvent: PlayfieldEvent) {
         if (this.isDragging) return;
-        this._hGutterHover = this._hoverGutter(this._hGutter, pfEvent);
-        this._vGutterHover = this._hoverGutter(this._vGutter, pfEvent);
+        this._isHGutterHovering = this._hoverGutter(this._hGutterRect, pfEvent);
+        this._isVGutterHovering = this._hoverGutter(this._vGutterRect, pfEvent);
     }
 
-    onExit(pfEvent: PlayfieldEvent) {
+    override onExit(pfEvent: PlayfieldEvent) {
         if (this.isDragging) return;
         super.onExit(pfEvent);
     }

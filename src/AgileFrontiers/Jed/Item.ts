@@ -18,7 +18,6 @@ export class Item extends _Item {
         this._value = value;
         this._label = label;
         this._itemOptions = new ItemOptions();
-        this._itemOptions.fontSize = h;
         if (w < 0) {
             // setting the width to a negative number forces right-aligned text
             this._itemOptions.textAlign = GfxParms.RIGHT;

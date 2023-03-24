@@ -34,12 +34,10 @@ export class Slider extends _Slider {
         this.cursorMove(0.5, 0.5);
         this.options.textBaseline = GfxParms.MIDDLE;
         this.options.textAlign = GfxParms.CENTER;
-        this.options.fontSize = 12;
         this.isDraggable = true;
     }
 
-    onChange(x: number, y: number, pfEvent: PlayfieldEvent) {
-        console.log("OnChange", x, y);
+    onSlide(rx: number, ry: number, pfEvent: PlayfieldEvent) {
     }
 
     cursorMove(rx: number, ry: number) {
@@ -106,7 +104,7 @@ export class Slider extends _Slider {
         if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
         if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
         this._rcursor.move(this.rx, this.ry);
-        this.onChange(this.rx, this.ry, pfEvent);
+        this.onSlide(this.rx, this.ry, pfEvent);
         pfEvent.isActive = false;
     }
 

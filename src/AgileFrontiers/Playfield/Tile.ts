@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-
+import { Dispatchable } from "./Abilities";
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -17,20 +17,18 @@ export class TileOptions extends Options {
 }
 
 export class _Tile { };
-export interface _Tile extends Logger, Tree, Rect, RelRect { };
-applyMixins(_Tile, [Logger, Tree, Rect, RelRect]);
+export interface _Tile extends Dispatchable, Logger, Tree, Rect, RelRect { };
+applyMixins(_Tile, [Dispatchable, Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
     private _playfield: Playfield;
     private _gfx: Gfx;
     private _options = new TileOptions;
-    private _logger: Logger;
     private _tabOrder = 0;
 
     constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
         super();
-        this.Logger();
         this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
         this.Tree(name, parent);
     }
@@ -46,11 +44,12 @@ export class Tile extends _Tile {
     addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
-        child._gfx = this._playfield.gfx;
+        child._gfx = this._playfield.gfx.clone();
         child._tabOrder = this.children.length - 1;
         let anyChild = child as any;
         // is this a good idea? or should we enforce objects initizing within their constructors?
         if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
+        if (anyChild.Dispatchable && !anyChild.isDispatchable) anyChild.Dispatchable();
         if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
         if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
         if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
@@ -58,6 +57,8 @@ export class Tile extends _Tile {
         if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
         if (anyChild.Selectable && !anyChild.isSelectable) anyChild.Selectable();
 
+        if (anyChild.Clicker && !anyChild.isClicker) anyChild.Clicker();
+        if (anyChild.Dispatcher && !anyChild.isDispatcher) anyChild.Dispatcher();
         if (anyChild.Dragger && !anyChild.isDragger) anyChild.Dragger();
         if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
         if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
@@ -65,10 +66,11 @@ export class Tile extends _Tile {
         if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
         if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
 
-        if (anyChild.EventDispatcher && !anyChild.isEventDispatcher) anyChild.EventDispatcher();
         if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
-
         if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+    }
+
+    _updateGparms() {
     }
     // --- Public Methods --- //
 
@@ -104,9 +106,6 @@ export class Tile extends _Tile {
 
     onTick(): void {
         this.children.forEach(child => (child as Tile).onTick());
-    }
-
-    onEvent(pfEvent: PlayfieldEvent): void {
     }
 
     // --- Overrides --- //

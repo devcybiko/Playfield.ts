@@ -28,15 +28,15 @@ export class VSplitter extends Splitter {
 
     _eastSize() {
         this._east.x = this._margins.left;
-        this._east.y = this._vGutter.y;
-        this._east.w = this._vGutter.x - this.x0;
+        this._east.y = this._vGutterRect.y;
+        this._east.w = this._vGutterRect.x - this.x0;
         this._east.h = this.h - this._margins.bottom;
     }
 
     _westSize() {
-        this._west.x = this._vGutter.x;
+        this._west.x = this._vGutterRect.x;
         this._west.y = this._margins.top;
-        this._west.w = this.w - this._vGutter.x - this._margins.right;
+        this._west.w = this.w - this._vGutterRect.x - this._margins.right;
         this._west.h = this.h - this._margins.bottom;
     }
 
@@ -55,10 +55,10 @@ export class VSplitter extends Splitter {
     }
 
     override draw() {
-        this._drawGutter(this._vGutter, this._vGutterHover);
+        this._drawGutter(this._vGutterRect, this._isVGutterHovering);
         this.gfx.gparms.borderColor = "black";
-        this._drawChild(this.east);
-        this._drawChild(this.west);
+        this.east.draw();
+        this.west.draw();
     }
 
     // --- onActions --- //
@@ -69,18 +69,18 @@ export class VSplitter extends Splitter {
             this._west.onRelResize(dw, 0, pfEvent);
         }
         if (dh) {
-            this._vGutter.rsize(0, dh);
+            this._vGutterRect.rsize(0, dh);
         }
     }
 
     override onDrop(pfEvent: PlayfieldEvent) {
-        this._vGutterHover = false;
+        this._isVGutterHovering = false;
         super.onDrop(pfEvent);
     }
 
     override onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
-        if (this._vGutterHover) {
-            this._vGutter.rmove(dx, 0);
+        if (this._isVGutterHovering) {
+            this._vGutterRect.rmove(dx, 0);
             this._east.onRelResize(dx, 0, pfEvent);
             this._west.rmove(dx, 0);
             this._west.onRelResize(-dx, 0, pfEvent);
@@ -89,14 +89,11 @@ export class VSplitter extends Splitter {
     }
 
     override onEvent(pfEvent: PlayfieldEvent) {
-        pfEvent.isActive = true;
-        this.dispatchEventToChild(pfEvent, this, false);
-        this.dispatchEventToChildren(pfEvent);
     }
 
     override onHovering(pfEvent: PlayfieldEvent) {
         if (this.isDragging) return;
-        this._vGutterHover = this._hoverGutter(this._vGutter, pfEvent);
+        this._isVGutterHovering = this._hoverGutter(this._vGutterRect, pfEvent);
     }
 
     onExit(pfEvent: PlayfieldEvent) {

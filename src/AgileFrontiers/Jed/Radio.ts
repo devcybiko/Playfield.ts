@@ -13,8 +13,6 @@ export class Radio extends _Radio {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
         this.label = label || value || name;
-        this.options.fontSize = 14;
-        this.gfx.gparms.fontSize = 14;
         let bb = this.gfx.boundingBox(label);
         this.w = this.w || bb.w + 2 + this.options.fontSize;
         this.h = this.h || bb.h + 2;

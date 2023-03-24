@@ -16,21 +16,24 @@ export class Label extends _Label {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "") {
         super(name, parent, x, y, w, h, value, value);
         this.label = value;
-        this.options.fontSize = h;
         this.options.fontStyle = GfxParms.BOLD;
         this._updateGparms();
+        let bb = this.gfx.boundingBox(this.label);
+        console.log(this.options);
+        if (!w) this.w = bb.w;
+        if (!h) this.h = bb.h;
+        this.options.borderColor = "red";
     }
 
     // --- Overrides --- //
     draw() {
         this._updateGparms();
-        this.gfx.gparms.borderColor = "";
         let x = this.X;
         let y = this.Y;
         let w = this.W;
         let h = this.H;
         this.gfx.clipRect(x, y, w, h);
-        this.gfx.textRect(this.value, x, y, w, h);
+        this.gfx.textRect(this.label, x, y, w, h);
         this.gfx.restore();
     }
 

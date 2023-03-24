@@ -1,11 +1,11 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Logger, Rect, between, Tree } from "../Utils";
-import { Draggable, EventDispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
+import { Draggable, Dispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
 
 export class _Group extends Item { };
-export interface _Group extends Draggable, EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_Group, [EventDispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
+export interface _Group extends Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
+applyMixins(_Group, [Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
 
 export class Group extends _Group {
     protected _isGroupItem: boolean;
@@ -16,12 +16,12 @@ export class Group extends _Group {
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label);
-        this.EventDispatcher();
         this._isBoxed = true;
         this._xMargin = 10;
         this._yMargin = 10;
         this.label = label;
         this._isResizing = false;
+        this.options.fontSize -= 2;
     }
 
     // --- Overrides --- //
@@ -101,7 +101,6 @@ export class Group extends _Group {
             this.gfx.rect(this.x, this.y, wh.w, wh.h);
             if (this.label) {
                 this.gfx.restore();
-                this.gfx.gparms.fontSize = 12;
                 let labelX = this.x + this.xMargin / 2;
                 let labelY = this.y - this.gfx.gparms.fontSize / 2;
                 let labelW = Math.min(this.gfx.boundingBox(this.label).w, wh.w - this.xMargin);

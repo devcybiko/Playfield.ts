@@ -30,12 +30,12 @@ export class HSplitter extends Splitter {
         this._north.x0 = this._margins.left;
         this._north.y0 = this._margins.top;
         this._north.x1 = this.x1 - this._margins.right;
-        this._north.y1 = this._hGutter.y;
+        this._north.y1 = this._hGutterRect.y;
     }
 
     _southSize() {
         this._south.x0 = this._margins.left;
-        this._south.y0 = this._hGutter.y;
+        this._south.y0 = this._hGutterRect.y;
         this._south.x1 = this.x1 - this._margins.right;
         this._south.y1 = this.y1 - this._margins.bottom;
     }
@@ -56,10 +56,10 @@ export class HSplitter extends Splitter {
 
     override draw() {
 
-        this._drawGutter(this._hGutter, this._hGutterHover);
+        this._drawGutter(this._hGutterRect, this._isHGutterHovering);
         this.gfx.gparms.borderColor = "black";
-        this._drawChild(this.north);
-        this._drawChild(this.south);
+        this.north.draw()
+        this.south.draw()
     }
 
     // --- onActions --- //
@@ -67,7 +67,7 @@ export class HSplitter extends Splitter {
     override onRelResize(dw: number, dh: number, pfEvent: PlayfieldEvent) {
         let thisTile = Tile.cast(this);
         if (dw) {
-            this._hGutter.rsize(dw, 0);
+            this._hGutterRect.rsize(dw, 0);
         }
         if (dh) {
             this._south.onRelResize(0, dh, pfEvent);
@@ -75,8 +75,8 @@ export class HSplitter extends Splitter {
     }
 
     override onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
-        if (this._hGutterHover) {
-            this._hGutter.rmove(0, dy);
+        if (this._isHGutterHovering) {
+            this._hGutterRect.rmove(0, dy);
             this._north.onRelResize(0, dy, pfEvent);
             this._south.rmove(0, dy);
             this._south.onRelResize(0, -dy, pfEvent);

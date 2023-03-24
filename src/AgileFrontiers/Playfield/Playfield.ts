@@ -50,17 +50,19 @@ export class Playfield extends _Playfield {
         this._delay = delay;
         this._lastTime = Date.now();
         this.redraw();
-        if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        // if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        if (this._delay >= 0) this._timerId = setInterval(this._tick.bind(this), this._delay, this);
     }
 
     stop() {
         this._delay = -1;
+        clearInterval(this._timerId);
     }
 
     // --- Private Methods --- //
 
     _tick() {
-        clearTimeout(this._timerId);
+        // clearTimeout(this._timerId);
         let now = Date.now();
         let extra = now - this._lastTime;
         this._handleEvents();
@@ -69,7 +71,7 @@ export class Playfield extends _Playfield {
         this._lastTime = Date.now();
         let delta = this._lastTime - now;
         if (this._delay && (delta > this._delay)) console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
-        this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        // this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
     _handleEvents() {

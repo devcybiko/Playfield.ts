@@ -110,9 +110,9 @@ export class BrowserGfx implements Gfx {
         x: number,
         y: number,
         w: number,
-        h: number,
-        gparms = this.gparms
+        h: number
     ) {
+        let gparms = this.gparms;
         this._ctx.beginPath();
         if (gparms.borderRadius) {
             this._ctx.roundRect(xx(x - 1), yy(y - 1), w, h, gparms.borderRadius);
