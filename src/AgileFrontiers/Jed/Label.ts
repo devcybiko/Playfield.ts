@@ -19,7 +19,6 @@ export class Label extends _Label {
         this.options.fontStyle = GfxParms.BOLD;
         this._updateGparms();
         let bb = this.gfx.boundingBox(this.label);
-        console.log(this.options);
         if (!w) this.w = bb.w;
         if (!h) this.h = bb.h;
         this.options.borderColor = "red";

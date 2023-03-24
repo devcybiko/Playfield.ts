@@ -11,11 +11,12 @@ applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Dispatcher, Logger, Cli
 
 export class Splitter extends _Splitter {
 
-    private _ne: RootTile;
-    private _nw: RootTile;
-    private _se: RootTile;
-    private _sw: RootTile;
-    protected _gutter: number;
+    protected _ne: RootTile;
+    protected _nw: RootTile;
+    protected _se: RootTile;
+    protected _sw: RootTile;
+    protected _hGutterSize: number;
+    protected _vGutterSize: number;
     protected _margins: Margins;
     protected _hGutterRect: Rect;
     protected _vGutterRect: Rect;
@@ -24,15 +25,17 @@ export class Splitter extends _Splitter {
     protected _topPercent: number;
     protected _leftPercent: number;
 
-    constructor(name: string, parent: Tile, topPercent = 0.5, leftPercent = 0.5) {
+    constructor(name: string, parent: Tile, topPercent = 0.5, leftPercent = 0.5, hGutterSize = 15, vGutterSize = 15) {
         super(name, parent, 0, 0, parent.w, parent.h);
         this.Logger();
         this._margins = new Margins().Margins(2, 2, 2, 2);
-        this._gutter = 7;
+        this._hGutterSize = hGutterSize;
+        this._vGutterSize = vGutterSize;
+        if (topPercent === 0 || topPercent === 1) this._hGutterSize = 0;
+        if (leftPercent === 0 || leftPercent === 1) this._vGutterSize = 0;
         this._topPercent = topPercent;
         this._leftPercent = leftPercent;
         this._initOnFirstCall();
-        this.Logger("log", false);
         this.isDraggable = true;
     }
 
@@ -59,40 +62,47 @@ export class Splitter extends _Splitter {
     _neSize() {
         this._ne.x0 = this._margins.left;
         this._ne.y0 = this._margins.top;
-        this._ne.x1 = this._vGutterRect.x - 1;
-        this._ne.y1 = this._hGutterRect.y - 1;
+        this._ne.x1 = this._vGutterRect.x - this._margins.right;
+        this._ne.y1 = Math.max(0, this._hGutterRect.y - this._margins.bottom);
     }
 
     _seSize() {
         this._se.x0 = this._margins.left;
-        this._se.y0 = this._hGutterRect.y + 1;
-        this._se.x1 = this._vGutterRect.x - 1;
+        this._se.y0 = this._hGutterRect.y + this._hGutterRect.h + 1;
+        this._se.x1 = this._vGutterRect.x - this._margins.right;
         this._se.y1 = this.y1 - this._margins.bottom;
     }
     _nwSize() {
-        this._nw.x0 = this._vGutterRect.x + 1;
+        this._nw.x0 = this._vGutterRect.x + this._vGutterRect.w + this._margins.right;
         this._nw.y0 = this._margins.top;
-        this._nw.x1 = this.x1 - this._margins.right;
-        this._nw.y1 = this._hGutterRect.y - 1;
+        this._nw.x1 = Math.max(0, this.x1 - this._margins.right);
+        this._nw.y1 = Math.max(0, this._hGutterRect.y - this._margins.bottom);
     }
 
     _swSize() {
-        this._sw.x0 = this._vGutterRect.x + 1;
-        this._sw.y0 = this._hGutterRect.y + 1;
-        this._sw.x1 = this.x1 - this._margins.right;
-        this._sw.y1 = this.y1 - this._margins.bottom;
+        this._sw.x0 = this._vGutterRect.x + this._vGutterRect.w + this._margins.right;
+        this._sw.y0 = this._hGutterRect.y + this._hGutterRect.h + 1;
+        this._sw.x1 = Math.max(0, this.x1 - this._margins.right);
+        this._sw.y1 = Math.max(0, this.y1 - this._margins.bottom);
     }
 
     _vGutterInit(leftPercent: number) {
-        let x0 = int(this.w * leftPercent) - int(this._gutter / 2);
-        let y0 = this._margins.top;
-        this._vGutterRect = (new Rect()).Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
+        if (this._vGutterSize === 0) {
+            this._vGutterRect = (new Rect()).Rect(this.w * leftPercent, 0, 0, this.h);
+        } else {
+            let x0 = int(this.w * leftPercent) - int(this._hGutterSize / 2);
+            let y0 = this._margins.top;
+            this._vGutterRect = (new Rect()).Rect(x0, y0, this._vGutterSize, this.h - this._margins.top - this._margins.bottom);
+        }
     }
 
     _hGutterInit(topPercent: number) {
+        if (this._hGutterSize === 0) {
+            this._hGutterRect = (new Rect().Rect(0, this.h * topPercent, this.w, 0));
+        }
         let x0 = 0;
-        let y0 = int(this.h * topPercent) - int(this._gutter / 2);
-        this._hGutterRect = (new Rect()).Rect(x0, y0, this.w, this._gutter);
+        let y0 = int(this.h * topPercent) - int(this._hGutterSize / 2);
+        this._hGutterRect = (new Rect()).Rect(x0, y0, this.w, this._hGutterSize);
     }
 
     _hoverGutter(gutter: Rect, pfEvent: PlayfieldEvent): boolean {
@@ -108,6 +118,8 @@ export class Splitter extends _Splitter {
     }
 
     _drawGutter(gutterRect: Rect, hover: boolean) {
+        if (gutterRect.x < 0) return;
+        if (gutterRect.y < 0) return;
         let gparms = this.gfx.gparms;
         gparms.borderColor = "";
         if (hover) {

@@ -1635,15 +1635,19 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
     ;
     (0, Utils_4.applyMixins)(_Splitter, [Abilities_4.Resizable, Abilities_4.Hoverable, Abilities_4.Draggable, Abilities_3.Dispatcher, Utils_4.Logger, Abilities_3.Clicker, Abilities_3.Presser, Abilities_3.Selecter, Abilities_3.Dragger, Abilities_3.Editer, Abilities_3.Hoverer]);
     class Splitter extends _Splitter {
-        constructor(name, parent, topPercent = 0.5, leftPercent = 0.5) {
+        constructor(name, parent, topPercent = 0.5, leftPercent = 0.5, hGutterSize = 15, vGutterSize = 15) {
             super(name, parent, 0, 0, parent.w, parent.h);
             this.Logger();
             this._margins = new Utils_4.Margins().Margins(2, 2, 2, 2);
-            this._gutter = 7;
+            this._hGutterSize = hGutterSize;
+            this._vGutterSize = vGutterSize;
+            if (topPercent === 0 || topPercent === 1)
+                this._hGutterSize = 0;
+            if (leftPercent === 0 || leftPercent === 1)
+                this._vGutterSize = 0;
             this._topPercent = topPercent;
             this._leftPercent = leftPercent;
             this._initOnFirstCall();
-            this.Logger("log", false);
             this.isDraggable = true;
         }
         _initOnFirstCall() {
@@ -1668,36 +1672,44 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
         _neSize() {
             this._ne.x0 = this._margins.left;
             this._ne.y0 = this._margins.top;
-            this._ne.x1 = this._vGutterRect.x - 1;
-            this._ne.y1 = this._hGutterRect.y - 1;
+            this._ne.x1 = this._vGutterRect.x - this._margins.right;
+            this._ne.y1 = Math.max(0, this._hGutterRect.y - this._margins.bottom);
         }
         _seSize() {
             this._se.x0 = this._margins.left;
-            this._se.y0 = this._hGutterRect.y + 1;
-            this._se.x1 = this._vGutterRect.x - 1;
+            this._se.y0 = this._hGutterRect.y + this._hGutterRect.h + 1;
+            this._se.x1 = this._vGutterRect.x - this._margins.right;
             this._se.y1 = this.y1 - this._margins.bottom;
         }
         _nwSize() {
-            this._nw.x0 = this._vGutterRect.x + 1;
+            this._nw.x0 = this._vGutterRect.x + this._vGutterRect.w + this._margins.right;
             this._nw.y0 = this._margins.top;
-            this._nw.x1 = this.x1 - this._margins.right;
-            this._nw.y1 = this._hGutterRect.y - 1;
+            this._nw.x1 = Math.max(0, this.x1 - this._margins.right);
+            this._nw.y1 = Math.max(0, this._hGutterRect.y - this._margins.bottom);
         }
         _swSize() {
-            this._sw.x0 = this._vGutterRect.x + 1;
-            this._sw.y0 = this._hGutterRect.y + 1;
-            this._sw.x1 = this.x1 - this._margins.right;
-            this._sw.y1 = this.y1 - this._margins.bottom;
+            this._sw.x0 = this._vGutterRect.x + this._vGutterRect.w + this._margins.right;
+            this._sw.y0 = this._hGutterRect.y + this._hGutterRect.h + 1;
+            this._sw.x1 = Math.max(0, this.x1 - this._margins.right);
+            this._sw.y1 = Math.max(0, this.y1 - this._margins.bottom);
         }
         _vGutterInit(leftPercent) {
-            let x0 = (0, Utils_4.int)(this.w * leftPercent) - (0, Utils_4.int)(this._gutter / 2);
-            let y0 = this._margins.top;
-            this._vGutterRect = (new Utils_4.Rect()).Rect(x0, y0, this._gutter, this.h - this._margins.top - this._margins.bottom);
+            if (this._vGutterSize === 0) {
+                this._vGutterRect = (new Utils_4.Rect()).Rect(this.w * leftPercent, 0, 0, this.h);
+            }
+            else {
+                let x0 = (0, Utils_4.int)(this.w * leftPercent) - (0, Utils_4.int)(this._hGutterSize / 2);
+                let y0 = this._margins.top;
+                this._vGutterRect = (new Utils_4.Rect()).Rect(x0, y0, this._vGutterSize, this.h - this._margins.top - this._margins.bottom);
+            }
         }
         _hGutterInit(topPercent) {
+            if (this._hGutterSize === 0) {
+                this._hGutterRect = (new Utils_4.Rect().Rect(0, this.h * topPercent, this.w, 0));
+            }
             let x0 = 0;
-            let y0 = (0, Utils_4.int)(this.h * topPercent) - (0, Utils_4.int)(this._gutter / 2);
-            this._hGutterRect = (new Utils_4.Rect()).Rect(x0, y0, this.w, this._gutter);
+            let y0 = (0, Utils_4.int)(this.h * topPercent) - (0, Utils_4.int)(this._hGutterSize / 2);
+            this._hGutterRect = (new Utils_4.Rect()).Rect(x0, y0, this.w, this._hGutterSize);
         }
         _hoverGutter(gutter, pfEvent) {
             if (!gutter)
@@ -1712,6 +1724,10 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
                 throw new Error("You must use Splitter.ne, Splitter.nw, Splitter.se or Splitter.sw");
         }
         _drawGutter(gutterRect, hover) {
+            if (gutterRect.x < 0)
+                return;
+            if (gutterRect.y < 0)
+                return;
             let gparms = this.gfx.gparms;
             gparms.borderColor = "";
             if (hover) {
@@ -2960,7 +2976,6 @@ define("Jed/Label", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
             this.options.fontStyle = Graphics_4.GfxParms.BOLD;
             this._updateGparms();
             let bb = this.gfx.boundingBox(this.label);
-            console.log(this.options);
             if (!w)
                 this.w = bb.w;
             if (!h)
@@ -3501,37 +3516,7 @@ define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTil
     Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
     Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
 });
-define("Test/PlayfieldTest", ["require", "exports", "Utils/index", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Utils_16, Shapes_1, Browser_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayfieldTest = void 0;
-    class PlayfieldTest {
-        constructor() {
-            this._playfieldApp = new Browser_1.BrowserPlayfieldApp();
-            this._playfield = this._playfieldApp.playfield;
-        }
-        boxTest() {
-            this._playfield.gfx.rect(10, 10, 100, 100);
-        }
-        tenthousandTestTile() {
-        }
-        shapeTest() {
-            let parent = this._playfield.rootTile;
-            // for (let i=0; i<10; i++) {
-            //     for(let j=0; j<1000; j++) {
-            //         let boxTile = new BoxTile("box", parent, random(0,1000), random(0,1000), 50, 50);
-            //     }
-            // }
-            let boxTile = new Shapes_1.BoxTile("box", parent, (0, Utils_16.random)(0, 1000), (0, Utils_16.random)(0, 1000), 50, 50);
-            let circleTile = new Shapes_1.CircleTile("circle", parent, 50, 50, 50, 50);
-            let boxTile2 = new Shapes_1.BoxTile("box", parent, 200, 200, 50, 50);
-            let fps = 16;
-            this._playfield.start(Math.floor(1 / fps * 1000));
-        }
-    }
-    exports.PlayfieldTest = PlayfieldTest;
-});
-define("Test/Test01", ["require", "exports", "Browser/index"], function (require, exports, Browser_2) {
+define("Test/Test01", ["require", "exports", "Browser/index"], function (require, exports, Browser_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3542,7 +3527,7 @@ define("Test/Test01", ["require", "exports", "Browser/index"], function (require
      */
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_2.BrowserPlayfieldApp();
+            this._playfieldApp = new Browser_1.BrowserPlayfieldApp();
             this._playfield = this._playfieldApp.playfield;
         }
         run() {
@@ -3551,7 +3536,7 @@ define("Test/Test01", ["require", "exports", "Browser/index"], function (require
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test02", ["require", "exports", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Shapes_2, Browser_3) {
+define("Test/Test02", ["require", "exports", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Shapes_1, Browser_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3564,13 +3549,13 @@ define("Test/Test02", ["require", "exports", "Playfield/Shapes/index", "Browser/
      */
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_3.BrowserPlayfieldApp();
+            this._playfieldApp = new Browser_2.BrowserPlayfieldApp();
             this._playfield = this._playfieldApp.playfield;
         }
         circleTileTest() {
             let parent = this._playfield.rootTile;
-            let circleTile = new Shapes_2.CircleTile("circle", parent, parent.w / 2, parent.h / 2, 50, 50);
-            let boxTile = new Shapes_2.BoxTile("box", parent, 10, 10, 50, 50);
+            let circleTile = new Shapes_1.CircleTile("circle", parent, parent.w / 2, parent.h / 2, 50, 50);
+            let boxTile = new Shapes_1.BoxTile("box", parent, 10, 10, 50, 50);
             this._playfield.start();
         }
         run() {
@@ -3579,7 +3564,7 @@ define("Test/Test02", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Shapes_3, Browser_4) {
+define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Shapes_2, Browser_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3591,21 +3576,21 @@ define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/
      */
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_4.BrowserPlayfieldApp();
+            this._playfieldApp = new Browser_3.BrowserPlayfieldApp();
             this._playfield = this._playfieldApp.playfield;
         }
         circleTileTest() {
             let parent = this._playfield.rootTile;
-            let lcircle = new Shapes_3.CircleTile("left", parent, 175, +75, 50, 50);
-            let rcircle = new Shapes_3.CircleTile("right", parent, +75, +75, 50, 50);
+            let lcircle = new Shapes_2.CircleTile("left", parent, 175, +75, 50, 50);
+            let rcircle = new Shapes_2.CircleTile("right", parent, +75, +75, 50, 50);
             lcircle.gfx.gparms.fillColor = "red";
             rcircle.gfx.gparms.fillColor = "red";
-            let llcircle = new Shapes_3.CircleTile("left", lcircle, 150, 50, 50, 50);
-            let lrcircle = new Shapes_3.CircleTile("right", lcircle, +50, 50, 50, 50);
+            let llcircle = new Shapes_2.CircleTile("left", lcircle, 150, 50, 50, 50);
+            let lrcircle = new Shapes_2.CircleTile("right", lcircle, +50, 50, 50, 50);
             llcircle.gfx.gparms.fillColor = "blue";
             lrcircle.gfx.gparms.fillColor = "blue";
-            let rlcircle = new Shapes_3.CircleTile("left", rcircle, 150, 50, 50, 50);
-            let rrcircle = new Shapes_3.CircleTile("right", rcircle, +50, 50, 50, 50);
+            let rlcircle = new Shapes_2.CircleTile("left", rcircle, 150, 50, 50, 50);
+            let rrcircle = new Shapes_2.CircleTile("right", rcircle, +50, 50, 50, 50);
             rlcircle.gfx.gparms.fillColor = "green";
             rrcircle.gfx.gparms.fillColor = "green";
             this._playfield.start();
@@ -3616,7 +3601,7 @@ define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/index", "Utils/index"], function (require, exports, Shapes_4, Browser_5, Utils_17) {
+define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/index", "Utils/index"], function (require, exports, Shapes_3, Browser_4, Utils_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3630,7 +3615,7 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_5.BrowserPlayfieldApp();
+            this._playfieldApp = new Browser_4.BrowserPlayfieldApp();
             this._playfield = this._playfieldApp.playfield;
         }
         tenthousandTestTile() {
@@ -3638,12 +3623,12 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
             let max = 1;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_17.random)(0, this._playfield.w);
-                    let y = (0, Utils_17.random)(0, this._playfield.h);
-                    let r = (0, Utils_17.random)(10, 50);
-                    let DX = (0, Utils_17.random)(-10, 10);
-                    let DY = (0, Utils_17.random)(-10, 10);
-                    let box = new Shapes_4.BoxTile("box", parent, x, y, r, r);
+                    let x = (0, Utils_16.random)(0, this._playfield.w);
+                    let y = (0, Utils_16.random)(0, this._playfield.h);
+                    let r = (0, Utils_16.random)(10, 50);
+                    let DX = (0, Utils_16.random)(-10, 10);
+                    let DY = (0, Utils_16.random)(-10, 10);
+                    let box = new Shapes_3.BoxTile("box", parent, x, y, r, r);
                     box.onTick = bounce.bind(box);
                     box.isSelected = true;
                     box.DX = DX;
@@ -3679,7 +3664,7 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Browser_6, Jed_1, Utils_18) {
+define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Browser_5, Jed_1, Utils_17) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3692,7 +3677,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
     let vslider = null;
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_6.BrowserPlayfieldApp("#playfield", 2.0);
+            this._playfieldApp = new Browser_5.BrowserPlayfieldApp("#playfield", 2.0);
             this._playfield = this._playfieldApp.playfield;
         }
         jedTest() {
@@ -3700,16 +3685,16 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
                 function updateCursor(rx, ry, pfEvent) {
                     hslider.cursorSize(rx, 18);
                     vslider.cursorSize(18, ry);
-                    bigSlider.text = `(${(0, Utils_18.int)(bigSlider.rx * 100)},${(0, Utils_18.int)(bigSlider.ry * 100)})`;
-                    hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
-                    vslider.text = `${(0, Utils_18.int)(vslider.ry * 100)}`;
+                    bigSlider.text = `(${(0, Utils_17.int)(bigSlider.rx * 100)},${(0, Utils_17.int)(bigSlider.ry * 100)})`;
+                    hslider.text = `${(0, Utils_17.int)(hslider.rx * 100)}`;
+                    vslider.text = `${(0, Utils_17.int)(vslider.ry * 100)}`;
                 }
                 function showValue(rx, ry, pfEvent) {
-                    resultLabel.value = this.name + ": " + (0, Utils_18.int)(rx * 100) + "," + (0, Utils_18.int)(ry * 100);
+                    resultLabel.value = this.name + ": " + (0, Utils_17.int)(rx * 100) + "," + (0, Utils_17.int)(ry * 100);
                     if (this.name[0] === 'h')
-                        this.text = `${(0, Utils_18.int)(this.rx * 100)}`;
+                        this.text = `${(0, Utils_17.int)(this.rx * 100)}`;
                     if (this.name[0] === 'v')
-                        this.text = `${(0, Utils_18.int)(this.ry * 100)}`;
+                        this.text = `${(0, Utils_17.int)(this.ry * 100)}`;
                 }
                 let sliderW = 30;
                 bigSlider = new Jed_1.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
@@ -3790,7 +3775,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Playfield_6, Browser_7, Jed_2, Utils_19) {
+define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Playfield_6, Browser_6, Jed_2, Utils_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3803,7 +3788,7 @@ define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index",
     let vslider = null;
     class TestClass {
         constructor() {
-            this._playfieldApp = new Browser_7.BrowserPlayfieldApp("#playfield", 1.0);
+            this._playfieldApp = new Browser_6.BrowserPlayfieldApp("#playfield", 1.0);
             this._playfield = this._playfieldApp.playfield;
         }
         jedTest() {
@@ -3845,16 +3830,16 @@ define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index",
                 function updateCursor(rx, ry, pfEvent) {
                     hslider.cursorSize(rx, 18);
                     vslider.cursorSize(18, ry);
-                    bigSlider.text = `(${(0, Utils_19.int)(bigSlider.rx * 100)},${(0, Utils_19.int)(bigSlider.ry * 100)})`;
-                    hslider.text = `${(0, Utils_19.int)(hslider.rx * 100)}`;
-                    vslider.text = `${(0, Utils_19.int)(vslider.ry * 100)}`;
+                    bigSlider.text = `(${(0, Utils_18.int)(bigSlider.rx * 100)},${(0, Utils_18.int)(bigSlider.ry * 100)})`;
+                    hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
+                    vslider.text = `${(0, Utils_18.int)(vslider.ry * 100)}`;
                 }
                 function showValue(rx, ry, pfEvent) {
-                    resultLabel.value = this.name + ": " + (0, Utils_19.int)(rx * 100) + "," + (0, Utils_19.int)(ry * 100);
+                    resultLabel.value = this.name + ": " + (0, Utils_18.int)(rx * 100) + "," + (0, Utils_18.int)(ry * 100);
                     if (this.name[0] === 'h')
-                        this.text = `${(0, Utils_19.int)(this.rx * 100)}`;
+                        this.text = `${(0, Utils_18.int)(this.rx * 100)}`;
                     if (this.name[0] === 'v')
-                        this.text = `${(0, Utils_19.int)(this.ry * 100)}`;
+                        this.text = `${(0, Utils_18.int)(this.ry * 100)}`;
                 }
                 let sliderW = 30;
                 bigSlider = new Jed_2.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
@@ -3936,6 +3921,53 @@ define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index",
     }
     exports.TestClass = TestClass;
 });
+define("Test/Test07", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index"], function (require, exports, Playfield_7, Browser_7, Jed_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TestClass = void 0;
+    /**
+     * Jed Test with Splitters and Relative Positioning
+     * Setting up N/S and E/W splitters only
+     */
+    let resultLabel = null;
+    let bigSlider = null;
+    let hslider = null;
+    let vslider = null;
+    class TestClass {
+        constructor() {
+            this._playfieldApp = new Browser_7.BrowserPlayfieldApp("#playfield", 1.0);
+            this._playfield = this._playfieldApp.playfield;
+        }
+        jedTest() {
+            function fourLabels(name, parent) {
+                new Jed_3.Label(name + ".NE", parent.ne, 10, 10, 0, 0, name + ".NE");
+                new Jed_3.Label(name + ".NW", parent.nw, 10, 10, 0, 0, name + ".NW");
+                new Jed_3.Label(name + ".SE", parent.se, 10, 10, 0, 0, name + ".SE");
+                new Jed_3.Label(name + ".SW", parent.sw, 10, 10, 0, 0, name + ".SW");
+            }
+            function makeSplitter(parent) {
+                let splitter = new Playfield_7.Splitter("splitter", parent, 0.5, 0.5);
+                let splitterNE = new Playfield_7.Splitter("splitterNE", splitter.ne, 0.5, 0);
+                let splitterNW = new Playfield_7.Splitter("splitterNw", splitter.nw, 0, 0.5);
+                let splitterSE = new Playfield_7.Splitter("splitterSE", splitter.se, 1, 0.5);
+                let splitterSW = new Playfield_7.Splitter("splitterSW", splitter.sw, 0.5, 1);
+                fourLabels("label.NE", splitterNE);
+                fourLabels("label.NW", splitterNW);
+                fourLabels("label.SE", splitterSE);
+                fourLabels("label.SW", splitterSW);
+                return;
+            }
+            let root = this._playfield.rootTile;
+            makeSplitter(root);
+            this._playfield.rootTile.printTree();
+            this._playfield.start(0);
+        }
+        run() {
+            this.jedTest();
+        }
+    }
+    exports.TestClass = TestClass;
+});
 define("Utils/StylesMixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3985,7 +4017,7 @@ define("Utils/StylesMixins", ["require", "exports"], function (require, exports)
 //# sourceMappingURL=PlayfieldGraphics.js.map
 define(function (require) {
     console.log("Main.js...");
-    var {TestClass} = require("Test/Test06");
+    var {TestClass} = require("Test/Test07");
     console.log(TestClass);
     let main = new TestClass();
     main.run();
