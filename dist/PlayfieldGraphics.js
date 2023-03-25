@@ -2331,6 +2331,83 @@ define("Browser/BrowserEventPump", ["require", "exports", "Browser/BrowserPlayfi
     }
     exports.BrowserEventPump = BrowserEventPump;
 });
+// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+define("Browser/BrowserFiles", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.BrowserFiles = exports.BrowserFile = void 0;
+    class BrowserFile {
+        constructor(key, path) {
+            this._key = key;
+            this._path = path;
+            this._status = BrowserFile.STATUS_ARRAY[0];
+            this._length = 0;
+        }
+        get status() {
+            return this._status;
+        }
+        set status(s) {
+            this._status = s;
+        }
+        get isError() {
+            return ["unintialized", "error", "abort"].includes(this._status);
+        }
+        get isDone() {
+            return ["loadend", "error", "abort"].includes(this._status);
+        }
+        get isInProgress() {
+            return ["initialized", "loadstart", "load", "progress"].includes(this._status);
+        }
+    }
+    exports.BrowserFile = BrowserFile;
+    BrowserFile.STATUS_ARRAY = ["uninitialized", "initialized", "loadstart", "load", "loadend", "progress", "error", "abort"];
+    class BrowserFiles {
+        constructor() {
+            this._files = {};
+        }
+        load(key, path) {
+            let file = new BrowserFile(key, path);
+            this._files[key] = file;
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = "arraybuffer";
+            this._addListeners(xhr, file);
+            xhr.open("GET", path);
+            xhr.send();
+            file.status = "initialized";
+            return xhr;
+        }
+        get(key) {
+            return this._files[key];
+        }
+        _addListeners(xhr, file) {
+            xhr._file = file;
+            xhr.addEventListener('loadstart', this._handleEvent.bind(this));
+            xhr.addEventListener('load', this._handleEvent.bind(this));
+            xhr.addEventListener('loadend', this._handleEvent.bind(this));
+            xhr.addEventListener('progress', this._handleEvent.bind(this));
+            xhr.addEventListener('error', this._handleEvent.bind(this));
+            xhr.addEventListener('abort', this._handleEvent.bind(this));
+        }
+        _handleEvent(event) {
+            console.log(event);
+            let xhr = event.currentTarget;
+            let file = xhr._file;
+            console.log(file);
+            if (xhr.status !== 200) {
+                file.status = "error";
+                file._error = xhr.statusText;
+            }
+            else {
+                file.status = event.type;
+                file._error = xhr.statusText;
+                file._data = xhr.response;
+                if (event.total)
+                    file._length = event.total;
+            }
+        }
+    }
+    exports.BrowserFiles = BrowserFiles;
+});
 define("Browser/BrowserGfx", ["require", "exports", "Playfield/Graphics/GfxParms", "Utils/index"], function (require, exports, GfxParms_2, Utils_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2624,14 +2701,16 @@ define("Browser/BrowserPlayfieldApp", ["require", "exports", "Playfield/index", 
     }
     exports.BrowserPlayfieldApp = BrowserPlayfieldApp;
 });
-define("Browser/index", ["require", "exports", "Browser/BrowserEventPump", "Browser/BrowserGfx", "Browser/BrowserPlayfieldApp", "Browser/BrowserPlayfieldEvent"], function (require, exports, BrowserEventPump_2, BrowserGfx_2, BrowserPlayfieldApp_1, BrowserPlayfieldEvent_2) {
+define("Browser/index", ["require", "exports", "Browser/BrowserEventPump", "Browser/BrowserGfx", "Browser/BrowserPlayfieldApp", "Browser/BrowserPlayfieldEvent", "Browser/BrowserFiles"], function (require, exports, BrowserEventPump_2, BrowserGfx_2, BrowserPlayfieldApp_1, BrowserPlayfieldEvent_2, BrowserFiles_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.BrowserPlayfieldEvent = exports.BrowserPlayfieldApp = exports.BrowserGfx = exports.BrowserEventPump = void 0;
+    exports.BrowserFile = exports.BrowserFiles = exports.BrowserPlayfieldEvent = exports.BrowserPlayfieldApp = exports.BrowserGfx = exports.BrowserEventPump = void 0;
     Object.defineProperty(exports, "BrowserEventPump", { enumerable: true, get: function () { return BrowserEventPump_2.BrowserEventPump; } });
     Object.defineProperty(exports, "BrowserGfx", { enumerable: true, get: function () { return BrowserGfx_2.BrowserGfx; } });
     Object.defineProperty(exports, "BrowserPlayfieldApp", { enumerable: true, get: function () { return BrowserPlayfieldApp_1.BrowserPlayfieldApp; } });
     Object.defineProperty(exports, "BrowserPlayfieldEvent", { enumerable: true, get: function () { return BrowserPlayfieldEvent_2.BrowserPlayfieldEvent; } });
+    Object.defineProperty(exports, "BrowserFiles", { enumerable: true, get: function () { return BrowserFiles_1.BrowserFiles; } });
+    Object.defineProperty(exports, "BrowserFile", { enumerable: true, get: function () { return BrowserFiles_1.BrowserFile; } });
 });
 define("Jed/ItemOptions", ["require", "exports", "Playfield/index"], function (require, exports, Playfield_3) {
     "use strict";
@@ -3480,6 +3559,11 @@ define("Jed/index", ["require", "exports", "Jed/Text", "Jed/Button", "Jed/Checkb
     Object.defineProperty(exports, "Group", { enumerable: true, get: function () { return Group_1.Group; } });
     Object.defineProperty(exports, "Slider", { enumerable: true, get: function () { return Slider_1.Slider; } });
 });
+// https://github.com/Daikalos/Clone_Super-Mario/tree/aea7acfc39495a597beefa7552205bbda22d0473/Super-Mario/Super-Mario/Content/Sprites
+define("Playfield/Image", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
 define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], function (require, exports, __1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3506,7 +3590,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             super(name, parent, x, y, w, h);
             this._colors = ["", "red", "orange", "green", "blue", "indigo", "violet"];
             this._color = 0;
-            this.gfx.gparms.fillColor = this._colors[2];
+            this._color = (0, Utils_14.int)((0, Utils_14.random)(0, this._colors.length));
         }
         // --- Overrides ---//
         draw() {
@@ -3514,8 +3598,10 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
                 this.gfx.gparms.borderColor = "black";
             else
                 this.gfx.gparms.borderColor = "";
-            this.gfx.gparms.fillColor = this._colors[this._color];
-            this.playfield.gfx.rect(this.x, this.y, this.w, this.h);
+            this.gfx.gparms.fillColor = "";
+            this._colors[this._color];
+            console.log(this.gfx.gparms.fillColor, this._color, this._colors);
+            this.gfx.rect(this.x, this.y, this.w, this.h);
             super.draw();
         }
         // --- onActions --- //
@@ -3875,9 +3961,9 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
     function bounce() {
         this.x += this.DX;
         this.y += this.DY;
-        if (this.x > this.playfield.w || this.x < 0)
+        if (this.x + this.w > this.playfield.w || this.x < 0)
             this.DX = -this.DX;
-        if (this.y > this.playfield.h || this.y < 0)
+        if (this.y + this.h > this.playfield.h || this.y < 0)
             this.DY = -this.DY;
     }
     class TestClass {
@@ -3887,7 +3973,7 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
         }
         tenthousandTestTile() {
             let parent = this._playfield.rootTile;
-            let max = 1;
+            let max = 10;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
                     let x = (0, Utils_17.random)(0, this._playfield.w);
@@ -3903,9 +3989,9 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
                 }
             }
             max *= 1000;
-            let fps = 60;
+            let fps = 15;
             let delay = Math.floor(1000 / fps);
-            this._playfield.start(delay);
+            this._playfield.start(1);
             // note: processing 10,000 Circles stressed the app at 55 FPS
             // note: processing 10,000 Boxes stressed the app at 142 FPS
             // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
@@ -4235,6 +4321,70 @@ define("Test/Test07", ["require", "exports", "Playfield/index", "Browser/index",
     }
     exports.TestClass = TestClass;
 });
+define("Test/TestBrowserFiles", ["require", "exports", "Browser/index"], function (require, exports, Browser) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TestClass = void 0;
+    Browser = __importStar(Browser);
+    /**
+     * Test File I/O
+     * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+     */
+    class TestClass {
+        constructor() {
+            this._key = "mario";
+            this._fname = "/static/images/mario_walking.png";
+            this._pollInterval = 1;
+            this._files = new Browser.BrowserFiles();
+        }
+        _checkFileProgress() {
+            let file = this._files.get(this._key);
+            let keepPolling = false;
+            if (!file) {
+                console.error("could not locate " + this._key);
+            }
+            else if (file.isError) {
+                console.error("error in loading " + this._key, "error=" + file._error);
+            }
+            else if (file.isDone) {
+                console.log("done loading " + this._key, "bytes loaded: " + file._length);
+                let blob = new Blob([file._data]);
+                let blobURL = URL.createObjectURL(blob);
+                console.log(blobURL);
+                let img = new Image(); // Create new img element
+                img.src = blobURL;
+                file._img = img;
+                setTimeout(this.showImage.bind(this), 1);
+            }
+            else if (file.isInProgress) {
+                console.log("still loading " + this._key, "bytes loaded: " + file._length);
+                keepPolling = true;
+            }
+            else {
+                console.error("error... unknown file status " + file.status);
+            }
+            if (!keepPolling)
+                clearInterval(this._timerID);
+        }
+        showImage() {
+            let canvas = document.getElementById("playfield");
+            console.log(canvas);
+            let ctx = canvas.getContext("2d");
+            console.log(ctx);
+            console.log(canvas.width, canvas.height);
+            // ctx.drawImage(this._files.get(this._key)._img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(this._files.get(this._key)._img, 0, 0);
+        }
+        loadImage() {
+            this._files.load(this._key, this._fname);
+            this._timerID = setInterval(this._checkFileProgress.bind(this), this._pollInterval);
+        }
+        run() {
+            this.loadImage();
+        }
+    }
+    exports.TestClass = TestClass;
+});
 define("Utils/StylesMixins", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -4284,7 +4434,7 @@ define("Utils/StylesMixins", ["require", "exports"], function (require, exports)
 //# sourceMappingURL=PlayfieldGraphics.js.map
 define(function (require) {
     console.log("Main.js...");
-    var {TestClass} = require("Test/GUIEditor");
+    var {TestClass} = require("Test/TestBrowserFiles");
     console.log(TestClass);
     let main = new TestClass();
     main.run();

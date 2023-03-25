@@ -10,8 +10,8 @@ import { random, int } from "../Utils";
 function bounce() {
     this.x += this.DX;
     this.y += this.DY;
-    if (this.x > this.playfield.w || this.x < 0) this.DX = -this.DX;
-    if (this.y > this.playfield.h || this.y < 0) this.DY = -this.DY;
+    if (this.x + this.w > this.playfield.w || this.x < 0) this.DX = -this.DX;
+    if (this.y + this.h > this.playfield.h || this.y < 0) this.DY = -this.DY;
 }
 
 export class TestClass {
@@ -24,7 +24,7 @@ export class TestClass {
     }
     tenthousandTestTile() {
         let parent = this._playfield.rootTile;
-        let max = 1;
+        let max = 10;
         for (let i = 0; i < max; i++) {
             for (let j = 0; j < 1000; j++) {
                 let x = random(0, this._playfield.w);
@@ -40,9 +40,9 @@ export class TestClass {
             }
         }
         max *= 1000;
-        let fps = 60;
+        let fps = 15;
         let delay = Math.floor(1000/fps);
-        this._playfield.start(delay);
+        this._playfield.start(1);
         // note: processing 10,000 Circles stressed the app at 55 FPS
         // note: processing 10,000 Boxes stressed the app at 142 FPS
         // note: processing 10,000 Empty Boxes stressed the app at 250 FPS

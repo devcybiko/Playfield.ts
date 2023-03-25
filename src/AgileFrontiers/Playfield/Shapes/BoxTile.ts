@@ -1,6 +1,6 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import { applyMixins, random } from "../../Utils";
+import { applyMixins, random, int } from "../../Utils";
 import { Draggable, Selectable, Clickable } from "../Abilities";
 
 export class _BoxTile extends ShapeTile { };
@@ -13,7 +13,7 @@ export class BoxTile extends _BoxTile {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
-        this.gfx.gparms.fillColor = this._colors[2];
+        this._color = int(random(0, this._colors.length));
 
     }
 
@@ -22,8 +22,9 @@ export class BoxTile extends _BoxTile {
     draw() {
         if (this.isSelected) this.gfx.gparms.borderColor = "black";
         else this.gfx.gparms.borderColor = "";
-        this.gfx.gparms.fillColor = this._colors[this._color];
-        this.playfield.gfx.rect(this.x, this.y, this.w, this.h);
+        this.gfx.gparms.fillColor = ""; this._colors[this._color];
+        console.log(this.gfx.gparms.fillColor, this._color, this._colors);
+        this.gfx.rect(this.x, this.y, this.w, this.h);
         super.draw();
     }
 
