@@ -4434,7 +4434,7 @@ define("Utils/StylesMixins", ["require", "exports"], function (require, exports)
 //# sourceMappingURL=PlayfieldGraphics.js.map
 define(function (require) {
     console.log("Main.js...");
-    var {TestClass} = require("Test/TestBrowserFiles");
+    var {TestClass} = require("Test/Test06");
     console.log(TestClass);
     let main = new TestClass();
     main.run();
