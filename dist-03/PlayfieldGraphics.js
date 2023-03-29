@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -162,6 +171,7 @@ define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
             if (parent)
                 parent.addChild(this);
             this._fullName = this._getFullName();
+            return this;
         }
         _getFullName() {
             let parentFullName = this.parent ? this.parent._fullName + "." : "";
@@ -190,12 +200,22 @@ define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
             }
             return null;
         }
-        toFront(obj) {
+        removeChild(obj) {
             if (obj) {
                 let i = this._children.indexOf(obj);
                 if (i === -1)
-                    return;
+                    return null;
                 this._children.splice(i, 1);
+                obj._parent = null;
+            }
+            else {
+                this.parent.removeChild(this);
+            }
+            return obj;
+        }
+        toFront(obj) {
+            if (obj) {
+                this.removeChild(obj);
                 this._children.push(obj);
             }
             else {
@@ -204,10 +224,7 @@ define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
         }
         toBack(obj) {
             if (obj) {
-                let i = this._children.indexOf(obj);
-                if (i === -1)
-                    return;
-                this._children.splice(i, 1);
+                this.removeChild(obj);
                 this._children.splice(0, 0, obj);
             }
             else {
@@ -219,11 +236,14 @@ define("Utils/TreeMixin", ["require", "exports"], function (require, exports) {
                 return this.parent.depth() + 1;
             return 0;
         }
-        printMe(node, ctx) {
-            console.log(" | ".repeat(node.depth()), node.name);
+        printMe() {
+            console.log(" | ".repeat(this.depth()), this.name);
         }
         printTree() {
-            this.dfs(this.printMe.bind(this), null);
+            this.printMe();
+            for (let child of this.children) {
+                child.printTree();
+            }
         }
         // --- Accessors --- //
         get parent() {
@@ -798,7 +818,7 @@ define("Playfield/Abilities/DraggableMixin", ["require", "exports"], function (r
     exports.Draggable = void 0;
     class Draggable {
         Draggable() {
-            this.isDraggable = true;
+            this.isDraggable = false;
             this.isDragging = false;
             return this;
         }
@@ -1492,8 +1512,8 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Option
             this.children.forEach(child => child.onTick());
         }
         // --- Overrides --- //
-        printMe(node, ctx) {
-            console.log(" | ".repeat(node.depth()), node.name, node.X, node.Y, node.W, node.H);
+        printMe() {
+            console.log(" | ".repeat(this.depth()), this.name, this.X, this.Y, this.W, this.H);
         }
         // --- Accessors --- //
         get gfx() {
@@ -2112,6 +2132,11 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
     }
     exports.VSplitter = VSplitter;
 });
+// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+define("Playfield/Files", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
 define("Playfield/index", ["require", "exports", "Playfield/Playfield", "Playfield/Tile", "Playfield/EventQueue", "Playfield/Splitter", "Playfield/HSplitter", "Playfield/VSplitter", "Playfield/Options", "Playfield/RootTile"], function (require, exports, Playfield_1, Tile_14, EventQueue_1, Splitter_3, HSplitter_1, VSplitter_1, Options_3, RootTile_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -2358,6 +2383,23 @@ define("Browser/BrowserFiles", ["require", "exports"], function (require, export
         get isInProgress() {
             return ["initialized", "loadstart", "load", "progress"].includes(this._status);
         }
+        _timer() {
+        }
+        wait(timeout = 1000000) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let that = this;
+                function waitForFoo(resolve, reject) {
+                    if (that.isDone)
+                        resolve(that);
+                    else if (timeout && (Date.now() - start) >= timeout)
+                        reject(new Error("timeout"));
+                    else
+                        setTimeout(waitForFoo.bind(that, resolve, reject), 30);
+                }
+                var start = Date.now();
+                return new Promise(waitForFoo);
+            });
+        }
     }
     exports.BrowserFile = BrowserFile;
     BrowserFile.STATUS_ARRAY = ["uninitialized", "initialized", "loadstart", "load", "loadend", "progress", "error", "abort"];
@@ -2374,7 +2416,7 @@ define("Browser/BrowserFiles", ["require", "exports"], function (require, export
             xhr.open("GET", path);
             xhr.send();
             file.status = "initialized";
-            return xhr;
+            return file;
         }
         get(key) {
             return this._files[key];
@@ -2844,15 +2886,15 @@ define("Jed/Button", ["require", "exports", "Jed/Item", "Utils/index", "Playfiel
             this.gfx.restore();
         }
         // --- onActions --- //
-        onEnter() {
+        onEnter(pfEvent) {
         }
-        onExit() {
+        onExit(pfEvent) {
         }
-        onHovering() {
+        onHovering(pfEvent) {
         }
-        onPress() {
+        onPress(pfEvent) {
         }
-        onRelease() {
+        onRelease(pfEvent) {
             if (this.isHovering)
                 this.go();
         }
@@ -2946,7 +2988,6 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
             this.label = label;
             this._isResizing = false;
             this.options.fontSize -= 2;
-            this.isDraggable = true;
             this.updateWidthHeight();
         }
         // --- Overrides --- //
@@ -3012,8 +3053,6 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
                     w = newW;
                 if (newH > h)
                     h = newH;
-                if (this.label.includes("greg"))
-                    console.log(newW, newH, w, h);
             }
             return { w, h };
         }
@@ -3547,17 +3586,156 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
     }
     exports.Text = Text;
 });
-define("Jed/index", ["require", "exports", "Jed/Text", "Jed/Button", "Jed/Checkbox", "Jed/Radio", "Jed/Label", "Jed/Group", "Jed/Slider"], function (require, exports, Text_1, Button_1, Checkbox_1, Radio_1, Label_1, Group_1, Slider_1) {
+define("Jed/Tree", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/Abilities/index", "Jed/Button", "Jed/Label", "Jed/Group"], function (require, exports, Item_8, Utils_14, Abilities_13, Button_1, Label_1, Group_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Slider = exports.Group = exports.Label = exports.Radio = exports.Checkbox = exports.Button = exports.Text = void 0;
+    exports.Tree = exports.TreeItem = exports._Tree = void 0;
+    class _Tree extends Item_8.Item {
+    }
+    exports._Tree = _Tree;
+    ;
+    ;
+    (0, Utils_14.applyMixins)(_Tree, [Abilities_13.Draggable, Abilities_13.Pressable, Abilities_13.Hoverable]);
+    class TreeButton extends Button_1.Button {
+        constructor(name, parent, x, y) {
+            super(name, parent, x, y, 0, 0, "-");
+            this._open = false;
+            this.isDraggable = false;
+        }
+        onPress(pfEvent) {
+            let parent = TreeItem.cast(this.parent);
+            parent.open = !parent.open;
+            this.open = parent.open;
+            pfEvent.isActive = false;
+        }
+        draw() {
+            super.draw();
+            return { w: this.W, h: this.H };
+        }
+        get open() {
+            return this._open;
+        }
+        set open(value) {
+            this._open = value;
+            if (this._open)
+                this.label = "+";
+            else
+                this.label = "-";
+        }
+    }
+    class TreeLabel extends Label_1.Label {
+        constructor(name, parent, x, y, w, h, label) {
+            super(name, parent, x, y, w, h, label);
+            this.isDraggable = false;
+            this.options.fontStyle = "";
+        }
+        draw() {
+            super.draw();
+            return { w: this.W, h: this.H };
+        }
+    }
+    class TreeItem extends Group_1.Group {
+        constructor(name, parent, x, y, w, h, label) {
+            super(name, parent, x, y, w, h);
+            this._margin = 5;
+            this._treeButton = new TreeButton("_button", this, x, y);
+            this._treeLabel = new TreeLabel("_label", this, x + this._treeButton.w / 2, y, 0, 0, label);
+            this._open = false;
+            this._isBoxed = false;
+        }
+        static cast(obj) {
+            return obj;
+        }
+        get open() {
+            return this._open;
+        }
+        set open(value) {
+            this._open = value && this.children.length > 2;
+        }
+        _drawChild(child, x, y) {
+            child.x = x;
+            child.y = y;
+            let { w, h } = child.draw();
+            let deltas = child._drawChildren(x + 10, y + h);
+            deltas.w = x + Math.max(deltas.w, w);
+            deltas.h = h + deltas.h;
+            return deltas;
+        }
+        _drawChildren(x, y) {
+            let dw = 0;
+            let dh = 0;
+            for (let child of this.children) {
+                let treeItemChild = TreeItem.cast(child);
+                if (treeItemChild.name === "_button" || treeItemChild.name === "_label")
+                    continue;
+                if (this._open) {
+                    let { w, h } = this._drawChild(treeItemChild, x, y + dh);
+                    dw = Math.max(dw, w);
+                    dh += h;
+                }
+            }
+            return { w: dw, h: dh };
+        }
+        draw() {
+            if (!this._treeButton)
+                return { w: 0, h: 0 };
+            this._treeButton.draw();
+            this._treeLabel.x = this._treeButton.x + this._treeButton.w + this._margin;
+            this._treeLabel.draw();
+            let deltas = { w: this._treeButton.W + this._treeLabel.W, h: Math.max(this._treeButton.H, this._treeLabel.H) };
+            return deltas;
+        }
+        onEvent(pfEvent) {
+            if (this._treeButton)
+                this._treeButton.onEvent(pfEvent);
+            if (this._treeLabel)
+                this._treeLabel.onEvent(pfEvent);
+            super.onEvent(pfEvent);
+        }
+    }
+    exports.TreeItem = TreeItem;
+    class Tree extends Group_1.Group {
+        constructor(name, parent, x, y, w, h, label) {
+            super(name, parent, x, y, w, h, label);
+            this._margin = 5;
+            this._root = new TreeItem("_tree", this, 0, 0, 0, 0, "");
+            this._root._open = true;
+            this._root._treeButton.removeChild();
+            this._root._treeLabel.removeChild();
+            this._root._treeButton = null;
+            this._root._treeLabel = null;
+            this.isBoxed = true;
+        }
+        addNode(node, label) {
+            let newChild = new TreeItem(label, node, node.x, node.y, 0, 0, label);
+            return newChild;
+        }
+        drawChildren() {
+            return this._root._drawChildren(0, 0);
+        }
+        draw() {
+            let deltas = this.drawChildren();
+            this.w = deltas.w;
+            this.h = deltas.h;
+            this.gfx.gparms.fillColor = "";
+            this.gfx.rect(this.X, this.Y, this.W, this.H);
+        }
+    }
+    exports.Tree = Tree;
+});
+define("Jed/index", ["require", "exports", "Jed/Text", "Jed/Button", "Jed/Checkbox", "Jed/Radio", "Jed/Label", "Jed/Group", "Jed/Slider", "Jed/Tree"], function (require, exports, Text_1, Button_2, Checkbox_1, Radio_1, Label_2, Group_2, Slider_1, Tree_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TreeItem = exports.Tree = exports.Slider = exports.Group = exports.Label = exports.Radio = exports.Checkbox = exports.Button = exports.Text = void 0;
     Object.defineProperty(exports, "Text", { enumerable: true, get: function () { return Text_1.Text; } });
-    Object.defineProperty(exports, "Button", { enumerable: true, get: function () { return Button_1.Button; } });
+    Object.defineProperty(exports, "Button", { enumerable: true, get: function () { return Button_2.Button; } });
     Object.defineProperty(exports, "Checkbox", { enumerable: true, get: function () { return Checkbox_1.Checkbox; } });
     Object.defineProperty(exports, "Radio", { enumerable: true, get: function () { return Radio_1.Radio; } });
-    Object.defineProperty(exports, "Label", { enumerable: true, get: function () { return Label_1.Label; } });
-    Object.defineProperty(exports, "Group", { enumerable: true, get: function () { return Group_1.Group; } });
+    Object.defineProperty(exports, "Label", { enumerable: true, get: function () { return Label_2.Label; } });
+    Object.defineProperty(exports, "Group", { enumerable: true, get: function () { return Group_2.Group; } });
     Object.defineProperty(exports, "Slider", { enumerable: true, get: function () { return Slider_1.Slider; } });
+    Object.defineProperty(exports, "Tree", { enumerable: true, get: function () { return Tree_1.Tree; } });
+    Object.defineProperty(exports, "TreeItem", { enumerable: true, get: function () { return Tree_1.TreeItem; } });
 });
 // https://github.com/Daikalos/Clone_Super-Mario/tree/aea7acfc39495a597beefa7552205bbda22d0473/Super-Mario/Super-Mario/Content/Sprites
 define("Playfield/Image", ["require", "exports"], function (require, exports) {
@@ -3575,7 +3753,7 @@ define("Playfield/Shapes/ShapeTile", ["require", "exports", "Playfield/index"], 
     }
     exports.ShapeTile = ShapeTile;
 });
-define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_14, Abilities_13) {
+define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Utils/index", "Playfield/Abilities/index"], function (require, exports, ShapeTile_1, Utils_15, Abilities_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BoxTile = exports._BoxTile = void 0;
@@ -3584,13 +3762,13 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     exports._BoxTile = _BoxTile;
     ;
     ;
-    (0, Utils_14.applyMixins)(_BoxTile, [Abilities_13.Draggable, Abilities_13.Selectable, Abilities_13.Clickable]);
+    (0, Utils_15.applyMixins)(_BoxTile, [Abilities_14.Draggable, Abilities_14.Selectable, Abilities_14.Clickable]);
     class BoxTile extends _BoxTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
             this._colors = ["", "red", "orange", "green", "blue", "indigo", "violet"];
             this._color = 0;
-            this._color = (0, Utils_14.int)((0, Utils_14.random)(0, this._colors.length));
+            this._color = (0, Utils_15.int)((0, Utils_15.random)(0, this._colors.length));
         }
         // --- Overrides ---//
         draw() {
@@ -3600,7 +3778,6 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
                 this.gfx.gparms.borderColor = "";
             this.gfx.gparms.fillColor = "";
             this._colors[this._color];
-            console.log(this.gfx.gparms.fillColor, this._color, this._colors);
             this.gfx.rect(this.x, this.y, this.w, this.h);
             super.draw();
         }
@@ -3623,7 +3800,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
     }
     exports.BoxTile = BoxTile;
 });
-define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_14, Utils_15) {
+define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/ShapeTile", "Playfield/Abilities/index", "Utils/index"], function (require, exports, ShapeTile_2, Abilities_15, Utils_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CircleTile = exports._CircleTile = void 0;
@@ -3632,7 +3809,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
     exports._CircleTile = _CircleTile;
     ;
     ;
-    (0, Utils_15.applyMixins)(_CircleTile, [Abilities_14.Draggable, Abilities_14.Selectable]);
+    (0, Utils_16.applyMixins)(_CircleTile, [Abilities_15.Draggable, Abilities_15.Selectable]);
     class CircleTile extends _CircleTile {
         constructor(name, parent, x, y, w, h) {
             super(name, parent, x, y, w, h);
@@ -3686,7 +3863,7 @@ define("Playfield/Shapes/index", ["require", "exports", "Playfield/Shapes/BoxTil
     Object.defineProperty(exports, "CircleTile", { enumerable: true, get: function () { return CircleTile_1.CircleTile; } });
     Object.defineProperty(exports, "ShapeTile", { enumerable: true, get: function () { return ShapeTile_3.ShapeTile; } });
 });
-define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index", "Jed/Item"], function (require, exports, Playfield_6, Browser_1, Jed, Utils_16, Item_8) {
+define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index", "Jed/Item"], function (require, exports, Playfield_6, Browser_1, Jed, Utils_17, Item_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3695,7 +3872,7 @@ define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/inde
         constructor() {
             this.isEditMode = true;
             this.groupItem = null;
-            this.logger = new Utils_16.Logger().Logger("info", false);
+            this.logger = new Utils_17.Logger().Logger("info", false);
             this._playfieldApp = new Browser_1.BrowserPlayfieldApp("#playfield", 1.0);
             this._playfield = this._playfieldApp.playfield;
         }
@@ -3772,7 +3949,7 @@ define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/inde
             }
         }
         onMenu(pfEvent) {
-            let item = Item_8.Item.cast(this);
+            let item = Item_9.Item.cast(this);
             let that = item.data;
             that.populateProperties(item, that);
         }
@@ -3954,7 +4131,7 @@ define("Test/Test03", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/index", "Utils/index"], function (require, exports, Shapes_3, Browser_5, Utils_17) {
+define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/index", "Utils/index"], function (require, exports, Shapes_3, Browser_5, Utils_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -3976,11 +4153,11 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
             let max = 10;
             for (let i = 0; i < max; i++) {
                 for (let j = 0; j < 1000; j++) {
-                    let x = (0, Utils_17.random)(0, this._playfield.w);
-                    let y = (0, Utils_17.random)(0, this._playfield.h);
-                    let r = (0, Utils_17.random)(10, 50);
-                    let DX = (0, Utils_17.random)(-10, 10);
-                    let DY = (0, Utils_17.random)(-10, 10);
+                    let x = (0, Utils_18.random)(0, this._playfield.w);
+                    let y = (0, Utils_18.random)(0, this._playfield.h);
+                    let r = (0, Utils_18.random)(10, 50);
+                    let DX = (0, Utils_18.random)(-10, 10);
+                    let DY = (0, Utils_18.random)(-10, 10);
                     let box = new Shapes_3.BoxTile("box", parent, x, y, r, r);
                     box.onTick = bounce.bind(box);
                     box.isSelected = true;
@@ -4017,7 +4194,7 @@ define("Test/Test04", ["require", "exports", "Playfield/Shapes/index", "Browser/
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Browser_6, Jed_1, Utils_18) {
+define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Browser_6, Jed_1, Utils_19) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -4038,16 +4215,16 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
                 function updateCursor(rx, ry, pfEvent) {
                     hslider.cursorSize(rx, 18);
                     vslider.cursorSize(18, ry);
-                    bigSlider.text = `(${(0, Utils_18.int)(bigSlider.rx * 100)},${(0, Utils_18.int)(bigSlider.ry * 100)})`;
-                    hslider.text = `${(0, Utils_18.int)(hslider.rx * 100)}`;
-                    vslider.text = `${(0, Utils_18.int)(vslider.ry * 100)}`;
+                    bigSlider.text = `(${(0, Utils_19.int)(bigSlider.rx * 100)},${(0, Utils_19.int)(bigSlider.ry * 100)})`;
+                    hslider.text = `${(0, Utils_19.int)(hslider.rx * 100)}`;
+                    vslider.text = `${(0, Utils_19.int)(vslider.ry * 100)}`;
                 }
                 function showValue(rx, ry, pfEvent) {
-                    resultLabel.value = this.name + ": " + (0, Utils_18.int)(rx * 100) + "," + (0, Utils_18.int)(ry * 100);
+                    resultLabel.value = this.name + ": " + (0, Utils_19.int)(rx * 100) + "," + (0, Utils_19.int)(ry * 100);
                     if (this.name[0] === 'h')
-                        this.text = `${(0, Utils_18.int)(this.rx * 100)}`;
+                        this.text = `${(0, Utils_19.int)(this.rx * 100)}`;
                     if (this.name[0] === 'v')
-                        this.text = `${(0, Utils_18.int)(this.ry * 100)}`;
+                        this.text = `${(0, Utils_19.int)(this.ry * 100)}`;
                 }
                 let sliderW = 30;
                 bigSlider = new Jed_1.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
@@ -4128,7 +4305,7 @@ define("Test/Test05", ["require", "exports", "Browser/index", "Jed/index", "Util
     }
     exports.TestClass = TestClass;
 });
-define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Playfield_7, Browser_7, Jed_2, Utils_19) {
+define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index", "Jed/index", "Utils/index"], function (require, exports, Playfield_7, Browser_7, Jed_2, Utils_20) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TestClass = void 0;
@@ -4183,16 +4360,16 @@ define("Test/Test06", ["require", "exports", "Playfield/index", "Browser/index",
                 function updateCursor(rx, ry, pfEvent) {
                     hslider.cursorSize(rx, 18);
                     vslider.cursorSize(18, ry);
-                    bigSlider.text = `(${(0, Utils_19.int)(bigSlider.rx * 100)},${(0, Utils_19.int)(bigSlider.ry * 100)})`;
-                    hslider.text = `${(0, Utils_19.int)(hslider.rx * 100)}`;
-                    vslider.text = `${(0, Utils_19.int)(vslider.ry * 100)}`;
+                    bigSlider.text = `(${(0, Utils_20.int)(bigSlider.rx * 100)},${(0, Utils_20.int)(bigSlider.ry * 100)})`;
+                    hslider.text = `${(0, Utils_20.int)(hslider.rx * 100)}`;
+                    vslider.text = `${(0, Utils_20.int)(vslider.ry * 100)}`;
                 }
                 function showValue(rx, ry, pfEvent) {
-                    resultLabel.value = this.name + ": " + (0, Utils_19.int)(rx * 100) + "," + (0, Utils_19.int)(ry * 100);
+                    resultLabel.value = this.name + ": " + (0, Utils_20.int)(rx * 100) + "," + (0, Utils_20.int)(ry * 100);
                     if (this.name[0] === 'h')
-                        this.text = `${(0, Utils_19.int)(this.rx * 100)}`;
+                        this.text = `${(0, Utils_20.int)(this.rx * 100)}`;
                     if (this.name[0] === 'v')
-                        this.text = `${(0, Utils_19.int)(this.ry * 100)}`;
+                        this.text = `${(0, Utils_20.int)(this.ry * 100)}`;
                 }
                 let sliderW = 30;
                 bigSlider = new Jed_2.Slider("bigSlider", parent, x + sliderW * 2, y, 200, 200);
@@ -4321,6 +4498,54 @@ define("Test/Test07", ["require", "exports", "Playfield/index", "Browser/index",
     }
     exports.TestClass = TestClass;
 });
+define("Test/Test08", ["require", "exports", "Browser/index", "Jed/index", "Playfield/Shapes/index", "Browser/index"], function (require, exports, Browser_9, Jed, Shapes_4, Browser_10) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TestClass = void 0;
+    Jed = __importStar(Jed);
+    /**
+     * Jed Test with treeItem
+     */
+    class TestClass {
+        constructor() {
+            this._playfieldApp = new Browser_9.BrowserPlayfieldApp("#playfield", 1.0);
+            this._playfield = this._playfieldApp.playfield;
+        }
+        loadFileTree(fname) {
+            this._files = new Browser_10.BrowserFiles();
+            this._file = this._files.load("directory", "/static/data/tree.json");
+        }
+        treeItemTest() {
+            let file = this._file.wait();
+            console.log(file);
+            let root = this._playfield.rootTile;
+            let box = new Shapes_4.BoxTile("box", root, 100, 100, 200, 200);
+            box.isSelected = true;
+            let treeItem = new Jed.Tree("tree", root, 100, 100, 0, 0, "Tree Example");
+            let a = treeItem.addNode(treeItem._root, "a");
+            let aa = treeItem.addNode(a, "aa");
+            let aaa = treeItem.addNode(aa, "aaa");
+            let aab = treeItem.addNode(aa, "aab");
+            let aac = treeItem.addNode(aa, "aac");
+            let ab = treeItem.addNode(a, "ab");
+            let ac = treeItem.addNode(a, "ac");
+            let b = treeItem.addNode(treeItem._root, "b");
+            let ba = treeItem.addNode(b, "ba");
+            let bb = treeItem.addNode(b, "bb");
+            let bc = treeItem.addNode(b, "bc");
+            let c = treeItem.addNode(treeItem._root, "c");
+            let ca = treeItem.addNode(c, "ca");
+            let cb = treeItem.addNode(c, "cb");
+            let cc = treeItem.addNode(c, "cc");
+            this._playfield.rootTile.printTree();
+            this._playfield.start();
+        }
+        run() {
+            this.treeItemTest();
+        }
+    }
+    exports.TestClass = TestClass;
+});
 define("Test/TestBrowserFiles", ["require", "exports", "Browser/index"], function (require, exports, Browser) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -4434,7 +4659,11 @@ define("Utils/StylesMixins", ["require", "exports"], function (require, exports)
 //# sourceMappingURL=PlayfieldGraphics.js.map
 define(function (require) {
     console.log("Main.js...");
+<<<<<<< Updated upstream:dist-03/PlayfieldGraphics.js
     var {TestClass} = require("Test/Test03");
+=======
+    var {TestClass} = require("Test/Test08");
+>>>>>>> Stashed changes:dist/PlayfieldGraphics.js
     console.log(TestClass);
     let main = new TestClass();
     main.run();
