@@ -26,7 +26,7 @@ export class TestClass {
         let parent = this._playfield.rootTile;
         let max = 10;
         for (let i = 0; i < max; i++) {
-            for (let j = 0; j < 1000; j++) {
+            for (let j = 0; j < 10; j++) {
                 let x = random(0, this._playfield.w);
                 let y = random(0, this._playfield.h);
                 let r = random(10, 50);
@@ -42,7 +42,7 @@ export class TestClass {
         max *= 1000;
         let fps = 15;
         let delay = Math.floor(1000/fps);
-        this._playfield.start(1);
+        this._playfield.start(delay);
         // note: processing 10,000 Circles stressed the app at 55 FPS
         // note: processing 10,000 Boxes stressed the app at 142 FPS
         // note: processing 10,000 Empty Boxes stressed the app at 250 FPS
