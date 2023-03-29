@@ -115,8 +115,8 @@ export class Tile extends _Tile {
 
     // --- Overrides --- //
 
-    override printMe(node: Tile, ctx: any) {
-        console.log(" | ".repeat(node.depth()), node.name, node.X, node.Y, node.W, node.H);
+    override printMe() {
+        console.log(" | ".repeat(this.depth()), this.name, this.X, this.Y, this.W, this.H);
     }
 
     // --- Accessors --- //

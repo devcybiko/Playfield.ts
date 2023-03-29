@@ -7,3 +7,4 @@ export { HSplitter } from "./HSplitter";
 export { VSplitter } from "./VSplitter";
 export { Options } from "./Options";
 export { RootTile } from "./RootTile";
+export { Files, File } from "./Files";

@@ -1,5 +1,5 @@
 import { Item } from "./Item";
-import { Tile } from "../Playfield";
+import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
 import { Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
@@ -43,15 +43,15 @@ export class Button extends _Button {
     }
 
     // --- onActions --- //
-    onEnter() {
+    override onEnter(pfEvent: PlayfieldEvent) {
     }
-    onExit() {
+    override onExit(pfEvent: PlayfieldEvent) {
     }
-    onHovering() {
+    override onHovering(pfEvent: PlayfieldEvent) {
     }
-    onPress() {
+    override onPress(pfEvent: PlayfieldEvent) {
     }
-    onRelease() {
+    override onRelease(pfEvent: PlayfieldEvent) {
         if (this.isHovering) this.go();
     }
 }

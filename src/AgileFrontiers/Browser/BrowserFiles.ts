@@ -1,6 +1,8 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
 
-export class BrowserFile {
+import { Files, File } from "../Playfield"
+
+export class BrowserFile implements File {
     public static STATUS_ARRAY = ["uninitialized", "initialized", "loadstart", "load", "loadend", "progress", "error", "abort"];
     protected _key: string;
     protected _path: string;
@@ -31,17 +33,26 @@ export class BrowserFile {
     public get isInProgress(): boolean {
         return ["initialized", "loadstart", "load", "progress"].includes(this._status);
     }
+    _timer() {
+    }
+    public async wait(timeout = 1000000): Promise<File> {
+        let that = this;
+        function waitForFoo(resolve: any, reject: any) {
+            if (that.isDone) resolve(that);
+            else if (timeout && (Date.now() - start) >= timeout) reject(new Error("timeout"));
+            else setTimeout(waitForFoo.bind(that, resolve, reject), 30);
+        }
+        var start = Date.now();
+        return new Promise(waitForFoo);
+    }
 }
 
-
-
-
-export class BrowserFiles {
+export class BrowserFiles implements Files {
     protected _files: any;
     constructor() {
         this._files = {};
     }
-    load(key: string, path: string) {
+    load(key: string, path: string): File {
         let file = new BrowserFile(key, path);
         this._files[key] = file;
         const xhr = new XMLHttpRequest();
@@ -50,7 +61,7 @@ export class BrowserFiles {
         xhr.open("GET", path);
         xhr.send();
         file.status = "initialized";
-        return xhr;
+        return file;
     }
     get(key: string) {
         return this._files[key];

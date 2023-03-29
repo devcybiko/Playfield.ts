@@ -9,6 +9,7 @@ export class Tree {
         this._children = [];
         if (parent) parent.addChild(this);
         this._fullName = this._getFullName();
+        return this;
     }
 
     _getFullName(): string {
@@ -42,11 +43,21 @@ export class Tree {
         return null;
     }
 
-    toFront(obj?: Tree) {
+    removeChild(obj?: Tree): Tree {
         if (obj) {
             let i = this._children.indexOf(obj);
-            if (i === -1) return;
+            if (i === -1) return null;
             this._children.splice(i, 1);
+            obj._parent = null;    
+        } else {
+            this.parent.removeChild(this);
+        }
+        return obj;
+    }
+
+    toFront(obj?: Tree) {
+        if (obj) {
+            this.removeChild(obj);
             this._children.push(obj);
         } else {
             this.parent.toFront(this);
@@ -55,9 +66,7 @@ export class Tree {
 
     toBack(obj?: Tree) {
         if (obj) {
-            let i = this._children.indexOf(obj);
-            if (i === -1) return;
-            this._children.splice(i, 1);
+            this.removeChild(obj);
             this._children.splice(0, 0, obj);
         } else {
             this.parent.toBack(this);
@@ -68,11 +77,14 @@ export class Tree {
         if (this.parent) return this.parent.depth() + 1;
         return 0;
     }
-    printMe(node: Tree, ctx: any) {
-        console.log(" | ".repeat(node.depth()), node.name);
+    printMe() {
+        console.log(" | ".repeat(this.depth()), this.name);
     }
     printTree() {
-        this.dfs(this.printMe.bind(this), null);
+        this.printMe()
+        for(let child of this.children) {
+            child.printTree();
+        }
     }
 
     // --- Accessors --- //

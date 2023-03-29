@@ -23,7 +23,6 @@ export class BoxTile extends _BoxTile {
         if (this.isSelected) this.gfx.gparms.borderColor = "black";
         else this.gfx.gparms.borderColor = "";
         this.gfx.gparms.fillColor = ""; this._colors[this._color];
-        console.log(this.gfx.gparms.fillColor, this._color, this._colors);
         this.gfx.rect(this.x, this.y, this.w, this.h);
         super.draw();
     }

@@ -22,7 +22,6 @@ export class Group extends _Group {
         this.label = label;
         this._isResizing = false;
         this.options.fontSize -= 2;
-        this.isDraggable = true;
         this.updateWidthHeight();
     }
 
@@ -94,7 +93,6 @@ export class Group extends _Group {
             let newH = cy + ch + this.yMargin * 2;
             if (newW > w) w = newW;
             if (newH > h) h = newH;
-            if (this.label.includes("greg")) console.log(newW, newH, w, h);
         }
         return { w, h };
     }
@@ -104,7 +102,7 @@ export class Group extends _Group {
         this.updateWidthHeight();
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
-           this.gfx.clipRect(this.X, this.Y, wh.w, wh.h);
+            this.gfx.clipRect(this.X, this.Y, wh.w, wh.h);
             this.gfx.rect(this.X, this.Y, wh.w, wh.h);
             if (this.label) {
                 this.gfx.restore();
@@ -125,7 +123,7 @@ export class Group extends _Group {
             this.drawChildren();
         }
     }
-    
+
     // --- Accessors --- //
 
     public get isGroupItem(): boolean {
