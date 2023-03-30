@@ -45,7 +45,7 @@ export class BrowserFile implements File {
             'utf8.bin': 'utf-8',
             'utf16le.bin': 'utf-16le',
             'macintosh.bin': 'macintosh'
-        };    
+        };
         var dataView = new DataView(this._data as unknown as ArrayBuffer);
         var decoder = new TextDecoder(encoding["ascii"]);
         var decodedString = decoder.decode(dataView);
@@ -117,5 +117,17 @@ export class BrowserFiles implements Files {
             file._data = xhr.response;
             if (event.total) file._length = event.total;
         }
+    }
+    save(filename: string, text: string): void {
+        console.log(`Downloading: ${filename}=${text.length} bytes`);
+        var element = document.createElement('a');
+        element.className = '';
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        alert(`Your file ${filename} has been downloaded`);
     }
 }

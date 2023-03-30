@@ -18,5 +18,6 @@ export interface File {
 
 export interface Files {
     load(key: string, path: string): File;
+    save(filename: string, text: string): void;
     get(key: string): File;
 }

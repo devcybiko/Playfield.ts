@@ -42,6 +42,9 @@ export class TestClass {
         file = await file.wait();
         console.log("loaded File")
         console.log(file.string);
+        _browserFiles.save(fname, file.string);
+
+
     }
     mkdir(node: Jed.TreeItem, dirs: any[]) {
         for (let dir of dirs) {
