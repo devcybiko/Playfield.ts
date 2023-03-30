@@ -1,7 +1,7 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
-import { Draggable } from "../Playfield/Abilities";
+import { Dimensions, applyMixins } from "../Utils";
+import { Draggable, Clickable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
 /**
@@ -9,7 +9,7 @@ import { GfxParms } from "../Playfield/Graphics";
  */
 export class _Label extends Item { };
 export interface _Label extends Draggable { };
-applyMixins(_Label, [Draggable]);
+applyMixins(_Label, [Draggable, Clickable]);
 
 export class Label extends _Label {
 
@@ -21,7 +21,7 @@ export class Label extends _Label {
     }
 
     // --- Overrides --- //
-    draw() {
+    draw(): Dimensions {
         this._updateGparms();
         let x = this.X;
         let y = this.Y;
@@ -39,6 +39,7 @@ export class Label extends _Label {
         // this.gfx.text(this.label, rectX, y, w, h);
         this.gfx.textRect(this.label, rectX, rectY, w, h);
         this.gfx.restore();
+        return new Dimensions(this.W, this.H);
     }
 
     get label(): string {

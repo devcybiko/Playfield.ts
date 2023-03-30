@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins, Logger, Rect, between, Tree } from "../Utils";
+import { applyMixins, Logger, Rect, between, Tree, Dimensions } from "../Utils";
 import { Draggable, Dispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
 
 export class _Group extends Item { };
@@ -97,7 +97,7 @@ export class Group extends _Group {
         return { w, h };
     }
 
-    draw() {
+    override draw(): Dimensions {
         this._updateGparms();
         this.updateWidthHeight();
         if (this.isBoxed) {
@@ -122,6 +122,7 @@ export class Group extends _Group {
         } else {
             this.drawChildren();
         }
+        return this.dimensions;
     }
 
     // --- Accessors --- //
@@ -176,5 +177,10 @@ export class Group extends _Group {
             }
         }
         return result;
+    }
+
+    onEvent(pfEvent: PlayfieldEvent) {
+        this.dispatchEventToChildren(pfEvent);
+        this.dispatchEvent(pfEvent, this);
     }
 }

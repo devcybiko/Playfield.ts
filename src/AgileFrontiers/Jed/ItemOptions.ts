@@ -1,7 +1,7 @@
 import { TileOptions } from "../Playfield";
 
 export class ItemOptions extends TileOptions {
-    fontSize = 24;
+    fontSize = 10;
     fontFace = "sans-serif";
     fontStyle = "";
     backgroundColor = "white";

@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { Dimensions, applyMixins } from "../Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
 export class _Text extends Item { };
@@ -29,7 +29,7 @@ export class Text extends _Text {
 
     // --- Overrides --- //
 
-    draw() {
+    override draw(): Dimensions {
         this._blink();
         let gfx = this.gfx;
         this._updateGparms();
@@ -44,6 +44,7 @@ export class Text extends _Text {
         // gfx.textRect(value, this.X, this.Y, this.W, this.H);
         this._drawCursor();
         gfx.restore();
+        return this.dimensions;
     }
 
     // --- onActions --- //

@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { Dimensions, applyMixins } from "../Utils";
 import { Draggable, Hoverable, Clickable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
@@ -23,7 +23,7 @@ export class Checkbox extends _Checkbox {
 
     // --- Overrides --- //
 
-    override draw() {
+    override draw(): Dimensions {
         let gparms = this.gfx.gparms;
         gparms.borderRadius = 0;
         this._updateGparms();
@@ -47,6 +47,7 @@ export class Checkbox extends _Checkbox {
         this.gfx.rect(boxX, boxY, boxW, boxH);
         this.gfx.text(this.label, textX, textY, textW, textH);
         this.gfx.restore();
+        return this.dimensions;
     }
 
     // --- onActions  --- //

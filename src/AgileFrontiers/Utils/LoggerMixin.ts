@@ -5,6 +5,11 @@ export class Logger {
     private _link: string;
     private _uselink: boolean;
 
+    constructor(...args: any[]) {
+        if (args.length === 0) return;
+        this.Logger(args[0], args[1]);
+    }
+
     // INFO ==> INFO, LOG, WARN, ERROR
     // LOG  ==> LOG, WARN, ERROR
     // WARN ==> WARN, ERROR

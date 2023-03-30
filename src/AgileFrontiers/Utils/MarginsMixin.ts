@@ -4,6 +4,11 @@ export class Margins {
     private _left = 0;
     private _right = 0;
 
+    constructor(...args: number[]) {
+        if (args.length === 0) return;
+        this.Margins(args[0], args[1], args[2], args[3]);
+    }
+
     Margins(top: number, right: number, bottom: number, left: number): Margins {
         this._top = top;
         this._bottom = bottom;

@@ -1,7 +1,7 @@
 import { Tile } from "./Tile";
 import { Dispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
-import { applyMixins, Logger, Margins, Rect, int, between, round } from "../Utils";
+import { applyMixins, Logger, Margins, Rect, int, between, round, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 
@@ -147,7 +147,7 @@ export class Splitter extends _Splitter {
         this._swSize();
     }
 
-    override draw() {
+    override draw(): Dimensions {
 
         this._drawGutter(this._hGutterRect, this._isHGutterHovering);
         this._drawGutter(this._vGutterRect, this._isVGutterHovering);
@@ -158,6 +158,7 @@ export class Splitter extends _Splitter {
         this.se.draw();
         this.nw.draw();
         this.sw.draw();
+        return this.dimensions;
     }
 
     // --- onActions --- //

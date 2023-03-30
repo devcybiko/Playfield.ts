@@ -11,6 +11,11 @@ export class Ratio {
     _idelta: number;
     _index: number;
 
+    constructor(...args: number[]) {
+        if (args.length === 0) return;
+        this.Ratio(args[0], args[1], args[2], args[3], args[4]);
+    }
+
     Ratio(rmin: number, rmax: number, value: number, imin: number, imax: number) {
         this._rmin = rmin;
         this._rmax = rmax;

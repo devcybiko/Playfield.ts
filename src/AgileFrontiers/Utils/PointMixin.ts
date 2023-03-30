@@ -2,9 +2,15 @@ export class Point {
     private _x = 0;
     private _y = 0;
 
-    Point(x: number, y: number) {
+    constructor(...args: number[]) {
+        if (args.length === 0) return;
+        this.Point(args[0], args[1]);
+    }
+
+    Point(x: number, y: number): Point {
         this._x = x;
         this._y = y;
+        return this;
     }
 
     // --- Public Methods --- //

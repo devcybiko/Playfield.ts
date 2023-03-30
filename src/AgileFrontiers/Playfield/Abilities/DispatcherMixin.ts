@@ -33,12 +33,14 @@ export class Dispatcher {
         let thisTile = Tile.cast(this);
         for (let child of thisTile.children.reverse()) {
             let dispatchableChild = Dispatchable.cast(child);
-            if (pfEvent.isActive) dispatchableChild.onEvent(pfEvent);
+            if (pfEvent.isActive) {
+                dispatchableChild.onEvent(pfEvent);
+            }
         }
     }
 
     onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEventToChildren(pfEvent);
-        Dispatchable.cast(this).dispatchEvent(pfEvent, Tile.cast(this).parent);
+        let thisTile = Tile.cast(this);
+        Dispatchable.cast(this).dispatchEvent(pfEvent, thisTile);
     }
 }

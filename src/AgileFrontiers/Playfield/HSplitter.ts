@@ -1,5 +1,5 @@
 import { Tile } from "./Tile";
-import { int } from "../Utils";
+import { Dimensions, int } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 import { Splitter } from "./Splitter";
@@ -54,12 +54,13 @@ export class HSplitter extends Splitter {
         this._southSize();
     }
 
-    override draw() {
+    override draw(): Dimensions {
 
         this._drawGutter(this._hGutterRect, this._isHGutterHovering);
         this.gfx.gparms.borderColor = "black";
         this.north.draw()
         this.south.draw()
+        return this.dimensions;
     }
 
     // --- onActions --- //

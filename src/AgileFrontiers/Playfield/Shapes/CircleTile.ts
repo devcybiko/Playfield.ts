@@ -1,7 +1,7 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
 import { Draggable, Selectable } from "../Abilities";
-import { applyMixins } from "../../Utils";
+import { Dimensions, applyMixins } from "../../Utils";
 
 export class _CircleTile extends ShapeTile { };
 export interface _CircleTile extends Draggable, Selectable { };
@@ -24,7 +24,7 @@ export class CircleTile extends _CircleTile {
         if (dr <= dw) return this;
     }
 
-    draw() {
+    override draw(): Dimensions {
         this.gfx.gparms.borderColor = "black";
         this.gfx.gparms.fillColor = "gray";
         this.gfx.circle(this.X, this.Y, this.W);
@@ -36,7 +36,7 @@ export class CircleTile extends _CircleTile {
             this.playfield.gfx.circle(this.X, this.Y, r);
             this.gfx.gparms.fillColor = oldColor;
         }
-        super.draw();
+        return super.draw();
     }
 
     // --- onActions --- //

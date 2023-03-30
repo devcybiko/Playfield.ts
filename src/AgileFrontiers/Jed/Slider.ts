@@ -1,6 +1,6 @@
 import { Tile } from "../Playfield/Tile";
 import { Draggable, Hoverable } from "../Playfield/Abilities";
-import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit } from "../Utils";
+import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
 import { GfxParms } from "../Playfield/Graphics";
 import { Item } from "./Item";
@@ -81,12 +81,13 @@ export class Slider extends _Slider {
         this.gfx.gparms.borderRadius = this._cursorBorderRadius;
         this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
     }
-    draw() {
+    override draw(): Dimensions {
         this._updateGparms();
         this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         this._drawContainer();
         this._drawCursor();
         this.gfx.restore();
+        return this.dimensions;
     }
 
     onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {

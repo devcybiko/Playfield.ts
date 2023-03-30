@@ -7,7 +7,7 @@ export class BrowserFile implements File {
     protected _key: string;
     protected _path: string;
     protected _status: string;
-    protected _data: string;
+    protected _data: any;
     protected _length: number;
     protected _statusText: string;
     protected _img: any; // _data interpretted as an image
@@ -33,7 +33,37 @@ export class BrowserFile implements File {
     public get isInProgress(): boolean {
         return ["initialized", "loadstart", "load", "progress"].includes(this._status);
     }
-    _timer() {
+    public get data(): any {
+        return this._data;
+    }
+    public set data(s: any) {
+        this._data = s;
+    }
+    public get string(): string {
+        var encoding = {
+            "ascii": "ascii",
+            'utf8.bin': 'utf-8',
+            'utf16le.bin': 'utf-16le',
+            'macintosh.bin': 'macintosh'
+        };    
+        var dataView = new DataView(this._data as unknown as ArrayBuffer);
+        var decoder = new TextDecoder(encoding["ascii"]);
+        var decodedString = decoder.decode(dataView);
+        return decodedString;
+    }
+    public set string(str: string) {
+        var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+        var bufView = new Uint16Array(buf);
+        for (var i = 0, strLen = str.length; i < strLen; i++) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        this._data = buf as any;
+    }
+    public get json(): any {
+        return JSON.parse(this.string);
+    }
+    public set json(obj: any) {
+        this._data = JSON.stringify(obj);
     }
     public async wait(timeout = 1000000): Promise<File> {
         let that = this;
@@ -76,10 +106,8 @@ export class BrowserFiles implements Files {
         xhr.addEventListener('abort', this._handleEvent.bind(this));
     }
     _handleEvent(event: any) {
-        console.log(event);
         let xhr = event.currentTarget;
         let file = xhr._file;
-        console.log(file);
         if (xhr.status !== 200) {
             file.status = "error";
             file._error = xhr.statusText;

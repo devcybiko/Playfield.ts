@@ -1,4 +1,4 @@
-import { applyMixins, Tree, Rect, RelRect, between, Logger, Margins } from "../Utils";
+import { applyMixins, Tree, Rect, RelRect, between, Logger, Margins, Dimensions } from "../Utils";
 import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
@@ -98,13 +98,20 @@ export class Tile extends _Tile {
         return Tile.null;
     }
 
-    drawChildren() {
-        this.children.forEach(child => (child as Tile).draw());
+    drawChildren(): Dimensions {
+        let maxDimensions = new Dimensions();
+        for(let child of this.children) {
+            let tileChild = Tile.cast(child);
+            let deltas = tileChild.draw();
+            maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
+            maxDimensions.h = Math.max(maxDimensions.h, tileChild.y + deltas.h);
+        }
+        return maxDimensions;
     }
 
-    draw(): void {
+    draw(): Dimensions {
         this._updateGparms();
-        this.drawChildren();
+        return this.drawChildren();
     }
 
     // --- OnActions --- //
@@ -141,6 +148,12 @@ export class Tile extends _Tile {
     get H(): number {
         // Absolute Screen Coordinates (kinda)
         return this.h;
+    }
+    get Dimensions(): Dimensions {
+        let d = this.dimensions;
+        d.w += this.x;
+        d.h = this.y;
+        return d;
     }
     public get playfield(): Playfield {
         return this._playfield;

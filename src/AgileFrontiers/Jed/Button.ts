@@ -40,6 +40,7 @@ export class Button extends _Button {
         this.gfx.clipRect(x, y, w, h);
         this.gfx.textRect(this.label, x, y, w, h);
         this.gfx.restore();
+        return this.dimensions;
     }
 
     // --- onActions --- //

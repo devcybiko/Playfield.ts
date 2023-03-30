@@ -3,10 +3,12 @@ import { BrowserPlayfieldApp } from "../Browser";
 import * as Jed from "../Jed";
 import { int, random } from "../Utils";
 import { BoxTile } from "../Playfield/Shapes";
-import {BrowserFiles, BrowserFile } from "../Browser";
+import { BrowserFiles, BrowserFile } from "../Browser";
 /**
  * Jed Test with treeItem
  */
+
+let _browserFiles = new BrowserFiles();
 
 export class TestClass {
     _playfieldApp: BrowserPlayfieldApp;
@@ -18,32 +20,49 @@ export class TestClass {
         this._playfieldApp = new BrowserPlayfieldApp("#playfield", 1.0);
         this._playfield = this._playfieldApp.playfield;
     }
-    loadFileTree(fname: string) {
-        this._files = new BrowserFiles();
+    async loadFileTree(): Promise<File> {
+        this._files = _browserFiles;
         this._file = this._files.load("directory", "/static/data/tree.json");
+        let file = await this._file.wait();
+        return file;
     }
-    treeItemTest() {
-        let file = this._file.wait();
-        console.log(file);
+    async showFilename(pfEvent: PlayfieldEvent) {
+        function fullPathName(treeItem: Jed.TreeItem) {
+            let s = treeItem.data.name;
+            for(let parent = Jed.TreeItem.cast(treeItem.parent); parent && parent.data; parent = Jed.TreeItem.cast(parent.parent)) {
+                s = `${Jed.TreeItem.cast(parent).data.name}/${s}`;
+            }
+            return s;
+        }
+    
+        pfEvent.isActive = false;
+        let thisTreeItem = Jed.TreeItem.cast(this);
+        let fname = fullPathName(thisTreeItem);
+        let file = _browserFiles.load("file", fname);
+        file = await file.wait();
+        console.log("loaded File")
+        console.log(file.string);
+    }
+    mkdir(node: Jed.TreeItem, dirs: any[]) {
+        for (let dir of dirs) {
+            if (dir.type === "directory") {
+                let item = node.addNode(dir.name, dir);
+                item.onClick = this.showFilename.bind(item);
+                this.mkdir(item, dir.contents);           
+            } else if (dir.type === "file") {
+                let item = node.addNode(dir.name, dir);
+                item.onClick = this.showFilename.bind(item);
+            } else {
+                console.log("ignoring", dir);
+            }
+        }
+    }
+    async treeItemTest() {
+        let file = await this.loadFileTree();
+        let dirs = file.json;
         let root = this._playfield.rootTile;
-        let box = new BoxTile("box", root, 100,100,200,200);
-        box.isSelected = true;
-        let treeItem = new Jed.Tree("tree", root, 100, 100, 0, 0, "Tree Example");
-        let a = treeItem.addNode(treeItem._root, "a");
-        let aa = treeItem.addNode(a, "aa");
-        let aaa = treeItem.addNode(aa, "aaa");
-        let aab = treeItem.addNode(aa, "aab");
-        let aac = treeItem.addNode(aa, "aac");
-        let ab = treeItem.addNode(a, "ab");
-        let ac = treeItem.addNode(a, "ac");
-        let b = treeItem.addNode(treeItem._root, "b");
-        let ba = treeItem.addNode(b, "ba");
-        let bb = treeItem.addNode(b, "bb");
-        let bc = treeItem.addNode(b, "bc");
-        let c = treeItem.addNode(treeItem._root, "c");
-        let ca = treeItem.addNode(c, "ca");
-        let cb = treeItem.addNode(c, "cb");
-        let cc = treeItem.addNode(c, "cc");
+        let tree = new Jed.Tree("tree", root, 100, 100, 0, 0, "Tree Example");
+        this.mkdir(tree.treeRoot, dirs);
         this._playfield.rootTile.printTree();
         this._playfield.start();
     }

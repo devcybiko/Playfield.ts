@@ -1,6 +1,6 @@
 import { Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
-import { applyMixins, random, int } from "../../Utils";
+import { applyMixins, random, int, Dimensions } from "../../Utils";
 import { Draggable, Selectable, Clickable } from "../Abilities";
 
 export class _BoxTile extends ShapeTile { };
@@ -19,12 +19,12 @@ export class BoxTile extends _BoxTile {
 
     // --- Overrides ---//
 
-    draw() {
+    override draw(): Dimensions {
         if (this.isSelected) this.gfx.gparms.borderColor = "black";
         else this.gfx.gparms.borderColor = "";
         this.gfx.gparms.fillColor = ""; this._colors[this._color];
         this.gfx.rect(this.x, this.y, this.w, this.h);
-        super.draw();
+        return super.draw();
     }
 
     // --- onActions --- //

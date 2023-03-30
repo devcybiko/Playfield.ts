@@ -1,5 +1,5 @@
 import { Tile } from "./Tile";
-import { Margins, Rect, int, between } from "../Utils";
+import { Margins, Rect, int, between, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { RootTile } from "./RootTile";
 import { Splitter } from "./Splitter";
@@ -54,11 +54,12 @@ export class VSplitter extends Splitter {
         this._westSize();
     }
 
-    override draw() {
+    override draw(): Dimensions {
         this._drawGutter(this._vGutterRect, this._isVGutterHovering);
         this.gfx.gparms.borderColor = "black";
         this.east.draw();
         this.west.draw();
+        return this.dimensions;
     }
 
     // --- onActions --- //

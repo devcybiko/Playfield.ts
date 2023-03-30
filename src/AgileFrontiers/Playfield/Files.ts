@@ -6,6 +6,12 @@ export interface File {
     get isError(): boolean;
     get isDone(): boolean;
     get isInProgress(): boolean;
+    get data(): any;
+    set data(s: any);
+    get string(): string;
+    set string(s: string);
+    get json(): any;
+    set json(j: any);
     wait(timeout?: number): Promise<File>;
 
 }

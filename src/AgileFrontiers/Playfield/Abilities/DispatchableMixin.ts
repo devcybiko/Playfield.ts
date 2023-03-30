@@ -19,12 +19,12 @@ export class Dispatchable {
 
     dispatchEvent(pfEvent: PlayfieldEvent, controller: any): void {
         let anyThis = this as any;
-        if (anyThis.isHoverable && controller.hoverEvent) controller.hoverEvent(pfEvent, this);
-        if (anyThis.isSelectable && controller.selectEvent) controller.selectEvent(pfEvent, this);
-        if (anyThis.isClickable && controller.clickEvent) controller.clickEvent(pfEvent, this);
-        if (anyThis.isPressable && controller.pressEvent) controller.pressEvent(pfEvent, this);
-        if (anyThis.isFocusable && controller.editerEvent) controller.editerEvent(pfEvent, this);
-        if (anyThis.isDraggable && controller.dragEvent) controller.dragEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isHoverable && controller.hoverEvent) controller.hoverEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isSelectable && controller.selectEvent) controller.selectEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isClickable && controller.clickEvent) controller.clickEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isPressable && controller.pressEvent) controller.pressEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isFocusable && controller.editerEvent) controller.editerEvent(pfEvent, this);
+        if (pfEvent.isActive && anyThis.isDraggable && controller.dragEvent) controller.dragEvent(pfEvent, this);
     }
 
     // --- On Actions --- //

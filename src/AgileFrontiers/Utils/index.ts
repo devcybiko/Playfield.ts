@@ -8,3 +8,4 @@ export {RelRect} from "./RelRectMixin";
 export {Point} from "./PointMixin";
 export {Margins} from "./MarginsMixin";
 export {Ratio} from "./RatioMixin";
+export {Dimensions} from "./DimensionsMixin";

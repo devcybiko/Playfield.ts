@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { Dimensions, applyMixins } from "../Utils";
 import { Draggable, Hoverable, Selectable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
@@ -23,7 +23,7 @@ export class Radio extends _Radio {
 
     // --- Overrides --- //
 
-    override draw() {
+    override draw(): Dimensions {
         let gparms = this.gfx.gparms;
         this._updateGparms();
         if (this.isSelected) gparms.fillColor = this.options.selectColor;
@@ -48,6 +48,7 @@ export class Radio extends _Radio {
         this.gfx.circle(boxX + r, boxY + r, r);
         this.gfx.text(this.label, textX, textY, textW, textH);
         this.gfx.restore();
+        return this.dimensions;
     }
 
     // --- onActions  --- //
