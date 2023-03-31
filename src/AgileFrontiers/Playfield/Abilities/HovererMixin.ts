@@ -19,7 +19,7 @@ export class Hoverer {
     hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable) {
         let tileChild = child as unknown as Tile;
         if (pfEvent.isMove) {
-            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
                 if (child.isHovering) {
                     child.onHovering(pfEvent);
                 } else {

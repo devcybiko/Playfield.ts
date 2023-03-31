@@ -19,12 +19,12 @@ export class Clicker {
     clickEvent(pfEvent: PlayfieldEvent, child: Clickable) {
         if (pfEvent.isPress) {
             let tileChild = child as unknown as Tile;
-            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
                 child.onClick(pfEvent);
             }
         } else if (pfEvent.isMenu) {
             let tileChild = child as unknown as Tile;
-            if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+            if (tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
                 child.onMenu(pfEvent);
             }
         }

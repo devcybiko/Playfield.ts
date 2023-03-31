@@ -2,6 +2,7 @@ import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Logger, Rect, between, Tree, Dimensions } from "../Utils";
 import { Draggable, Dispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
+import { BrowserPlayfieldEvent } from "../Browser";
 
 export class _Group extends Item { };
 export interface _Group extends Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
@@ -27,14 +28,22 @@ export class Group extends _Group {
 
     // --- Overrides --- //
 
-    inBounds(dx: number, dy: number): Tile {
+    inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
         for (let child of this.children.reverse()) {
             let tileChild = child as unknown as Tile;
-            if (tileChild.isVisible && tileChild.inBounds(dx, dy)) {
+            if (pfEvent) {
+                pfEvent.touchedBy.push(this.fullName);
+                pfEvent.counter++;
+            }
+            if (tileChild.isVisible && tileChild.inBounds(dx, dy, pfEvent)) {
                 return tileChild as unknown as Tile;
             }
         }
         if (this.isBoxed) {
+            if (pfEvent) {
+                pfEvent.touchedBy.push(this.fullName);
+                pfEvent.counter++;
+            }
             let wh = this._computeWidthHeight();
             let result = this.isVisible &&
                 between(this.X, dx, this.X + wh.w) &&
@@ -43,7 +52,7 @@ export class Group extends _Group {
                 return this as unknown as Tile;
             }
         }
-        return super.inBounds(dx, dy);
+        return super.inBounds(dx, dy, pfEvent);
     }
 
     // onEvent(pfEvent: PlayfieldEvent) {

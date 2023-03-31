@@ -28,6 +28,7 @@ export class TestClass {
     }
     async showFilename(pfEvent: PlayfieldEvent) {
         function fullPathName(treeItem: Jed.TreeItem) {
+            if (treeItem.data.type === "directory") return null;
             let s = treeItem.data.name;
             for (let parent = treeItem.parent as any; parent && parent.data; parent = parent.parent as any) {
                 s = `${parent.data.name}/${s}`;
@@ -37,6 +38,10 @@ export class TestClass {
         pfEvent.isActive = false;
         let thisTreeItem = this as unknown as Jed.TreeItem;
         let fname = fullPathName(thisTreeItem);
+        if (!fname) {
+            thisTreeItem.open = !thisTreeItem.open;
+            return;
+        };
         let file = _browserFiles.load("file", fname);
         file = await file.wait();
         console.log("loaded File")
@@ -73,11 +78,11 @@ export class TestClass {
         let file = await this.loadFileTree();
         let dirs = file.json;
         let root = this._playfield.rootTile;
-        let tree = new Jed.Tree("tree", root, 100, 100, 0, 0, "Tree Example");
+        let tree = new Jed.Tree("tree", root, 0, 0, 0, 0, "Tree Example");
         // this.simpleScenerio(tree);
         this.mkdir(tree.treeRoot, dirs);
         this._playfield.rootTile.printTree();
-        this._playfield.start(1000 / 60);
+        this._playfield.start(1000/8);
     }
     run() {
         this.treeItemTest();

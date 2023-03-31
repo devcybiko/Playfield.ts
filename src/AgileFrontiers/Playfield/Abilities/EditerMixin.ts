@@ -28,7 +28,7 @@ export class Editer {
     
     _focusChild(pfEvent: PlayfieldEvent, child: Editable) {
         let tileChild = child as unknown as Tile;
-        if (pfEvent.isKeyboardEvent || tileChild.inBounds(pfEvent.x, pfEvent.y)) {
+        if (pfEvent.isKeyboardEvent || tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             this._unfocusChildren(pfEvent, child);
             this._focusObj = child;
             child.isFocus = true;

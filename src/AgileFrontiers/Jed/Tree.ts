@@ -10,6 +10,7 @@ export class Tree extends Group {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label?: string) {
         super(name, parent, x, y, w, h, label);
         this._treeRoot = new TreeItem("_treeRoot", this, 0, 0, 0, 0, "");
+        this._treeRoot.isVisible = true;
         this._treeRoot._open = true;
         this._treeRoot._treeButton.removeChild();
         this._treeRoot._treeLabel.removeChild();
@@ -20,6 +21,7 @@ export class Tree extends Group {
     addNode(node: TreeItem, label: string, data?: any): TreeItem {
         let newChild = new TreeItem(label, node, node.x, node.y, 0, 0, label);
         newChild.data = data;
+        if (node.name === "_treeRoot") newChild.isVisible = true;
         return newChild;
     }
     override drawChildren(): Dimensions {

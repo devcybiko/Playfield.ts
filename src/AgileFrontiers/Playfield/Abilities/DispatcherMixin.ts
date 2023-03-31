@@ -21,7 +21,7 @@ export class Dispatcher {
         //       if the children have children it is the 
         //       responsibility of the children to pass the event down
         let thisTile = this as unknown as Tile;
-        if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y)) {
+        if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             this._forEachChild(pfEvent);
         } else if (pfEvent.isKeyboardEvent) {
             this._forEachChild(pfEvent);

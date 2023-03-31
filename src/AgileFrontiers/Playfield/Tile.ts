@@ -91,19 +91,20 @@ export class Tile extends _Tile {
     }
     // --- Public Methods --- //
 
-    inBoundsChildren(x: number, y: number, checkThis = true): Tile {
+    inBoundsChildren(x: number, y: number, pfEvent?: PlayfieldEvent, checkThis = true): Tile {
+        // GLS - the CheckThis flag doesn't appear to ever be used
         let found = Tile.null;
-        if (checkThis) found = this.inBounds(x,y);
+        if (checkThis) found = this.inBounds(x,y, pfEvent);
         if (found) return found;
         for (let child of this.children) {
             let tileChild = child as unknown as Tile;
-            found = tileChild.inBoundsChildren(x, y);
+            found = tileChild.inBoundsChildren(x, y, pfEvent);
             if (found) break;
         }
         return found;
     }
 
-    inBounds(x: number, y: number): Tile {
+    inBounds(x: number, y: number, pfEvent?: PlayfieldEvent): Tile {
         if (this.isVisible &&
             between(this.X, x, this.X + this.w) &&
             between(this.Y, y, this.Y + this.h))
@@ -136,7 +137,7 @@ export class Tile extends _Tile {
     // --- Overrides --- //
 
     override printMe() {
-        console.log(" | ".repeat(this.depth()), this.name, this.x, this.y, this.w, this.h, "(", this.X, this.Y, this.W, this.H, ")");
+        console.log(" | ".repeat(this.depth()), this.name, this.x, this.y, this.w, this.h, "(", this.X, this.Y, this.W, this.H, ")", this.isVisible);
     }
 
     // --- Accessors --- //

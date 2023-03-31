@@ -66,7 +66,7 @@ export class Playfield extends _Playfield {
         let now = Date.now();
         let beginning = now;
         let extra = now - this._lastTime;
-        this._handleEvents();
+        let eventCounts = this._handleEvents();
         let then = Date.now();
         let handleEventsDelta = then - now;
         now = Date.now();
@@ -80,24 +80,26 @@ export class Playfield extends _Playfield {
         this._lastTime = Date.now();
         let delta = this._lastTime - beginning;
         if (this._delay > 0 && (delta > this._delay)) {
-            console.log({ handleEventsDelta, onTickDelta, redrawDelta });
+            console.log({ handleEventsDelta, onTickDelta, redrawDelta, eventCounts });
             console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
         }
         // this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
     _handleEvents() {
-        let that = this;
-        let cnt = 0;
-        for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            cnt++;
-            this._rootTile.onEvent(pfEvent);
-            // console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);
-        }
-        // console.log(cnt + " Events Handled...");
         function next() {
             return that._eventQueue.getEvent();
         }
+        let that = this;
+        let cnt = 0;
+        for (let pfEvent = next(); pfEvent; pfEvent = next()) {
+            this._rootTile.onEvent(pfEvent);
+            // console.log(pfEvent);
+            cnt+=pfEvent.counter;
+            // console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);
+        }
+        return cnt;
+        // console.log(cnt + " Events Handled...");
     }
 
     // --- Accessors --- //

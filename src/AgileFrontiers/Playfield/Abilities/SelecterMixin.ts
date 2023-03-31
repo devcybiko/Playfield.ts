@@ -24,10 +24,11 @@ export class Selecter {
     // --- Public Methods --- //
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
+        // GLS - doing a check of all children is questionable
+        // GLS - I thought each individual object passed events to children via OnEvent()
         let tileChild = child as unknown as Tile;
-        let selectedObj = this._selectedObj as unknown as Selectable;
         if (pfEvent.isPress) {
-            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y) as unknown as Selectable;
+            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y, pfEvent) as unknown as Selectable;
             if (foundChild && foundChild.isSelectable) this._selectChild(pfEvent, foundChild);
         }
     }

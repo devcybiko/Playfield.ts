@@ -15,7 +15,8 @@ export class TreeItem extends Group {
         super(name, parent, x, y, w, h);
         this._treeButton = new TreeButton("_button", this, 0, 0); // x,y,w,h filled in during draw()
         this._treeLabel = new TreeLabel("_label", this, 0, 0, 0, 0, label); // x,y,w,h filled in during draw()
-        this._open = false;
+        this.open = false;
+        this.isVisible = false;
         this._isBoxed = false;
     }
 
@@ -49,6 +50,7 @@ export class TreeItem extends Group {
     _drawChildren(x: number, y: number): Dimensions {
         let dw = 0;
         let dh = 0;
+        if (!this.isVisible) return new Dimensions();
         for (let child of this.children) {
             let treeItemChild = child as unknown as TreeItem;
             if (treeItemChild.name === "_button" || treeItemChild.name === "_label") continue;
@@ -63,7 +65,7 @@ export class TreeItem extends Group {
 
     override draw(enable = true): Dimensions {
         this.updateRect();
-        if (!this.isVisible) return;
+        if (!this.isVisible) return new Dimensions();
         this.updateGparms(enable);
         if (!this._treeButton) return new Dimensions(0, 0); // don't try to draw() the root
         this._treeButton.draw(enable);
@@ -80,7 +82,7 @@ export class TreeItem extends Group {
             return;
         }
         let thisTile = this as unknown as Tile;
-        if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y)) {
+        if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             this._forEachChild(pfEvent);
         } else if (pfEvent.isKeyboardEvent) {
             this._forEachChild(pfEvent);
@@ -88,7 +90,8 @@ export class TreeItem extends Group {
     }
 
     addNode(label: string, data?: any): TreeItem {
-        let newChild = new TreeItem(label, this, this.x, this.y, 0, 0, label);
+        let newChild = new TreeItem(label, this, 0, 0, 0, 0, label);
+        if (this.name == "_treeRoot") newChild.isVisible = true;
         newChild.data = data;
         return newChild;
     }
