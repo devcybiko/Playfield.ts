@@ -17,7 +17,7 @@ export class Hoverer {
     // --- Public Methods --- //
     
     hoverEvent(pfEvent: PlayfieldEvent, child: Hoverable) {
-        let tileChild = Tile.cast(child);
+        let tileChild = child as unknown as Tile;
         if (pfEvent.isMove) {
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 if (child.isHovering) {

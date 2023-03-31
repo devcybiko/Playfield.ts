@@ -30,6 +30,7 @@ export class Tile extends _Tile {
     protected _data: any;
     protected _X = 0;
     protected _Y = 0;
+    protected _isVisible = true;
 
     constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
         super();
@@ -95,7 +96,7 @@ export class Tile extends _Tile {
         if (checkThis) found = this.inBounds(x,y);
         if (found) return found;
         for (let child of this.children) {
-            let tileChild = Tile.cast(child);
+            let tileChild = child as unknown as Tile;
             found = tileChild.inBoundsChildren(x, y);
             if (found) break;
         }
@@ -103,7 +104,7 @@ export class Tile extends _Tile {
     }
 
     inBounds(x: number, y: number): Tile {
-        if (
+        if (this.isVisible &&
             between(this.X, x, this.X + this.w) &&
             between(this.Y, y, this.Y + this.h))
             return this;
@@ -113,7 +114,7 @@ export class Tile extends _Tile {
     drawChildren(enable = true): Dimensions {
         let maxDimensions = new Dimensions();
         for(let child of this.children) {
-            let tileChild = Tile.cast(child);
+            let tileChild = child as unknown as Tile;
             let deltas = tileChild.draw(enable);
             maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
             maxDimensions.h = Math.max(maxDimensions.h, tileChild.y + deltas.h);
@@ -146,7 +147,7 @@ export class Tile extends _Tile {
     set x(n: number) {
         this._x = n;
         this._X = n;
-        if (this.parent) this._X += Tile.cast(this.parent).X;
+        if (this.parent) this._X += (this.parent as unknown as Tile).X;
     }
     get x(): number {
         return this._x;
@@ -154,7 +155,7 @@ export class Tile extends _Tile {
     set y(n: number) {
         this._y = n;
         this._Y = n;
-        if (this.parent) this._Y += Tile.cast(this.parent).Y;
+        if (this.parent) this._Y += (this.parent as unknown as Tile).Y;
     }
     get y(): number {
         return this._y;
@@ -205,6 +206,12 @@ export class Tile extends _Tile {
     }
     public set options(value) {
         this._options = value;
+    }
+    public get isVisible() {
+        return this._isVisible;
+    }
+    public set isVisible(value) {
+        this._isVisible = value;
     }
 
 }

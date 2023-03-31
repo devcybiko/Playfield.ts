@@ -29,13 +29,13 @@ export class TestClass {
     async showFilename(pfEvent: PlayfieldEvent) {
         function fullPathName(treeItem: Jed.TreeItem) {
             let s = treeItem.data.name;
-            for (let parent = Jed.TreeItem.cast(treeItem.parent); parent && parent.data; parent = Jed.TreeItem.cast(parent.parent)) {
-                s = `${Jed.TreeItem.cast(parent).data.name}/${s}`;
+            for (let parent = treeItem.parent as any; parent && parent.data; parent = parent.parent as any) {
+                s = `${parent.data.name}/${s}`;
             }
             return s;
         }
         pfEvent.isActive = false;
-        let thisTreeItem = Jed.TreeItem.cast(this);
+        let thisTreeItem = this as unknown as Jed.TreeItem;
         let fname = fullPathName(thisTreeItem);
         let file = _browserFiles.load("file", fname);
         file = await file.wait();

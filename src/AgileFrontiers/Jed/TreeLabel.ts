@@ -15,19 +15,19 @@ export class TreeLabel extends Label {
         return super.draw(enable);
     }
     get data(): any {
-        let parent = TreeItem.cast(this.parent);
+        let parent = this.parent as unknown as TreeItem;
         if (parent) return parent.data;
         return null;
     }
     onClick(pfEvent: PlayfieldEvent) {
         // console.log("onClick", this.name)
-        let parent = TreeItem.cast(this.parent);
+        let parent = this.parent as unknown as TreeItem;
         return parent.onClick(pfEvent);
     }
     onMenu(pfEvent: PlayfieldEvent) {
         // if (!pfEvent.isMove) console.log(this.fullName, "onEvent");
         // console.log("onMenu", this.name)
-        let parent = TreeItem.cast(this.parent);
+        let parent = this.parent as unknown as TreeItem;
         return parent.onMenu(pfEvent);
     }
     onEvent(pfEvent: PlayfieldEvent) {

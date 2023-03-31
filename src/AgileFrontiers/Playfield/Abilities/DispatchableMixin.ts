@@ -30,7 +30,7 @@ export class Dispatchable {
     // --- On Actions --- //
     
     onEvent(pfEvent: PlayfieldEvent): void {
-        this.dispatchEvent(pfEvent, Tile.cast(this).parent);
+        this.dispatchEvent(pfEvent, (this as any).parent);
     }
 
     // --- Accessors --- //

@@ -16,7 +16,7 @@ export class Presser {
     // --- Public Methods --- //
 
     pressEvent(pfEvent: PlayfieldEvent, child: Pressable) {
-        let tileChild = Tile.cast(child);
+        let tileChild = child as unknown as Tile;
         if (pfEvent.isPress && tileChild.inBounds(pfEvent.x, pfEvent.y)) {
             child.isPressed = true;
             child.onPress(pfEvent);

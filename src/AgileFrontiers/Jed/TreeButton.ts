@@ -11,7 +11,8 @@ export class TreeButton extends Button {
         this.isDraggable = false;
     }
     onPress(pfEvent: PlayfieldEvent) {
-        let parent = TreeItem.cast(this.parent);
+        if (!pfEvent.isMove) console.log("onPress", this);
+        let parent = this.parent as unknown as TreeItem;
         parent.open = !parent.open;
         this.open = parent.open;
         pfEvent.isActive = false;
@@ -19,7 +20,7 @@ export class TreeButton extends Button {
 
     draw(enable = true) {
         this.updateRect();
-        let parent = TreeItem.cast(this.parent);
+        let parent = this.parent as unknown as TreeItem;
         if (parent.children.length > 2) {
             if (parent.open) this.label = "-";
             else this.label = "+";
@@ -34,7 +35,6 @@ export class TreeButton extends Button {
         this._open = value;
     }
     onEvent(pfEvent: PlayfieldEvent) {
-        // if (!pfEvent.isMove) console.log(this.fullName, "onEvent");
         super.onEvent(pfEvent);
     }
 }

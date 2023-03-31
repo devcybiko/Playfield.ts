@@ -42,7 +42,7 @@ export class RelRect {
         return (new Rect).Rect(0,0,0,0);
     }
     set x0(x0: number) {
-        let thisRect = Rect.cast(this);
+        let thisRect = this as unknown as Rect;
         this._x0 = x0;
         if (-1 < x0 && x0 < 1) {
             if (x0 > 0) thisRect.x = int(this._parentRect.w * x0);
@@ -53,7 +53,7 @@ export class RelRect {
         }
     }
     set y0(y0: number) {
-        let thisRect = Rect.cast(this);
+        let thisRect = this as unknown as Rect;
         this._y0 = y0;
         if (-1 < y0 && y0 < 1) {
             if (y0 > 0) thisRect.y = int(this._parentRect.h * y0);
@@ -64,7 +64,7 @@ export class RelRect {
         }
     }
     set x1(x1: number) {
-        let thisRect = Rect.cast(this);
+        let thisRect = this as unknown as Rect;
         this._x1 = x1;
         if (-1 < x1 && x1 < 1) {
             if (x1 > 0) thisRect.w = int(this._parentRect.w * x1) + 1;
@@ -75,7 +75,7 @@ export class RelRect {
         }
     }
     set y1(y1: number) {
-        let thisRect = Rect.cast(this);
+        let thisRect = this as unknown as Rect;
         this._y1 = y1;
         if (-1 < y1 && y1 < 1) {
             if (y1 > 0) thisRect.h = int(this._parentRect.h * y1) + 1;

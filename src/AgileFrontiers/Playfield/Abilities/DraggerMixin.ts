@@ -41,7 +41,7 @@ export class Dragger {
 
     _grabChild(pfEvent: PlayfieldEvent, child: Draggable) {
         if (!child.isDraggable) return;
-        let tileChild = Tile.cast(child);
+        let tileChild = child as unknown as Tile;
         if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
             let dx = pfEvent.x - tileChild.X;
             let dy = pfEvent.y - tileChild.Y;

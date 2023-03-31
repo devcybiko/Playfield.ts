@@ -24,10 +24,10 @@ export class Selecter {
     // --- Public Methods --- //
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
-        let tileChild = Tile.cast(child);
-        let selectedObj = Selectable.cast(this._selectedObj);
+        let tileChild = child as unknown as Tile;
+        let selectedObj = this._selectedObj as unknown as Selectable;
         if (pfEvent.isPress) {
-            let foundChild = Selectable.cast(tileChild.inBoundsChildren(pfEvent.x, pfEvent.y));
+            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y) as unknown as Selectable;
             if (foundChild && foundChild.isSelectable) this._selectChild(pfEvent, foundChild);
         }
     }

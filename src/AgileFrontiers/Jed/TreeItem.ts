@@ -27,6 +27,13 @@ export class TreeItem extends Group {
     }
     public set open(value: boolean) {
         this._open = value && this.children.length > 2;
+        if (this._open) {
+            this.children.forEach(child => (child as Tile).isVisible = true)
+        } else {
+            this.children.forEach(child => (child as Tile).isVisible = false)
+        }
+        this._treeButton.isVisible = true; // oops, it's a proper child, so turn it back on
+        this._treeLabel.isVisible = true; // oops, it's a proper child, so turn it back on
     }
 
     _drawChild(obj: TreeItem, x: number, y: number) {
@@ -43,7 +50,7 @@ export class TreeItem extends Group {
         let dw = 0;
         let dh = 0;
         for (let child of this.children) {
-            let treeItemChild = TreeItem.cast(child);
+            let treeItemChild = child as unknown as TreeItem;
             if (treeItemChild.name === "_button" || treeItemChild.name === "_label") continue;
             if (this._open) {
                 let deltas = this._drawChild(treeItemChild, x, y + dh);
@@ -55,6 +62,8 @@ export class TreeItem extends Group {
     }
 
     override draw(enable = true): Dimensions {
+        this.updateRect();
+        if (!this.isVisible) return;
         this.updateGparms(enable);
         if (!this._treeButton) return new Dimensions(0, 0); // don't try to draw() the root
         this._treeButton.draw(enable);
@@ -70,7 +79,7 @@ export class TreeItem extends Group {
         if (!this._open) {
             return;
         }
-        let thisTile = Tile.cast(this);
+        let thisTile = this as unknown as Tile;
         if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y)) {
             this._forEachChild(pfEvent);
         } else if (pfEvent.isKeyboardEvent) {

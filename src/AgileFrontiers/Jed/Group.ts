@@ -28,17 +28,20 @@ export class Group extends _Group {
     // --- Overrides --- //
 
     inBounds(dx: number, dy: number): Tile {
-        this.updateGparms();
         for (let child of this.children.reverse()) {
             let tileChild = child as unknown as Tile;
-            if (tileChild.inBounds(dx, dy)) return Tile.cast(this);
+            if (tileChild.isVisible && tileChild.inBounds(dx, dy)) {
+                return tileChild as unknown as Tile;
+            }
         }
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
-            let result =
+            let result = this.isVisible &&
                 between(this.X, dx, this.X + wh.w) &&
                 between(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
-            if (result) return Tile.cast(this);
+            if (result) {
+                return this as unknown as Tile;
+            }
         }
         return super.inBounds(dx, dy);
     }
@@ -84,7 +87,7 @@ export class Group extends _Group {
         // if (w || h) return { w, h };
 
         for (let child of this.children) {
-            let rectChild = Rect.cast(child);
+            let rectChild = child as unknown as Rect;
             let cx = rectChild.x;
             let cy = rectChild.y;
             let cw = rectChild.w;
@@ -181,6 +184,6 @@ export class Group extends _Group {
 
     onEvent(pfEvent: PlayfieldEvent) {
         this.dispatchEventToChildren(pfEvent);
-        this.dispatchEvent(pfEvent, this);
+        this.dispatchEvent(pfEvent, this.parent);
     }
 }

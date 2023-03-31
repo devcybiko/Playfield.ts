@@ -66,7 +66,7 @@ export class HSplitter extends Splitter {
     // --- onActions --- //
 
     override onRelResize(dw: number, dh: number, pfEvent: PlayfieldEvent) {
-        let thisTile = Tile.cast(this);
+        let thisTile = this as unknown as Tile;
         if (dw) {
             this._hGutterRect.rsize(dw, 0);
         }

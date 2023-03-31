@@ -430,7 +430,7 @@ define("Utils/RelRectMixin", ["require", "exports", "Utils/Functions", "Utils/Re
             return (new RectMixin_1.Rect).Rect(0, 0, 0, 0);
         }
         set x0(x0) {
-            let thisRect = RectMixin_1.Rect.cast(this);
+            let thisRect = this as unknown as RectMixin_1.Rect;
             this._x0 = x0;
             if (-1 < x0 && x0 < 1) {
                 if (x0 > 0)
@@ -446,7 +446,7 @@ define("Utils/RelRectMixin", ["require", "exports", "Utils/Functions", "Utils/Re
             }
         }
         set y0(y0) {
-            let thisRect = RectMixin_1.Rect.cast(this);
+            let thisRect = this as unknown as RectMixin_1.Rect;
             this._y0 = y0;
             if (-1 < y0 && y0 < 1) {
                 if (y0 > 0)
@@ -462,7 +462,7 @@ define("Utils/RelRectMixin", ["require", "exports", "Utils/Functions", "Utils/Re
             }
         }
         set x1(x1) {
-            let thisRect = RectMixin_1.Rect.cast(this);
+            let thisRect = this as unknown as RectMixin_1.Rect;
             this._x1 = x1;
             if (-1 < x1 && x1 < 1) {
                 if (x1 > 0)
@@ -478,7 +478,7 @@ define("Utils/RelRectMixin", ["require", "exports", "Utils/Functions", "Utils/Re
             }
         }
         set y1(y1) {
-            let thisRect = RectMixin_1.Rect.cast(this);
+            let thisRect = this as unknown as RectMixin_1.Rect;
             this._y1 = y1;
             if (-1 < y1 && y1 < 1) {
                 if (y1 > 0)
@@ -718,13 +718,13 @@ define("Playfield/Abilities/ClickerMixin", ["require", "exports", "Playfield/Til
         // --- Public Methods --- //
         clickEvent(pfEvent, child) {
             if (pfEvent.isPress) {
-                let tileChild = Tile_1.Tile.cast(child);
+                let tileChild = child as unknown as Tile_1.Tile;
                 if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                     child.onClick(pfEvent);
                 }
             }
             else if (pfEvent.isMenu) {
-                let tileChild = Tile_1.Tile.cast(child);
+                let tileChild = child as unknown as Tile_1.Tile;
                 if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                     child.onMenu(pfEvent);
                 }
@@ -762,7 +762,7 @@ define("Playfield/Abilities/DispatchableMixin", ["require", "exports", "Playfiel
         }
         // --- On Actions --- //
         onEvent(pfEvent) {
-            this.dispatchEvent(pfEvent, Tile_2.Tile.cast(this).parent);
+            this.dispatchEvent(pfEvent, this).parent as unknown as Tile_2.Tile;
         }
         // --- Accessors --- //
         get isDispatchable() {
@@ -789,7 +789,7 @@ define("Playfield/Abilities/DispatcherMixin", ["require", "exports", "Playfield/
             // Note: this passes the event to every immediate child
             //       if the children have children it is the 
             //       responsibility of the children to pass the event down
-            let thisTile = Tile_3.Tile.cast(this);
+            let thisTile = this as unknown as Tile_3.Tile;
             if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y)) {
                 this._forEachChild(pfEvent);
             }
@@ -798,16 +798,16 @@ define("Playfield/Abilities/DispatcherMixin", ["require", "exports", "Playfield/
             }
         }
         _forEachChild(pfEvent) {
-            let thisTile = Tile_3.Tile.cast(this);
+            let thisTile = this as unknown as Tile_3.Tile;
             for (let child of thisTile.children.reverse()) {
-                let dispatchableChild = DispatchableMixin_1.Dispatchable.cast(child);
+                let dispatchableChild = child as unknown as DispatchableMixin_1.Dispatchable;
                 if (pfEvent.isActive)
                     dispatchableChild.onEvent(pfEvent);
             }
         }
         onEvent(pfEvent) {
             this.dispatchEventToChildren(pfEvent);
-            DispatchableMixin_1.Dispatchable.cast(this).dispatchEvent(pfEvent, Tile_3.Tile.cast(this).parent);
+            this).dispatchEvent(pfEvent, Tile_3.Tile.cast(this).parent as unknown as DispatchableMixin_1.Dispatchable;
         }
     }
     exports.Dispatcher = Dispatcher;
@@ -893,7 +893,7 @@ define("Playfield/Abilities/DraggerMixin", ["require", "exports", "Playfield/Til
         _grabChild(pfEvent, child) {
             if (!child.isDraggable)
                 return;
-            let tileChild = Tile_4.Tile.cast(child);
+            let tileChild = child as unknown as Tile_4.Tile;
             if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 let dx = pfEvent.x - tileChild.X;
                 let dy = pfEvent.y - tileChild.Y;
@@ -1107,7 +1107,7 @@ define("Playfield/Abilities/HovererMixin", ["require", "exports", "Playfield/Til
         }
         // --- Public Methods --- //
         hoverEvent(pfEvent, child) {
-            let tileChild = Tile_5.Tile.cast(child);
+            let tileChild = child as unknown as Tile_5.Tile;
             if (pfEvent.isMove) {
                 if (tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                     if (child.isHovering) {
@@ -1172,7 +1172,7 @@ define("Playfield/Abilities/PresserMixin", ["require", "exports", "Playfield/Til
         }
         // --- Public Methods --- //
         pressEvent(pfEvent, child) {
-            let tileChild = Tile_6.Tile.cast(child);
+            let tileChild = child as unknown as Tile_6.Tile;
             if (pfEvent.isPress && tileChild.inBounds(pfEvent.x, pfEvent.y)) {
                 child.isPressed = true;
                 child.onPress(pfEvent);
@@ -1197,12 +1197,12 @@ define("Playfield/Abilities/Resizable", ["require", "exports", "Playfield/Tile"]
             return obj;
         }
         resize(w, h) {
-            let thisTile = Tile_7.Tile.cast(this);
+            let thisTile = this as unknown as Tile_7.Tile;
             thisTile.w = w;
             thisTile.h = h;
         }
         relResize(dw, dh) {
-            let thisTile = Tile_7.Tile.cast(this);
+            let thisTile = this as unknown as Tile_7.Tile;
             thisTile.w += dw;
             thisTile.h += dh;
         }
@@ -1212,22 +1212,22 @@ define("Playfield/Abilities/Resizable", ["require", "exports", "Playfield/Tile"]
             this.onResizeChildren(w, h, pfEvent);
         }
         onRelResize(dw, dh, pfEvent) {
-            let thisTile = Tile_7.Tile.cast(this);
+            let thisTile = this as unknown as Tile_7.Tile;
             this.relResize(dw, dh);
             this.onRelResizeChildren(dw, dh, pfEvent);
         }
         onResizeChildren(w, h, pfEvent) {
-            let thisTile = Tile_7.Tile.cast(this);
+            let thisTile = this as unknown as Tile_7.Tile;
             for (let _child of thisTile.children) {
-                let child = Resizable.cast(_child);
+                let child = _child as unknown as Resizable;
                 if (child.isResizable)
                     child.onResize(w, h, pfEvent);
             }
         }
         onRelResizeChildren(dw, dh, pfEvent) {
-            let thisTile = Tile_7.Tile.cast(this);
+            let thisTile = this as unknown as Tile_7.Tile;
             for (let _child of thisTile.children) {
-                let child = Resizable.cast(_child);
+                let child = _child as unknown as Resizable;
                 if (child.isResizable)
                     child.onRelResize(dw, dh, pfEvent);
             }
@@ -1290,10 +1290,10 @@ define("Playfield/Abilities/SelecterMixin", ["require", "exports", "Playfield/Ab
         }
         // --- Public Methods --- //
         selectEvent(pfEvent, child) {
-            let tileChild = Tile_8.Tile.cast(child);
-            let selectedObj = SelectableMixin_1.Selectable.cast(this._selectedObj);
+            let tileChild = child as unknown as Tile_8.Tile;
+            let selectedObj = this._selectedObj as unknown as SelectableMixin_1.Selectable;
             if (pfEvent.isPress) {
-                let foundChild = SelectableMixin_1.Selectable.cast(tileChild.inBoundsChildren(pfEvent.x, pfEvent.y));
+                let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y) as unknown as SelectableMixin_1.Selectable;
                 if (foundChild && foundChild.isSelectable)
                     this._selectChild(pfEvent, foundChild);
             }
@@ -1487,7 +1487,7 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Option
             if (found)
                 return found;
             for (let child of this.children) {
-                let tileChild = Tile.cast(child);
+                let tileChild = child as unknown as Tile;
                 found = tileChild.inBoundsChildren(x, y);
                 if (found)
                     break;
@@ -1522,13 +1522,13 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Option
         get X() {
             // Absolute Screen coordinates
             if (this.parent)
-                return this.x + Tile.cast(this.parent).X;
+                return this.x + this.parent as unknown as Tile.X;
             return this.x;
         }
         get Y() {
             // Absolute Screen Coordinates
             if (this.parent)
-                return this.y + Tile.cast(this.parent).Y;
+                return this.y + this.parent as unknown as Tile.Y;
             return this.y;
         }
         get W() {
@@ -1844,7 +1844,7 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
-            let thisTile = Tile_11.Tile.cast(this);
+            let thisTile = this as unknown as Tile_11.Tile;
             if (dw) {
                 this._hGutterRect.rsize(dw, 0);
                 this._nw.onRelResize(dw, 0, pfEvent);
@@ -1994,7 +1994,7 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
-            let thisTile = Tile_12.Tile.cast(this);
+            let thisTile = this as unknown as Tile_12.Tile;
             if (dw) {
                 this._hGutterRect.rsize(dw, 0);
             }
@@ -2081,7 +2081,7 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
-            let thisTile = Tile_13.Tile.cast(this);
+            let thisTile = this as unknown as Tile_13.Tile;
             if (dw) {
                 this._west.onRelResize(dw, 0, pfEvent);
             }
@@ -2994,16 +2994,16 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
         inBounds(dx, dy) {
             this._updateGparms(enable);
             for (let child of this.children.reverse()) {
-                let tileChild = Playfield_5.Tile.cast(child);
+                let tileChild = child as unknown as Playfield_5.Tile;
                 if (tileChild.inBounds(dx, dy))
-                    return Playfield_5.Tile.cast(this);
+                    return this as unknown as Playfield_5.Tile;
             }
             if (this.isBoxed) {
                 let wh = this._computeWidthHeight();
                 let result = (0, Utils_9.between)(this.X, dx, this.X + wh.w) &&
                     (0, Utils_9.between)(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
                 if (result)
-                    return Playfield_5.Tile.cast(this);
+                    return this as unknown as Playfield_5.Tile;
             }
             return super.inBounds(dx, dy);
         }
@@ -3042,7 +3042,7 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
             let h = super.h;
             // if (w || h) return { w, h };
             for (let child of this.children) {
-                let rectChild = Utils_9.Rect.cast(child);
+                let rectChild = child as unknown as Utils_9.Rect;
                 let cx = rectChild.x;
                 let cy = rectChild.y;
                 let cw = rectChild.w;
@@ -3603,7 +3603,7 @@ define("Jed/Tree", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             this.isDraggable = false;
         }
         onPress(pfEvent) {
-            let parent = TreeItem.cast(this.parent);
+            let parent = this.parent as unknown as TreeItem;
             parent.open = !parent.open;
             this.open = parent.open;
             pfEvent.isActive = false;
@@ -3665,7 +3665,7 @@ define("Jed/Tree", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             let dw = 0;
             let dh = 0;
             for (let child of this.children) {
-                let treeItemChild = TreeItem.cast(child);
+                let treeItemChild = child as unknown as TreeItem;
                 if (treeItemChild.name === "_button" || treeItemChild.name === "_label")
                     continue;
                 if (this._open) {
@@ -3886,7 +3886,7 @@ define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/inde
             item.isDraggable = true;
         }
         addItem() {
-            let buttonClicked = Playfield_6.Tile.cast(this);
+            let buttonClicked = this as unknown as Playfield_6.Tile;
             let that = buttonClicked.data;
             let x = 10;
             let y = 10;
@@ -3949,12 +3949,12 @@ define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/inde
             }
         }
         onMenu(pfEvent) {
-            let item = Item_9.Item.cast(this);
+            let item = this as unknown as Item_9.Item;
             let that = item.data;
             that.populateProperties(item, that);
         }
         editMode() {
-            let thisTile = Playfield_6.Tile.cast(this);
+            let thisTile = this as unknown as Playfield_6.Tile;
             let isOn = thisTile.name.includes("on");
             let that = thisTile.data;
             if (isOn) {
@@ -4032,7 +4032,7 @@ define("Test/GUIEditor", ["require", "exports", "Playfield/index", "Browser/inde
             this.currentItem.label = this.preferences.label.value;
         }
         GUIEditor() {
-            this.root = Playfield_6.RootTile.cast(this._playfield.rootTile);
+            this.root = this._playfield.rootTile as unknown as Playfield_6.RootTile;
             this.splitter = new Playfield_6.Splitter("splitter", this.root, 0.65, 0.25);
             this.left = this.splitter.ne;
             this.right = this.splitter.nw;

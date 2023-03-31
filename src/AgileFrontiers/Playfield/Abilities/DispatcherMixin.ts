@@ -20,7 +20,7 @@ export class Dispatcher {
         // Note: this passes the event to every immediate child
         //       if the children have children it is the 
         //       responsibility of the children to pass the event down
-        let thisTile = Tile.cast(this);
+        let thisTile = this as unknown as Tile;
         if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y)) {
             this._forEachChild(pfEvent);
         } else if (pfEvent.isKeyboardEvent) {
@@ -30,10 +30,10 @@ export class Dispatcher {
 
 
     _forEachChild(pfEvent: PlayfieldEvent) {
-        let thisTile = Tile.cast(this);
+        let thisTile = this as unknown as Tile;
         pfEvent.touchedBy.push(thisTile.fullName);
         for (let child of thisTile.children.reverse()) {
-            let dispatchableChild = Dispatchable.cast(child);
+            let dispatchableChild = child as unknown as Dispatchable;
             if (pfEvent.isActive) {
                 dispatchableChild.onEvent(pfEvent);
             }
@@ -41,7 +41,7 @@ export class Dispatcher {
     }
 
     onEvent(pfEvent: PlayfieldEvent) {
-        let thisTile = Tile.cast(this);
-        Dispatchable.cast(this).dispatchEvent(pfEvent, thisTile);
+        let thisTile = this as unknown as Tile;
+        thisTile.dispatchEvent(pfEvent, thisTile as unknown as Dispatchable);
     }
 }

@@ -32,7 +32,7 @@ export class TestClass {
         item.isDraggable = true;
     }
     addItem() {
-        let buttonClicked = Tile.cast(this);
+        let buttonClicked = this as unknown as Tile;
         let that = buttonClicked.data as TestClass;
         let x = 10;
         let y = 10;
@@ -84,12 +84,12 @@ export class TestClass {
         }
     }
     onMenu(pfEvent: PlayfieldEvent) {
-        let item = Item.cast(this);
+        let item = this as unknown as Item;
         let that = item.data as TestClass;
         that.populateProperties(item, that);
     }
     editMode() {
-        let thisTile = Tile.cast(this);
+        let thisTile = this as unknown as Tile;
         let isOn = thisTile.name.includes("on");
         let that = thisTile.data;
         if (isOn) {
@@ -171,7 +171,7 @@ export class TestClass {
         this.currentItem.label = this.preferences.label.value;
     }
     GUIEditor() {
-        this.root = RootTile.cast(this._playfield.rootTile);
+        this.root = this._playfield.rootTile as unknown as RootTile;
         this.splitter = new Splitter("splitter", this.root, 0.65, 0.25);
 
         this.left = this.splitter.ne;
