@@ -20,7 +20,7 @@ export class Text extends _Text {
         super(name, parent, x, y, w, h, value, label);
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
-        this._updateGparms();
+        this.updateGparms();
         this._nchars = Math.ceil(this.w / this.gfx.boundingBox("m").w);
         this._nchars2 = Math.ceil(this.w / this.gfx.boundingBox("m").w / 2);
         this._left = 0;
@@ -29,10 +29,10 @@ export class Text extends _Text {
 
     // --- Overrides --- //
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         this._blink();
         let gfx = this.gfx;
-        this._updateGparms();
+        this.updateGparms(enable);
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
 

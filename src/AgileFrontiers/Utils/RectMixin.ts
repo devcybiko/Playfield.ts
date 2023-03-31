@@ -2,10 +2,10 @@ import { Dimensions } from "./DimensionsMixin";
 import { Point } from "./PointMixin";
 
 export class Rect {
-    private _x = 0;
-    private _y = 0;
-    private _w = 0; // w=1 is a single pixel
-    private _h = 0; // h= 1 is a single pixel
+    protected _x = 0;
+    protected _y = 0;
+    protected _w = 0; // w=1 is a single pixel
+    protected _h = 0; // h= 1 is a single pixel
 
     constructor(...args: number[]) {
         if (args.length === 0) return;
@@ -13,10 +13,6 @@ export class Rect {
     }
 
     Rect(x: number, y: number, w: number, h: number) {
-        return this.RectWH(x, y, w, h);
-    }
-
-    RectWH(x: number, y: number, w: number, h: number) {
         this._x = x;
         this._y = y;
         this._w = w;
@@ -72,22 +68,6 @@ export class Rect {
     }
     set h(n: number) {
         this._h = n;
-    }
-    get X(): number {
-        // placeholder for absolute screen X
-        return this._x;
-    }
-    get Y(): number {
-        // placeholder for absolute screen Y
-        return this._y;
-    }
-    get W(): number {
-        // placeholder for absolute absolute W
-        return this._w;
-    }
-    get H(): number {
-        // placeholder for absolute absolute H
-        return this._h;
     }
     get point(): Point {
         return new Point(this._x, this._y);

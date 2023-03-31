@@ -12,7 +12,7 @@ class Playfield {
         obj.playfield = this;
         this.objs.push(obj);
     }
-    redraw() {
+    redraw(enable = true) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs) obj.draw(this.ctx);
     }
@@ -48,7 +48,7 @@ playfield.add(new Box("RED", "red", 0, 0, 100, 100, 10, 10));
 playfield.add(new Box("GREEN", "green", 100, 200, 50, 50, -10, -10));
 playfield.add(new Box("ORANGE", "orange", 200, 125, 50, 25, -5, 0));
 playfield.add(new Box("BLUE", "blue", 200, 200, 50, 50, -20, -20));
-playfield.redraw();
+playfield.redraw(enable);
 ```
 
 ## Summary
@@ -59,7 +59,7 @@ playfield.redraw();
 * Playfield is a class that manages the canvas
   * `constructor(canvasId)` - grabs the context and initializes a list of objects
   * `add(obj)` - adds an object to the list of objects on the playfield
-  * `redraw()` - clears and redraws all the objects in the playfield
+  * `redraw(enable)` - clears and redraws all the objects in the playfield
 * Box is a class that draws a box on the canvas
   * `constructor()` creates the box at the x,y,w,h as well as the color and name of the box
   * `draw(ctx)` draws the box on the context

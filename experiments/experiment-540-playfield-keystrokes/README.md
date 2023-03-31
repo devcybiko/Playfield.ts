@@ -21,7 +21,7 @@ class PObject {
         if (key === "ArrowDown") this.y += 10;
         if (key === "ArrowLeft") this.x -= 10;
         if (key === "ArrowRight") this.x += 10;
-        this.playfield.redraw();
+        this.playfield.redraw(enable);
     }
 }
 ```

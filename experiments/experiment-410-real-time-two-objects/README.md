@@ -20,7 +20,7 @@ let h_1 = 50;
 redraw_0();
 redraw_1();
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     redraw_0();
     redraw_1();
@@ -43,7 +43,7 @@ function timer() {
     y_0 += 10;
     x_1 -= 10;
     y_1 -= 10;
-    redraw();
+    redraw(enable);
 }
 
 ```
@@ -52,7 +52,7 @@ function timer() {
   * by appending `_0` and `_1' to each of the state variables
   * x, y, w, h
 * Correspondingly, we make a new `redraw_0()` and `redraw_1()` function to draw their respective rectangles
-* And, we rewrite `redraw()` to clear the canvas and call each of `redraw_0` and `redraw_1`
+* And, we rewrite `redraw(enable)` to clear the canvas and call each of `redraw_0` and `redraw_1`
 * Additionally, we rewrite `timer()` to move the rectangles in two different directions.
 
 * Notice that the green rectangle appears to pass 'in front' of the red rectangle

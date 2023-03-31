@@ -54,12 +54,12 @@ export class HSplitter extends Splitter {
         this._southSize();
     }
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
 
         this._drawGutter(this._hGutterRect, this._isHGutterHovering);
         this.gfx.gparms.borderColor = "black";
-        this.north.draw()
-        this.south.draw()
+        this.north.draw(enable)
+        this.south.draw(enable)
         return this.dimensions;
     }
 

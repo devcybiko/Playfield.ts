@@ -108,7 +108,7 @@ class Playfield extends Mixin {
     }
     _timer(playfield) {
         playfield._goAll();
-        playfield.redraw();
+        playfield.redraw(enable);
     }
     _goAll() {
         for (let obj of this.objs) obj.go();
@@ -117,7 +117,7 @@ class Playfield extends Mixin {
         obj.playfield = this;
         this.objs.push(obj);
     }
-    redraw() {
+    redraw(enable = true) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs) obj.draw(this.ctx);
     }
@@ -156,13 +156,13 @@ class Playfield extends Mixin {
         this.objs.splice(0, 0, obj);
     }
     start(tick=125) {
-        this.redraw();
+        this.redraw(enable);
         this._timerId = setInterval(this._timer, tick, this);
     }
     stop() {
         if (this._timerId) {
             clearInterval(this._timerId);
-            this.redraw();
+            this.redraw(enable);
         }
     }
     collisions(theObj, x = theObj.x, y = theObj.y, w = theObj.w, h = theObj.h) {

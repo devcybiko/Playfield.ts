@@ -12,9 +12,9 @@ let color = "red";
 let x = 0;
 let y = 0;
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = color;
     ctx.strokeStyle = 'black';
@@ -35,14 +35,14 @@ function handleKeyEvent(event) {
     if (event.key === 'ArrowDown') y += 10;
     if (event.key === 'ArrowLeft') x += -10;
     if (event.key === 'ArrowRight') x += 10;
-    redraw();
+    redraw(enable);
 }
 
 function handleMouseEvent(event) {
     console.log({event});
     x = event.offsetX - 50;
     y = event.offsetY - 50;
-    redraw();
+    redraw(enable);
 }
 ```
 
@@ -50,7 +50,7 @@ function handleMouseEvent(event) {
 * And, we've added a new function to `handleMouseEvent`s
   - Every time the mouse is moved, it calls the `HandleMouseEvent`
   - this function merely resets the x,y values to the current location of the mouse pointer
-  - then it calls `redraw()`
+  - then it calls `redraw(enable)`
 * Notice that we've `Refactored` the rectangle calling code to its own function
   - REFACTORING: moving code around without changing it's functionality
   - We need to draw the rectangle in two places - at the end of the `handleKeyEvent` and at the end of the `handleMouseEvent`
@@ -67,6 +67,6 @@ function handleMouseEvent(event) {
     console.log({event});
     x = event.offsetX - 50;
     y = event.offsetY - 50;
-    redraw();
+    redraw(enable);
 }
 ```

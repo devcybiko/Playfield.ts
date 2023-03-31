@@ -12,9 +12,9 @@ let objs = [
     { color:"blue", x:250, y:250, w:50, h:50, dx: -20, dy: -20},
 ];
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let obj of objs) draw(obj);
 }
@@ -33,7 +33,7 @@ function move(obj) {
 
 function timer() {
     for(let obj of objs) move(obj);
-    redraw();
+    redraw(enable);
 }
 
 ```
@@ -45,7 +45,7 @@ function timer() {
 * This also reduces our dependency on "global" variables - which are evil
 
 * `draw(obj)` and `move(obj)` now operate on an object
-* `redraw()` iterates over a list of objects - and doesn't depend on index variables
+* `redraw(enable)` iterates over a list of objects - and doesn't depend on index variables
 * likewise for `timer()` 
 * I've also reduced the timer interval to just 1/8th of a second (125 msecs)
 * AND: I've added a new 'blue' object the tears across the screen.

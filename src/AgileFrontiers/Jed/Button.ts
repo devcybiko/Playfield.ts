@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { applyMixins, Dimensions } from "../Utils";
 import { Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
@@ -25,9 +25,9 @@ export class Button extends _Button {
         return false;
     }
 
-    override draw() {
+    override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
-        this._updateGparms();
+        this.updateGparms(enable);
         let x = this.X;
         let y = this.Y;
         let bb = this.gfx.boundingBox(this.label);

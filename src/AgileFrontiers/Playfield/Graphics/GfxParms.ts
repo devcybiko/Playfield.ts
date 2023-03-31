@@ -21,12 +21,13 @@ export class GfxParms {
     private _fontFace: string;
     private _fontStyle: string;
 
-    color = "black";
-    borderColor = "black";
-    fillColor = "white";
-    borderRadius = 0;
-    textAlign: CanvasTextAlign;
-    textBaseline: CanvasTextBaseline;
+    private _enable = true; // turn off actual drawing (great for creating bounding boxes)
+    private _color = "black";
+    private _borderColor = "black";
+    private _fillColor = "white";
+    private _borderRadius = 0;
+    private _textAlign: CanvasTextAlign;
+    private _textBaseline: CanvasTextBaseline;
     private _font: string;
 
     constructor() {
@@ -67,6 +68,48 @@ export class GfxParms {
     public set fontStyle(value: string) {
         this._fontStyle = value;
         this._updateFont();
+    }
+    public get enable() {
+        return this._enable;
+    }
+    public set enable(value) {
+        this._enable = value;
+    }
+    public get color() {
+        return this._color;
+    }
+    public set color(value) {
+        this._color = value;
+    }
+    public get borderColor() {
+        return this._borderColor;
+    }
+    public set borderColor(value) {
+        this._borderColor = value;
+    }
+    public get fillColor() {
+        return this._fillColor;
+    }
+    public set fillColor(value) {
+        this._fillColor = value;
+    }
+    public get borderRadius() {
+        return this._borderRadius;
+    }
+    public set borderRadius(value) {
+        this._borderRadius = value;
+    }
+    public get textAlign(): CanvasTextAlign {
+        return this._textAlign;
+    }
+    public set textAlign(value: CanvasTextAlign) {
+        this._textAlign = value;
+    }
+    public get textBaseline(): CanvasTextBaseline {
+        return this._textBaseline;
+    }
+    public set textBaseline(value: CanvasTextBaseline) {
+        this._textBaseline = value;
     }
 
 }

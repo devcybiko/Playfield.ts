@@ -25,7 +25,7 @@ class Playfield {
         if (playfield.selectedObj) playfield.selectedObj.deselect();
         playfield.selectedObj = obj;
         if (obj) obj.select();
-        playfield.redraw();
+        playfield.redraw(enable);
 }
 
 class Box {
@@ -71,11 +71,11 @@ class Box {
     * it calls `playfield.selectedObj.deselect()` to deselect the old obj
     * it calls `obj.select()` to select the new obj
     * it resets `playfield.selectedObj = obj`
-    * and finally, calls `redraw()`
+    * and finally, calls `redraw(enable)`
 * Some additions to `Box`
   * `this.isSelected` to let the box render differently if it is selected
   * the `select()` and `deselect()` methods to handle updating the selected state
   * the `click(x,y)` method to do something special if the box is clicked upon
   * the `inBounds(x, y)` method is used to see if the object encompasses the mouse click
-  * finally the `draw()` method has been updated to only display a black border if the box is selected
+  * finally the `draw(enable)` method has been updated to only display a black border if the box is selected
 * Also, we added the `utils.js` file for utility methods

@@ -10,16 +10,16 @@ class Playfield {
     moveAll() {
         for(let obj of this.objs) obj.move();
     }
-    redraw() {
+    redraw(enable = true) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for(let obj of this.objs) obj.draw(this.ctx);
     }
     timer() {
         playfield.moveAll();
-        playfield.redraw();
+        playfield.redraw(enable);
     }    
     start() {
-        this.redraw();
+        this.redraw(enable);
         setInterval(this.timer, 125);
     }
 }

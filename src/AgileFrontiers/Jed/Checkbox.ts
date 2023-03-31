@@ -23,10 +23,10 @@ export class Checkbox extends _Checkbox {
 
     // --- Overrides --- //
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
         gparms.borderRadius = 0;
-        this._updateGparms();
+        this.updateGparms(enable);
         if (this.isChecked) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor

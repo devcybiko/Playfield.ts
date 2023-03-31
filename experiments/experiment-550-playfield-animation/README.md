@@ -6,10 +6,10 @@ class Playfield {
     ...
     timer(playfield) {
         playfield.goAll();
-        playfield.redraw();
+        playfield.redraw(enable);
     }
     start() {
-        this.redraw();
+        this.redraw(enable);
         setInterval(this.timer, 125, this);
     }
     goAll() {
@@ -78,7 +78,7 @@ class Circle extends Meanderer {
 ## Summary
 * To add animation, we update `Playfield` with the `timer` and `start` methods
   * `start()` kicks off a timer which calls `timer` every "tick" of our clock (1/8 sec or 125 msecs)
-  * `timer()` is called every "tick" and calls `goAll()` and `redraw()`
+  * `timer()` is called every "tick" and calls `goAll()` and `redraw(enable)`
   * `goAll()` iterates overall the objects and calls its `go()` method
     * `go()` is intended to be a generic method that just animates the object
   * `collisions(obj)` compares the rect of the `obj` to all the other objects

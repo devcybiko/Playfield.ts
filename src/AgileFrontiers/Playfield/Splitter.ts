@@ -147,17 +147,17 @@ export class Splitter extends _Splitter {
         this._swSize();
     }
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
 
         this._drawGutter(this._hGutterRect, this._isHGutterHovering);
         this._drawGutter(this._vGutterRect, this._isVGutterHovering);
 
         this.gfx.gparms.borderColor = "black";
         this.gfx.gparms.fillColor = "";
-        this.ne.draw();
-        this.se.draw();
-        this.nw.draw();
-        this.sw.draw();
+        this.ne.draw(enable);
+        this.se.draw(enable);
+        this.nw.draw(enable);
+        this.sw.draw(enable);
         return this.dimensions;
     }
 

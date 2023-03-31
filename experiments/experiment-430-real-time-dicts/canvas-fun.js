@@ -9,9 +9,9 @@ let objs = [
     { color:"blue", x:250, y:250, w:50, h:50, dx: -20, dy: -20},
 ];
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let obj of objs) draw(obj);
 }
@@ -30,5 +30,5 @@ function move(obj) {
 
 function timer() {
     for(let obj of objs) move(obj);
-    redraw();
+    redraw(enable);
 }

@@ -28,11 +28,17 @@ export class Tile extends _Tile {
     protected _options = new TileOptions;
     protected _tabOrder = 0;
     protected _data: any;
+    protected _X = 0;
+    protected _Y = 0;
 
     constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
         super();
-        this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
         this.Tree(name, parent);
+        this.x = x0;
+        this.y = y0;
+        this.w = w;
+        this.h = h;
+        // this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
         this._data = null;
     }
 
@@ -73,7 +79,13 @@ export class Tile extends _Tile {
         if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
 
-    _updateGparms() {
+    updateRect() {
+        // this is called only in rare cases where the parent never sets .x or .y
+        this.x = this.x; // see set x(), below (updates _X relative to parent)
+        this.y = this.y; // see set y(), below (updates _Y relative to parent)
+    }
+    updateGparms(enable = true) {
+        this.gfx.gparms.enable = enable;
         this.gfx.gparms.fillColor = this._options.backgroundColor;
     }
     // --- Public Methods --- //
@@ -98,20 +110,20 @@ export class Tile extends _Tile {
         return Tile.null;
     }
 
-    drawChildren(): Dimensions {
+    drawChildren(enable = true): Dimensions {
         let maxDimensions = new Dimensions();
         for(let child of this.children) {
             let tileChild = Tile.cast(child);
-            let deltas = tileChild.draw();
+            let deltas = tileChild.draw(enable);
             maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
             maxDimensions.h = Math.max(maxDimensions.h, tileChild.y + deltas.h);
         }
         return maxDimensions;
     }
 
-    draw(): Dimensions {
-        this._updateGparms();
-        return this.drawChildren();
+    draw(enable = true): Dimensions {
+        this.updateGparms(enable);
+        return this.drawChildren(enable);
     }
 
     // --- OnActions --- //
@@ -123,7 +135,7 @@ export class Tile extends _Tile {
     // --- Overrides --- //
 
     override printMe() {
-        console.log(" | ".repeat(this.depth()), this.name, this.X, this.Y, this.W, this.H);
+        console.log(" | ".repeat(this.depth()), this.name, this.x, this.y, this.w, this.h, "(", this.X, this.Y, this.W, this.H, ")");
     }
 
     // --- Accessors --- //
@@ -131,15 +143,29 @@ export class Tile extends _Tile {
     get gfx(): Gfx {
         return this._gfx;
     }
+    set x(n: number) {
+        this._x = n;
+        this._X = n;
+        if (this.parent) this._X += Tile.cast(this.parent).X;
+    }
+    get x(): number {
+        return this._x;
+    }
+    set y(n: number) {
+        this._y = n;
+        this._Y = n;
+        if (this.parent) this._Y += Tile.cast(this.parent).Y;
+    }
+    get y(): number {
+        return this._y;
+    }
     get X(): number {
         // Absolute Screen coordinates
-        if (this.parent) return this.x + Tile.cast(this.parent).X;
-        return this.x;
+        return this._X;
     }
     get Y(): number {
         // Absolute Screen Coordinates
-        if (this.parent) return this.y + Tile.cast(this.parent).Y;
-        return this.y;
+        return this._Y;
     }
     get W(): number {
         // Absolute Screen Coordinates (kinda)

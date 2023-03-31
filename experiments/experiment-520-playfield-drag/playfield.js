@@ -16,7 +16,7 @@ class Playfield {
         obj.playfield = this;
         this.objs.push(obj);
     }
-    redraw() {
+    redraw(enable = true) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs) obj.draw(this.ctx);
     }
@@ -41,7 +41,7 @@ class Playfield {
             playfield.grabDX = event.offsetX - obj.x;
             playfield.grabDY = event.offsetY - obj.y;
         }
-        playfield.redraw();
+        playfield.redraw(enable);
     }
     handleMouseUp(event) {
         let playfield = event.srcElement.playfield;
@@ -54,7 +54,7 @@ class Playfield {
         if (playfield.dragObj) {
             _log("handleMouseMove");
             playfield.dragObj.drag(event.offsetX - playfield.grabDX, event.offsetY - playfield.grabDY);
-            playfield.redraw();
+            playfield.redraw(enable);
         }
     }
 }

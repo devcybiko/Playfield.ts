@@ -28,7 +28,7 @@ class PObject {
         this.x = x;
         this.y = y;
     }
-    draw() {} // abstract method
+    draw(enable = true) {} // abstract method
 }
 
 class Box extends PObject {

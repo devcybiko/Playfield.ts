@@ -14,7 +14,7 @@ function handleMouseEvent(event) {
     if (drag) {
         x = event.offsetX - 50;
         y = event.offsetY - 50;
-        redraw();
+        redraw(enable);
     }
 }
 ```

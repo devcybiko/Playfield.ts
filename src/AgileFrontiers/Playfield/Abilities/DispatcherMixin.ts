@@ -31,6 +31,7 @@ export class Dispatcher {
 
     _forEachChild(pfEvent: PlayfieldEvent) {
         let thisTile = Tile.cast(this);
+        pfEvent.touchedBy.push(thisTile.fullName);
         for (let child of thisTile.children.reverse()) {
             let dispatchableChild = Dispatchable.cast(child);
             if (pfEvent.isActive) {

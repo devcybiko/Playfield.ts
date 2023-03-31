@@ -20,7 +20,7 @@ function handleMouseEvent(event) {
     if (drag) {
         x = event.offsetX - grabDX;
         y = event.offsetY - grabDY;
-        redraw();
+        redraw(enable);
     }
 }
 ```

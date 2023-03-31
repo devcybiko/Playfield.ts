@@ -13,7 +13,7 @@ class Circle extends Shape {
         this.logger = new Logger("Circle");
         this.r = r;
     }
-    draw() {
+    draw(enable = true) {
         if (this.isSelected) {
             this.playfield.gfx.circle(
                 this.x + this.r,

@@ -10,7 +10,7 @@ class Box extends Shape {
     super(name, x, y, w, h, color, borderColor, fillColor);
     this.logger = new Logger("Box");
   }
-  draw() {
+  draw(enable = true) {
     if (this.isSelected) {
       this.playfield.gfx.textRect(
         this.name,

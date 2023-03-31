@@ -17,7 +17,7 @@ let h_1 = 50;
 redraw_0();
 redraw_1();
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     redraw_0();
     redraw_1();
@@ -40,5 +40,5 @@ function timer() {
     y_0 += 10;
     x_1 -= 10;
     y_1 -= 10;
-    redraw();
+    redraw(enable);
 }

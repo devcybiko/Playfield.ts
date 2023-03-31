@@ -13,9 +13,9 @@ let h = [100, 50, 25];
 let dx = [10, -10, -5];
 let dy = [10, -10, 0]
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let i=0; i<color.length; i++) {
         draw(i);
@@ -38,7 +38,7 @@ function timer() {
     for(let i=0; i<color.length; i++) {
         move(i);
     }
-    redraw();
+    redraw(enable);
 }
 ```
 * This is a major rewrite of our canvas code
@@ -48,11 +48,11 @@ function timer() {
 * We also removed the individual `redraw_n` functions 
   * and replaced them with a single function `draw(n)`
   * that takes an index into the arrays to draw the `nth` object
-* `redraw()` now iterates over all the objects and 
+* `redraw(enable)` now iterates over all the objects and 
 * a new function `move(n)` adds the `dx` and `dy` (deltas) to the 'nth` object
 * `timer()` now iterates over all the object arrays on each 'tick' of our clock (interval timer)
   * calls `move(n)` on each of them
-  * then calls `redraw()` to redraw each of them
+  * then calls `redraw(enable)` to redraw each of them
 * NOTICE: We're calling the 'timer` every 1/4 second (250 milliseconds)
   * so our animation is running faster
 * ALSO NOTICE: That the orange rectangle appears to move more 'slowly' than the other two

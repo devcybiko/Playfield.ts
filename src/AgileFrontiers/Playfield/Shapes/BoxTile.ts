@@ -19,12 +19,12 @@ export class BoxTile extends _BoxTile {
 
     // --- Overrides ---//
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         if (this.isSelected) this.gfx.gparms.borderColor = "black";
         else this.gfx.gparms.borderColor = "";
         this.gfx.gparms.fillColor = ""; this._colors[this._color];
         this.gfx.rect(this.x, this.y, this.w, this.h);
-        return super.draw();
+        return super.draw(enable);
     }
 
     // --- onActions --- //

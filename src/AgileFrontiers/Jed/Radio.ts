@@ -23,9 +23,9 @@ export class Radio extends _Radio {
 
     // --- Overrides --- //
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
-        this._updateGparms();
+        this.updateGparms(enable);
         if (this.isSelected) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor

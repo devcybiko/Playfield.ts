@@ -40,7 +40,7 @@ export interface PlayfieldEvent {
     set isCommand(value: boolean);
     get isKeyboardEvent(): boolean;
     set isKeyboardEvent(value: boolean);
-    
+
     get swipe(): number;
     set swipe(value: number);
     get isSwipeLeft(): boolean;
@@ -50,4 +50,9 @@ export interface PlayfieldEvent {
 
     get isActive(): boolean;
     set isActive(value: boolean);
+    get counter(): number;
+    set counter(n: number);
+    get touchedBy(): string[];
+    set touchedBy(value: string[]);
+
 }

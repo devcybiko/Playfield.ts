@@ -22,6 +22,7 @@ export class Tree {
     addChild(child: Tree): void {
         child._parent = this;
         this._children.push(child);
+        child._fullName = child._getFullName();
     }
 
     root(): Tree {
@@ -52,6 +53,7 @@ export class Tree {
         } else {
             this.parent.removeChild(this);
         }
+        this._fullName = this._getFullName();
         return obj;
     }
 

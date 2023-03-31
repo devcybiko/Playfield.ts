@@ -23,14 +23,15 @@ export class Item extends _Item {
             this._itemOptions.textAlign = GfxParms.RIGHT;
             this.w = -w;
         }
-        this._updateGparms();
+        this.updateGparms();
         this._autoLabelWidthHeight();
     }
 
     public static cast(obj: any): Item {
         return obj as Item;
     }
-    public _updateGparms() {
+    public updateGparms(enable = true) {
+        super.updateGparms(enable);
         this.gfx.gparms.fillColor = this.options.backgroundColor;
         this.gfx.gparms.color = this.options.textColor;
         this.gfx.gparms.borderColor = this.options.borderColor;
@@ -43,7 +44,7 @@ export class Item extends _Item {
     }
 
     public _autoLabelWidthHeight() {
-        this._updateGparms();
+        this.updateGparms();
         let bb = this.gfx.boundingBox(this.label);
         this.w = this.w || bb.w + 2 + this.options.fontSize;
         this.h = this.h || bb.h + 2;

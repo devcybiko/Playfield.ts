@@ -21,8 +21,8 @@ export class Label extends _Label {
     }
 
     // --- Overrides --- //
-    draw(): Dimensions {
-        this._updateGparms();
+    override draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         let x = this.X;
         let y = this.Y;
         let w = this.W;

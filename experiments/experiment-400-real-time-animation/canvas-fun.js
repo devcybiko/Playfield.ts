@@ -8,9 +8,9 @@ let y = 0;
 let w = 100;
 let h = 100;
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = color;
     ctx.strokeStyle = 'black';
@@ -21,5 +21,5 @@ function redraw() {
 function timer() {
     x += 10;
     y += 10;
-    redraw();
+    redraw(enable);
 }

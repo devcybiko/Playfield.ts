@@ -11,7 +11,7 @@ class Playfield {
         obj.playfield = this;
         this.objs.push(obj);
     }
-    redraw() {
+    redraw(enable = true) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let obj of this.objs) obj.draw(this.ctx);
     }
@@ -30,7 +30,7 @@ class Playfield {
         if (playfield.selectedObj) playfield.selectedObj.deselect();
         playfield.selectedObj = obj;
         if (obj) obj.select();
-        playfield.redraw();
+        playfield.redraw(enable);
     }
 }
 

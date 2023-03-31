@@ -1456,7 +1456,7 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Option
             if (anyChild.isDraggable && anyChild.isPressable)
                 this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress");
         }
-        _updateGparms() {
+        _updateGparms(enable) {
             this.gfx.gparms.fillColor = this._options.backgroundColor;
         }
         // --- Public Methods --- //
@@ -1480,12 +1480,12 @@ define("Playfield/Tile", ["require", "exports", "Utils/index", "Playfield/Option
                 return this;
             return Tile.null;
         }
-        drawChildren() {
-            this.children.forEach(child => child.draw());
+        drawChildren(enable) {
+            this.children.forEach(child => child.draw(enable));
         }
-        draw() {
-            this._updateGparms();
-            this.drawChildren();
+        draw(enable = true) {
+            this._updateGparms(enable);
+            this.drawChildren(enable);
         }
         // --- OnActions --- //
         onTick() {
@@ -1568,11 +1568,11 @@ define("Playfield/RootTile", ["require", "exports", "Playfield/Tile", "Playfield
             return obj;
         }
         // --- Overrides --- //
-        draw() {
-            this._updateGparms();
+        draw(enable = true) {
+            this._updateGparms(enable);
             this.gfx.clipRect(this.X, this.Y, this.W, this.H);
             this.gfx.rect(this.X, this.Y, this.W, this.H);
-            this.drawChildren();
+            this.drawChildren(enable);
             this.gfx.restore();
         }
     }
@@ -1630,14 +1630,14 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/in
         clear() {
             this.gfx.rect(0, 0, this._gfx.width, this._gfx.height);
         }
-        redraw() {
+        redraw(enable = true) {
             this.clear();
-            this.rootTile.draw();
+            this.rootTile.draw(enable);
         }
         start(delay = 125) {
             this._delay = delay;
             this._lastTime = Date.now();
-            this.redraw();
+            this.redraw(enable);
             // if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
             if (this._delay >= 0)
                 this._timerId = setInterval(this._tick.bind(this), this._delay, this);
@@ -1653,7 +1653,7 @@ define("Playfield/Playfield", ["require", "exports", "Playfield/Tile", "Utils/in
             let extra = now - this._lastTime;
             this._handleEvents();
             this.rootTile.onTick(); // process all ticks
-            this.redraw(); // redraw the playfield
+            this.redraw(enable); // redraw the playfield
             this._lastTime = Date.now();
             let delta = this._lastTime - now;
             if (this._delay && (delta > this._delay))
@@ -1812,15 +1812,15 @@ define("Playfield/Splitter", ["require", "exports", "Playfield/Tile", "Playfield
             this._nwSize();
             this._swSize();
         }
-        draw() {
+        draw(enable = true) {
             this._drawGutter(this._hGutterRect, this._isHGutterHovering);
             this._drawGutter(this._vGutterRect, this._isVGutterHovering);
             this.gfx.gparms.borderColor = "black";
             this.gfx.gparms.fillColor = "";
-            this.ne.draw();
-            this.se.draw();
-            this.nw.draw();
-            this.sw.draw();
+            this.ne.draw(enable);
+            this.se.draw(enable);
+            this.nw.draw(enable);
+            this.sw.draw(enable);
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
@@ -1966,11 +1966,11 @@ define("Playfield/HSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             this._northSize();
             this._southSize();
         }
-        draw() {
+        draw(enable = true) {
             this._drawGutter(this._hGutterRect, this._isHGutterHovering);
             this.gfx.gparms.borderColor = "black";
-            this.north.draw();
-            this.south.draw();
+            this.north.draw(enable);
+            this.south.draw(enable);
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
@@ -2053,11 +2053,11 @@ define("Playfield/VSplitter", ["require", "exports", "Playfield/Tile", "Playfiel
             this._eastSize();
             this._westSize();
         }
-        draw() {
+        draw(enable = true) {
             this._drawGutter(this._vGutterRect, this._isVGutterHovering);
             this.gfx.gparms.borderColor = "black";
-            this.east.draw();
-            this.west.draw();
+            this.east.draw(enable);
+            this.west.draw(enable);
         }
         // --- onActions --- //
         onRelResize(dw, dh, pfEvent) {
@@ -2757,13 +2757,13 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
                 this._itemOptions.textAlign = Graphics_1.GfxParms.RIGHT;
                 this.w = -w;
             }
-            this._updateGparms();
+            this._updateGparms(enable);
             this._autoLabelWidthHeight();
         }
         static cast(obj) {
             return obj;
         }
-        _updateGparms() {
+        _updateGparms(enable) {
             this.gfx.gparms.fillColor = this.options.backgroundColor;
             this.gfx.gparms.color = this.options.textColor;
             this.gfx.gparms.borderColor = this.options.borderColor;
@@ -2775,7 +2775,7 @@ define("Jed/Item", ["require", "exports", "Playfield/index", "Utils/index", "Pla
             this.gfx.gparms.borderRadius = this.options.borderRadius;
         }
         _autoLabelWidthHeight() {
-            this._updateGparms();
+            this._updateGparms(enable);
             let bb = this.gfx.boundingBox(this.label);
             this.w = this.w || bb.w + 2 + this.options.fontSize;
             this.h = this.h || bb.h + 2;
@@ -2825,9 +2825,9 @@ define("Jed/Button", ["require", "exports", "Jed/Item", "Utils/index", "Playfiel
         go() {
             return false;
         }
-        draw() {
+        draw(enable = true) {
             let gparms = this.gfx.gparms;
-            this._updateGparms();
+            this._updateGparms(enable);
             let x = this.X;
             let y = this.Y;
             let bb = this.gfx.boundingBox(this.label);
@@ -2879,10 +2879,10 @@ define("Jed/Checkbox", ["require", "exports", "Jed/Item", "Utils/index", "Playfi
             return false;
         }
         // --- Overrides --- //
-        draw() {
+        draw(enable = true) {
             let gparms = this.gfx.gparms;
             gparms.borderRadius = 0;
-            this._updateGparms();
+            this._updateGparms(enable);
             if (this.isChecked)
                 gparms.fillColor = this.options.selectColor;
             else if (this.isHovering)
@@ -2951,7 +2951,7 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
         }
         // --- Overrides --- //
         inBounds(dx, dy) {
-            this._updateGparms();
+            this._updateGparms(enable);
             for (let child of this.children.reverse()) {
                 let tileChild = Playfield_5.Tile.cast(child);
                 if (tileChild.inBounds(dx, dy))
@@ -3017,8 +3017,8 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
             }
             return { w, h };
         }
-        draw() {
-            this._updateGparms();
+        draw(enable = true) {
+            this._updateGparms(enable);
             this.updateWidthHeight();
             if (this.isBoxed) {
                 let wh = this._computeWidthHeight();
@@ -3037,11 +3037,11 @@ define("Jed/Group", ["require", "exports", "Jed/Item", "Playfield/index", "Utils
                     gfx.rect(labelX, labelY, labelW, labelH);
                     gfx.text(this.label, labelX, labelY, labelW);
                 }
-                this.drawChildren();
+                this.drawChildren(enable);
                 this.gfx.restore();
             }
             else {
-                this.drawChildren();
+                this.drawChildren(enable);
             }
         }
         // --- Accessors --- //
@@ -3123,8 +3123,8 @@ define("Jed/Label", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
             this.options.borderColor = "";
         }
         // --- Overrides --- //
-        draw() {
-            this._updateGparms();
+        draw(enable = true) {
+            this._updateGparms(enable);
             let x = this.X;
             let y = this.Y;
             let w = this.W;
@@ -3180,9 +3180,9 @@ define("Jed/Radio", ["require", "exports", "Jed/Item", "Utils/index", "Playfield
             return false;
         }
         // --- Overrides --- //
-        draw() {
+        draw(enable = true) {
             let gparms = this.gfx.gparms;
-            this._updateGparms();
+            this._updateGparms(enable);
             if (this.isSelected)
                 gparms.fillColor = this.options.selectColor;
             else if (this.isHovering)
@@ -3295,8 +3295,8 @@ define("Jed/Slider", ["require", "exports", "Playfield/Abilities/index", "Utils/
             this.gfx.gparms.borderRadius = this._cursorBorderRadius;
             this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
         }
-        draw() {
-            this._updateGparms();
+        draw(enable = true) {
+            this._updateGparms(enable);
             this.gfx.clipRect(this.X, this.Y, this.W, this.H);
             this._drawContainer();
             this._drawCursor();
@@ -3405,17 +3405,17 @@ define("Jed/Text", ["require", "exports", "Jed/Item", "Utils/index", "Playfield/
             this._nchars2 = 0;
             this.options.fontFace = "monospace";
             this.options.fontSize = h;
-            this._updateGparms();
+            this._updateGparms(enable);
             this._nchars = Math.ceil(this.w / this.gfx.boundingBox("m").w);
             this._nchars2 = Math.ceil(this.w / this.gfx.boundingBox("m").w / 2);
             this._left = 0;
             this._right = this._computeRight();
         }
         // --- Overrides --- //
-        draw() {
+        draw(enable = true) {
             this._blink();
             let gfx = this.gfx;
-            this._updateGparms();
+            this._updateGparms(enable);
             if (this.isFocus)
                 this.gfx.gparms.color = this.options.selectColor;
             else
@@ -3593,7 +3593,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             this._color = (0, Utils_14.int)((0, Utils_14.random)(0, this._colors.length));
         }
         // --- Overrides ---//
-        draw() {
+        draw(enable = true) {
             if (this.isSelected)
                 this.gfx.gparms.borderColor = "black";
             else
@@ -3602,7 +3602,7 @@ define("Playfield/Shapes/BoxTile", ["require", "exports", "Playfield/Shapes/Shap
             this._colors[this._color];
             console.log(this.gfx.gparms.fillColor, this._color, this._colors);
             this.gfx.rect(this.x, this.y, this.w, this.h);
-            super.draw();
+            super.draw(enable);
         }
         // --- onActions --- //
         onGrab(dx, dy, event) {
@@ -3648,7 +3648,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
             if (dr <= dw)
                 return this;
         }
-        draw() {
+        draw(enable = true) {
             this.gfx.gparms.borderColor = "black";
             this.gfx.gparms.fillColor = "gray";
             this.gfx.circle(this.X, this.Y, this.W);
@@ -3659,7 +3659,7 @@ define("Playfield/Shapes/CircleTile", ["require", "exports", "Playfield/Shapes/S
                 this.playfield.gfx.circle(this.X, this.Y, r);
                 this.gfx.gparms.fillColor = oldColor;
             }
-            super.draw();
+            super.draw(enable);
         }
         // --- onActions --- //
         onGrab(dx, dy, event) {

@@ -10,9 +10,9 @@ let h = [100, 50, 25];
 let dx = [10, -10, -5];
 let dy = [10, -10, 0]
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let i=0; i<color.length; i++) {
         draw(i);
@@ -35,5 +35,5 @@ function timer() {
     for(let i=0; i<color.length; i++) {
         move(i);
     }
-    redraw();
+    redraw(enable);
 }

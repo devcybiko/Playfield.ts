@@ -54,11 +54,11 @@ export class VSplitter extends Splitter {
         this._westSize();
     }
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         this._drawGutter(this._vGutterRect, this._isVGutterHovering);
         this.gfx.gparms.borderColor = "black";
-        this.east.draw();
-        this.west.draw();
+        this.east.draw(enable);
+        this.west.draw(enable);
         return this.dimensions;
     }
 

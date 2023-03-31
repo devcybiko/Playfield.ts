@@ -25,7 +25,7 @@ class Playfield {
             playfield.grabDX = event.offsetX - obj.x;
             playfield.grabDY = event.offsetY - obj.y;
         }
-        playfield.redraw();
+        playfield.redraw(enable);
     }
     handleMouseUp(event) {
         let playfield = event.srcElement.playfield;
@@ -37,7 +37,7 @@ class Playfield {
         if (!playfield) return _error("ERROR: mousemove not associated with a playfield");
         if (playfield.dragObj) {
             playfield.dragObj.drag(event.offsetX - playfield.grabDX, event.offsetY - playfield.grabDY);
-            playfield.redraw();
+            playfield.redraw(enable);
         }
     }
 }

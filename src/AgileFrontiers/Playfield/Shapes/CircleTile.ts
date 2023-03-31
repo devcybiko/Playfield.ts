@@ -24,7 +24,7 @@ export class CircleTile extends _CircleTile {
         if (dr <= dw) return this;
     }
 
-    override draw(): Dimensions {
+    override draw(enable = true): Dimensions {
         this.gfx.gparms.borderColor = "black";
         this.gfx.gparms.fillColor = "gray";
         this.gfx.circle(this.X, this.Y, this.W);
@@ -36,7 +36,7 @@ export class CircleTile extends _CircleTile {
             this.playfield.gfx.circle(this.X, this.Y, r);
             this.gfx.gparms.fillColor = oldColor;
         }
-        return super.draw();
+        return super.draw(enable);
     }
 
     // --- onActions --- //

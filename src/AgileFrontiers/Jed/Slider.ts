@@ -81,8 +81,8 @@ export class Slider extends _Slider {
         this.gfx.gparms.borderRadius = this._cursorBorderRadius;
         this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
     }
-    override draw(): Dimensions {
-        this._updateGparms();
+    override draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         this._drawContainer();
         this._drawCursor();

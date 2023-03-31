@@ -1,6 +1,8 @@
 export class BrowserPlayfieldEvent {
     private _event: any;
     private _isActive: boolean;
+    private _counter: number;
+    private _touchedBy: string[];
 
     // mouse events
     private _x: number;
@@ -32,6 +34,8 @@ export class BrowserPlayfieldEvent {
     constructor(event: any, ratio = 1.0) {
         this.event = event;
         this._isActive = true;
+        this._counter = 0;
+        this._touchedBy = [];
         // this.type = event.type;
 
         // mouse events
@@ -194,6 +198,7 @@ export class BrowserPlayfieldEvent {
         this._isActive = value;
     }
     public get isMouseEvent(): boolean {
+        this.counter++;
         return this._isMouseEvent;
     }
     public set isMouseEvent(value: boolean) {
@@ -204,6 +209,18 @@ export class BrowserPlayfieldEvent {
     }
     public set isKeyboardEvent(value: boolean) {
         this._isKeyboardEvent = value;
+    }
+    public get counter(): number {
+        return this._counter;
+    }
+    public set counter(value: number) {
+        this._counter = value;
+    }
+    public get touchedBy(): string[] {
+        return this._touchedBy;
+    }
+    public set touchedBy(value: string[]) {
+        this._touchedBy = value;
     }
 
 }

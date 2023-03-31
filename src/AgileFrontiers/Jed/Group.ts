@@ -28,9 +28,9 @@ export class Group extends _Group {
     // --- Overrides --- //
 
     inBounds(dx: number, dy: number): Tile {
-        this._updateGparms();
+        this.updateGparms();
         for (let child of this.children.reverse()) {
-            let tileChild = Tile.cast(child);
+            let tileChild = child as unknown as Tile;
             if (tileChild.inBounds(dx, dy)) return Tile.cast(this);
         }
         if (this.isBoxed) {
@@ -97,8 +97,8 @@ export class Group extends _Group {
         return { w, h };
     }
 
-    override draw(): Dimensions {
-        this._updateGparms();
+    override draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         this.updateWidthHeight();
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();
@@ -117,10 +117,10 @@ export class Group extends _Group {
                 gfx.rect(labelX, labelY, labelW, labelH);
                 gfx.text(this.label, labelX, labelY, labelW);
             }
-            this.drawChildren();
+            this.drawChildren(enable);
             this.gfx.restore();
         } else {
-            this.drawChildren();
+            this.drawChildren(enable);
         }
         return this.dimensions;
     }

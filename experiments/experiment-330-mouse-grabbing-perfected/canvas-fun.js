@@ -15,9 +15,9 @@ let grabDX = 0;
 let grabDY = 0;
 let drag = false;
 
-redraw();
+redraw(enable);
 
-function redraw() {
+function redraw(enable = true) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = color;
     ctx.strokeStyle = 'black';
@@ -38,7 +38,7 @@ function handleKeyEvent(event) {
     if (event.key === 'ArrowDown') y += 10;
     if (event.key === 'ArrowLeft') x += -10;
     if (event.key === 'ArrowRight') x += 10;
-    redraw();
+    redraw(enable);
 }
 
 function handleMouseEvent(event) {
@@ -56,7 +56,7 @@ function handleMouseEvent(event) {
     if (drag) {
         x = event.offsetX - grabDX;
         y = event.offsetY - grabDY;
-        redraw();
+        redraw(enable);
     }
 }
 
