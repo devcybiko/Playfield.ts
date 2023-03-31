@@ -1,8 +1,6 @@
 
 define(function (require) {
-    console.log("Main.js...");
-    var {TestClass} = require("Test/Test08");
-    console.log(TestClass);
-    let main = new TestClass();
+    var TestClasses = require("Test/index");
+    let main = new TestClasses[_testcase_]();
     main.run();
 });
