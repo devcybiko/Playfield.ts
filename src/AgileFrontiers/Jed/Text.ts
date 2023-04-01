@@ -18,6 +18,7 @@ export class Text extends _Text {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value, label);
+        this._type += ".Text";
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this.updateGparms();
@@ -33,6 +34,7 @@ export class Text extends _Text {
         this._blink();
         let gfx = this.gfx;
         this.updateGparms(enable);
+        this.updateRect();
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
 

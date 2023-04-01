@@ -1,4 +1,4 @@
-import { Playfield, PlayfieldEvent, Tile, Splitter, RootTile } from "../Playfield";
+import { Playfield, PlayfieldEvent, Tile, Splitter, ControllerTile } from "../Playfield";
 import { BrowserPlayfieldApp } from "../Browser";
 import * as Jed from "../Jed";
 import { int, random, Logger } from "../Utils";
@@ -8,10 +8,10 @@ export class TestClass {
     _playfieldApp: BrowserPlayfieldApp;
     _playfield: Playfield;
     public static counter = 1;
-    root: RootTile;
+    root: ControllerTile;
     splitter: Splitter;
-    left: RootTile;
-    right: RootTile;
+    left: ControllerTile;
+    right: ControllerTile;
     isEditMode = true;
     groupItem = null as any as Jed.Group;
     logger = new Logger().Logger("info", false);
@@ -74,7 +74,8 @@ export class TestClass {
             item = new Jed.Slider("slider-" + (TestClass.counter++), that.right, x, y, w, w);
         }
         if (item) {
-            item.isDraggable = that.isEditMode;
+            item.isDraggable = true;
+            // item.isDraggable = that.isEditMode;
             item.onMenu = that.onMenu.bind(item);
             item.data = that;
             that.populateProperties(item, that);
@@ -87,6 +88,7 @@ export class TestClass {
         let item = this as unknown as Item;
         let that = item.data as TestClass;
         that.populateProperties(item, that);
+        console.log(JSON.stringify(item.serialize(), null, 2));
     }
     editMode() {
         let thisTile = this as unknown as Tile;
@@ -105,7 +107,7 @@ export class TestClass {
     setData(obj: any, data: any) {
         obj.data = data;
     }
-    createAddPanel(parent: RootTile, that: TestClass) {
+    createAddPanel(parent: ControllerTile, that: TestClass) {
         let x = 10;
         let y = 20;
         let w = 180;
@@ -138,13 +140,28 @@ export class TestClass {
 
         editMode.selectChild(editModeOn);
     }
+    createSaveLoadPanel(parent: ControllerTile, that: TestClass) {
+        let x = 10;
+        let y = 20;
+        let w = 180;
+        let h = 30;
+        let dy = 40
+        let filename = new Jed.Text("filename", parent, x, y, w, 0, "Filename: ");
+        let saveButton = new Jed.Button("save", parent, x, y+=dy, 0, 0, "Save");
+        let loadButton = new Jed.Button("load", parent, x, y+=dy, 0, 0, "Load");
+
+        saveButton.go = (() => {
+            let obj = that.right.serialize();
+            console.log(JSON.stringify(obj, null, 2));
+        });
+    }
     makeText(name: string, parent: Tile, x: number, y: number, w: number, h: number, label: string) {
         let text = new Jed.Text(name, parent, x, y, w, h, name);
         let title = new Jed.Label(name+"-label", parent, x, y, 100, h, label, label);
         title.options.textAlign = "right";
         return text;
     }
-    createPreferencesPanel(parent: RootTile, that: TestClass) {
+    createPreferencesPanel(parent: ControllerTile, that: TestClass) {
         let x = parent.w / 2;
         let y = 20;
         let w = 200;
@@ -171,13 +188,14 @@ export class TestClass {
         this.currentItem.label = this.preferences.label.value;
     }
     GUIEditor() {
-        this.root = this._playfield.rootTile as unknown as RootTile;
+        this.root = this._playfield.rootTile as unknown as ControllerTile;
         this.splitter = new Splitter("splitter", this.root, 0.65, 0.25);
 
         this.left = this.splitter.ne;
         this.right = this.splitter.nw;
         this.createAddPanel(this.left, this);
         this.preferences = this.createPreferencesPanel(this.splitter.sw, this);
+        this.createSaveLoadPanel(this.splitter.se, this);
     }
     run() {
         this.GUIEditor();

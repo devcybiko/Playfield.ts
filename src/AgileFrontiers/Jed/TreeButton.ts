@@ -19,6 +19,7 @@ export class TreeButton extends Button {
     }
 
     draw(enable = true) {
+        this.updateGparms(enable);
         this.updateRect();
         let parent = this.parent as unknown as TreeItem;
         if (parent.children.length > 2) {
@@ -36,5 +37,10 @@ export class TreeButton extends Button {
     }
     onEvent(pfEvent: PlayfieldEvent) {
         super.onEvent(pfEvent);
+    }
+
+    objectify(): any {
+        // don't report this object
+        return null;
     }
 }

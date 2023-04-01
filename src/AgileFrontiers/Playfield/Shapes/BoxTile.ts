@@ -13,6 +13,7 @@ export class BoxTile extends _BoxTile {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
+        this._type = "BoxTile";
         this._color = int(random(0, this._colors.length));
 
     }

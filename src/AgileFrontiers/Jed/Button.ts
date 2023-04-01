@@ -12,6 +12,7 @@ export class Button extends _Button {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
+        this._type += ".Button";
         this.label = label || value || name;
         this.gfx.gparms.borderRadius = 10;
         this.options.textAlign = GfxParms.CENTER;
@@ -21,13 +22,10 @@ export class Button extends _Button {
 
     // --- Overrides --- //
 
-    go(): boolean {
-        return false;
-    }
-
     override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
         this.updateGparms(enable);
+        this.updateRect();
         let x = this.X;
         let y = this.Y;
         let bb = this.gfx.boundingBox(this.label);

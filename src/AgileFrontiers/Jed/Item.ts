@@ -1,4 +1,4 @@
-import { Tile } from "../Playfield";
+import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
 import { Draggable, Selectable, Clickable } from "../Playfield/Abilities";
 import { ItemOptions } from "./ItemOptions"
@@ -15,6 +15,7 @@ export class Item extends _Item {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
+        this._type += ".Item";
         this._value = value;
         this._label = label || value || name;
         this._itemOptions = new ItemOptions();
@@ -50,10 +51,20 @@ export class Item extends _Item {
         this.h = this.h || bb.h + 2;
     }
     public go() {
-        throw Error("Unimplemented feature: 'go()';");
+        // generic 'click' or 'press' functionality here
+        // user function for whatever this thing is supposed to do
     }
 
+    onMenu(pfEvent: PlayfieldEvent) {
+        console.log(this);
+    }
 
+    objectify() {
+        let obj = super.objectify();
+        obj.label = this.label;
+        obj.value = this.value;
+        return obj;
+    }
     // --- Accessors --- //
 
     get value(): string {

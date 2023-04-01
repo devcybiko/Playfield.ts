@@ -17,6 +17,7 @@ export class Group extends _Group {
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label, label);
+        this._type += ".Group";
         this._isBoxed = true;
         this._xMargin = 10;
         this._yMargin = 10;
@@ -111,6 +112,7 @@ export class Group extends _Group {
 
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
+        this.updateRect();
         this.updateWidthHeight();
         if (this.isBoxed) {
             let wh = this._computeWidthHeight();

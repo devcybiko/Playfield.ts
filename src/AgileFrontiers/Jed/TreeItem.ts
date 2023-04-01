@@ -13,6 +13,7 @@ export class TreeItem extends Group {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label: string) {
         super(name, parent, x, y, w, h);
+        this._type += ".TreeItem";
         this._treeButton = new TreeButton("_button", this, 0, 0); // x,y,w,h filled in during draw()
         this._treeLabel = new TreeLabel("_label", this, 0, 0, 0, 0, label); // x,y,w,h filled in during draw()
         this.open = false;
@@ -64,6 +65,7 @@ export class TreeItem extends Group {
     }
 
     override draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         this.updateRect();
         if (!this.isVisible) return new Dimensions();
         this.updateGparms(enable);

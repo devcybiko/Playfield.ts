@@ -11,13 +11,13 @@ export class TreeLabel extends Label {
         this.Logger("info", false);
     }
     draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         this.updateRect();
         return super.draw(enable);
     }
     get data(): any {
         let parent = this.parent as unknown as TreeItem;
-        if (parent) return parent.data;
-        return null;
+        return parent.data;
     }
     onClick(pfEvent: PlayfieldEvent) {
         // console.log("onClick", this.name)
@@ -33,6 +33,10 @@ export class TreeLabel extends Label {
     onEvent(pfEvent: PlayfieldEvent) {
         // if (!pfEvent.isMove) console.log(this.fullName, "onEvent");
         super.onEvent(pfEvent);
+    }
+    objectify(): any {
+        // don't report this object
+        return null;
     }
 }
 

@@ -1,5 +1,6 @@
+import { Tile } from "../Playfield";
 import { int } from "./Functions";
-import { Rect } from "./RectMixin";
+import { Tree } from "./TreeMixin";
 
 export class RelRect {
     // all points are relative to the parent
@@ -13,12 +14,15 @@ export class RelRect {
     private _y0 = 0;
     private _x1 = 0;
     private _y1 = 0;
+    private _thisTile: Tile;
 
     RelRect(x0: number, y0: number, x1: number, y1: number) {
+        this._thisTile = this as unknown as Tile;
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
+        console.log(this);
         return this;
     }
 
@@ -36,53 +40,48 @@ export class RelRect {
     get y1() {
         return this._y1;
     }
-    get _parentRect(): Rect {
-        let that = this as any;
-        if (that.parent) that._parent as Rect;
-        return (new Rect).Rect(0,0,0,0);
-    }
     set x0(x0: number) {
-        let thisRect = this as unknown as Rect;
+        let thisTile = this._thisTile;
         this._x0 = x0;
         if (-1 < x0 && x0 < 1) {
-            if (x0 > 0) thisRect.x = int(this._parentRect.w * x0);
-            else thisRect.x = int(this._parentRect.w * (1+ x0));
+            if (x0 >= 0) thisTile.x = int(thisTile.parent.w * x0);
+            else thisTile.x = int(thisTile.parent.w * (1+ x0));
         } else {
-            if (x0 >= 0) thisRect.x = x0;
-            else thisRect.x = this._parentRect.w + x0;
+            if (x0 >= 0) thisTile.x = x0;
+            else thisTile.x = thisTile.parent.w + x0;
         }
     }
     set y0(y0: number) {
-        let thisRect = this as unknown as Rect;
+        let thisTile = this._thisTile;
         this._y0 = y0;
         if (-1 < y0 && y0 < 1) {
-            if (y0 > 0) thisRect.y = int(this._parentRect.h * y0);
-            else thisRect.y = int(this._parentRect.h * (1 + y0));
+            if (y0 >= 0) thisTile.y = int(thisTile.parent.h * y0);
+            else thisTile.y = int(thisTile.parent.h * (1 + y0));
         } else {
-            if (y0 >= 0) thisRect.y = y0;
-            else thisRect.y = this._parentRect.h + y0;
+            if (y0 >= 0) thisTile.y = y0;
+            else thisTile.y = thisTile.parent.h + y0;
         }
     }
     set x1(x1: number) {
-        let thisRect = this as unknown as Rect;
+        let thisTile = this._thisTile;
         this._x1 = x1;
         if (-1 < x1 && x1 < 1) {
-            if (x1 > 0) thisRect.w = int(this._parentRect.w * x1) + 1;
-            else thisRect.w = int(this._parentRect.w * (1 + x1)) + 1;
+            if (x1 >= 0) thisTile.w = int(thisTile.parent.w * x1) + 1;
+            else thisTile.w = int(thisTile.parent.w * (1 + x1)) + 1;
         } else {
-            if (x1 >= 0) thisRect.w = x1 - thisRect.x + 1;
-            else thisRect.w = this._parentRect.w + x1 - thisRect.x + 1;
+            if (x1 >= 0) thisTile.w = x1 - thisTile.x + 1;
+            else thisTile.w = thisTile.parent.w + x1 - thisTile.x + 1;
         }
     }
     set y1(y1: number) {
-        let thisRect = this as unknown as Rect;
+        let thisTile = this._thisTile;;
         this._y1 = y1;
         if (-1 < y1 && y1 < 1) {
-            if (y1 > 0) thisRect.h = int(this._parentRect.h * y1) + 1;
-            else thisRect.h = int(this._parentRect.h * (1 + y1)) + 1;
+            if (y1 >= 0) thisTile.h = int(thisTile.parent.h * y1) + 1;
+            else thisTile.h = int(thisTile.parent.h * (1 + y1)) + 1;
         } else {
-            if (y1 >= 0) thisRect.h = y1 - thisRect.y + 1;
-            else thisRect.h = this._parentRect.h + y1 - thisRect.y + 1;
+            if (y1 >= 0) thisTile.h = y1 - thisTile.y + 1;
+            else thisTile.h = thisTile.parent.h + y1 - thisTile.y + 1;
         }
     }
 }

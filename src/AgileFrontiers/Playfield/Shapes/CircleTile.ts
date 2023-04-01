@@ -12,6 +12,7 @@ export class CircleTile extends _CircleTile {
     _dy = 0;
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
+        this._type = "CircleTile";
     }
 
     // --- Overrides --- //

@@ -31,15 +31,17 @@ export class Tile extends _Tile {
     protected _X = 0;
     protected _Y = 0;
     protected _isVisible = true;
+    public _rect: Rect;
+    public _type = "Tile";
 
-    constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super();
         this.Tree(name, parent);
-        this.x = x0;
-        this.y = y0;
+        this.x = x;
+        this.y = y;
         this.w = w;
         this.h = h;
-        // this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
+        if (parent) this.RelRect(x, y, x + w - 1, y + h - 1);
         this._data = null;
     }
 
@@ -128,6 +130,29 @@ export class Tile extends _Tile {
         return this.drawChildren(enable);
     }
 
+    serialize() {
+        let obj = this.objectify();
+        if (obj && this.children) {
+            obj.children = [];
+            for(let _child of this.children) {
+                let child = _child as unknown as Tile;
+                let childObj = child.serialize();
+                if (childObj) obj.children.push(childObj);
+            }
+        }
+        return obj;
+    }
+
+    objectify(): any {
+        let obj = {} as any;
+        obj.name = this.name;
+        obj.x = this.x;
+        obj.y = this.y;
+        obj.w = this.w;
+        obj.h = this.h;
+        return obj;
+    }
+
     // --- OnActions --- //
 
     onTick(): void {
@@ -148,7 +173,7 @@ export class Tile extends _Tile {
     set x(n: number) {
         this._x = n;
         this._X = n;
-        if (this.parent) this._X += (this.parent as unknown as Tile).X;
+        this._X += this.parent.X;
     }
     get x(): number {
         return this._x;
@@ -156,7 +181,10 @@ export class Tile extends _Tile {
     set y(n: number) {
         this._y = n;
         this._Y = n;
-        if (this.parent) this._Y += (this.parent as unknown as Tile).Y;
+        this._Y += this.parent.Y;
+    }
+    get parent(): Tile {
+        return this._parent as Tile;
     }
     get y(): number {
         return this._y;

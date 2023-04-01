@@ -30,6 +30,7 @@ export class Slider extends _Slider {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value="", label="") {
         super(name, parent, x, y, w, h, value, label);
+        this._type += ".Slider";
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
         this.cursorMove(0.5, 0.5);
@@ -83,6 +84,7 @@ export class Slider extends _Slider {
     }
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
+        this.updateRect();
         this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         this._drawContainer();
         this._drawCursor();
