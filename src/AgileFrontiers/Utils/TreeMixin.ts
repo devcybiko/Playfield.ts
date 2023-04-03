@@ -39,14 +39,32 @@ export class Tree {
 
     }
 
-    dfs(visit: (obj: Tree, ctx: any) => any, ctx?: any): any {
-        let stop = visit(this, ctx);
-        if (stop) return stop;
-        for (let child of this._children) {
-            stop = child.dfs(visit, ctx);
-            if (stop) return stop;
+    /**
+     * depth-first-search
+     * each object in the tree is visited in class visitor-pattern
+     * if any object returns a non-falsey value, 
+     *   all processing stops and that value is returned up the call stack
+     * if any object returns "stop-children"
+     *   that object's children are not searched
+     */
+    dfs(before: (obj: Tree, ctx: any) => any, after?: (obj: Tree, ctx: any) => any, ctx?: any, reverse = false): any {
+        let children = this.childrenClone; // in case someone modifies the order of objects during descent
+        if (reverse) children.reverse(); // is this an expensive operation? should we change the iteration strategy?
+        let stop = before && before(this, ctx);
+        if (stop) {
+            // if true-ish stop all processing. great for "finding" objects
+            if (stop === "stop-children") {
+                // don't process children, but continue on to siblings
+                stop = false;
+            }
+        } else {
+            for (let i=0; i<children.length; i++) {
+                stop = children[i].dfs(before, after, ctx, reverse);
+                if (stop) break;
+            }
         }
-        return null;
+        if (!stop) stop = after && after(this, ctx);
+        return stop; // if true-ish stop all processing. great for "finding" objects
     }
 
     removeChild(obj?: Tree): Tree {
@@ -54,7 +72,7 @@ export class Tree {
             let i = this._children.indexOf(obj);
             if (i === -1) return null;
             this._children.splice(i, 1);
-            obj._parent = null;    
+            obj._parent = null;
         } else {
             this._parent.removeChild(this);
         }
@@ -64,7 +82,9 @@ export class Tree {
 
     toFront(obj?: Tree) {
         if (obj) {
+            let oldParent = obj._parent;
             this.removeChild(obj);
+            obj._parent = oldParent;
             this._children.push(obj);
         } else {
             this._parent.toFront(this);
@@ -73,7 +93,9 @@ export class Tree {
 
     toBack(obj?: Tree) {
         if (obj) {
+            let oldParent = obj._parent;
             this.removeChild(obj);
+            obj._parent = oldParent;
             this._children.splice(0, 0, obj);
         } else {
             this._parent.toBack(this);
@@ -90,7 +112,7 @@ export class Tree {
     }
     printTree() {
         this.printMe()
-        for(let child of this.children) {
+        for (let child of this.children) {
             child.printTree();
         }
     }
@@ -106,9 +128,12 @@ export class Tree {
     set name(s : string) {
         this._name = s;
     }
-    get children(): Array<Tree> {
+    get childrenClone(): Array<Tree> {
         // return a shallow copy
         return [...this._children];
+    }
+    get children(): Array<Tree> {
+        return this._children;
     }
     get fullName(): string {
         return this._fullName;

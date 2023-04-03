@@ -95,11 +95,11 @@ export class TestClass {
         let isOn = thisTile.name.includes("on");
         let that = thisTile.data;
         if (isOn) {
-            that.right.dfs(that.makeDraggable, this.right);
+            that.right.dfs(that.makeDraggable, null, this.right);
             that.right.options.backgroundColor = "white";
             thisTile.data.isEditMode = true;
         } else {
-            that.right.dfs(that.makeUnDraggable, this.right);
+            that.right.dfs(that.makeUnDraggable, null, this.right);
             that.right.options.backgroundColor = "#ddd";
             thisTile.data.isEditMode = false;
         }
@@ -132,7 +132,7 @@ export class TestClass {
         let addText = new Jed.Button("addText", addButtonGroup, x, y += dy, w, h, "Add Text");
 
         this.left.dfs(this.makeUnDraggable);
-        this.left.dfs(this.setData, this);
+        this.left.dfs(this.setData, null, this);
         addButtonGroup.children.forEach((obj: any) => { obj.go = that.addItem.bind(obj) });
 
         this._playfield.rootTile.printTree();

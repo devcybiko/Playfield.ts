@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-import { Dispatchable } from "./Abilities";
+import { Eventable } from "./Abilities"
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -18,8 +18,8 @@ export class TileOptions extends Options {
 }
 
 export class _Tile { };
-export interface _Tile extends Dispatchable, Logger, Tree, Rect, RelRect { };
-applyMixins(_Tile, [Dispatchable, Logger, Tree, Rect, RelRect]);
+export interface _Tile extends Eventable, Logger, Tree, Rect, RelRect { };
+applyMixins(_Tile, [Eventable, Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
@@ -31,12 +31,15 @@ export class Tile extends _Tile {
     protected _X = 0;
     protected _Y = 0;
     protected _isVisible = true;
-    public _rect: Rect;
+    public override _rect: Rect;
     public _type = "Tile";
+    public _tile: Tile;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super();
         this.Tree(name, parent);
+        this._tile = this;
+        this.Logger();
         this.x = x;
         this.y = y;
         this.w = w;
@@ -53,17 +56,20 @@ export class Tile extends _Tile {
 
     // --- Overrides --- //
 
-    addChild(child: Tile) {
+    override addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
         child._gfx = this._playfield.gfx.clone();
         child._tabOrder = this.children.length - 1;
         let anyChild = child as any;
         // is this a good idea? or should we enforce objects initizing within their constructors?
+        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+
         if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
         if (anyChild.Dispatchable && !anyChild.isDispatchable) anyChild.Dispatchable();
         if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
         if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
+        if (anyChild.Eventable && !anyChild.isEventable) anyChild.Eventable();
         if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
         if (anyChild.Pressable && !anyChild.isPressable) anyChild.Pressable();
         if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
@@ -71,14 +77,13 @@ export class Tile extends _Tile {
 
         if (anyChild.Clicker && !anyChild.isClicker) anyChild.Clicker();
         if (anyChild.Dispatcher && !anyChild.isDispatcher) anyChild.Dispatcher();
-        if (anyChild.Dragger && !anyChild.isDragger) anyChild.Dragger();
+        if (anyChild.DragController && !anyChild.isDragController) anyChild.DragController();
         if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
         if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
         if (anyChild.Presser && !anyChild.isPresser) anyChild.Presser();
         if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
         if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
 
-        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
         if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
 
@@ -96,7 +101,7 @@ export class Tile extends _Tile {
     inBoundsChildren(x: number, y: number, pfEvent?: PlayfieldEvent, checkThis = true): Tile {
         // GLS - the CheckThis flag doesn't appear to ever be used
         let found = Tile.null;
-        if (checkThis) found = this.inBounds(x,y, pfEvent);
+        if (checkThis) found = this.inBounds(x, y, pfEvent);
         if (found) return found;
         for (let child of this.children) {
             let tileChild = child as unknown as Tile;
@@ -116,7 +121,7 @@ export class Tile extends _Tile {
 
     drawChildren(enable = true): Dimensions {
         let maxDimensions = new Dimensions();
-        for(let child of this.children) {
+        for (let child of this.children) {
             let tileChild = child as unknown as Tile;
             let deltas = tileChild.draw(enable);
             maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
@@ -170,23 +175,23 @@ export class Tile extends _Tile {
     get gfx(): Gfx {
         return this._gfx;
     }
-    set x(n: number) {
+    override set x(n: number) {
         this._x = n;
         this._X = n;
         this._X += this.parent.X;
     }
-    get x(): number {
+    override get x(): number {
         return this._x;
     }
-    set y(n: number) {
+    override set y(n: number) {
         this._y = n;
         this._Y = n;
         this._Y += this.parent.Y;
     }
-    get parent(): Tile {
+    override get parent(): Tile {
         return this._parent as Tile;
     }
-    get y(): number {
+    override get y(): number {
         return this._y;
     }
     get X(): number {
@@ -242,5 +247,7 @@ export class Tile extends _Tile {
     public set isVisible(value) {
         this._isVisible = value;
     }
-
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        return super.onEvent(pfEvent, controller);
+    }
 }

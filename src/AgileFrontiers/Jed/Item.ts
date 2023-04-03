@@ -28,10 +28,7 @@ export class Item extends _Item {
         this._autoLabelWidthHeight();
     }
 
-    public static cast(obj: any): Item {
-        return obj as Item;
-    }
-    public updateGparms(enable = true) {
+    public override updateGparms(enable = true) {
         super.updateGparms(enable);
         this.gfx.gparms.fillColor = this.options.backgroundColor;
         this.gfx.gparms.color = this.options.textColor;
@@ -55,11 +52,10 @@ export class Item extends _Item {
         // user function for whatever this thing is supposed to do
     }
 
-    onMenu(pfEvent: PlayfieldEvent) {
-        console.log(this);
+    override onMenu(pfEvent: PlayfieldEvent) {
     }
 
-    objectify() {
+    override objectify() {
         let obj = super.objectify();
         obj.label = this.label;
         obj.value = this.value;
@@ -79,7 +75,7 @@ export class Item extends _Item {
     public set label(value: string) {
         this._label = value;
     }
-    public get options(): ItemOptions {
+    public override get options(): ItemOptions {
         return this._itemOptions;
     }
 }

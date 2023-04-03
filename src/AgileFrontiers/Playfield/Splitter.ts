@@ -1,13 +1,13 @@
 import { Tile } from "./Tile";
-import { Dispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
+import { DragController, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { ControllerTile } from "./ControllerTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer]);
 
 export class Splitter extends _Splitter {
 
@@ -114,7 +114,7 @@ export class Splitter extends _Splitter {
 
     // --- Overrides --- //
 
-    addChild(child: Tile) {
+    override addChild(child: Tile) {
         if (this.children.length < 4) super.addChild(child);
         else throw new Error("You must use Splitter.ne, Splitter.nw, Splitter.se or Splitter.sw");
     }
@@ -218,11 +218,6 @@ export class Splitter extends _Splitter {
             this._sw.onRelResize(-dx, 0, pfEvent);
             pfEvent.isActive = false;
         }
-    }
-
-    override onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEvent(pfEvent, this.parent);
-        if (pfEvent.isActive) this.dispatchEventToChildren(pfEvent);
     }
 
     override onHovering(pfEvent: PlayfieldEvent) {

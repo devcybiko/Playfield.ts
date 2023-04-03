@@ -1,9 +1,8 @@
 export {Clickable} from "./ClickableMixin";
 export {Clicker} from "./ClickerMixin";
-export {Dispatchable} from "./DispatchableMixin";
-export {Dispatcher} from "./DispatcherMixin";
+export {Eventable } from "./EventableMixin";
 export {Draggable} from "./DraggableMixin";
-export {Dragger} from "./DraggerMixin";
+export {DragController} from "./DragController";
 export {Editable} from "./EditableMixin";
 export {Editer} from "./EditerMixin";
 export {Hoverable} from "./HoverableMixin";

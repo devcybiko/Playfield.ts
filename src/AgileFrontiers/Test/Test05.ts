@@ -17,7 +17,7 @@ export class TestClass {
     _playfield: Playfield;
 
     constructor() {
-        this._playfieldApp = new BrowserPlayfieldApp("#playfield", 2.0);
+        this._playfieldApp = new BrowserPlayfieldApp("#playfield",1.0);
         this._playfield = this._playfieldApp.playfield;
     }
     jedTest() {

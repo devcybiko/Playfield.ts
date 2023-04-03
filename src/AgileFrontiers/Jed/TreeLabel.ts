@@ -10,31 +10,27 @@ export class TreeLabel extends Label {
         this.options.fontStyle = "";
         this.Logger("info", false);
     }
-    draw(enable = true): Dimensions {
+    override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
         return super.draw(enable);
     }
-    get data(): any {
+    override get data(): any {
         let parent = this.parent as unknown as TreeItem;
         return parent.data;
     }
-    onClick(pfEvent: PlayfieldEvent) {
-        // console.log("onClick", this.name)
+    override onClick(pfEvent: PlayfieldEvent) {
         let parent = this.parent as unknown as TreeItem;
         return parent.onClick(pfEvent);
     }
-    onMenu(pfEvent: PlayfieldEvent) {
-        // if (!pfEvent.isMove) console.log(this.fullName, "onEvent");
-        // console.log("onMenu", this.name)
+    override onMenu(pfEvent: PlayfieldEvent) {
         let parent = this.parent as unknown as TreeItem;
         return parent.onMenu(pfEvent);
     }
-    onEvent(pfEvent: PlayfieldEvent) {
-        // if (!pfEvent.isMove) console.log(this.fullName, "onEvent");
-        super.onEvent(pfEvent);
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        super.onEvent(pfEvent, controller);
     }
-    objectify(): any {
+    override objectify(): any {
         // don't report this object
         return null;
     }

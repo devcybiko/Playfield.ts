@@ -92,7 +92,7 @@ export class Slider extends _Slider {
         return this.dimensions;
     }
 
-    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let c = this._cursor;
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
             this._isSliding = true;
@@ -103,7 +103,7 @@ export class Slider extends _Slider {
         return super.onGrab(dx, dy, pfEvent);
     }
 
-    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
+    override onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
         if (this._isSliding) {
             let c = this._cursor;
             let xmax = this.dw + this._margins.left;
@@ -118,7 +118,7 @@ export class Slider extends _Slider {
         }
     }
 
-    onDrop(pfEvent: PlayfieldEvent): void {
+    override onDrop(pfEvent: PlayfieldEvent): void {
         super.onDrop(pfEvent);
         this._isSliding = false;
     }

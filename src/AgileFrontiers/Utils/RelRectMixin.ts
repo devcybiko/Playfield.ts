@@ -22,7 +22,6 @@ export class RelRect {
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
-        console.log(this);
         return this;
     }
 

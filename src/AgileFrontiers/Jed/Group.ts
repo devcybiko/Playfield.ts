@@ -1,12 +1,11 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins, Logger, Rect, between, Tree, Dimensions } from "../Utils";
-import { Draggable, Dispatcher, Clicker, Presser, Selecter, Dragger, Editer, Hoverer } from "../Playfield/Abilities";
-import { BrowserPlayfieldEvent } from "../Browser";
+import { applyMixins, Logger, Rect, between, Dimensions } from "../Utils";
+import { Draggable, Eventable, Clicker, Presser, Selecter, DragController, Editer, Hoverer } from "../Playfield/Abilities";
 
 export class _Group extends Item { };
-export interface _Group extends Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_Group, [Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
+export interface _Group extends Draggable, Eventable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer { };
+applyMixins(_Group, [Eventable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer]);
 
 export class Group extends _Group {
     protected _isGroupItem: boolean;
@@ -29,7 +28,7 @@ export class Group extends _Group {
 
     // --- Overrides --- //
 
-    inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
+    override inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
         for (let child of this.children.reverse()) {
             let tileChild = child as unknown as Tile;
             if (pfEvent) {
@@ -60,7 +59,7 @@ export class Group extends _Group {
     //     this.dispatchEventToChildren(pfEvent);
     // }
 
-    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         super.onGrab(dx, dy, pfEvent);
         pfEvent.isActive = true;
         if (this.isBoxed && between(this.w - 10, dx, this.w + 10) && between(this.h - 10, dy, this.h + 10)) {
@@ -69,7 +68,7 @@ export class Group extends _Group {
         return true;
     }
 
-    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
+    override onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent) {
         if (this._isResizing) {
             super.w = this.w + dx;
             super.h = this.h + dy;
@@ -78,7 +77,7 @@ export class Group extends _Group {
         }
     }
 
-    onDrop(pfEvent: PlayfieldEvent): boolean {
+    override onDrop(pfEvent: PlayfieldEvent): boolean {
         super.onDrop(pfEvent);
         this._isResizing = false;
         return true;
@@ -166,21 +165,21 @@ export class Group extends _Group {
         this._yMargin = value;
     }
 
-    public get w(): number {
+    public override get w(): number {
         if (!super.w) return this._computeWidthHeight().w;
         else return super.w;
     }
-    public set w(n: number) {
+    public override set w(n: number) {
         super.w = n;
     }
-    public get h(): number {
+    public override get h(): number {
         if (!super.h) return this._computeWidthHeight().h;
         else return super.h;
     }
-    public set h(n: number) {
+    public override set h(n: number) {
         super.h = n;
     }
-    public get value(): string {
+    public override get value(): string {
         let result = "";
         let comma = "";
         for (let child of this.children) {
@@ -191,10 +190,5 @@ export class Group extends _Group {
             }
         }
         return result;
-    }
-
-    onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEventToChildren(pfEvent);
-        this.dispatchEvent(pfEvent, this.parent);
     }
 }

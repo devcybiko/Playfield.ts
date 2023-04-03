@@ -12,21 +12,20 @@ export class RootTile extends ControllerTile {
         this.h = playfield.gfx.height;
     }
 
-    // -- static members --- //
-    public static cast(obj: any): RootTile {
-        return obj as RootTile;
-    }
-
-    get parent(): Tile {
+    override get parent(): Tile {
         // this is a "trick". I always return "this" so that default values are returned to caller
         // this prevents me from having to constantly check if (this.parent)
         // if one wants the actual parent, use this._parent (which could potentially be null)
         return this;
     }
-    get X(): number {
-        return this._x;
+
+    override get X(): number {
+        // Special case of root - it's always 0 for parent.X()
+        return 0;
     }
-    get Y(): number {
-        return this._y;
+    override get Y(): number {
+        // Special case of root - it's always 0 for parent.Y()
+        return 0;
     }
+
 }

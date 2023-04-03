@@ -9,7 +9,7 @@ export class Draggable {
     protected _isDragging: boolean;
 
     Draggable() {
-        this.isDraggable = false;
+        this.isDraggable = true;
         this.isDragging = false;
         return this;
     }

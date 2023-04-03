@@ -44,17 +44,17 @@ export class Label extends _Label {
         return new Dimensions(this.W, this.H);
     }
 
-    get label(): string {
+    override get label(): string {
         return super.label;
     }
-    set label(s: string) {
+    override set label(s: string) {
         super.label = s;
         super.value = s;
     }
-    get value(): string {
+    override get value(): string {
         return super.value;
     }
-    set value(s: string) {
+    override set value(s: string) {
         super.label = s;
         super.value = s;
     }

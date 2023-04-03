@@ -15,12 +15,14 @@ export class BoxTile extends _BoxTile {
         super(name, parent, x, y, w, h);
         this._type = "BoxTile";
         this._color = int(random(0, this._colors.length));
+        this.isDraggable = true;
 
     }
 
     // --- Overrides ---//
 
     override draw(enable = true): Dimensions {
+        this.updateRect();
         if (this.isSelected) this.gfx.gparms.borderColor = "black";
         else this.gfx.gparms.borderColor = "";
         this.gfx.gparms.fillColor = ""; this._colors[this._color];
@@ -30,19 +32,17 @@ export class BoxTile extends _BoxTile {
 
     // --- onActions --- //
 
-    onGrab(dx: number, dy: number, event: any): boolean {
+    override onGrab(dx: number, dy: number, event: any): boolean {
         this.toFront();
         super.onGrab(dx, dy, event);
         return true;
     }
-    onClick(): void {
+    override onClick(): void {
         this._color = (this._color + 1) % this._colors.length;
         this.warn(this._color);
     }
-    onDrop(event: any): void {
+    override onDrop(event: any): void {
         this.toFront();
         super.onDrop(event);
-    }
-    onTick(): void {
     }
 }

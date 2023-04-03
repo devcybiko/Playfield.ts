@@ -51,13 +51,13 @@ export class Text extends _Text {
 
     // --- onActions --- //
 
-    onArrowLeft(): void {
+    override onArrowLeft(): void {
         this._cursorInc(-1);
     }
-    onArrowRight(): void {
+    override onArrowRight(): void {
         this._cursorInc(+1);
     }
-    onBackspace(): void {
+    override onBackspace(): void {
         if (this._cursor > 0) {
             let c = this._cursor;
             let left = this.value.substring(0, c - 1);
@@ -67,21 +67,21 @@ export class Text extends _Text {
             this.log(left, right, this._cursor, this.value);
         }
     }
-    onKey(key: string): void {
+    override onKey(key: string): void {
         let c = this._cursor;
         this.value = this.value.substring(0, c) + key + this.value.substring(c);
         this._cursorInc(+1);
     }
-    onFocus(pfEvent: PlayfieldEvent): void {
+    override onFocus(pfEvent: PlayfieldEvent): void {
         super.onFocus(pfEvent);
         this._startCursorBlinking();
         pfEvent.isActive = false;
     }
-    onUnfocus(): void {
+    override  onUnfocus(): void {
         this._stopCursorBlinking();
     }
 
-    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         this.onFocus(pfEvent);
         return super.onGrab(dx, dy, pfEvent);
     }

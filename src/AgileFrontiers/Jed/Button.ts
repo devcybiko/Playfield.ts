@@ -1,12 +1,12 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Dimensions } from "../Utils";
-import { Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
+import { Eventable, Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
 export class _Button extends Item { };
-export interface _Button extends Draggable, Pressable, Hoverable { };
-applyMixins(_Button, [Draggable, Pressable, Hoverable]);
+export interface _Button extends Eventable, Draggable, Pressable, Hoverable { };
+applyMixins(_Button, [Eventable, Draggable, Pressable, Hoverable]);
 
 export class Button extends _Button {
 
