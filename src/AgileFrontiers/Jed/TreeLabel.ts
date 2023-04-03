@@ -6,7 +6,6 @@ import { TreeItem } from "./TreeItem";
 export class TreeLabel extends Label {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label: string) {
         super(name, parent, x, y, w, h, label);
-        this.isDraggable = false;
         this.options.fontStyle = "";
         this.Logger("info", false);
     }

@@ -1,16 +1,18 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 /**
  * can be edited
  */
 export interface Editable { }
 export class Editable {
-    protected _isEditable: boolean;
+    protected _isEditableInitialized: boolean;
     protected _isFocus: boolean;
     protected _isFocusable: boolean;
+    public _asTile: Tile;
 
     Editable() {
-        this.isEditable = true;
+        this._isEditableInitialized = true;
         this.isFocus = false;
         this.isFocusable = true;
         return this;
@@ -26,6 +28,12 @@ export class Editable {
     }
     onBackspace(pfEvent: PlayfieldEvent): void {
     }
+    onDelete(pfEvent: PlayfieldEvent): void {
+    }
+    onEOL(pfEvent: PlayfieldEvent): void {
+    }
+    onBOL(pfEvent: PlayfieldEvent): void {
+    }
     private onBackSpace(pfEvent: PlayfieldEvent): void {
         // this is the wrong method
         // you should be using onBackspace(), above
@@ -40,12 +48,6 @@ export class Editable {
 
     // --- Accessors --- //
 
-    public get isEditable(): boolean {
-        return this._isEditable;
-    }
-    public set isEditable(value: boolean) {
-        this._isEditable = value;
-    }
     public get isFocusable(): boolean {
         return this._isFocusable;
     }

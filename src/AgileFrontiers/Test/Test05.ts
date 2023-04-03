@@ -70,7 +70,7 @@ export class TestClass {
             let button1 = new Button("Button1", parent, x, y, 100, 0);
             button1.label = "Hello World";
             button1.value = "Greg Smith";
-            button1.isDraggable = false;
+            button1.isDragEnabled = true;
 
             button1.go = printGo.bind(button1);
         }

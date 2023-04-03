@@ -74,7 +74,7 @@ export class TestClass {
             item = new Jed.Slider("slider-" + (TestClass.counter++), that.right, x, y, w, w);
         }
         if (item) {
-            item.isDraggable = true;
+            item.isDragEnabled = true;
             // item.isDraggable = that.isEditMode;
             item.onMenu = that.onMenu.bind(item);
             item.data = that;

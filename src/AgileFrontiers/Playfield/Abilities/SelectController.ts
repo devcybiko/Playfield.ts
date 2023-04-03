@@ -1,4 +1,4 @@
-import { Selectable } from "./SelectableMixin";
+import { Selectable } from "./Selectable";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
@@ -10,13 +10,14 @@ import { Tile } from "../Tile";
  * selecting a new child must unselect the currently selected child
  * issue: how do we unselect a child when the "background" parent tile is selected
  */
-export interface Selecter { };
-export class Selecter {
-    protected isSelecter: boolean;
+export interface SelectController { };
+export class SelectController {
+    protected _isSelectController: boolean;
     protected _selectedObj: Selectable;
+    public _asTile: Tile;
 
-    Selecter() {
-        this.isSelecter = true;
+    SelectController() {
+        this._isSelectController = true;
         this._selectedObj = null;
         return this;
     }
@@ -28,8 +29,8 @@ export class Selecter {
         // GLS - I thought each individual object passed events to children via OnEvent()
         let tileChild = child as unknown as Tile;
         if (pfEvent.isPress) {
-            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y, pfEvent) as unknown as Selectable;
-            if (foundChild && foundChild.isSelectable) this._selectChild(pfEvent, foundChild);
+            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y, pfEvent) as any;
+            if (foundChild && foundChild._isSelectableInitialized) this._selectChild(pfEvent, foundChild);
         }
     }
 

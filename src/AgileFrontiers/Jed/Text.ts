@@ -57,6 +57,17 @@ export class Text extends _Text {
     override onArrowRight(): void {
         this._cursorInc(+1);
     }
+    override onEOL(): void {
+        this._cursor = this.value.length;
+    }
+    override onBOL(): void {
+        this._cursor = 0;
+    }
+    override onDelete(): void {
+        if (this._cursor === this.value.length) return;
+        this.onArrowRight();
+        this.onBackspace();
+    }
     override onBackspace(): void {
         if (this._cursor > 0) {
             let c = this._cursor;

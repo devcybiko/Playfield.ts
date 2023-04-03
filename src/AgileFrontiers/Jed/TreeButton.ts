@@ -8,7 +8,6 @@ export class TreeButton extends Button {
     constructor(name: string, parent: Tile, x: number, y: number) {
         super(name, parent, x, y, 0, 0, "-");
         this._open = false;
-        this.isDraggable = false;
     }
     override onPress(pfEvent: PlayfieldEvent) {
         let parent = this.parent as unknown as TreeItem;

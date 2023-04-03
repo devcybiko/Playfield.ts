@@ -10,6 +10,7 @@ export class RootTile extends ControllerTile {
         this._gfx = playfield.gfx.clone();
         this.w = playfield.gfx.width;
         this.h = playfield.gfx.height;
+        this._initTile();
     }
 
     override get parent(): Tile {

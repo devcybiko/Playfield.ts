@@ -1,12 +1,10 @@
-import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
-import { Resizable, DragController, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
+import { SwipeController, Resizable, DragController, SelectController, ClickController, PressController, EditController, HoverController } from "./Abilities";
 import { applyMixins, Dimensions, Logger } from "../Utils";
-import { PlayfieldEvent } from "./PlayfieldEvent";
 
 export class _ControllerTile extends Tile { };
-export interface _ControllerTile extends Resizable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer { };
-applyMixins(_ControllerTile, [Resizable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer]);
+export interface _ControllerTile extends SwipeController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
+applyMixins(_ControllerTile, [ SwipeController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
 
 export class ControllerTile extends _ControllerTile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {

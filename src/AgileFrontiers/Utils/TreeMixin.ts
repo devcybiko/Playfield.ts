@@ -47,9 +47,17 @@ export class Tree {
      * if any object returns "stop-children"
      *   that object's children are not searched
      */
-    dfs(before: (obj: Tree, ctx: any) => any, after?: (obj: Tree, ctx: any) => any, ctx?: any, reverse = false): any {
-        let children = this.childrenClone; // in case someone modifies the order of objects during descent
-        if (reverse) children.reverse(); // is this an expensive operation? should we change the iteration strategy?
+    dfs(before: (obj: Tree, ctx: any) => any, after?: (obj: Tree, ctx: any) => any, ctx?: any, order = 1, clone=false): any {
+        let children;
+        let index;
+
+        if (clone) children = this.childrenClone; // get a clone in case someone modifies the order of objects during descent
+        else children = this.children;
+
+        if (order === 1)index = 0;
+        else if (order === -1) index = children.length - 1; // reverse order
+        else  throw new Error("dfs order must be +1 or -1, not: " + order);
+
         let stop = before && before(this, ctx);
         if (stop) {
             // if true-ish stop all processing. great for "finding" objects
@@ -59,8 +67,9 @@ export class Tree {
             }
         } else {
             for (let i=0; i<children.length; i++) {
-                stop = children[i].dfs(before, after, ctx, reverse);
+                stop = children[index].dfs(before, after, ctx, order, clone);
                 if (stop) break;
+                index += order;
             }
         }
         if (!stop) stop = after && after(this, ctx);

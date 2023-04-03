@@ -1,11 +1,11 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Logger, Rect, between, Dimensions } from "../Utils";
-import { Draggable, Eventable, Clicker, Presser, Selecter, DragController, Editer, Hoverer } from "../Playfield/Abilities";
+import { Draggable, Eventable, ClickController, PressController, SelectController, DragController, EditController, HoverController } from "../Playfield/Abilities";
 
 export class _Group extends Item { };
-export interface _Group extends Draggable, Eventable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer { };
-applyMixins(_Group, [Eventable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer]);
+export interface _Group extends Draggable, Eventable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
+applyMixins(_Group, [Eventable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
 
 export class Group extends _Group {
     protected _isGroupItem: boolean;

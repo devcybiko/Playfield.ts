@@ -9,12 +9,15 @@
  * - this is not asynchronous and there is no callback
  */
 
+import { Tile } from "../Tile";
+
 export interface Timer { }
 export class Timer {
     protected isTimer: boolean;
     protected _delay: number;
     protected _lastTime: number;
     protected _timeout: number;
+    public _asTile: Tile;
 
     Timer() {
         this.isTimer = true;

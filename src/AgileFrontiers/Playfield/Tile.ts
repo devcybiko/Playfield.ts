@@ -31,14 +31,14 @@ export class Tile extends _Tile {
     protected _X = 0;
     protected _Y = 0;
     protected _isVisible = true;
-    public override _rect: Rect;
+    public override _asRect: Rect;
     public _type = "Tile";
-    public _tile: Tile;
+    public override _asTile: Tile;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super();
         this.Tree(name, parent);
-        this._tile = this;
+        this._asTile = this;
         this.Logger();
         this.x = x;
         this.y = y;
@@ -56,37 +56,37 @@ export class Tile extends _Tile {
 
     // --- Overrides --- //
 
+    _initTile() {
+        let anyChild = this as any;
+        // is this a good idea? or should we enforce objects initizing within their constructors?
+        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+
+        anyChild.Clickable && anyChild.Clickable();
+        anyChild.Draggable && anyChild.Draggable();
+        anyChild.Editable && anyChild.Editable();
+        anyChild.Eventable && anyChild.Eventable();
+        anyChild.Hoverable && anyChild.Hoverable();
+        anyChild.Pressable && anyChild.Pressable();
+        anyChild.Resizable && anyChild.Resizable();
+        anyChild.Selectable && anyChild.Selectable();
+        anyChild.Swipeable && anyChild.Swipeable();
+
+        anyChild.ClickController && anyChild.ClickController();
+        anyChild.DragController && anyChild.DragController();
+        anyChild.EditController && anyChild.EditController();
+        anyChild.HoverController && anyChild.HoverController();
+        anyChild.PressController && anyChild.PressController();
+        anyChild.SelectController && anyChild.SelectController();
+        anyChild.SwipeController && anyChild.SwipeController();
+        anyChild._isDraggableInitized && anyChild._isPressable && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+    }
     override addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
         child._gfx = this._playfield.gfx.clone();
         child._tabOrder = this.children.length - 1;
-        let anyChild = child as any;
-        // is this a good idea? or should we enforce objects initizing within their constructors?
-        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
-
-        if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
-        if (anyChild.Dispatchable && !anyChild.isDispatchable) anyChild.Dispatchable();
-        if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
-        if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
-        if (anyChild.Eventable && !anyChild.isEventable) anyChild.Eventable();
-        if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
-        if (anyChild.Pressable && !anyChild.isPressable) anyChild.Pressable();
-        if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
-        if (anyChild.Selectable && !anyChild.isSelectable) anyChild.Selectable();
-
-        if (anyChild.Clicker && !anyChild.isClicker) anyChild.Clicker();
-        if (anyChild.Dispatcher && !anyChild.isDispatcher) anyChild.Dispatcher();
-        if (anyChild.DragController && !anyChild.isDragController) anyChild.DragController();
-        if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
-        if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
-        if (anyChild.Presser && !anyChild.isPresser) anyChild.Presser();
-        if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
-        if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
-
-        if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+        child._initTile();
     }
-
     updateRect() {
         // this is called only in rare cases where the parent never sets .x or .y
         this.x = this.x; // see set x(), below (updates _X relative to parent)
@@ -121,8 +121,8 @@ export class Tile extends _Tile {
 
     drawChildren(enable = true): Dimensions {
         let maxDimensions = new Dimensions();
-        for (let child of this.children) {
-            let tileChild = child as unknown as Tile;
+        for (let i = 0; i < this.children.length; i++) {
+            let tileChild = this.children[i] as unknown as Tile;
             let deltas = tileChild.draw(enable);
             maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
             maxDimensions.h = Math.max(maxDimensions.h, tileChild.y + deltas.h);
@@ -132,6 +132,7 @@ export class Tile extends _Tile {
 
     draw(enable = true): Dimensions {
         this.updateGparms(enable);
+        this.updateRect();
         return this.drawChildren(enable);
     }
 
@@ -139,7 +140,7 @@ export class Tile extends _Tile {
         let obj = this.objectify();
         if (obj && this.children) {
             obj.children = [];
-            for(let _child of this.children) {
+            for (let _child of this.children) {
                 let child = _child as unknown as Tile;
                 let childObj = child.serialize();
                 if (childObj) obj.children.push(childObj);

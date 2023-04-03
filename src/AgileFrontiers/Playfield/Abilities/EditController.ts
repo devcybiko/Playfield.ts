@@ -1,4 +1,4 @@
-import { Editable } from "./EditableMixin";
+import { Editable } from "./Editable";
 import { Tree } from "../../Utils";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
@@ -6,20 +6,22 @@ import { Tile } from "../Tile";
 /**
  * can control Editable
  */
-export interface Editer { };
-export class Editer {
-    protected isEditer: boolean;
+export interface EditController { };
+export class EditController {
+    protected _isEditControllerInitialized: boolean;
     protected _focusObj: Editable;
+    public _asTile: Tile;
 
-    Editer() {
-        this.isEditer = true;
+    EditController() {
+        this._isEditControllerInitialized = true;
         this._focusObj = null;
         return this;
     }
 
     // --- Public Methods --- //
 
-    editerEvent(pfEvent: PlayfieldEvent, child: Editable) {
+    editEvent(pfEvent: PlayfieldEvent, child: Editable) {
+        console.log(this, pfEvent);
         if (pfEvent.isPress) return this._focusChild(pfEvent, child);
         else if (pfEvent.isKeyDown) return this._dispatchKey(pfEvent, child);
     }
@@ -29,39 +31,45 @@ export class Editer {
     _focusChild(pfEvent: PlayfieldEvent, child: Editable) {
         let tileChild = child as unknown as Tile;
         if (pfEvent.isKeyboardEvent || tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
-            this._unfocusChildren(pfEvent, child);
+            this.unfocusAlLChildren(pfEvent, child);
             this._focusObj = child;
             child.isFocus = true;
             child.onFocus(pfEvent);
         }
     }
 
-    _editerParent(): Editer {
-        return (this as unknown as Tile).parent as unknown as Editer;
+    _editerParent(): EditController {
+        return (this as unknown as Tile).parent as unknown as EditController;
     }
 
-    _unfocusChild(child: any, ctx: any) {
+    _unfocusChild(_child: Tree, pfEvent: PlayfieldEvent) {
+        let child = _child as unknown as EditController;
         // this is a function called by Tree.dfs()
-        if (child._focusObj) {
-            // we're PRETTY sure this is Editable...
-            child._focusObj.isFocus = false;
-            child._focusObj.onUnfocus();
+        if (child._isEditControllerInitialized) {
+            if (child._focusObj) {
+                child._focusObj.isFocus = false;
+                child._focusObj.onUnfocus(pfEvent);
+                child._focusObj = null;
+            }
         }
     }
 
-    _unfocusChildren(pfEvent: PlayfieldEvent, child: Editable) {
+    unfocusAlLChildren(pfEvent: PlayfieldEvent, child: Editable) {
         // we have to unfocus ALL the children in the tree
         // otherwise, the keyboard events go to all currently inFocus items
-        let root = (this as unknown as Tree).root();
-        root.dfs(this._unfocusChild);
+        let root = this._asTile.root();
+        root.dfs(this._unfocusChild, null, pfEvent);
     }
 
     _dispatchKey(pfEvent: PlayfieldEvent, child: Editable) {
         if (child.isFocus) {
             if (pfEvent.key.length === 1) child.onKey(pfEvent.key, pfEvent);
-            else if (pfEvent.key === "ArrowLeft") child.onArrowLeft(pfEvent);
-            else if (pfEvent.key === "ArrowRight") child.onArrowRight(pfEvent);
-            else if (pfEvent.key === "Backspace") child.onBackspace(pfEvent);
+            else if (pfEvent.key === "ArrowLeft" && !pfEvent.isShift) child.onArrowLeft(pfEvent);
+            else if (pfEvent.key === "ArrowRight" && !pfEvent.isShift) child.onArrowRight(pfEvent);
+            else if (pfEvent.key === "ArrowLeft" && pfEvent.isShift) child.onBOL(pfEvent);
+            else if (pfEvent.key === "ArrowRight" && pfEvent.isShift) child.onEOL(pfEvent);
+            else if (pfEvent.key === "Backspace" && !pfEvent.isShift) child.onBackspace(pfEvent);
+            else if (pfEvent.key === "Backspace" && pfEvent.isShift) child.onDelete(pfEvent);
             else if (pfEvent.key === "Tab" && !pfEvent.isShift) this._nextChild(1, pfEvent);
             else if (pfEvent.key === "Tab" && pfEvent.isShift) this._nextChild(-1, pfEvent);
         }

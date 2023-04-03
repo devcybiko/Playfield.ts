@@ -6,10 +6,11 @@ import { Tile } from "../Tile";
  */
 export interface Resizable { }
 export class Resizable {
-    protected _isResizable: boolean;
+    protected _isResizableInitialized: boolean;
+    public _asTile: Tile;
 
     Resizable() {
-        this.isResizable = true;
+        this._isResizableInitialized = true;
     }
 
     public static cast(obj: any): Resizable {
@@ -45,7 +46,7 @@ export class Resizable {
         let thisTile = this as unknown as Tile;
         for(let _child of thisTile.children) {
             let child = _child as unknown as Resizable;
-            if (child.isResizable) child.onResize(w, h, pfEvent);
+            if (child._isResizableInitialized) child.onResize(w, h, pfEvent);
         }
     }
 
@@ -53,17 +54,7 @@ export class Resizable {
         let thisTile = this as unknown as Tile;
         for(let _child of thisTile.children) {
             let child = _child as unknown as Resizable;
-            if (child.isResizable) child.onRelResize(dw, dh, pfEvent);
+            if (child._isResizableInitialized) child.onRelResize(dw, dh, pfEvent);
         }
     }
-
-    // --- Accessors --- //
-
-    public get isResizable(): boolean {
-        return this._isResizable;
-    }
-    public set isResizable(value: boolean) {
-        this._isResizable = value;
-    }
-
 }

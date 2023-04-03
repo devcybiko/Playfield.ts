@@ -1,16 +1,16 @@
-import { Clickable } from "./ClickableMixin";
+import { Clickable } from "./Clickable";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 /** 
  * can control Clickable
  */
-export interface Clicker { };
-export class Clicker {
-    protected isClicker: boolean;
+export interface ClickController { };
+export class ClickController {
+    protected _isClickControllerInitialized: boolean;
 
-    Clicker() {
-        this.isClicker = true;
+    ClickController() {
+        this._isClickControllerInitialized = true;
         return this;
     }
 
@@ -18,7 +18,7 @@ export class Clicker {
     
     clickEvent(pfEvent: PlayfieldEvent, child: Clickable) {
         if (pfEvent.isPress) {
-            let tileChild = child as unknown as Tile;
+            let tileChild = child._asTile;
             if (tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
                 child.onClick(pfEvent);
             }

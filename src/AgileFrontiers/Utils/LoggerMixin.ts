@@ -4,7 +4,7 @@ export class Logger {
     private _level: string;
     private _link: string;
     private _uselink: boolean;
-    public _logger: Logger;
+    public _asLogger: Logger;
 
     constructor(...args: any[]) {
         if (args.length === 0) return;
@@ -19,7 +19,7 @@ export class Logger {
         this._isLoggable = true;
         this._level = logLevel;
         this._uselink = uselink;
-        this._logger = this;
+        this._asLogger = this;
         return this;
     }
 

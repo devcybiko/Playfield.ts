@@ -1,13 +1,13 @@
 import { Tile } from "./Tile";
-import { DragController, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
+import { DragController, SelectController, ClickController, PressController, EditController, HoverController } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { ControllerTile } from "./ControllerTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Logger, Clicker, Presser, Selecter, DragController, Editer, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
 
 export class Splitter extends _Splitter {
 
@@ -37,7 +37,7 @@ export class Splitter extends _Splitter {
         this._topPercent = topPercent;
         this._leftPercent = leftPercent;
         this._initOnFirstCall();
-        this.isDraggable = true;
+        this.isDragEnabled = true;
     }
 
     _initOnFirstCall() {

@@ -1,14 +1,16 @@
 import { PlayfieldEvent } from "../PlayfieldEvent"
+import { Tile } from "../Tile";
 
 /**
  * can be clicked - but not released
  */
 export interface Clickable { }
 export class Clickable {
-    protected _isClickable: boolean;
+    protected _isClickableInitialized: boolean;
+    public _asTile: Tile;
 
     Clickable() {
-        this.isClickable = true;
+        this._isClickableInitialized = true;
     }
 
     // --- onActions --- //
@@ -17,14 +19,4 @@ export class Clickable {
     }
     onMenu(pfEvent: PlayfieldEvent): void {
     }
-
-    // --- Accessors --- //
-
-    public get isClickable(): boolean {
-        return this._isClickable;
-    }
-    public set isClickable(value: boolean) {
-        this._isClickable = value;
-    }
-
 }

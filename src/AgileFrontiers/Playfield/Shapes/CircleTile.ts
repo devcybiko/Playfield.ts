@@ -10,11 +10,11 @@ applyMixins(_CircleTile, [Draggable, Selectable]);
 export class CircleTile extends _CircleTile {
     _dx = 0;
     _dy = 0;
-    override _tile: Tile; // updated by Tile
+    override _asTile: Tile; // updated by Tile
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
         this._type = "CircleTile";
-        this.isDraggable = true;
+        this.isDragEnabled = true;
     }
 
     // --- Overrides --- //

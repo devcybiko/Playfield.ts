@@ -96,7 +96,7 @@ export class Playfield extends _Playfield {
         }
         let cnt = 0;
         for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            this._rootTile.dfs(null, this._onEventVistor.bind(this), pfEvent, true);
+            this._rootTile.dfs(null, this._onEventVistor.bind(this), pfEvent, -1, true);
             // console.log(pfEvent);
             cnt += pfEvent.counter;
             // if (!pfEvent.isMove) console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);

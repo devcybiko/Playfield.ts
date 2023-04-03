@@ -1,15 +1,17 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 /**
  * Pressable - can be pressed and released
  */
 export interface Pressable { }
 export class Pressable {
-    protected _isPressable: boolean;
+    protected _isPressableInitialized: boolean;
     protected _isPressed: boolean;
+    public _asTile: Tile;
 
     Pressable() {
-        this.isPressable = true;
+        this._isPressableInitialized = true;
         this.isPressed = false;
         return this;
     }
@@ -29,11 +31,4 @@ export class Pressable {
     public set isPressed(value: boolean) {
         this._isPressed = value;
     }
-    public get isPressable(): boolean {
-        return this._isPressable;
-    }
-    public set isPressable(value: boolean) {
-        this._isPressable = value;
-    }
-
 }
