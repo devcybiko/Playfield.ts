@@ -6,11 +6,12 @@ import {Tile} from "../Tile";
  */
 export interface Selectable { }
 export class Selectable {
-    protected _isSelectable: boolean;
+    protected _isSelectableInitialized: boolean;
     protected _isSelected: boolean;
+    public _asTile: Tile;
 
     Selectable() {
-        this._isSelectable = true;
+        this._isSelectableInitialized = true;
         this._isSelected = false;
         return this;
     }
@@ -34,12 +35,5 @@ export class Selectable {
     }
     public set isSelected(value: boolean) {
         this._isSelected = value;
-    }
-
-    public get isSelectable(): boolean {
-        return this._isSelectable;
-    }
-    public set isSelectable(value: boolean) {
-        this._isSelectable = value;
     }
 }

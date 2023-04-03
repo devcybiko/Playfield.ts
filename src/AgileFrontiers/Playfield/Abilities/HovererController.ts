@@ -1,16 +1,17 @@
-import { Hoverable } from "./HoverableMixin";
+import { Hoverable } from "./Hoverable";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 /**
  * can control Hoverable
  */
-export interface Hoveer { };
-export class Hoverer {
-    protected isHoverer: boolean;
+export interface HoverController { };
+export class HoverController {
+    protected _isHoverController: boolean;
+    public _asTile: Tile;
 
-    Hoverer() {
-        this.isHoverer = true;
+    HoverController() {
+        this._isHoverController = true;
         return this;
     }
 

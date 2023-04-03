@@ -14,7 +14,7 @@ export class TestClass {
     _playfield: Playfield;
 
     constructor() {
-        this._playfieldApp = new BrowserPlayfieldApp();
+        this._playfieldApp = new BrowserPlayfieldApp(undefined, 1.0)
         this._playfield = this._playfieldApp.playfield;
     }
     circleTileTest() {

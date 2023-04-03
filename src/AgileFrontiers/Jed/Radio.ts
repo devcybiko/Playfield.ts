@@ -13,19 +13,15 @@ export class Radio extends _Radio {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
+        this._type += ".Radio";
     }
     
-    // --- Public Methods --- //
-
-    go(): boolean {
-        return false;
-    }
-
     // --- Overrides --- //
 
     override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
         this.updateGparms(enable);
+        this.updateRect();
         if (this.isSelected) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor
@@ -52,8 +48,8 @@ export class Radio extends _Radio {
     }
 
     // --- onActions  --- //
-    override onSelect(): boolean {
-        return this.go();
+    override onSelect() {
+        this.go();
     }
     public get isChecked() {
         return this._isChecked;

@@ -1,20 +1,20 @@
 import { Tile } from "./Tile";
-import { Dispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
+import { DragController, SelectController, ClickController, PressController, EditController, HoverController } from "./Abilities";
 import { Resizable, Draggable, Hoverable } from "./Abilities";
 import { applyMixins, Logger, Margins, Rect, int, between, round, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "./PlayfieldEvent";
-import { RootTile } from "./RootTile";
+import { ControllerTile } from "./ControllerTile";
 
 export class _Splitter extends Tile { };
-export interface _Splitter extends Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
+export interface _Splitter extends Resizable, Hoverable, Draggable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
+applyMixins(_Splitter, [Resizable, Hoverable, Draggable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
 
 export class Splitter extends _Splitter {
 
-    protected _ne: RootTile;
-    protected _nw: RootTile;
-    protected _se: RootTile;
-    protected _sw: RootTile;
+    protected _ne: ControllerTile;
+    protected _nw: ControllerTile;
+    protected _se: ControllerTile;
+    protected _sw: ControllerTile;
     protected _hGutterSize: number;
     protected _vGutterSize: number;
     protected _margins: Margins;
@@ -27,6 +27,7 @@ export class Splitter extends _Splitter {
 
     constructor(name: string, parent: Tile, topPercent = 0.5, leftPercent = 0.5, hGutterSize = 15, vGutterSize = 15) {
         super(name, parent, 0, 0, parent.w, parent.h);
+        this._type += ".Splitter";
         this.Logger();
         this._margins = new Margins().Margins(2, 2, 2, 2);
         this._hGutterSize = hGutterSize;
@@ -36,7 +37,7 @@ export class Splitter extends _Splitter {
         this._topPercent = topPercent;
         this._leftPercent = leftPercent;
         this._initOnFirstCall();
-        this.isDraggable = true;
+        this.isDragEnabled = true;
     }
 
     _initOnFirstCall() {
@@ -45,10 +46,11 @@ export class Splitter extends _Splitter {
             this._isVGutterHovering = false;
             this._hGutterInit(this._topPercent);
             this._vGutterInit(this._leftPercent);
-            this._ne = new RootTile("ne", this, 0, 0, 0, 0);
-            this._nw = new RootTile("nw", this, 0, 0, 0, 0);
-            this._se = new RootTile("se", this, 0, 0, 0, 0);
-            this._sw = new RootTile("sw", this, 0, 0, 0, 0);
+            console.log(this._hGutterRect, this._vGutterRect);
+            this._ne = new ControllerTile("ne", this, 0, 0, 0, 0);
+            this._nw = new ControllerTile("nw", this, 0, 0, 0, 0);
+            this._se = new ControllerTile("se", this, 0, 0, 0, 0);
+            this._sw = new ControllerTile("sw", this, 0, 0, 0, 0);
             this._resize();
         }
     }
@@ -102,7 +104,7 @@ export class Splitter extends _Splitter {
         }
         let x0 = 0;
         let y0 = int(this.h * topPercent) - int(this._hGutterSize / 2);
-        this._hGutterRect = (new Rect()).Rect(x0, y0, this.w, this._hGutterSize);
+        this._hGutterRect = new Rect(x0, y0, this.w, this._hGutterSize);
     }
 
     _hoverGutter(gutter: Rect, pfEvent: PlayfieldEvent): boolean {
@@ -112,7 +114,7 @@ export class Splitter extends _Splitter {
 
     // --- Overrides --- //
 
-    addChild(child: Tile) {
+    override addChild(child: Tile) {
         if (this.children.length < 4) super.addChild(child);
         else throw new Error("You must use Splitter.ne, Splitter.nw, Splitter.se or Splitter.sw");
     }
@@ -218,11 +220,6 @@ export class Splitter extends _Splitter {
         }
     }
 
-    override onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEvent(pfEvent, this.parent);
-        if (pfEvent.isActive) this.dispatchEventToChildren(pfEvent);
-    }
-
     override onHovering(pfEvent: PlayfieldEvent) {
         if (this.isDragging) return;
         this._isHGutterHovering = this._hoverGutter(this._hGutterRect, pfEvent);
@@ -236,32 +233,32 @@ export class Splitter extends _Splitter {
 
     // --- Accessors --- //
 
-    public get ne(): RootTile {
+    public get ne(): ControllerTile {
         this._initOnFirstCall();
         return this._ne;
     }
-    public set ne(value: RootTile) {
+    public set ne(value: ControllerTile) {
         this._ne = value;
     }
-    public get nw(): RootTile {
+    public get nw(): ControllerTile {
         this._initOnFirstCall();
         return this._nw;
     }
-    public set nw(value: RootTile) {
+    public set nw(value: ControllerTile) {
         this._nw = value;
     }
-    public get se(): RootTile {
+    public get se(): ControllerTile {
         this._initOnFirstCall();
         return this._se;
     }
-    public set se(value: RootTile) {
+    public set se(value: ControllerTile) {
         this._se = value;
     }
-    public get sw(): RootTile {
+    public get sw(): ControllerTile {
         this._initOnFirstCall();
         return this._sw;
     }
-    public set sw(value: RootTile) {
+    public set sw(value: ControllerTile) {
         this._sw = value;
     }
 }

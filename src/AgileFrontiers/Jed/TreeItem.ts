@@ -13,6 +13,7 @@ export class TreeItem extends Group {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label: string) {
         super(name, parent, x, y, w, h);
+        this._type += ".TreeItem";
         this._treeButton = new TreeButton("_button", this, 0, 0); // x,y,w,h filled in during draw()
         this._treeLabel = new TreeLabel("_label", this, 0, 0, 0, 0, label); // x,y,w,h filled in during draw()
         this.open = false;
@@ -20,9 +21,6 @@ export class TreeItem extends Group {
         this._isBoxed = false;
     }
 
-    public static cast(obj: any): TreeItem {
-        return obj as TreeItem;
-    }
     public get open(): boolean {
         return this._open;
     }
@@ -64,6 +62,7 @@ export class TreeItem extends Group {
     }
 
     override draw(enable = true): Dimensions {
+        this.updateGparms(enable);
         this.updateRect();
         if (!this.isVisible) return new Dimensions();
         this.updateGparms(enable);
@@ -75,17 +74,12 @@ export class TreeItem extends Group {
         return deltas;
     }
 
-    onEvent(pfEvent: PlayfieldEvent) {
-        if (this._treeButton) this._treeButton.onEvent(pfEvent);
-        if (this._treeLabel) this._treeLabel.onEvent(pfEvent);
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        if (this._treeButton) return this._treeButton.onEvent(pfEvent, controller);
+        if (this._treeLabel) return this._treeLabel.onEvent(pfEvent, controller);
         if (!this._open) {
-            return;
-        }
-        let thisTile = this as unknown as Tile;
-        if (pfEvent.isMouseEvent && thisTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
-            this._forEachChild(pfEvent);
-        } else if (pfEvent.isKeyboardEvent) {
-            this._forEachChild(pfEvent);
+            // if we're collapsed, don't process child nodes
+            return "stop-children";
         }
     }
 
@@ -95,10 +89,8 @@ export class TreeItem extends Group {
         newChild.data = data;
         return newChild;
     }
-    onClick(pfEvent: PlayfieldEvent) {
-        console.log("TreeItem.onClick!", this.name)
+    override onClick(pfEvent: PlayfieldEvent) {
     }
-    onMenu(pfEvent: PlayfieldEvent) {
-        console.log("TreeItem.onMenu!", this.name)
+    override onMenu(pfEvent: PlayfieldEvent) {
     }
 }

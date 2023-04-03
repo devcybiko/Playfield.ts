@@ -1,13 +1,13 @@
 import { Tile } from "../Playfield/Tile";
-import { Draggable, Hoverable } from "../Playfield/Abilities";
+import { Draggable, Swipeable, Hoverable } from "../Playfield/Abilities";
 import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
 import { GfxParms } from "../Playfield/Graphics";
 import { Item } from "./Item";
 
 export class _Slider extends Item { };
-export interface _Slider extends Draggable, Hoverable { };
-applyMixins(_Slider, [Draggable, Hoverable]);
+export interface _Slider extends Draggable, Swipeable, Hoverable { };
+applyMixins(_Slider, [Draggable, Swipeable, Hoverable]);
 
 function inormalize(r: number, multiplier: number) {
     if (r <= 1.0) return int(r * multiplier);
@@ -30,15 +30,16 @@ export class Slider extends _Slider {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value="", label="") {
         super(name, parent, x, y, w, h, value, label);
+        this._type += ".Slider";
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
         this.cursorMove(0.5, 0.5);
         this.options.textBaseline = GfxParms.MIDDLE;
         this.options.textAlign = GfxParms.CENTER;
-        this.isDraggable = true;
     }
 
     onSlide(rx: number, ry: number, pfEvent: PlayfieldEvent) {
+        // this is the overridable method for the user to capture the sliding events
     }
 
     cursorMove(rx: number, ry: number) {
@@ -81,8 +82,10 @@ export class Slider extends _Slider {
         this.gfx.gparms.borderRadius = this._cursorBorderRadius;
         this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
     }
+
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
+        this.updateRect();
         this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         this._drawContainer();
         this._drawCursor();
@@ -90,19 +93,18 @@ export class Slider extends _Slider {
         return this.dimensions;
     }
 
-    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onSwipeStart(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let c = this._cursor;
+        console.log(dx, dy);
+        console.log(c);
+        console.log(this);
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
-            this._isSliding = true;
-            super.onGrab(dx, dy, pfEvent);
-            return true;
+            return super.onSwipeStart(dx, dy, pfEvent);
         }
-        this._isSliding = false;
-        return super.onGrab(dx, dy, pfEvent);
     }
 
-    onDrag(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
-        if (this._isSliding) {
+    override onSwipe(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
+        // if (this._isSliding) {
             let c = this._cursor;
             let xmax = this.dw + this._margins.left;
             let ymax = this.dh + this._margins.top;
@@ -111,14 +113,14 @@ export class Slider extends _Slider {
             this._rcursor.move(this.rx, this.ry);
             this.onSlide(this.rx, this.ry, pfEvent);
             pfEvent.isActive = false;
-        } else {
-            super.onDrag(dx, dy, pfEvent);
-        }
+        // } else {
+        //     super.onSwipe(dx, dy, pfEvent);
+        // }
     }
 
-    onDrop(pfEvent: PlayfieldEvent): void {
-        super.onDrop(pfEvent);
-        this._isSliding = false;
+    override onSwipeEnd(pfEvent: PlayfieldEvent): void {
+        super.onSwipeEnd(pfEvent);
+        // this._isSliding = false;
     }
 
     // --- Accessors --- //

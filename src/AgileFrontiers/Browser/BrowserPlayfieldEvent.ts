@@ -3,6 +3,7 @@ export class BrowserPlayfieldEvent {
     private _isActive: boolean;
     private _counter: number;
     private _touchedBy: string[];
+    private _type: string;
 
     // mouse events
     private _x: number;
@@ -36,7 +37,7 @@ export class BrowserPlayfieldEvent {
         this._isActive = true;
         this._counter = 0;
         this._touchedBy = [];
-        // this.type = event.type;
+        this._type = event.type;
 
         // mouse events
         this.isMouseEvent = event.type.startsWith("mouse") || event.type.startsWith("wheel");
@@ -221,6 +222,12 @@ export class BrowserPlayfieldEvent {
     }
     public set touchedBy(value: string[]) {
         this._touchedBy = value;
+    }
+    public get type(): string {
+        return this._type;
+    }
+    public set type(value: string) {
+        this._type = value;
     }
 
 }

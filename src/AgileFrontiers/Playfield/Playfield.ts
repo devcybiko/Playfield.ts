@@ -31,8 +31,7 @@ export class Playfield extends _Playfield {
         this._gfx = gfx;
         this._eventQueue = eventQueue;
         this.Rect(0, 0, this._gfx.width, this._gfx.height);
-        this._rootTile = new RootTile("_root", Tile.null, 0, 0, this.w, this.h);
-        this._rootTile.playfield = this;
+        this._rootTile = new RootTile("_root", this);
     }
 
     // --- Public Methods --- //
@@ -86,20 +85,23 @@ export class Playfield extends _Playfield {
         // this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
     }
 
+    _onEventVistor(obj: any, pfEvent: any): any {
+        if (obj.onEvent) return obj.onEvent(pfEvent, this._rootTile);
+        return null;
+    }
     _handleEvents() {
+        let that = this;
         function next() {
             return that._eventQueue.getEvent();
         }
-        let that = this;
         let cnt = 0;
         for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            this._rootTile.onEvent(pfEvent);
+            this._rootTile.dfs(null, this._onEventVistor.bind(this), pfEvent, -1, true);
             // console.log(pfEvent);
-            cnt+=pfEvent.counter;
-            // console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);
+            cnt += pfEvent.counter;
+            // if (!pfEvent.isMove) console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);
         }
         return cnt;
-        // console.log(cnt + " Events Handled...");
     }
 
     // --- Accessors --- //

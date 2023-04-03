@@ -54,5 +54,7 @@ export interface PlayfieldEvent {
     set counter(n: number);
     get touchedBy(): string[];
     set touchedBy(value: string[]);
+    get type(): string;
+    set type(value: string);
 
 }

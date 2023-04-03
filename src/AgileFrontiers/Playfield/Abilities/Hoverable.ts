@@ -1,16 +1,18 @@
 import { PlayfieldEvent } from "../PlayfieldEvent";
+import { Tile } from "../Tile";
 
 /**
  * can be hovered over
  */
 export interface Hoverable { }
 export class Hoverable {
-    protected _isHoverable: boolean;
+    protected _isHoverableInitialized: boolean;
     protected _isHovering: boolean;
+    public _asTile: Tile;
 
     Hoverable() {
+        this._isHoverableInitialized = true;
         this.isHovering = false;
-        this.isHoverable = true;
         return this;
     }
 
@@ -38,11 +40,4 @@ export class Hoverable {
     public set isHovering(value: boolean) {
         this._isHovering = value;
     }
-    public get isHoverable() {
-        return this._isHoverable;
-    }
-    public set isHoverable(value: boolean) {
-        this._isHoverable = value;
-    }
-
 }

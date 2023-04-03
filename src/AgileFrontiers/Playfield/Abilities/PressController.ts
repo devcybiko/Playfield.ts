@@ -1,15 +1,17 @@
-import { Pressable } from "./PressableMixin";
+import { Pressable } from "./Pressable";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 /**
  * can control Pressable
  */
-export interface Presser { };
-export class Presser {
-    protected isPresser: boolean;
-    Presser() {
-        this.isPresser = true;
+export interface PressController { };
+export class PressController {
+    protected _isPressControllerInitialized: boolean;
+    public _asTile: Tile;
+    
+    PressController() {
+        this._isPressControllerInitialized = true;
         return this;
     }
 

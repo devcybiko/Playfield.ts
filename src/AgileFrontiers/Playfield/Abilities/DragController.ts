@@ -1,19 +1,20 @@
-import { Draggable } from "./DraggableMixin";
+import { Draggable } from "./Draggable";
 import { PlayfieldEvent } from "../PlayfieldEvent";
 import { Tile } from "../Tile";
 
 /**
  * can control Draggable
  */
-export interface Dragger { };
-export class Dragger {
-    protected isDragger: boolean;
+export interface DragController { };
+export class DragController {
+    protected _isDragControllerInitialized: boolean;
     protected _dragObj: Draggable;
     protected _dragX: number;
     protected _dragY: number;
+    public _asTile: Tile;
 
-    Dragger() {
-        this.isDragger = true;
+    DragController() {
+        this._isDragControllerInitialized = true;
         this._dragObj = null;
         this._dragX = 0;
         this._dragY = 0;
@@ -31,7 +32,6 @@ export class Dragger {
     // --- Private Methods --- //
 
     _dragChild(pfEvent: PlayfieldEvent, child: Draggable) {
-        if (!child.isDraggable) return;
         if (this._dragObj) {
             this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
             this._dragX = pfEvent.x;
@@ -40,11 +40,12 @@ export class Dragger {
     }
 
     _grabChild(pfEvent: PlayfieldEvent, child: Draggable) {
-        if (!child.isDraggable) return;
-        let tileChild = child as unknown as Tile;
-        if (tileChild.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
-            let dx = pfEvent.x - tileChild.X;
-            let dy = pfEvent.y - tileChild.Y;
+        if (!child.isDragEnabled) return;
+        if (child._asTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
+            let dx = pfEvent.x - child._asTile.X;
+            let dy = pfEvent.y - child._asTile.Y;
+            console.log(dx, dy, this._asTile.X, this._asTile.Y);
+            console.log(this, this._asTile);
             if (child.onGrab(dx, dy, pfEvent)) {
                 // if the child does not reject the "grab"
                 this._dropChild(pfEvent, child);

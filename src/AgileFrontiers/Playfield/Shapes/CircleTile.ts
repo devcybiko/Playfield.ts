@@ -1,4 +1,4 @@
-import { Tile } from "..";
+import { PlayfieldEvent, Tile } from "..";
 import { ShapeTile } from "./ShapeTile"
 import { Draggable, Selectable } from "../Abilities";
 import { Dimensions, applyMixins } from "../../Utils";
@@ -10,13 +10,16 @@ applyMixins(_CircleTile, [Draggable, Selectable]);
 export class CircleTile extends _CircleTile {
     _dx = 0;
     _dy = 0;
+    override _asTile: Tile; // updated by Tile
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
+        this._type = "CircleTile";
+        this.isDragEnabled = true;
     }
 
     // --- Overrides --- //
 
-    inBounds(x: number, y: number): Tile {
+    override inBounds(x: number, y: number, pfEvent?: PlayfieldEvent): Tile {
         let dx = this.X - x;
         let dy = this.Y - y;
         let dr = dx * dx + dy * dy;
@@ -25,6 +28,7 @@ export class CircleTile extends _CircleTile {
     }
 
     override draw(enable = true): Dimensions {
+        this.updateRect();
         this.gfx.gparms.borderColor = "black";
         this.gfx.gparms.fillColor = "gray";
         this.gfx.circle(this.X, this.Y, this.W);
@@ -36,12 +40,18 @@ export class CircleTile extends _CircleTile {
             this.playfield.gfx.circle(this.X, this.Y, r);
             this.gfx.gparms.fillColor = oldColor;
         }
+        this.gfx.gparms.fillColor = "";
+        this.gfx.gparms.textAlign = "center";
+        this.gfx.gparms.textBaseline = "middle";
+        this.gfx.gparms.borderColor = "";
+        this.gfx.gparms.fontSize = 12;
+        this.gfx.textRect(this.fullName, this.X-this.W, this.Y-this.W, this.W*2, this.W*2);
         return super.draw(enable);
     }
 
     // --- onActions --- //
 
-    onGrab(dx: number, dy: number, event: any) {
+    override onGrab(dx: number, dy: number, event: any) {
         this._dx = this.X - event.x;
         this._dy = this.Y - event.y;
         this.toFront();
@@ -49,10 +59,13 @@ export class CircleTile extends _CircleTile {
         return super.onGrab(dx, dy, event);
     }
 
-    onDrop() {
+    override onDrop() {
         this.toFront();
         this._dx = 0;
         this._dy = 0;
         this.isSelected = false;
+    }
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        super.onEvent(pfEvent, controller);
     }
 }

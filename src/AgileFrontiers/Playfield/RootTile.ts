@@ -1,34 +1,32 @@
-import { Playfield } from "./Playfield";
 import { Tile } from "./Tile";
-import { Resizable, Dispatcher, Dragger, Selecter, Clicker, Presser, Editer, Hoverer } from "./Abilities";
-import { applyMixins, Dimensions, Logger } from "../Utils";
-import { PlayfieldEvent } from "./PlayfieldEvent";
+import { ControllerTile } from "./ControllerTile";
+import { Playfield } from "./Playfield";
 
-export class _RootTile extends Tile { };
-export interface _RootTile extends Resizable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer { };
-applyMixins(_RootTile, [Resizable, Dispatcher, Logger, Clicker, Presser, Selecter, Dragger, Editer, Hoverer]);
-
-export class RootTile extends _RootTile {
-    constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
-        super(name, parent, x0, y0, w, h);
+export class RootTile extends ControllerTile {
+    constructor(name: string, playfield: Playfield) {
+        super(name, null, 0, 0, 0, 0);
+        this._type += ".RootTile";
+        this.playfield = playfield;
+        this._gfx = playfield.gfx.clone();
+        this.w = playfield.gfx.width;
+        this.h = playfield.gfx.height;
+        this._initTile();
     }
 
-    // -- static members --- //
-    public static cast(obj: any): RootTile {
-        return obj as RootTile;
-    }
-    // --- Overrides --- //
-
-    override draw(enable = true): Dimensions {
-        this.updateGparms(enable);
-        this.gfx.clipRect(this.X, this.Y, this.W, this.H);
-        this.gfx.rect(this.X, this.Y, this.W, this.H);
-        this.drawChildren(enable);
-        this.gfx.restore();
-        return this.dimensions;
+    override get parent(): Tile {
+        // this is a "trick". I always return "this" so that default values are returned to caller
+        // this prevents me from having to constantly check if (this.parent)
+        // if one wants the actual parent, use this._parent (which could potentially be null)
+        return this;
     }
 
-    onEvent(pfEvent: PlayfieldEvent) {
-        this.dispatchEventToChildren(pfEvent);
+    override get X(): number {
+        // Special case of root - it's always 0 for parent.X()
+        return 0;
     }
+    override get Y(): number {
+        // Special case of root - it's always 0 for parent.Y()
+        return 0;
+    }
+
 }

@@ -8,17 +8,16 @@ export class TreeButton extends Button {
     constructor(name: string, parent: Tile, x: number, y: number) {
         super(name, parent, x, y, 0, 0, "-");
         this._open = false;
-        this.isDraggable = false;
     }
-    onPress(pfEvent: PlayfieldEvent) {
-        if (!pfEvent.isMove) console.log("onPress", this);
+    override onPress(pfEvent: PlayfieldEvent) {
         let parent = this.parent as unknown as TreeItem;
         parent.open = !parent.open;
         this.open = parent.open;
         pfEvent.isActive = false;
     }
 
-    draw(enable = true) {
+    override draw(enable = true) {
+        this.updateGparms(enable);
         this.updateRect();
         let parent = this.parent as unknown as TreeItem;
         if (parent.children.length > 2) {
@@ -34,7 +33,12 @@ export class TreeButton extends Button {
     public set open(value: boolean) {
         this._open = value;
     }
-    onEvent(pfEvent: PlayfieldEvent) {
-        super.onEvent(pfEvent);
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        super.onEvent(pfEvent, controller);
+    }
+
+    override objectify(): any {
+        // don't report this object
+        return null;
     }
 }

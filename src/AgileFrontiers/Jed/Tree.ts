@@ -9,6 +9,7 @@ export class Tree extends Group {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label?: string) {
         super(name, parent, x, y, w, h, label);
+        this._type += ".Tree";
         this._treeRoot = new TreeItem("_treeRoot", this, 0, 0, 0, 0, "");
         this._treeRoot.isVisible = true;
         this._treeRoot._open = true;

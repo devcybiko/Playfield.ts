@@ -6,6 +6,7 @@ export class Rect {
     protected _y = 0;
     protected _w = 0; // w=1 is a single pixel
     protected _h = 0; // h= 1 is a single pixel
+    public _asRect: Rect;
 
     constructor(...args: number[]) {
         if (args.length === 0) return;
@@ -17,6 +18,7 @@ export class Rect {
         this._y = y;
         this._w = w;
         this._h = h;
+        this._asRect = this;
         return this;
     }
 

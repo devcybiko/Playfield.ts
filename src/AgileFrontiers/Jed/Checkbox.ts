@@ -13,20 +13,16 @@ export class Checkbox extends _Checkbox {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value || name);
+        this._type += ".Checkbox";
     }
     
-    // --- Public Methods --- //
-
-    go(): boolean {
-        return false;
-    }
-
     // --- Overrides --- //
 
     override draw(enable = true): Dimensions {
         let gparms = this.gfx.gparms;
         gparms.borderRadius = 0;
         this.updateGparms(enable);
+        this.updateRect();
         if (this.isChecked) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor
@@ -51,9 +47,9 @@ export class Checkbox extends _Checkbox {
     }
 
     // --- onActions  --- //
-    override onClick(): boolean {
+    override onClick() {
         this.isChecked = !this.isChecked;
-        return this.go();
+        this.go();
     }
 
     // --- Accessors --- //

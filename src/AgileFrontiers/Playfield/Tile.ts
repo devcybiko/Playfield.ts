@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-import { Dispatchable } from "./Abilities";
+import { Eventable } from "./Abilities"
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -18,8 +18,8 @@ export class TileOptions extends Options {
 }
 
 export class _Tile { };
-export interface _Tile extends Dispatchable, Logger, Tree, Rect, RelRect { };
-applyMixins(_Tile, [Dispatchable, Logger, Tree, Rect, RelRect]);
+export interface _Tile extends Eventable, Logger, Tree, Rect, RelRect { };
+applyMixins(_Tile, [Eventable, Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
@@ -31,15 +31,20 @@ export class Tile extends _Tile {
     protected _X = 0;
     protected _Y = 0;
     protected _isVisible = true;
+    public override _asRect: Rect;
+    public _type = "Tile";
+    public override _asTile: Tile;
 
-    constructor(name: string, parent: Tile, x0: number, y0: number, w: number, h: number) {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super();
         this.Tree(name, parent);
-        this.x = x0;
-        this.y = y0;
+        this._asTile = this;
+        this.Logger();
+        this.x = x;
+        this.y = y;
         this.w = w;
         this.h = h;
-        // this.RelRect(x0, y0, x0 + w - 1, y0 + h - 1);
+        if (parent) this.RelRect(x, y, x + w - 1, y + h - 1);
         this._data = null;
     }
 
@@ -51,35 +56,37 @@ export class Tile extends _Tile {
 
     // --- Overrides --- //
 
-    addChild(child: Tile) {
+    _initTile() {
+        let anyChild = this as any;
+        // is this a good idea? or should we enforce objects initizing within their constructors?
+        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+
+        anyChild.Clickable && anyChild.Clickable();
+        anyChild.Draggable && anyChild.Draggable();
+        anyChild.Editable && anyChild.Editable();
+        anyChild.Eventable && anyChild.Eventable();
+        anyChild.Hoverable && anyChild.Hoverable();
+        anyChild.Pressable && anyChild.Pressable();
+        anyChild.Resizable && anyChild.Resizable();
+        anyChild.Selectable && anyChild.Selectable();
+        anyChild.Swipeable && anyChild.Swipeable();
+
+        anyChild.ClickController && anyChild.ClickController();
+        anyChild.DragController && anyChild.DragController();
+        anyChild.EditController && anyChild.EditController();
+        anyChild.HoverController && anyChild.HoverController();
+        anyChild.PressController && anyChild.PressController();
+        anyChild.SelectController && anyChild.SelectController();
+        anyChild.SwipeController && anyChild.SwipeController();
+        anyChild._isDraggableInitized && anyChild._isPressable && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+    }
+    override addChild(child: Tile) {
         super.addChild(child);
         child.playfield = this._playfield;
         child._gfx = this._playfield.gfx.clone();
         child._tabOrder = this.children.length - 1;
-        let anyChild = child as any;
-        // is this a good idea? or should we enforce objects initizing within their constructors?
-        if (anyChild.Clickable && !anyChild.isClickable) anyChild.Clickable();
-        if (anyChild.Dispatchable && !anyChild.isDispatchable) anyChild.Dispatchable();
-        if (anyChild.Draggable && !anyChild.isDraggable) anyChild.Draggable();
-        if (anyChild.Editable && !anyChild.isEditable) anyChild.Editable();
-        if (anyChild.Hoverable && !anyChild.isHoverable) anyChild.Hoverable();
-        if (anyChild.Pressable && !anyChild.isPressable) anyChild.Pressable();
-        if (anyChild.Resizable && !anyChild.isResizable) anyChild.Resizable();
-        if (anyChild.Selectable && !anyChild.isSelectable) anyChild.Selectable();
-
-        if (anyChild.Clicker && !anyChild.isClicker) anyChild.Clicker();
-        if (anyChild.Dispatcher && !anyChild.isDispatcher) anyChild.Dispatcher();
-        if (anyChild.Dragger && !anyChild.isDragger) anyChild.Dragger();
-        if (anyChild.Editer && !anyChild.isEditer) anyChild.Editer();
-        if (anyChild.Hoverer && !anyChild.isHoverer) anyChild.Hoverer();
-        if (anyChild.Presser && !anyChild.isPresser) anyChild.Presser();
-        if (anyChild.Resizer && !anyChild.isResizer) anyChild.Resizer();
-        if (anyChild.Selecter && !anyChild.isSelecter) anyChild.Selecter();
-
-        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
-        if (anyChild.isDraggable && anyChild.isPressable) this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+        child._initTile();
     }
-
     updateRect() {
         // this is called only in rare cases where the parent never sets .x or .y
         this.x = this.x; // see set x(), below (updates _X relative to parent)
@@ -94,7 +101,7 @@ export class Tile extends _Tile {
     inBoundsChildren(x: number, y: number, pfEvent?: PlayfieldEvent, checkThis = true): Tile {
         // GLS - the CheckThis flag doesn't appear to ever be used
         let found = Tile.null;
-        if (checkThis) found = this.inBounds(x,y, pfEvent);
+        if (checkThis) found = this.inBounds(x, y, pfEvent);
         if (found) return found;
         for (let child of this.children) {
             let tileChild = child as unknown as Tile;
@@ -114,8 +121,8 @@ export class Tile extends _Tile {
 
     drawChildren(enable = true): Dimensions {
         let maxDimensions = new Dimensions();
-        for(let child of this.children) {
-            let tileChild = child as unknown as Tile;
+        for (let i = 0; i < this.children.length; i++) {
+            let tileChild = this.children[i] as unknown as Tile;
             let deltas = tileChild.draw(enable);
             maxDimensions.w = Math.max(maxDimensions.w, tileChild.x + deltas.w);
             maxDimensions.h = Math.max(maxDimensions.h, tileChild.y + deltas.h);
@@ -125,7 +132,31 @@ export class Tile extends _Tile {
 
     draw(enable = true): Dimensions {
         this.updateGparms(enable);
+        this.updateRect();
         return this.drawChildren(enable);
+    }
+
+    serialize() {
+        let obj = this.objectify();
+        if (obj && this.children) {
+            obj.children = [];
+            for (let _child of this.children) {
+                let child = _child as unknown as Tile;
+                let childObj = child.serialize();
+                if (childObj) obj.children.push(childObj);
+            }
+        }
+        return obj;
+    }
+
+    objectify(): any {
+        let obj = {} as any;
+        obj.name = this.name;
+        obj.x = this.x;
+        obj.y = this.y;
+        obj.w = this.w;
+        obj.h = this.h;
+        return obj;
     }
 
     // --- OnActions --- //
@@ -145,20 +176,23 @@ export class Tile extends _Tile {
     get gfx(): Gfx {
         return this._gfx;
     }
-    set x(n: number) {
+    override set x(n: number) {
         this._x = n;
         this._X = n;
-        if (this.parent) this._X += (this.parent as unknown as Tile).X;
+        this._X += this.parent.X;
     }
-    get x(): number {
+    override get x(): number {
         return this._x;
     }
-    set y(n: number) {
+    override set y(n: number) {
         this._y = n;
         this._Y = n;
-        if (this.parent) this._Y += (this.parent as unknown as Tile).Y;
+        this._Y += this.parent.Y;
     }
-    get y(): number {
+    override get parent(): Tile {
+        return this._parent as Tile;
+    }
+    override get y(): number {
         return this._y;
     }
     get X(): number {
@@ -214,5 +248,7 @@ export class Tile extends _Tile {
     public set isVisible(value) {
         this._isVisible = value;
     }
-
+    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
+        return super.onEvent(pfEvent, controller);
+    }
 }

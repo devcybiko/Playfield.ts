@@ -4,7 +4,7 @@ export class ItemOptions extends TileOptions {
     fontSize = 10;
     fontFace = "sans-serif";
     fontStyle = "";
-    backgroundColor = "white";
+    override backgroundColor = "white";
     foregroundColor = "black";
     containerColor = "gray";
     textColor = "black";

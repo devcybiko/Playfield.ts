@@ -18,6 +18,7 @@ export class Text extends _Text {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value, label);
+        this._type += ".Text";
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this.updateGparms();
@@ -33,6 +34,7 @@ export class Text extends _Text {
         this._blink();
         let gfx = this.gfx;
         this.updateGparms(enable);
+        this.updateRect();
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
 
@@ -49,13 +51,24 @@ export class Text extends _Text {
 
     // --- onActions --- //
 
-    onArrowLeft(): void {
+    override onArrowLeft(): void {
         this._cursorInc(-1);
     }
-    onArrowRight(): void {
+    override onArrowRight(): void {
         this._cursorInc(+1);
     }
-    onBackspace(): void {
+    override onEOL(): void {
+        this._cursor = this.value.length;
+    }
+    override onBOL(): void {
+        this._cursor = 0;
+    }
+    override onDelete(): void {
+        if (this._cursor === this.value.length) return;
+        this.onArrowRight();
+        this.onBackspace();
+    }
+    override onBackspace(): void {
         if (this._cursor > 0) {
             let c = this._cursor;
             let left = this.value.substring(0, c - 1);
@@ -65,21 +78,21 @@ export class Text extends _Text {
             this.log(left, right, this._cursor, this.value);
         }
     }
-    onKey(key: string): void {
+    override onKey(key: string): void {
         let c = this._cursor;
         this.value = this.value.substring(0, c) + key + this.value.substring(c);
         this._cursorInc(+1);
     }
-    onFocus(pfEvent: PlayfieldEvent): void {
+    override onFocus(pfEvent: PlayfieldEvent): void {
         super.onFocus(pfEvent);
         this._startCursorBlinking();
         pfEvent.isActive = false;
     }
-    onUnfocus(): void {
+    override  onUnfocus(): void {
         this._stopCursorBlinking();
     }
 
-    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         this.onFocus(pfEvent);
         return super.onGrab(dx, dy, pfEvent);
     }
