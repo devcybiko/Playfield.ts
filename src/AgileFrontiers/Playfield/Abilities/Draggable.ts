@@ -6,7 +6,7 @@ import { Tile } from "../Tile";
  */
 export interface Draggable { }
 export class Draggable {
-    protected _isDraggableInitialized: boolean;
+    public _isDraggableInitialized: boolean;
     protected _isDragging: boolean;
     private _isDragEnabled: boolean;
     public _asTile: Tile;

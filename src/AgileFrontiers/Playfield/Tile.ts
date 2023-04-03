@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-import { Eventable } from "./Abilities"
+import { ClickController, Clickable, DragController, Draggable, EditController, Editable, Eventable, HoverController, Hoverable, PressController, Pressable, Resizable, SelectController, Selectable, SwipeController, Swipeable } from "./Abilities"
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -59,26 +59,26 @@ export class Tile extends _Tile {
     _initTile() {
         let anyChild = this as any;
         // is this a good idea? or should we enforce objects initizing within their constructors?
-        if (anyChild.Logger && !anyChild.isLoggable) anyChild.Logger();
+        (anyChild as Logger).Logger && (anyChild as Logger).Logger();
 
-        anyChild.Clickable && anyChild.Clickable();
-        anyChild.Draggable && anyChild.Draggable();
-        anyChild.Editable && anyChild.Editable();
-        anyChild.Eventable && anyChild.Eventable();
-        anyChild.Hoverable && anyChild.Hoverable();
-        anyChild.Pressable && anyChild.Pressable();
-        anyChild.Resizable && anyChild.Resizable();
-        anyChild.Selectable && anyChild.Selectable();
-        anyChild.Swipeable && anyChild.Swipeable();
+        (anyChild as Clickable).Clickable && (anyChild as Clickable).Clickable();
+        (anyChild as Draggable).Draggable && (anyChild as Draggable).Draggable();
+        (anyChild as Editable).Editable && (anyChild as Editable).Editable();
+        (anyChild as Eventable).Eventable && (anyChild as Eventable).Eventable();
+        (anyChild as Hoverable).Hoverable && (anyChild as Hoverable).Hoverable();
+        (anyChild as Pressable).Pressable && (anyChild as Pressable).Pressable();
+        (anyChild as Resizable).Resizable && (anyChild as Resizable).Resizable();
+        (anyChild as Selectable).Selectable && (anyChild as Selectable).Selectable();
+        (anyChild as Swipeable).Swipeable && (anyChild as Swipeable).Swipeable();
 
-        anyChild.ClickController && anyChild.ClickController();
-        anyChild.DragController && anyChild.DragController();
-        anyChild.EditController && anyChild.EditController();
-        anyChild.HoverController && anyChild.HoverController();
-        anyChild.PressController && anyChild.PressController();
-        anyChild.SelectController && anyChild.SelectController();
-        anyChild.SwipeController && anyChild.SwipeController();
-        anyChild._isDraggableInitized && anyChild._isPressable && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+        (anyChild as ClickController).ClickController && (anyChild as ClickController).ClickController();
+        (anyChild as DragController).DragController && (anyChild as DragController).DragController();
+        (anyChild as EditController).EditController && (anyChild as EditController).EditController();
+        (anyChild as HoverController).HoverController && (anyChild as HoverController).HoverController();
+        (anyChild as PressController).PressController && (anyChild as PressController).PressController();
+        (anyChild as SelectController).SelectController && (anyChild as SelectController).SelectController();
+        (anyChild as SwipeController).SwipeController && (anyChild as SwipeController).SwipeController();
+        (anyChild as Draggable)._isDraggableInitialized && (anyChild as Pressable)._isPressableInitialized && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
     override addChild(child: Tile) {
         super.addChild(child);

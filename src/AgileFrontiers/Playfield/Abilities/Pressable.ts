@@ -6,7 +6,7 @@ import { Tile } from "../Tile";
  */
 export interface Pressable { }
 export class Pressable {
-    protected _isPressableInitialized: boolean;
+    public _isPressableInitialized: boolean;
     protected _isPressed: boolean;
     public _asTile: Tile;
 
