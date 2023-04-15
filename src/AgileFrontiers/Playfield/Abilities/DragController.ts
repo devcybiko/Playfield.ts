@@ -44,8 +44,6 @@ export class DragController {
         if (child._asTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             let dx = pfEvent.x - child._asTile.X;
             let dy = pfEvent.y - child._asTile.Y;
-            console.log(dx, dy, this._asTile.X, this._asTile.Y);
-            console.log(this, this._asTile);
             if (child.onGrab(dx, dy, pfEvent)) {
                 // if the child does not reject the "grab"
                 this._dropChild(pfEvent, child);

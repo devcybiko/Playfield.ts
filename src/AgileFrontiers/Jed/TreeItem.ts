@@ -1,6 +1,7 @@
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { Dimensions } from "../Utils";
+import { Dimensions, between } from "../Utils";
 import { Group } from "./Group";
+import { Tree } from "./Tree";
 import { TreeButton } from "./TreeButton";
 import { TreeLabel } from "./TreeLabel";
 
@@ -61,6 +62,12 @@ export class TreeItem extends Group {
         return new Dimensions(dw, dh);
     }
 
+    override inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
+        if (this._treeButton && this._treeButton.inBounds(dx, dy, pfEvent)) return this._treeButton;
+        if (this._treeLabel && this._treeLabel.inBounds(dx, dy, pfEvent)) return this._treeLabel;
+        return super.inBounds(dx, dy);
+    }
+
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
@@ -75,17 +82,19 @@ export class TreeItem extends Group {
     }
 
     override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
-        if (this._treeButton) return this._treeButton.onEvent(pfEvent, controller);
-        if (this._treeLabel) return this._treeLabel.onEvent(pfEvent, controller);
-        if (!this._open) {
+        let stop = false as any;
+        if (!stop && this._treeButton) stop = this._treeButton.onEvent(pfEvent, controller);
+        if (!stop && this._treeLabel) stop = this._treeLabel.onEvent(pfEvent, controller);
+        if (!stop && !this._open) {
             // if we're collapsed, don't process child nodes
-            return "stop-children";
+            stop = "stop-children";
         }
+        return stop;
     }
 
     addNode(label: string, data?: any): TreeItem {
         let newChild = new TreeItem(label, this, 0, 0, 0, 0, label);
-        if (this.name == "_treeRoot") newChild.isVisible = true;
+        if (this.name == Tree.TREE_ROOT_NAME) newChild.isVisible = true;
         newChild.data = data;
         return newChild;
     }

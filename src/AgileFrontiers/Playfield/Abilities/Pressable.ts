@@ -21,6 +21,7 @@ export class Pressable {
     onPress(pfEvent: PlayfieldEvent): void {
     }
     onRelease(pfEvent: PlayfieldEvent): void {
+        pfEvent.isActive = false;
     }
 
     // --- Accessors --- //

@@ -65,7 +65,4 @@ export class CircleTile extends _CircleTile {
         this._dy = 0;
         this.isSelected = false;
     }
-    override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
-        super.onEvent(pfEvent, controller);
-    }
 }

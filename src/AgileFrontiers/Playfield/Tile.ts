@@ -44,7 +44,7 @@ export class Tile extends _Tile {
         this.y = y;
         this.w = w;
         this.h = h;
-        if (parent) this.RelRect(x, y, x + w - 1, y + h - 1);
+        if (parent && w && h) this.RelRect(x, y, x + w - 1, y + h - 1);
         this._data = null;
     }
 
@@ -112,6 +112,7 @@ export class Tile extends _Tile {
     }
 
     inBounds(x: number, y: number, pfEvent?: PlayfieldEvent): Tile {
+        // if (!pfEvent.isMove) console.log("inbounds 0", this);
         if (this.isVisible &&
             between(this.X, x, this.X + this.w) &&
             between(this.Y, y, this.Y + this.h))

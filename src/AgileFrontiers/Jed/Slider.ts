@@ -95,9 +95,6 @@ export class Slider extends _Slider {
 
     override onSwipeStart(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let c = this._cursor;
-        console.log(dx, dy);
-        console.log(c);
-        console.log(this);
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
             return super.onSwipeStart(dx, dy, pfEvent);
         }

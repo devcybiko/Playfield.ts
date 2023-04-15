@@ -25,6 +25,7 @@ export class Playfield extends _Playfield {
     private _delay = -1;
     private _timerId = 0 as any;
     private _eventQueue: EventQueue;
+    private _useInterval = true;
 
     constructor(gfx: Gfx, eventQueue: EventQueue) {
         super();
@@ -49,13 +50,20 @@ export class Playfield extends _Playfield {
         this._delay = delay;
         this._lastTime = Date.now();
         this.redraw();
-        // if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
-        if (this._delay >= 0) this._timerId = setInterval(this._tick.bind(this), this._delay, this);
+        if (this._useInterval) {
+            if (this._delay >= 0) this._timerId = setInterval(this._tick.bind(this), this._delay, this);
+        } else {
+            if (this._delay >= 0) this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
     }
 
     stop() {
         this._delay = -1;
-        clearInterval(this._timerId);
+        if (this._useInterval) {
+            clearInterval(this._timerId);
+        } else {
+            clearTimeout(this._timerId);
+        }
     }
 
     // --- Private Methods --- //
@@ -82,7 +90,9 @@ export class Playfield extends _Playfield {
             console.log({ handleEventsDelta, onTickDelta, redrawDelta, eventCounts });
             console.error(`WARNING: The tick() processing time (${delta}ms aka ${1000 / delta} fps) exceeds the _delay (${this._delay}ms aka ${1000 / this._delay} fps). This could cause latency and jitter problems. There is only ${extra}ms between frames`);
         }
-        // this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        if (!this._useInterval) {
+            this._timerId = setTimeout(this._tick.bind(this), this._delay, this);
+        }
     }
 
     _onEventVistor(obj: any, pfEvent: any): any {
@@ -96,7 +106,7 @@ export class Playfield extends _Playfield {
         }
         let cnt = 0;
         for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            this._rootTile.dfs(null, this._onEventVistor.bind(this), pfEvent, -1, true);
+            this._rootTile.dfs(this._onEventVistor.bind(this), null, pfEvent, -1, true);
             // console.log(pfEvent);
             cnt += pfEvent.counter;
             // if (!pfEvent.isMove) console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);

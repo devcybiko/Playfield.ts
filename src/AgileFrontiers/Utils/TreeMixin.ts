@@ -58,7 +58,8 @@ export class Tree {
         else if (order === -1) index = children.length - 1; // reverse order
         else  throw new Error("dfs order must be +1 or -1, not: " + order);
 
-        let stop = before && before(this, ctx);
+        let stop;
+        if (before) stop = before(this, ctx);
         if (stop) {
             // if true-ish stop all processing. great for "finding" objects
             if (stop === "stop-children") {
@@ -72,7 +73,7 @@ export class Tree {
                 index += order;
             }
         }
-        if (!stop) stop = after && after(this, ctx);
+        if (!stop && after) stop = after(this, ctx);
         return stop; // if true-ish stop all processing. great for "finding" objects
     }
 

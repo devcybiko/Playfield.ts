@@ -21,7 +21,6 @@ export class EditController {
     // --- Public Methods --- //
 
     editEvent(pfEvent: PlayfieldEvent, child: Editable) {
-        console.log(this, pfEvent);
         if (pfEvent.isPress) return this._focusChild(pfEvent, child);
         else if (pfEvent.isKeyDown) return this._dispatchKey(pfEvent, child);
     }

@@ -8,6 +8,7 @@ export class TreeLabel extends Label {
         super(name, parent, x, y, w, h, label);
         this.options.fontStyle = "";
         this.Logger("info", false);
+
     }
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
@@ -27,7 +28,7 @@ export class TreeLabel extends Label {
         return parent.onMenu(pfEvent);
     }
     override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
-        super.onEvent(pfEvent, controller);
+        return super.onEvent(pfEvent, controller);
     }
     override objectify(): any {
         // don't report this object

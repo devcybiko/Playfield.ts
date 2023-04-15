@@ -1,6 +1,6 @@
 import { Playfield } from "../Playfield";
 import { CircleTile, BoxTile } from "../Playfield/Shapes"
-import {BrowserPlayfieldApp} from "../Browser";
+import { BrowserPlayfieldApp } from "../Browser";
 
 /**
  * Speed test
@@ -8,10 +8,20 @@ import {BrowserPlayfieldApp} from "../Browser";
 import { random, int } from "../Utils";
 
 function bounce() {
-    this.x += this.DX;
-    this.y += this.DY;
-    if (this.x + this.w > this.playfield.w || this.x < 0) this.DX = -this.DX;
-    if (this.y + this.h > this.playfield.h || this.y < 0) this.DY = -this.DY;
+    let oldX = this.x;
+    let oldY = this.y;
+    let newX = this.x + this.DX;
+    let newY = this.y + this.DY;
+    if (newX + this.w > this.playfield.w || newX < 0) {
+        this.DX = -this.DX;
+        newX = oldX;
+    }
+    if (newY + this.h > this.playfield.h || newY < 0) {
+        this.DY = -this.DY;
+        newY = oldY;
+    }
+    this.x = newX;
+    this.y = newY;
 }
 
 export class TestClass {
@@ -39,9 +49,8 @@ export class TestClass {
                 (box as any).DY = DY;
             }
         }
-        max *= 1000;
-        let fps = 15;
-        let delay = Math.floor(1000/fps);
+        let fps = 30;
+        let delay = Math.floor(1000 / fps);
         this._playfield.start(delay);
         // note: processing 10,000 Circles stressed the app at 55 FPS
         // note: processing 10,000 Boxes stressed the app at 142 FPS

@@ -1,9 +1,7 @@
-import { Playfield, PlayfieldEvent, Tile, Splitter, Files, File } from "../Playfield";
+import { Playfield, PlayfieldEvent, Files, File } from "../Playfield";
 import { BrowserPlayfieldApp } from "../Browser";
 import * as Jed from "../Jed";
-import { int, random } from "../Utils";
-import { BoxTile } from "../Playfield/Shapes";
-import { BrowserFiles, BrowserFile } from "../Browser";
+import { BrowserFiles } from "../Browser";
 /**
  * Jed Test with treeItem
  */
@@ -35,8 +33,8 @@ export class TestClass {
             }
             return s;
         }
-        pfEvent.isActive = false;
         let thisTreeItem = this as unknown as Jed.TreeItem;
+        pfEvent.isActive = false;
         let fname = fullPathName(thisTreeItem);
         if (!fname) {
             thisTreeItem.open = !thisTreeItem.open;
@@ -44,9 +42,9 @@ export class TestClass {
         };
         let file = _browserFiles.load("file", fname);
         file = await file.wait();
-        console.log("loaded File")
+        console.log("loaded File", fname)
         console.log(file.string);
-        _browserFiles.save(fname, file.string);
+        // _browserFiles.save(fname, file.string);
     }
     mkdir(node: Jed.TreeItem, dirs: any[]) {
         for (let dir of dirs) {
@@ -82,7 +80,7 @@ export class TestClass {
         // this.simpleScenerio(tree);
         this.mkdir(tree.treeRoot, dirs);
         this._playfield.rootTile.printTree();
-        this._playfield.start(1000/8);
+        this._playfield.start(1000/60);
     }
     run() {
         this.treeItemTest();

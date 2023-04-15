@@ -78,4 +78,7 @@ export class Item extends _Item {
     public override get options(): ItemOptions {
         return this._itemOptions;
     }
+    override printMe() {
+        console.log(" | ".repeat(this.depth()), this.name, this.isVisible, this.x, this.y, this.w, this.h, "(", this.X, this.Y, this.W, this.H, ")", this.isVisible);
+    }
 }

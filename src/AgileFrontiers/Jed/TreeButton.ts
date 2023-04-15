@@ -34,7 +34,7 @@ export class TreeButton extends Button {
         this._open = value;
     }
     override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {
-        super.onEvent(pfEvent, controller);
+        return super.onEvent(pfEvent, controller);
     }
 
     override objectify(): any {

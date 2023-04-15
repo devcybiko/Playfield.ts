@@ -28,16 +28,13 @@ export class TestClass {
         } else if (file.isError) {
             console.error("error in loading " + this._key, "error=" + file._error);
         } else if (file.isDone) {
-            console.log("done loading " + this._key, "bytes loaded: " + file._length);
             let blob = new Blob([file._data]);
             let blobURL = URL.createObjectURL(blob);
-            console.log(blobURL);
             let img = new Image(); // Create new img element
             img.src = blobURL;
             file._img = img;
             setTimeout(this.showImage.bind(this), 1);
         } else if (file.isInProgress) {
-            console.log("still loading " + this._key, "bytes loaded: " + file._length);
             keepPolling = true;
         } else {
             console.error("error... unknown file status " + file.status);
@@ -46,10 +43,7 @@ export class TestClass {
     }
     showImage() {
         let canvas = document.getElementById("playfield") as any;
-        console.log(canvas);
         let ctx = canvas.getContext("2d");
-        console.log(ctx);
-        console.log(canvas.width, canvas.height);
         // ctx.drawImage(this._files.get(this._key)._img, 0, 0, canvas.width, canvas.height);
         ctx.drawImage(this._files.get(this._key)._img, 0, 0);
     }

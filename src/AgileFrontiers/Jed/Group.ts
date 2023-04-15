@@ -29,21 +29,19 @@ export class Group extends _Group {
     // --- Overrides --- //
 
     override inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
-        for (let child of this.children.reverse()) {
-            let tileChild = child as unknown as Tile;
-            if (pfEvent) {
-                pfEvent.touchedBy.push(this.fullName);
-                pfEvent.counter++;
-            }
+        if (this.isVisible) {
+            return super.inBounds(dx, dy, pfEvent);
+        }
+    }
+     inBounds_old(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            let tileChild = this.children[i] as unknown as Tile;
+            // if (pfEvent && !pfEvent.isMove) console.log("checking...", pfEvent, tileChild.data, tileChild.isVisible, tileChild.fullName, dx, dy, this.x, this.y, this.w, this.h)
             if (tileChild.isVisible && tileChild.inBounds(dx, dy, pfEvent)) {
-                return tileChild as unknown as Tile;
+                return tileChild;
             }
         }
         if (this.isBoxed) {
-            if (pfEvent) {
-                pfEvent.touchedBy.push(this.fullName);
-                pfEvent.counter++;
-            }
             let wh = this._computeWidthHeight();
             let result = this.isVisible &&
                 between(this.X, dx, this.X + wh.w) &&
@@ -54,10 +52,6 @@ export class Group extends _Group {
         }
         return super.inBounds(dx, dy, pfEvent);
     }
-
-    // onEvent(pfEvent: PlayfieldEvent) {
-    //     this.dispatchEventToChildren(pfEvent);
-    // }
 
     override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         super.onGrab(dx, dy, pfEvent);

@@ -42,15 +42,8 @@ export class Button extends _Button {
     }
 
     // --- onActions --- //
-    override onEnter(pfEvent: PlayfieldEvent) {
-    }
-    override onExit(pfEvent: PlayfieldEvent) {
-    }
-    override onHovering(pfEvent: PlayfieldEvent) {
-    }
-    override onPress(pfEvent: PlayfieldEvent) {
-    }
     override onRelease(pfEvent: PlayfieldEvent) {
         if (this.isHovering) this.go();
+        return super.onRelease(pfEvent);
     }
 }

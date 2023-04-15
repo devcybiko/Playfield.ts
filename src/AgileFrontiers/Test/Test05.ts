@@ -39,7 +39,7 @@ export class TestClass {
             bigSlider = new Slider("bigSlider", parent, x + sliderW* 2, y, 200, 200);
             bigSlider.onSlide = updateCursor.bind(bigSlider);
 
-            hslider = new Slider("hslider", parent, x + sliderW, parent.h - sliderW, parent.w - x -sliderW - 1, sliderW);
+            hslider = new Slider("hslider", parent, x + sliderW, y + y - sliderW - 1, bigSlider.w + sliderW, sliderW);
             hslider.vslide = false;
             hslider.onSlide = showValue.bind(hslider);
 

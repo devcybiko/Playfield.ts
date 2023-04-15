@@ -4,13 +4,14 @@ import { Group } from "./Group";
 import { TreeItem } from "./TreeItem";
 
 export class Tree extends Group {
+    static readonly TREE_ROOT_NAME = "_treeRoot";
     _treeRoot: TreeItem;
     _margin = 5;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, label?: string) {
         super(name, parent, x, y, w, h, label);
         this._type += ".Tree";
-        this._treeRoot = new TreeItem("_treeRoot", this, 0, 0, 0, 0, "");
+        this._treeRoot = new TreeItem(Tree.TREE_ROOT_NAME, this, 0, 0, 0, 0, "");
         this._treeRoot.isVisible = true;
         this._treeRoot._open = true;
         this._treeRoot._treeButton.removeChild();
@@ -18,12 +19,6 @@ export class Tree extends Group {
         this._treeRoot._treeButton = null;
         this._treeRoot._treeLabel = null;
         this.isBoxed = true;
-    }
-    addNode(node: TreeItem, label: string, data?: any): TreeItem {
-        let newChild = new TreeItem(label, node, node.x, node.y, 0, 0, label);
-        newChild.data = data;
-        if (node.name === "_treeRoot") newChild.isVisible = true;
-        return newChild;
     }
     override drawChildren(): Dimensions {
         return this._treeRoot._drawChildren(this._margin, this._margin);

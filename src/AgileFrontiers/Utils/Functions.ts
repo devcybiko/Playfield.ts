@@ -7,7 +7,7 @@ export function inclusive(a: any, b: any, c: any): boolean {
     return result;
 }
 export function random(low: number, high: number): number {
-    let result = Math.random() * (high - low) + low;
+    let result = int(Math.random() * (high - low)) + low;
     return result;
 }
 export function snapTo(n: number, snap: number) {
