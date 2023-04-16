@@ -132,6 +132,9 @@ export class Tree {
     get parent(): Tree {
         return this._parent;
     }
+    set parent(p: Tree) {
+        this._parent = p;
+    }
     get name(): string {
         return this._name;
     }

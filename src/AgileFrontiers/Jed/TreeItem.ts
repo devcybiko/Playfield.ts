@@ -36,17 +36,23 @@ export class TreeItem extends Group {
         this._treeLabel.isVisible = true; // oops, it's a proper child, so turn it back on
     }
 
-    _drawChild(obj: TreeItem, x: number, y: number) {
+    override inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
+        if (this._treeButton && this._treeButton.inBounds(dx, dy, pfEvent)) return this._treeButton;
+        if (this._treeLabel && this._treeLabel.inBounds(dx, dy, pfEvent)) return this._treeLabel;
+        return super.inBounds(dx, dy);
+    }
+
+    _drawChild(enable: boolean, obj: TreeItem, x: number, y: number) {
         obj.x = x;
         obj.y = y;
         let dims = obj.draw();
-        let childrenDims = obj._drawChildren(this._indent, this._margin + dims.h);
+        let childrenDims = obj._drawChildren(enable, this._indent, this._margin + dims.h);
         dims.w = Math.max(x + dims.w, x + childrenDims.w + this._indent);
         dims.h = Math.max(dims.h + childrenDims.h + this._margin, 0);
         return dims;
     }
 
-    _drawChildren(x: number, y: number): Dimensions {
+    _drawChildren(enable: boolean, x: number, y: number): Dimensions {
         let dw = 0;
         let dh = 0;
         if (!this.isVisible) return new Dimensions();
@@ -54,7 +60,7 @@ export class TreeItem extends Group {
             let treeItemChild = child as unknown as TreeItem;
             if (treeItemChild.name === "_button" || treeItemChild.name === "_label") continue;
             if (this._open) {
-                let deltas = this._drawChild(treeItemChild, x, y + dh);
+                let deltas = this._drawChild(enable, treeItemChild, x, y + dh);
                 dw = Math.max(dw, deltas.w);
                 dh += deltas.h;
             }
@@ -62,23 +68,22 @@ export class TreeItem extends Group {
         return new Dimensions(dw, dh);
     }
 
-    override inBounds(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
-        if (this._treeButton && this._treeButton.inBounds(dx, dy, pfEvent)) return this._treeButton;
-        if (this._treeLabel && this._treeLabel.inBounds(dx, dy, pfEvent)) return this._treeLabel;
-        return super.inBounds(dx, dy);
-    }
-
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
+        // console.log(this.parent.parent.parent.parent.name, this.parent.parent.parent.name, this.parent.parent.name, this.parent.name, this.name);
+        // console.log(this.parent.parent.parent.parent.y, this.parent.parent.parent.y, this.parent.parent.y, this.parent.y, this.y);
+        // console.log(this.parent.parent.parent.parent.Y, this.parent.parent.parent.Y, this.parent.parent.Y, this.parent.Y, this.Y);
+
         if (!this.isVisible) return new Dimensions();
-        this.updateGparms(enable);
-        if (!this._treeButton) return new Dimensions(0, 0); // don't try to draw() the root
-        this._treeButton.draw(enable);
-        this._treeLabel.x = this._treeButton.x + this._treeButton.w + this._margin;
-        this._treeLabel.draw(enable);
-        let deltas = new Dimensions(this._treeButton.W + this._treeLabel.W, Math.max(this._treeButton.H, this._treeLabel.H));
-        return deltas;
+        if (this._treeButton && this._treeLabel) {
+            this._treeButton.draw(enable);
+            this._treeLabel.x = this._treeButton.x + this._treeButton.w + this._margin;
+            this._treeLabel.draw(enable);
+            return new Dimensions(this._treeButton.W + this._treeLabel.W, Math.max(this._treeButton.H, this._treeLabel.H));
+        } else {
+            return this._drawChildren(enable, this._margin, this._margin);
+        }
     }
 
     override onEvent(pfEvent: PlayfieldEvent, controller: Tile) {

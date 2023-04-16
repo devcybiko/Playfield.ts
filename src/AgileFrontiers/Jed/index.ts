@@ -9,3 +9,4 @@ export { Tree } from "./Tree";
 export { TreeItem } from "./TreeItem";
 export { TreeLabel } from "./TreeLabel";
 export { TreeButton } from "./TreeButton";
+export { View } from "./View";

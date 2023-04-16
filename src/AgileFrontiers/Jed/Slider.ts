@@ -42,14 +42,17 @@ export class Slider extends _Slider {
         // this is the overridable method for the user to capture the sliding events
     }
 
-    cursorMove(rx: number, ry: number) {
+    cursorMove(rx?: number, ry?: number) {
+        if (rx === undefined || ry === undefined) return {rx: this._rcursor.x, ry: this._rcursor.y};
         let x = inormalize(rx, this.dw) + this._margins.left;
         let y = inormalize(ry, this.dh) + this._margins.top;
         this._cursor.move(x, y);
         this._rcursor.move(rx, ry);
+        return {rx: this._rcursor.x, ry: this._rcursor.y}
     }
 
-    cursorSize(rw: number, rh: number) {
+    cursorSize(rw?: number, rh?: number) {
+        if (rw === undefined || rh === undefined) return {rw: this._rcursor.w, rh: this._rcursor.h};
         let dw = this.W - this._margins.left - this._margins.right;
         let dh = this.H - this._margins.top - this._margins.bottom;
         let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
@@ -57,8 +60,9 @@ export class Slider extends _Slider {
         w = Math.max(w, this._minW);
         h = Math.max(h, this._minH);
         this._cursor.size(w, h);
-        this.cursorMove(this._rcursor.x, this._rcursor.y);
+        // this.cursorMove(this._rcursor.x, this._rcursor.y);
         this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
+        return {rw: this._rcursor.w, rh: this._rcursor.h}
     }
 
     _drawContainer() {
@@ -162,6 +166,14 @@ export class Slider extends _Slider {
 
     set cursor(cursor: Rect) {
         this._cursor = cursor;
+    }
+
+    get rcursor(): Rect {
+        return this._rcursor;
+    }
+
+    set rcursor(rcursor: Rect) {
+        this._rcursor = rcursor;
     }
 
     get hslide(): boolean {

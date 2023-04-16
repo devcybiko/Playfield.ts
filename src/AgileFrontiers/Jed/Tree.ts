@@ -18,11 +18,9 @@ export class Tree extends Group {
         this._treeRoot._treeLabel.removeChild();
         this._treeRoot._treeButton = null;
         this._treeRoot._treeLabel = null;
-        this.isBoxed = true;
+        this.isBoxed = false;
     }
-    override drawChildren(): Dimensions {
-        return this._treeRoot._drawChildren(this._margin, this._margin);
-    }
+
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
@@ -30,8 +28,8 @@ export class Tree extends Group {
         this.w = deltas.w;
         this.h = deltas.h + this._margin * 2;
         this.gfx.gparms.fillColor = "";
-        this.gfx.rect(this.X, this.Y, this.W, this.H);
-        return this.dimensions;
+        if (this.isBoxed) this.gfx.rect(this.X, this.Y, this.W, this.H);
+        return this._treeRoot.draw(enable);
     }
     public get treeRoot(): TreeItem {
         return this._treeRoot;

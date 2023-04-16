@@ -85,4 +85,14 @@ export class Rect {
         this._w = d.w;
         this._h = d.h;
     }
+    get rect(): Rect {
+        return new Rect(this.x, this.y, this.w, this.h);
+    }
+    set rect(value: Rect) {
+        this.x = value.x;
+        this.y = value.y;
+        this.w = value.w;
+        this.h = value.h;
+    }
+
 }

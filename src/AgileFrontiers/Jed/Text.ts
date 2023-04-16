@@ -31,10 +31,10 @@ export class Text extends _Text {
     // --- Overrides --- //
 
     override draw(enable = true): Dimensions {
-        this._blink();
-        let gfx = this.gfx;
         this.updateGparms(enable);
         this.updateRect();
+        this._blink();
+        let gfx = this.gfx;
         if (this.isFocus) this.gfx.gparms.color = this.options.selectColor;
         else this.gfx.gparms.color = this.options.textColor;
 

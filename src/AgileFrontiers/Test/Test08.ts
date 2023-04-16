@@ -76,11 +76,12 @@ export class TestClass {
         let file = await this.loadFileTree();
         let dirs = file.json;
         let root = this._playfield.rootTile;
-        let tree = new Jed.Tree("tree", root, 0, 0, 0, 0, "Tree Example");
+        let view = new Jed.View("theView", root, 50, 50, 150, 500, "Files");
+        let tree = new Jed.Tree("tree", view.body, 0, 0, 0, 0, "Tree Example");
         // this.simpleScenerio(tree);
         this.mkdir(tree.treeRoot, dirs);
         this._playfield.rootTile.printTree();
-        this._playfield.start(1000/60);
+        this._playfield.start(1000 / 60);
     }
     run() {
         this.treeItemTest();

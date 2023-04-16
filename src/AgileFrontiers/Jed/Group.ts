@@ -13,15 +13,16 @@ export class Group extends _Group {
     protected _xMargin: number;
     protected _yMargin: number;
     protected _isResizing: boolean;
+    protected _autoResize: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w = 0, h = 0, label?: string) {
         super(name, parent, x, y, w, h, label, label);
         this._type += ".Group";
-        this._isBoxed = true;
+        this._isBoxed = false;
         this._xMargin = 10;
         this._yMargin = 10;
-        this.label = label;
         this._isResizing = false;
+        this._autoResize = false;
         this.options.fontSize -= 2;
         this.updateWidthHeight();
     }
@@ -32,25 +33,6 @@ export class Group extends _Group {
         if (this.isVisible) {
             return super.inBounds(dx, dy, pfEvent);
         }
-    }
-     inBounds_old(dx: number, dy: number, pfEvent?: PlayfieldEvent): Tile {
-        for (let i = this.children.length - 1; i >= 0; i--) {
-            let tileChild = this.children[i] as unknown as Tile;
-            // if (pfEvent && !pfEvent.isMove) console.log("checking...", pfEvent, tileChild.data, tileChild.isVisible, tileChild.fullName, dx, dy, this.x, this.y, this.w, this.h)
-            if (tileChild.isVisible && tileChild.inBounds(dx, dy, pfEvent)) {
-                return tileChild;
-            }
-        }
-        if (this.isBoxed) {
-            let wh = this._computeWidthHeight();
-            let result = this.isVisible &&
-                between(this.X, dx, this.X + wh.w) &&
-                between(this.Y - this.gfx.gparms.fontSize / 2, dy, this.Y + wh.h);
-            if (result) {
-                return this as unknown as Tile;
-            }
-        }
-        return super.inBounds(dx, dy, pfEvent);
     }
 
     override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
@@ -87,7 +69,7 @@ export class Group extends _Group {
         let w = super.w;
         let h = super.h;
 
-        // if (w || h) return { w, h };
+        if (w || h) return { w, h };
 
         for (let child of this.children) {
             let rectChild = child as unknown as Rect;
@@ -103,31 +85,37 @@ export class Group extends _Group {
         return { w, h };
     }
 
+    _drawLabel() {
+        if (this.label) {
+            this.gfx.restore();
+            let labelX = this.X + this.xMargin / 2;
+            let labelY = this.Y - this.gfx.gparms.fontSize / 2;
+            let labelW = Math.min(this.gfx.boundingBox(this.label).w, this.H - this.xMargin);
+            let labelH = this.gfx.gparms.fontSize;
+            let gfx = this.gfx.clone();
+            gfx.gparms.borderColor = "";
+            gfx.gparms.fillColor = this.options.backgroundColor;
+            this.gfx.clipRect(labelX, labelY, this.W - this.xMargin / 2, this.H + this.gfx.gparms.fontSize / 2)
+            gfx.rect(labelX, labelY, labelW, labelH);
+            gfx.text(this.label, labelX, labelY, labelW);
+            gfx.restore();
+            this.gfx.clipRect(this.X, this.Y, this.W, this.H);
+        }
+    }
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
         this.updateWidthHeight();
+        this.gfx.clipRect(this.X, this.Y, this.W, this.H);
         if (this.isBoxed) {
-            let wh = this._computeWidthHeight();
-            this.gfx.clipRect(this.X, this.Y, wh.w, wh.h);
-            this.gfx.rect(this.X, this.Y, wh.w, wh.h);
-            if (this.label) {
-                this.gfx.restore();
-                let labelX = this.X + this.xMargin / 2;
-                let labelY = this.Y - this.gfx.gparms.fontSize / 2;
-                let labelW = Math.min(this.gfx.boundingBox(this.label).w, wh.w - this.xMargin);
-                let labelH = this.gfx.gparms.fontSize;
-                let gfx = this.gfx.clone();
-                gfx.gparms.borderColor = "";
-                gfx.gparms.fillColor = this.options.backgroundColor;
-                this.gfx.clipRect(labelX, labelY, wh.w - this.xMargin / 2, wh.h + this.gfx.gparms.fontSize / 2)
-                gfx.rect(labelX, labelY, labelW, labelH);
-                gfx.text(this.label, labelX, labelY, labelW);
-            }
-            this.drawChildren(enable);
-            this.gfx.restore();
-        } else {
-            this.drawChildren(enable);
+            this.gfx.rect(this.X, this.Y, this.W, this.H);
+            // this._drawLabel();
+        }
+        let dims = this.drawChildren(enable);
+        this.gfx.restore();
+        if (this.autoResize) {
+            this.w = dims.w;
+            this.h = dims.h;
         }
         return this.dimensions;
     }
@@ -185,4 +173,12 @@ export class Group extends _Group {
         }
         return result;
     }
+
+    public get autoResize(): boolean {
+        return this._autoResize;
+    }
+    public set autoResize(value: boolean) {
+        this._autoResize = value;
+    }
+
 }
