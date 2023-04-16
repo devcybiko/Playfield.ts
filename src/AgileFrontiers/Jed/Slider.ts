@@ -1,13 +1,13 @@
 import { Tile } from "../Playfield/Tile";
-import { Draggable, Swipeable, Hoverable } from "../Playfield/Abilities";
+import { Draggable, Slideable, Hoverable } from "../Playfield/Abilities";
 import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
 import { GfxParms } from "../Playfield/Graphics";
 import { Item } from "./Item";
 
 export class _Slider extends Item { };
-export interface _Slider extends Draggable, Swipeable, Hoverable { };
-applyMixins(_Slider, [Draggable, Swipeable, Hoverable]);
+export interface _Slider extends Draggable, Slideable, Hoverable { };
+applyMixins(_Slider, [Draggable, Slideable, Hoverable]);
 
 function inormalize(r: number, multiplier: number) {
     if (r <= 1.0) return int(r * multiplier);
@@ -26,7 +26,6 @@ export class Slider extends _Slider {
     protected _minW = 10;
     protected _minH = 10;
     protected _cursorBorderRadius = 10;
-    protected _isSliding = false;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value="", label="") {
         super(name, parent, x, y, w, h, value, label);
@@ -38,7 +37,7 @@ export class Slider extends _Slider {
         this.options.textAlign = GfxParms.CENTER;
     }
 
-    onSlide(rx: number, ry: number, pfEvent: PlayfieldEvent) {
+    onChange(rx: number, ry: number, pfEvent: PlayfieldEvent) {
         // this is the overridable method for the user to capture the sliding events
     }
 
@@ -97,31 +96,26 @@ export class Slider extends _Slider {
         return this.dimensions;
     }
 
-    override onSwipeStart(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+    override onSlideStart(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
         let c = this._cursor;
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
-            return super.onSwipeStart(dx, dy, pfEvent);
+            return super.onSlideStart(dx, dy, pfEvent);
         }
     }
 
-    override onSwipe(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
-        // if (this._isSliding) {
+    override onSlide(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
             let c = this._cursor;
             let xmax = this.dw + this._margins.left;
             let ymax = this.dh + this._margins.top;
             if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
             if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
             this._rcursor.move(this.rx, this.ry);
-            this.onSlide(this.rx, this.ry, pfEvent);
+            this.onChange(this.rx, this.ry, pfEvent);
             pfEvent.isActive = false;
-        // } else {
-        //     super.onSwipe(dx, dy, pfEvent);
-        // }
     }
 
-    override onSwipeEnd(pfEvent: PlayfieldEvent): void {
-        super.onSwipeEnd(pfEvent);
-        // this._isSliding = false;
+    override onSlideEnd(pfEvent: PlayfieldEvent): void {
+        super.onSlideEnd(pfEvent);
     }
 
     // --- Accessors --- //

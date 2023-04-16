@@ -33,8 +33,8 @@ export class View extends Group {
         this._hSlider.cursorSize(0.5, 1.0);
         this._hSlider.cursorMove(0.0, 0.0);
 
-        this._vSlider.onSlide = this._vChange.bind(this);
-        this._hSlider.onSlide = this._hChange.bind(this);
+        this._vSlider.onChange = this._vChange.bind(this);
+        this._hSlider.onChange = this._hChange.bind(this);
         this.isBoxed = true;
         this._view.isBoxed = true;
     }

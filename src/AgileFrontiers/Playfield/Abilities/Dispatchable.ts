@@ -30,7 +30,7 @@ export class Eventable {
                 if (pfEvent.isActive && anyThis._isClickableInitialized && controller.clickEvent) controller.clickEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isPressableInitialized && controller.pressEvent) controller.pressEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis.isFocusable && controller.editEvent) controller.editEvent(pfEvent, this);
-                if (pfEvent.isActive && anyThis._isSwipeableInitialized && controller.swipeEvent) controller.swipeEvent(pfEvent, this);
+                if (pfEvent.isActive && anyThis._isSlideableInitialized && controller.slideEvent) controller.slideEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis.isDragEnabled && controller.dragEvent) controller.dragEvent(pfEvent, this);
             }
         } else if (pfEvent.isKeyboardEvent) {

@@ -37,15 +37,15 @@ export class TestClass {
 
             let sliderW = 30;
             bigSlider = new Slider("bigSlider", parent, x + sliderW* 2, y, 200, 200);
-            bigSlider.onSlide = updateCursor.bind(bigSlider);
+            bigSlider.onChange = updateCursor.bind(bigSlider);
 
             hslider = new Slider("hslider", parent, x + sliderW, y + y - sliderW - 1, bigSlider.w + sliderW, sliderW);
             hslider.vslide = false;
-            hslider.onSlide = showValue.bind(hslider);
+            hslider.onChange = showValue.bind(hslider);
 
             vslider = new Slider("vslider", parent, x, y, sliderW, y - sliderW - 1);
             vslider.hslide = false;
-            vslider.onSlide = showValue.bind(vslider);
+            vslider.onChange = showValue.bind(vslider);
             return { bigSlider, hslider, vslider };
         }
 

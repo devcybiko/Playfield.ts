@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-import { ClickController, Clickable, DragController, Draggable, EditController, Editable, Eventable, HoverController, Hoverable, PressController, Pressable, Resizable, SelectController, Selectable, SwipeController, Swipeable } from "./Abilities"
+import { ClickController, Clickable, DragController, Draggable, EditController, Editable, Eventable, HoverController, Hoverable, PressController, Pressable, Resizable, SelectController, Selectable, SlideController, Slideable } from "./Abilities"
 /**
  * A Tile is a rectangular item on a Playfield.
  * It can draw itself on the Playfield
@@ -69,7 +69,7 @@ export class Tile extends _Tile {
         (anyChild as Pressable).Pressable && (anyChild as Pressable).Pressable();
         (anyChild as Resizable).Resizable && (anyChild as Resizable).Resizable();
         (anyChild as Selectable).Selectable && (anyChild as Selectable).Selectable();
-        (anyChild as Swipeable).Swipeable && (anyChild as Swipeable).Swipeable();
+        (anyChild as Slideable).Slideable && (anyChild as Slideable).Slideable();
 
         (anyChild as ClickController).ClickController && (anyChild as ClickController).ClickController();
         (anyChild as DragController).DragController && (anyChild as DragController).DragController();
@@ -77,7 +77,7 @@ export class Tile extends _Tile {
         (anyChild as HoverController).HoverController && (anyChild as HoverController).HoverController();
         (anyChild as PressController).PressController && (anyChild as PressController).PressController();
         (anyChild as SelectController).SelectController && (anyChild as SelectController).SelectController();
-        (anyChild as SwipeController).SwipeController && (anyChild as SwipeController).SwipeController();
+        (anyChild as SlideController).SlideController && (anyChild as SlideController).SlideController();
         (anyChild as Draggable)._isDraggableInitialized && (anyChild as Pressable)._isPressableInitialized && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
     override addChild(child: Tile) {
