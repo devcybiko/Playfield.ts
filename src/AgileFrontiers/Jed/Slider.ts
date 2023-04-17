@@ -1,13 +1,13 @@
 import { Tile } from "../Playfield/Tile";
-import { Draggable, Slideable, Hoverable } from "../Playfield/Abilities";
+import { Draggable, Slideable, Swipeable, Hoverable } from "../Playfield/Abilities";
 import { applyMixins, Rect, Margins, Ratio, Tree, int, between, limit, Dimensions } from "../Utils";
 import { PlayfieldEvent } from "../Playfield/PlayfieldEvent";
 import { GfxParms } from "../Playfield/Graphics";
 import { Item } from "./Item";
 
 export class _Slider extends Item { };
-export interface _Slider extends Draggable, Slideable, Hoverable { };
-applyMixins(_Slider, [Draggable, Slideable, Hoverable]);
+export interface _Slider extends Swipeable, Draggable, Slideable, Hoverable { };
+applyMixins(_Slider, [Swipeable, Draggable, Slideable, Hoverable]);
 
 function inormalize(r: number, multiplier: number) {
     if (r <= 1.0) return int(r * multiplier);
@@ -26,8 +26,9 @@ export class Slider extends _Slider {
     protected _minW = 10;
     protected _minH = 10;
     protected _cursorBorderRadius = 10;
+    private _isEnabled = true;
 
-    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value="", label="") {
+    constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value, label);
         this._type += ".Slider";
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
@@ -42,16 +43,16 @@ export class Slider extends _Slider {
     }
 
     cursorMove(rx?: number, ry?: number) {
-        if (rx === undefined || ry === undefined) return {rx: this._rcursor.x, ry: this._rcursor.y};
+        if (rx === undefined || ry === undefined) return { rx: this._rcursor.x, ry: this._rcursor.y };
         let x = inormalize(rx, this.dw) + this._margins.left;
         let y = inormalize(ry, this.dh) + this._margins.top;
         this._cursor.move(x, y);
         this._rcursor.move(rx, ry);
-        return {rx: this._rcursor.x, ry: this._rcursor.y}
+        return { rx: this._rcursor.x, ry: this._rcursor.y }
     }
 
     cursorSize(rw?: number, rh?: number) {
-        if (rw === undefined || rh === undefined) return {rw: this._rcursor.w, rh: this._rcursor.h};
+        if (rw === undefined || rh === undefined) return { rw: this._rcursor.w, rh: this._rcursor.h };
         let dw = this.W - this._margins.left - this._margins.right;
         let dh = this.H - this._margins.top - this._margins.bottom;
         let w = inormalize(rw, dw) || this._cursor.w; // preserve old width if rw == 0
@@ -61,7 +62,7 @@ export class Slider extends _Slider {
         this._cursor.size(w, h);
         // this.cursorMove(this._rcursor.x, this._rcursor.y);
         this._rcursor.size(rw || this._rcursor.w, rh || this._rcursor.h);
-        return {rw: this._rcursor.w, rh: this._rcursor.h}
+        return { rw: this._rcursor.w, rh: this._rcursor.h }
     }
 
     _drawContainer() {
@@ -71,16 +72,16 @@ export class Slider extends _Slider {
 
     _drawCursor() {
         let c = this._cursor;
-        if (this.isDragging) {
+        if (this._isEnabled && this.isDragging) {
             this.gfx.gparms.fillColor = this.options.selectColor;
-        } else if (this.isHovering) {
+        } else if (this._isEnabled && this.isHovering) {
             this.gfx.gparms.fillColor = this.options.hoverColor;
         } else {
             this.gfx.gparms.fillColor = this.options.backgroundColor;
         }
         if (this._vslide && !this._hslide) {
             this.gfx.gparms.textBaseline = GfxParms.MIDDLE;
-            this.gfx.gparms.textAlign = GfxParms.CENTER;    
+            this.gfx.gparms.textAlign = GfxParms.CENTER;
         }
         this.gfx.gparms.borderRadius = this._cursorBorderRadius;
         this.gfx.textRect(this._text, this.X + c.x, this.Y + c.y, c.w, c.h);
@@ -97,25 +98,39 @@ export class Slider extends _Slider {
     }
 
     override onSlideStart(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
+        if (!this._isEnabled) return;
         let c = this._cursor;
         if (between(c.x, dx, c.x + c.w) && between(c.y, dy, c.y + c.h)) {
             return super.onSlideStart(dx, dy, pfEvent);
+        } else { // click!
+            let vPage = c.h / this.h;
+            if (this._hslide && (dx < c.x)) this.onSlide(-c.w / 2, 0, pfEvent);
+            else if (this._hslide && (dx > c.x)) this.onSlide(c.w / 2, 0, pfEvent);
+            if (this._vslide && (dy < c.y)) this.onSlide(0, -c.h / 2, pfEvent);
+            else if (this._vslide && (dy > c.y)) this.onSlide(0, c.h / 2, pfEvent);
         }
     }
 
     override onSlide(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
-            let c = this._cursor;
-            let xmax = this.dw + this._margins.left;
-            let ymax = this.dh + this._margins.top;
-            if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
-            if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
-            this._rcursor.move(this.rx, this.ry);
-            this.onChange(this.rx, this.ry, pfEvent);
-            pfEvent.isActive = false;
+        if (!this._isEnabled) return;
+        let c = this._cursor;
+        let xmax = this.dw + this._margins.left;
+        let ymax = this.dh + this._margins.top;
+        if (this._hslide) c.x = limit(this._margins.left, c.x + dx, xmax);
+        if (this._vslide) c.y = limit(this._margins.top, c.y + dy, ymax);
+        this._rcursor.move(this.rx, this.ry);
+        this.onChange(this.rx, this.ry, pfEvent);
+        pfEvent.isActive = false;
     }
 
     override onSlideEnd(pfEvent: PlayfieldEvent): void {
+        if (!this._isEnabled) return;
         super.onSlideEnd(pfEvent);
+    }
+
+    override onSwipe(dx: number, dy: number, pfEvent: PlayfieldEvent): void {
+        if (!this._isEnabled) return;
+        this.onSlide(dx, dy, pfEvent);
     }
 
     // --- Accessors --- //
@@ -145,7 +160,7 @@ export class Slider extends _Slider {
         if (this.dh === 0) return this._rcursor.y;
         return (this._cursor.y - this._margins.top) / this.dh;
     }
-    
+
     get margins(): Margins {
         return this._margins
     }
@@ -184,6 +199,12 @@ export class Slider extends _Slider {
 
     set vslide(value: boolean) {
         this._vslide = value;
+    }
+    public get isEnabled() {
+        return this._isEnabled;
+    }
+    public set isEnabled(value) {
+        this._isEnabled = value;
     }
 
 }

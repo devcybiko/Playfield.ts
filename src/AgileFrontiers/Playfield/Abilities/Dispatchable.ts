@@ -26,6 +26,7 @@ export class Eventable {
         if (pfEvent.isMouseEvent) {
             if (pfEvent.isActive && anyThis._isHoverableInitialized && controller.hoverEvent) controller.hoverEvent(pfEvent, this);
             if (inBounds) {
+                if (pfEvent.isActive && anyThis._isSwipeableInitialized && controller.swipeEvent) controller.swipeEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isSelectableInitialized && controller.selectEvent) controller.selectEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isClickableInitialized && controller.clickEvent) controller.clickEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isPressableInitialized && controller.pressEvent) controller.pressEvent(pfEvent, this);

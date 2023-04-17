@@ -41,12 +41,20 @@ export interface PlayfieldEvent {
     get isKeyboardEvent(): boolean;
     set isKeyboardEvent(value: boolean);
 
-    get swipe(): number;
-    set swipe(value: number);
+    get swipeX(): number;
+    set swipeX(value: number);
     get isSwipeLeft(): boolean;
     set isSwipeLeft(value: boolean);
     get isSwipeRight(): boolean;
     set isSwipeRight(value: boolean);
+    get swipeY(): number;
+    set swipeY(value: number);
+    get isSwipeUp(): boolean;
+    set isSwipeUp(value: boolean);
+    get isSwipeDown(): boolean;
+    set isSwipeDown(value: boolean);
+    get isSwipe(): boolean;
+    set isSwipe(value: boolean);
 
     get isActive(): boolean;
     set isActive(value: boolean);

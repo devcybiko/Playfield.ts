@@ -1,6 +1,6 @@
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins } from "../Utils";
-import { Draggable, Selectable, Clickable } from "../Playfield/Abilities";
+import { Draggable, Clickable } from "../Playfield/Abilities";
 import { ItemOptions } from "./ItemOptions"
 import { GfxParms } from "../Playfield/Graphics";
 

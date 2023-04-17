@@ -1,10 +1,11 @@
 import { Tile } from "./Tile";
 import { SlideController, Resizable, DragController, SelectController, ClickController, PressController, EditController, HoverController } from "./Abilities";
 import { applyMixins, Dimensions, Logger } from "../Utils";
+import { SwipeController } from "./Abilities/SwipeController";
 
 export class _ControllerTile extends Tile { };
-export interface _ControllerTile extends SlideController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
-applyMixins(_ControllerTile, [ SlideController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
+export interface _ControllerTile extends SwipeController, SlideController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController { };
+applyMixins(_ControllerTile, [ SwipeController, SlideController, Resizable, Logger, ClickController, PressController, SelectController, DragController, EditController, HoverController]);
 
 export class ControllerTile extends _ControllerTile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {

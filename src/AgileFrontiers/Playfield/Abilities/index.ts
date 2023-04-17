@@ -13,5 +13,7 @@ export { Resizable } from "./Resizable";
 export { Selectable } from "./Selectable";
 export { SelectController } from "./SelectController";
 export { Slideable } from "./Slideable";
+export { SwipeController } from "./SwipeController";
+export { Swipeable } from "./Swipeable";
 export { SlideController } from "./SlideController";
 export { Timer } from "./Timer";
