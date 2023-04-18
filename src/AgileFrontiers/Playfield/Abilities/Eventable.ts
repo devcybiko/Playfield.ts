@@ -25,13 +25,13 @@ export class Eventable {
         let inBounds = anyThis.inBounds(pfEvent.x, pfEvent.y, pfEvent);
         if (pfEvent.isMouseEvent) {
             if (pfEvent.isActive && anyThis._isHoverableInitialized && controller.hoverEvent) controller.hoverEvent(pfEvent, this);
+            if (pfEvent.isActive && anyThis._isSlideableInitialized && controller.slideEvent) controller.slideEvent(pfEvent, this);
             if (inBounds) {
                 if (pfEvent.isActive && anyThis._isSwipeableInitialized && controller.swipeEvent) controller.swipeEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isSelectableInitialized && controller.selectEvent) controller.selectEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isClickableInitialized && controller.clickEvent) controller.clickEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isPressableInitialized && controller.pressEvent) controller.pressEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis.isFocusable && controller.editEvent) controller.editEvent(pfEvent, this);
-                if (pfEvent.isActive && anyThis._isSlideableInitialized && controller.slideEvent) controller.slideEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis.isDragEnabled && controller.dragEvent) controller.dragEvent(pfEvent, this);
             }
         } else if (pfEvent.isKeyboardEvent) {

@@ -26,6 +26,7 @@ export class Playfield extends _Playfield {
     private _timerId = 0 as any;
     private _eventQueue: EventQueue;
     private _useInterval = true;
+    private _eventObject: Tile;
 
     constructor(gfx: Gfx, eventQueue: EventQueue) {
         super();
@@ -106,8 +107,12 @@ export class Playfield extends _Playfield {
         }
         let cnt = 0;
         for (let pfEvent = next(); pfEvent; pfEvent = next()) {
-            this._rootTile.dfs(this._onEventVistor.bind(this), null, pfEvent, -1, true);
-            // console.log(pfEvent);
+            if (this._eventObject) {
+                this._eventObject.onEvent(pfEvent, this._rootTile);
+                // console.log(pfEvent);
+        } else {
+                this._rootTile.dfs(this._onEventVistor.bind(this), null, pfEvent, -1, true);
+            }
             cnt += pfEvent.counter;
             // if (!pfEvent.isMove) console.log(pfEvent.event.type, pfEvent.counter, pfEvent.touchedBy);
         }
@@ -124,6 +129,12 @@ export class Playfield extends _Playfield {
     }
     get gfx(): Gfx {
         return this._gfx;
+    }
+    public get eventObject(): Tile {
+        return this._eventObject;
+    }
+    public set eventObject(value: Tile) {
+        this._eventObject = value;
     }
 
 }

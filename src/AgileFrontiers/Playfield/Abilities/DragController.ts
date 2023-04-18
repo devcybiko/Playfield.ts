@@ -50,6 +50,7 @@ export class DragController {
                 this._dragX = pfEvent.x;
                 this._dragY = pfEvent.y;
                 this._dragObj = child;
+                this._asTile.playfield.eventObject = child._asTile;
             }
         }
     }
@@ -58,7 +59,7 @@ export class DragController {
         if (this._dragObj) {
             this._dragObj.onDrop(pfEvent);
             this._dragObj = null;
+            this._asTile.playfield.eventObject = null;
         }
     }
-
 }

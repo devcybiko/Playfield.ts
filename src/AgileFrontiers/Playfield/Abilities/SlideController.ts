@@ -37,6 +37,7 @@ export class SlideController {
             this._slideObj.onSlide(pfEvent.x - this._slideX, pfEvent.y - this._slideY, pfEvent);
             this._slideX = pfEvent.x;
             this._slideY = pfEvent.y;
+            console.log("_slideChild", this._asTile.fullName);
         }
     }
 
@@ -51,6 +52,8 @@ export class SlideController {
                 this._slideX = pfEvent.x;
                 this._slideY = pfEvent.y;
                 this._slideObj = child;
+                this._asTile.playfield.eventObject = child._asTile;
+                console.log("_slideStart", child._asTile.fullName);
             }
         }
     }
@@ -59,6 +62,8 @@ export class SlideController {
         if (this._slideObj) {
             this._slideObj.onSlideEnd(pfEvent);
             this._slideObj = null;
+            this._asTile.playfield.eventObject = null;
+            console.log("_slideEnd", this._asTile.fullName);
         }
     }
 

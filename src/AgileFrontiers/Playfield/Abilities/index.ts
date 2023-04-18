@@ -1,6 +1,6 @@
 export { Clickable } from "./Clickable";
 export { ClickController } from "./ClickController";
-export { Eventable } from "./Dispatchable";
+export { Eventable } from "./Eventable";
 export { Draggable } from "./Draggable";
 export { DragController } from "./DragController";
 export { Editable } from "./Editable";
