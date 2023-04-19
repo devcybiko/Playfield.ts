@@ -83,7 +83,7 @@ export class Tile extends _Tile {
         (anyChild as SlideController).SlideController && (anyChild as SlideController).SlideController();
         (anyChild as SwipeController).SwipeController && (anyChild as SwipeController).SwipeController();
 
-        (anyChild as Draggable)._isDraggableInitialized && (anyChild as Pressable)._isPressableInitialized && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
+        // (anyChild as Draggable)._isDraggableInitialized && (anyChild as Pressable)._isPressableInitialized && this.error("Warning: It's not a good idea to mix Draggable with Pressable since Draggable will invalidate the Event on isPress")
     }
     override addChild(child: Tile) {
         super.addChild(child);

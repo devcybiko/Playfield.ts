@@ -9,7 +9,6 @@ applyMixins(_Group, [Swipeable, Eventable, Logger, ClickController, PressControl
 
 export class Group extends _Group {
     protected _isGroupItem: boolean;
-    protected _isBoxed: boolean;
     protected _xMargin: number;
     protected _yMargin: number;
     protected _isResizing: boolean;
@@ -19,8 +18,8 @@ export class Group extends _Group {
         super(name, parent, x, y, w, h, label, label);
         this._type += ".Group";
         this._isBoxed = false;
-        this._xMargin = 10;
-        this._yMargin = 10;
+        this._xMargin = 0;
+        this._yMargin = 0;
         this._isResizing = false;
         this._autoResize = false;
         this.options.fontSize -= 2;
@@ -59,17 +58,17 @@ export class Group extends _Group {
         return true;
     }
 
-    updateWidthHeight() {
-        let wh = this._computeWidthHeight();
+    updateWidthHeight(force = false) {
+        let wh = this._computeWidthHeight(force);
         super.w = wh.w;
         super.h = wh.h;
     }
 
-    _computeWidthHeight() {
+    _computeWidthHeight(force = false) {
         let w = super.w;
         let h = super.h;
 
-        if (w || h) return { w, h };
+        if (!force && (w || h)) return { w, h };
 
         for (let child of this.children) {
             let rectChild = child as unknown as Rect;
@@ -127,12 +126,6 @@ export class Group extends _Group {
     }
     public set isGroupItem(value: boolean) {
         this._isGroupItem = value;
-    }
-    public get isBoxed(): boolean {
-        return this._isBoxed;
-    }
-    public set isBoxed(value: boolean) {
-        this._isBoxed = value;
     }
     public get xMargin(): number {
         return this._xMargin;

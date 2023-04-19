@@ -12,6 +12,7 @@ export class Item extends _Item {
     protected _value: string;
     protected _label: string;
     protected _itemOptions: ItemOptions;
+    protected _isBoxed: boolean;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
@@ -44,7 +45,7 @@ export class Item extends _Item {
     public _autoLabelWidthHeight() {
         this.updateGparms();
         let bb = this.gfx.boundingBox(this.label);
-        this.w = this.w || bb.w + 2 + this.options.fontSize;
+        this.w = this.w || bb.w + 2;
         this.h = this.h || bb.h + 2;
     }
     public go() {
@@ -80,5 +81,11 @@ export class Item extends _Item {
     }
     override printMe() {
         console.log(" | ".repeat(this.depth()), this.name, this.isVisible, this.x, this.y, this.w, this.h, "(", this.X, this.Y, this.W, this.H, ")", this.isVisible);
+    }
+    public get isBoxed(): boolean {
+        return this._isBoxed;
+    }
+    public set isBoxed(value: boolean) {
+        this._isBoxed = value;
     }
 }

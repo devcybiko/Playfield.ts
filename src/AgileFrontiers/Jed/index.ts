@@ -1,12 +1,11 @@
 export { Text } from "./Text";
 export { Button } from "./Button";
 export { Checkbox } from "./Checkbox";
+export { Item } from "./Item";
+export { Menu, MenuItem } from "./Menu";
 export { Radio } from "./Radio";
 export { Label } from "./Label";
 export { Group } from "./Group";
 export { Slider } from "./Slider";
-export { Tree } from "./Tree";
-export { TreeItem } from "./TreeItem";
-export { TreeLabel } from "./TreeLabel";
-export { TreeButton } from "./TreeButton";
+export { Tree, TreeItem, TreeLabel, TreeButton } from "./Tree";
 export { View } from "./View";
