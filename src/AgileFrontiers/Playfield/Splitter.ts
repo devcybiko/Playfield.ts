@@ -66,6 +66,7 @@ export class Splitter extends _Splitter {
         this._ne.y0 = this._margins.top;
         this._ne.x1 = this._vGutterRect.x - this._margins.right;
         this._ne.y1 = Math.max(0, this._hGutterRect.y - this._margins.bottom);
+        console.log(this._ne);
     }
 
     _seSize() {

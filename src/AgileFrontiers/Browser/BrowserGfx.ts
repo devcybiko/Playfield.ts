@@ -255,18 +255,18 @@ export class BrowserGfx implements Gfx {
     }
 
     clipRect(x = 0, y = 0, w = this._ctx.canvas.width, h = this._ctx.canvas.height) {
-        this.save();
-        let region = new Path2D();
-        region.rect(xx(x - 1), yy(y - 1), w + 2, h + 2);
-        this._ctx.clip(region);
+        // this.save();
+        // let region = new Path2D();
+        // region.rect(xx(x - 1), yy(y - 1), w + 2, h + 2);
+        // this._ctx.clip(region);
     }
 
     save() {
-        this._ctx.save();
+        // this._ctx.save();
     }
 
     restore() {
-        this._ctx.restore();
+        // this._ctx.restore();
     }
 
     // --- Accessors --- //

@@ -17,10 +17,10 @@ export class ControllerTile extends _ControllerTile {
 
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
-        this.gfx.clipRect(this.X, this.Y, this.W, this.H);
-        // this.gfx.rect(this.X, this.Y, this.W, this.H);
+        // this.gfx.clipRect(this.X, this.Y, this.W, this.H);
+        this.gfx.rect(this.X, this.Y, this.W, this.H);
         this.drawChildren(enable);
-        this.gfx.restore();
+        // this.gfx.restore();
         return this.dimensions;
     }
 }

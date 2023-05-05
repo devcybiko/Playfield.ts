@@ -14,10 +14,10 @@ export class RelRect {
     private _y0 = 0;
     private _x1 = 0;
     private _y1 = 0;
-    private _thisTile: Tile;
+    public _asTile: Tile;
 
     RelRect(x0: number, y0: number, x1: number, y1: number) {
-        this._thisTile = this as unknown as Tile;
+        this._asTile = this as unknown as Tile;
         this.x0 = x0;
         this.y0 = y0;
         this.x1 = x1;
@@ -40,7 +40,7 @@ export class RelRect {
         return this._y1;
     }
     set x0(x0: number) {
-        let thisTile = this._thisTile;
+        let thisTile = this._asTile;
         this._x0 = x0;
         if (-1 < x0 && x0 < 1) {
             if (x0 >= 0) thisTile.x = int(thisTile.parent.w * x0);
@@ -51,7 +51,7 @@ export class RelRect {
         }
     }
     set y0(y0: number) {
-        let thisTile = this._thisTile;
+        let thisTile = this._asTile;
         this._y0 = y0;
         if (-1 < y0 && y0 < 1) {
             if (y0 >= 0) thisTile.y = int(thisTile.parent.h * y0);
@@ -62,7 +62,7 @@ export class RelRect {
         }
     }
     set x1(x1: number) {
-        let thisTile = this._thisTile;
+        let thisTile = this._asTile;
         this._x1 = x1;
         if (-1 < x1 && x1 < 1) {
             if (x1 >= 0) thisTile.w = int(thisTile.parent.w * x1) + 1;
@@ -73,7 +73,7 @@ export class RelRect {
         }
     }
     set y1(y1: number) {
-        let thisTile = this._thisTile;;
+        let thisTile = this._asTile;;
         this._y1 = y1;
         if (-1 < y1 && y1 < 1) {
             if (y1 >= 0) thisTile.h = int(thisTile.parent.h * y1) + 1;
