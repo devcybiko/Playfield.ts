@@ -108,9 +108,16 @@ export class Playfield extends _Playfield {
         let cnt = 0;
         for (let pfEvent = next(); pfEvent; pfEvent = next()) {
             if (this._eventObject) {
+                // this object has the "attention" of the Playfield
                 this._eventObject.onEvent(pfEvent, this._rootTile);
                 // console.log(pfEvent);
-        } else {
+            } else {
+                // send the event to every object...
+                // before = _onEventVisitor
+                // after = null
+                // ctx = pfEvent
+                // order = -1 (reversed)
+                // clone = true (in case there are deletions)
                 this._rootTile.dfs(this._onEventVistor.bind(this), null, pfEvent, -1, true);
             }
             cnt += pfEvent.counter;

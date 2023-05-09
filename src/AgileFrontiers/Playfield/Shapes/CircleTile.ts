@@ -14,7 +14,7 @@ export class CircleTile extends _CircleTile {
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number) {
         super(name, parent, x, y, w, h);
         this._type = "CircleTile";
-        this.isDragEnabled = true;
+        this.isDraggable = true;
     }
 
     // --- Overrides --- //

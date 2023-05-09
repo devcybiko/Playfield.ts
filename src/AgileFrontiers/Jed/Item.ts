@@ -1,5 +1,5 @@
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { applyMixins } from "../Utils";
+import { Dimensions, applyMixins } from "../Utils";
 import { Draggable, Clickable } from "../Playfield/Abilities";
 import { ItemOptions } from "./ItemOptions"
 import { GfxParms } from "../Playfield/Graphics";
@@ -13,12 +13,13 @@ export class Item extends _Item {
     protected _label: string;
     protected _itemOptions: ItemOptions;
     protected _isBoxed: boolean;
+    private _labelBB: Dimensions;
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h);
         this._type += ".Item";
         this._value = value;
-        this._label = label || value || name;
+        this.label = label || value || name;
         this._itemOptions = new ItemOptions();
         if (w < 0) {
             // setting the width to a negative number forces right-aligned text
@@ -75,6 +76,7 @@ export class Item extends _Item {
     }
     public set label(value: string) {
         this._label = value;
+        this._labelBB = this.gfx.boundingBox(this._label || "");
     }
     public override get options(): ItemOptions {
         return this._itemOptions;
@@ -88,4 +90,11 @@ export class Item extends _Item {
     public set isBoxed(value: boolean) {
         this._isBoxed = value;
     }
+    public get labelBB(): Dimensions {
+        return this._labelBB;
+    }
+    public set labelBB(value: Dimensions) {
+        this._labelBB = value;
+    }
+
 }

@@ -21,7 +21,7 @@ export class MenuItem extends _MenuItem {
         this.updateRect();
         let x = this.X;
         let y = this.Y;
-        let bb = this.gfx.boundingBox(this.label);
+        let bb = this.labelBB;
         let w = this.W || bb.w;
         let h = this.H || bb.h;
         if (this.isHovering && this.isPressed) gparms.fillColor = this.options.selectColor;

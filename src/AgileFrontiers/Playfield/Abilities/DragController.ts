@@ -36,11 +36,12 @@ export class DragController {
             this._dragObj.onDrag(pfEvent.x - this._dragX, pfEvent.y - this._dragY, pfEvent);
             this._dragX = pfEvent.x;
             this._dragY = pfEvent.y;
+            pfEvent.isActive = false;
         }
     }
 
     _grabChild(pfEvent: PlayfieldEvent, child: Draggable) {
-        if (!child.isDragEnabled) return;
+        if (!child.isDraggable) return;
         if (child._asTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             let dx = pfEvent.x - child._asTile.X;
             let dy = pfEvent.y - child._asTile.Y;
@@ -51,6 +52,7 @@ export class DragController {
                 this._dragY = pfEvent.y;
                 this._dragObj = child;
                 this._asTile.playfield.eventObject = child._asTile;
+                pfEvent.isActive = false;
             }
         }
     }
@@ -60,6 +62,7 @@ export class DragController {
             this._dragObj.onDrop(pfEvent);
             this._dragObj = null;
             this._asTile.playfield.eventObject = null;
+            pfEvent.isActive = false;
         }
     }
 }

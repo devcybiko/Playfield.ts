@@ -3,7 +3,7 @@ import { Gfx } from "./Graphics";
 import { Playfield } from "./Playfield";
 import { PlayfieldEvent } from "./PlayfieldEvent";
 import { Options } from "./Options";
-import { ClickController, Clickable, DragController, Draggable, EditController, Editable, Eventable, HoverController, Hoverable, PressController, Pressable, Resizable, SelectController, Selectable, SlideController, Slideable } from "./Abilities"
+import { ClickController, Clickable, DragController, Draggable, EditController, Editable, DispatchController, HoverController, Hoverable, PressController, Pressable, Resizable, SelectController, Selectable, SlideController, Slideable } from "./Abilities"
 import { Swipeable } from "./Abilities/Swipeable";
 import { SwipeController } from "./Abilities/SwipeController";
 /**
@@ -20,8 +20,8 @@ export class TileOptions extends Options {
 }
 
 export class _Tile { };
-export interface _Tile extends Eventable, Logger, Tree, Rect, RelRect { };
-applyMixins(_Tile, [Eventable, Logger, Tree, Rect, RelRect]);
+export interface _Tile extends DispatchController, Logger, Tree, Rect, RelRect { };
+applyMixins(_Tile, [DispatchController, Logger, Tree, Rect, RelRect]);
 
 export interface Tile { };
 export class Tile extends _Tile {
@@ -66,7 +66,7 @@ export class Tile extends _Tile {
         (anyChild as Clickable).Clickable && (anyChild as Clickable).Clickable();
         (anyChild as Draggable).Draggable && (anyChild as Draggable).Draggable();
         (anyChild as Editable).Editable && (anyChild as Editable).Editable();
-        (anyChild as Eventable).Eventable && (anyChild as Eventable).Eventable();
+        (anyChild as DispatchController).DispatchController && (anyChild as DispatchController).DispatchController();
         (anyChild as Hoverable).Hoverable && (anyChild as Hoverable).Hoverable();
         (anyChild as Pressable).Pressable && (anyChild as Pressable).Pressable();
         (anyChild as Resizable).Resizable && (anyChild as Resizable).Resizable();

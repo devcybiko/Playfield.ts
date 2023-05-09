@@ -37,7 +37,7 @@ export class Splitter extends _Splitter {
         this._topPercent = topPercent;
         this._leftPercent = leftPercent;
         this._initOnFirstCall();
-        this.isDragEnabled = true;
+        this.isDraggable = true;
     }
 
     _initOnFirstCall() {

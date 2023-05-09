@@ -25,12 +25,10 @@ export class SelectController {
     // --- Public Methods --- //
 
     selectEvent(pfEvent: PlayfieldEvent, child: Selectable) {
-        // GLS - doing a check of all children is questionable
-        // GLS - I thought each individual object passed events to children via OnEvent()
-        let tileChild = child as unknown as Tile;
+        // child has been clicked on
+        // now, unselect all the children and select the child
         if (pfEvent.isPress) {
-            let foundChild = tileChild.inBoundsChildren(pfEvent.x, pfEvent.y, pfEvent) as any;
-            if (foundChild && foundChild._isSelectableInitialized) this._selectChild(pfEvent, foundChild);
+            this._selectChild(pfEvent, child);        
         }
     }
 
@@ -43,18 +41,20 @@ export class SelectController {
     // --- Private Methods --- //
 
     _selectChild(pfEvent: PlayfieldEvent | null, child: Selectable) {
-        this._unselectChild(pfEvent, child);
+        for(let _immediateChild of this._asTile.children) {
+            let immediateChild = _immediateChild as unknown as Selectable;
+            console.log("_unselectChild", this._asTile.fullName, _immediateChild.fullName, child.isSelected);
+            if (immediateChild.isSelected) this._unselectChild(pfEvent, immediateChild);
+        }
         this._selectedObj = child;
         child.isSelected = true;
         child.onSelect(pfEvent);
     }
 
     _unselectChild(pfEvent: PlayfieldEvent | null, child: Selectable) {
-        if (this._selectedObj) {
-            this._selectedObj.isSelected = false;
-            this._selectedObj.onUnselect(pfEvent);
-            this._selectedObj = null;
-        }
+        if (this._selectedObj === child) this._selectedObj = null;
+        child.isSelected = false;
+        child.onUnselect(pfEvent);
     }
 
     // --- Accessors --- //

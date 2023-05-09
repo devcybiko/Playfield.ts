@@ -32,17 +32,16 @@ export class SlideController {
     // --- Private Methods --- //
 
     _slideChild(pfEvent: PlayfieldEvent, child: Slideable) {
-        if (!child._isSlideableInitialized) return;
+        if (!child._isSlideableInitialized) return; // is this necessary?
         if (this._slideObj) {
             this._slideObj.onSlide(pfEvent.x - this._slideX, pfEvent.y - this._slideY, pfEvent);
             this._slideX = pfEvent.x;
             this._slideY = pfEvent.y;
-            console.log("_slideChild", this._asTile.fullName);
         }
     }
 
     _slideStart(pfEvent: PlayfieldEvent, child: Slideable) {
-        if (!child._isSlideableInitialized) return;
+        if (!child._isSlideableInitialized) return; // is this necessary?
         if (child._asTile.inBounds(pfEvent.x, pfEvent.y, pfEvent)) {
             let dx = pfEvent.x - child._asTile.X;
             let dy = pfEvent.y - child._asTile.Y;

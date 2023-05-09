@@ -8,13 +8,13 @@ export interface Draggable { }
 export class Draggable {
     public _isDraggableInitialized: boolean;
     protected _isDragging: boolean;
-    private _isDragEnabled: boolean;
+    private _isDraggable: boolean;
     public _asTile: Tile;
 
     Draggable() {
         this._isDraggableInitialized = true;
         this.isDragging = false;
-        this.isDragEnabled = false;
+        this.isDraggable = false;
         return this;
     }
 
@@ -48,11 +48,11 @@ export class Draggable {
     public set isDragging(value: boolean) {
         this._isDragging = value;
     }
-    public get isDragEnabled(): boolean {
-        return this._isDragEnabled;
+    public get isDraggable(): boolean {
+        return this._isDraggable;
     }
-    public set isDragEnabled(value: boolean) {
-        this._isDragEnabled = value;
+    public set isDraggable(value: boolean) {
+        this._isDraggable = value;
     }
 
 }

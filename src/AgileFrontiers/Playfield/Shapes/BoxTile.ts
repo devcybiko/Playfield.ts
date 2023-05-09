@@ -15,7 +15,7 @@ export class BoxTile extends _BoxTile {
         super(name, parent, x, y, w, h);
         this._type = "BoxTile";
         this._color = int(random(0, this._colors.length));
-        this.isDragEnabled = true;
+        this.isDraggable = true;
 
     }
 

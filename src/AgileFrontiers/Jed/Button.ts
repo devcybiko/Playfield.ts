@@ -1,12 +1,12 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
 import { applyMixins, Dimensions } from "../Utils";
-import { Eventable, Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
+import { DispatchController, Draggable, Pressable, Hoverable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
 
 export class _Button extends Item { };
-export interface _Button extends Eventable, Draggable, Pressable, Hoverable { };
-applyMixins(_Button, [Eventable, Draggable, Pressable, Hoverable]);
+export interface _Button extends DispatchController, Draggable, Pressable, Hoverable { };
+applyMixins(_Button, [DispatchController, Draggable, Pressable, Hoverable]);
 
 export class Button extends _Button {
 
@@ -28,9 +28,8 @@ export class Button extends _Button {
         this.updateRect();
         let x = this.X;
         let y = this.Y;
-        let bb = this.gfx.boundingBox(this.label);
-        let w = this.W || bb.w;
-        let h = this.H || bb.h;
+        let w = this.W || this.labelBB.w;
+        let h = this.H || this.labelBB.h;
         if (this.isHovering && this.isPressed) gparms.fillColor = this.options.selectColor;
         else if (this.isHovering && !this.isPressed) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor;

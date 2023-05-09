@@ -26,6 +26,7 @@ export class Radio extends _Radio {
         else if (this.isHovering) gparms.fillColor = this.options.hoverColor;
         else gparms.fillColor = this.options.backgroundColor
 
+        let bb = this.gfx.boundingBox(this.label);
         let boxX = this.X + 1;
         let boxY = this.Y + 1 ;
         let boxW = this.gfx.gparms.fontSize;
@@ -35,8 +36,11 @@ export class Radio extends _Radio {
 
         let textX = boxX + boxW + 2;
         let textY = boxY;
-        let textW = this.W - boxW - 2;
-        let textH = boxH;
+        let textW = bb.w;
+        let textH = bb.h;
+
+        this.w = boxW + textW + 2;
+        this.h = textH;
 
         this.gfx.gparms.textBaseline = GfxParms.BOTTOM;
 

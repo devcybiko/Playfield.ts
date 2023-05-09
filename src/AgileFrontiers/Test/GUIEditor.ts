@@ -26,14 +26,17 @@ export class TestClass {
         this.logger.log(...args);
     }
     makeUnDraggable(item: any) {
+        if (!item._isDraggableInitialized) return;
         item.isDraggable = false;
     }
     makeDraggable(item: any) {
+        if (!item._isDraggableInitialized) return;
         item.isDraggable = true;
     }
     addItem() {
         let buttonClicked = this as unknown as Tile;
         let that = buttonClicked.data as TestClass;
+        if (!that.isEditMode) return;
         let x = 10;
         let y = 10;
         let w = 200;
@@ -74,7 +77,7 @@ export class TestClass {
             item = new Jed.Slider("slider-" + (TestClass.counter++), that.right, x, y, w, w);
         }
         if (item) {
-            item.isDragEnabled = true;
+            item.isDraggable = true;
             // item.isDraggable = that.isEditMode;
             item.onMenu = that.onMenu.bind(item);
             item.data = that;
@@ -90,34 +93,34 @@ export class TestClass {
         that.populateProperties(item, that);
         console.log(JSON.stringify(item.serialize(), null, 2));
     }
-    editMode() {
-        let thisTile = this as unknown as Tile;
-        let isOn = thisTile.name.includes("on");
-        let that = thisTile.data;
+    setEditMode() {
+        let editModeItem = this as unknown as Item;
+        let isOn = editModeItem.label == "On"
+        let that = editModeItem.data;
         if (isOn) {
-            that.right.dfs(that.makeDraggable, null, this.right);
+            that.right.dfs(that.makeDraggable, null, that.right);
             that.right.options.backgroundColor = "white";
-            thisTile.data.isEditMode = true;
+            editModeItem.data.isEditMode = true;
         } else {
-            that.right.dfs(that.makeUnDraggable, null, this.right);
+            that.right.dfs(that.makeUnDraggable, null, that.right);
             that.right.options.backgroundColor = "#ddd";
-            thisTile.data.isEditMode = false;
+            editModeItem.data.isEditMode = false;
         }
     }
     setData(obj: any, data: any) {
         obj.data = data;
     }
     createAddPanel(parent: ControllerTile, that: TestClass) {
-        let x = 10;
+        let x = 0;
         let y = 20;
         let w = 180;
         let h = 30;
         let dy = 40
-        let editMode = new Jed.Group("editMode", this.left, x, y, w, 0, "Edit Mode");
-        let editModeOn = new Jed.Radio("on", editMode, 10, 10, 0, 0, "On");
-        let editModeOff = new Jed.Radio("off", editMode, 10, 40, 0, 0, "Off");
-        editModeOn.go = this.editMode.bind(editModeOn);
-        editModeOff.go = this.editMode.bind(editModeOff);
+        let editMode = new Jed.Group("editMode", this.left, x, y, 0, 0, "Edit Mode");
+        let editModeOn = new Jed.Radio("on", editMode, 5, 5, 0, 0, "On");
+        let editModeOff = new Jed.Radio("off", editMode, 5, 25, 0, 0, "Off");
+        editModeOn.go = this.setEditMode.bind(editModeOn);
+        editModeOff.go = this.setEditMode.bind(editModeOff);
 
         y = -dy / 2;
         let addButtonGroup = new Jed.Group("addButtonGroup", this.left, x, 130, 0, 0, "Add Item");

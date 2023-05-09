@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas Clip Rect</title>
+	<style>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="myCanvas" width="200" height="200"></canvas>
+	<script>
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+		
+		// Draw a rectangle
+		ctx.fillStyle = "red";
+		ctx.fillRect(10, 10, 50, 50);
+		
+		// Clip the canvas to a smaller rectangle
+        let region = new Path2D();
+        region.rect(20, 20, 100, 100);
+        ctx.save();
+		ctx.clip(region);
+        ctx.strokeStyle = "black";
+        ctx.stroke(region);
+		
+		// Draw a circle inside the clipping region
+		ctx.fillStyle = "green";
+		ctx.beginPath();
+		ctx.arc(30, 30, 20, 0, 2 * Math.PI);
+		ctx.fill();
+				
+		// Draw a circle outside the clipping region
+		ctx.beginPath();
+		ctx.fillStyle = "blue";
+		ctx.arc(100, 100, 40, 0, 2 * Math.PI);
+		ctx.fill();
+		
+        // create an inner clipping region
+        let region2 = new Path2D();
+        region2.rect(40 , 75, 100, 100);
+        ctx.save();
+		ctx.clip(region2);
+        ctx.fillStyle = ctx.strokeStyle = "black";
+        ctx.stroke(region2);
+
+        // Draw a yellow circle outside the second clipping region but inside the first
+		ctx.fillStyle = "yellow";
+		ctx.beginPath();
+		ctx.arc(50, 75, 20, 0, 2 * Math.PI);
+		ctx.fill();
+
+		// Restore the last canvas state to remove the inner clip region
+		ctx.restore();
+		
+        // Draw a orange circle outside the second clipping region but inside the first
+		ctx.fillStyle = "orange";
+		ctx.beginPath();
+		ctx.arc(100, 75, 20, 0, 2 * Math.PI);
+		ctx.fill();
+
+        // restore to draw anywhere
+        ctx.restore();
+
+        // Draw a indigo circle outside the first clipping region 
+		ctx.fillStyle = "indigo";
+		ctx.beginPath();
+		ctx.arc(150, 150, 20, 0, 2 * Math.PI);
+		ctx.fill();
+
+	</script>
+</body>
+</html>

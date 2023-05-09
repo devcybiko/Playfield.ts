@@ -1,6 +1,6 @@
 import { Item } from "./Item";
 import { PlayfieldEvent, Tile } from "../Playfield";
-import { Dimensions, applyMixins } from "../Utils";
+import { Dimensions, applyMixins, int } from "../Utils";
 import { Draggable, Editable, Timer } from "../Playfield/Abilities";
 
 export class _Text extends Item { };
@@ -22,8 +22,9 @@ export class Text extends _Text {
         this.options.fontFace = "monospace";
         this.options.fontSize = h;
         this.updateGparms();
-        this._nchars = Math.ceil(this.w / this.gfx.boundingBox("m").w);
-        this._nchars2 = Math.ceil(this.w / this.gfx.boundingBox("m").w / 2);
+        let em = this.gfx.boundingBox("m");
+        this._nchars = int(Math.ceil(this.w / em.w));
+        this._nchars2 = int(Math.ceil(this.w / em.w / 2));
         this._left = 0;
         this._right = this._computeRight();
     }
