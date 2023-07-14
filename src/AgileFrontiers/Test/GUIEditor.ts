@@ -41,7 +41,7 @@ export class TestClass {
         let y = 10;
         let w = 200;
         let h = 30;
-        let item;
+        let item = null as any;
         if (buttonClicked.name.includes("Button")) {
             that.log("add button");
             item = new Jed.Button("button-" + (TestClass.counter++), that.right, x, y, w, h);
@@ -80,6 +80,8 @@ export class TestClass {
             item.isDraggable = true;
             // item.isDraggable = that.isEditMode;
             item.onMenu = that.onMenu.bind(item);
+            item.origOnGrab = item.onGrab;
+            item.onGrab = that.onGrab.bind(item);
             item.data = that;
             that.populateProperties(item, that);
             that.log(item);
@@ -91,7 +93,12 @@ export class TestClass {
         let item = this as unknown as Item;
         let that = item.data as TestClass;
         that.populateProperties(item, that);
-        console.log(JSON.stringify(item.serialize(), null, 2));
+    }
+    onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent) {
+        let item = this as any;
+        let that = item.data as TestClass;
+        item.toFront();
+        if (item.origOnGrab) return item.origOnGrab(dx, dy, pfEvent);
     }
     setEditMode() {
         let editModeItem = this as unknown as Item;
