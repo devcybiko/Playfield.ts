@@ -1,5 +1,5 @@
 import { Item } from "./Item";
-import { Tile } from "../Playfield";
+import { Tile, PlayfieldEvent } from "../Playfield";
 import { Dimensions, applyMixins } from "../Utils";
 import { Draggable, Pressable } from "../Playfield/Abilities";
 import { GfxParms } from "../Playfield/Graphics";
@@ -60,5 +60,9 @@ export class Label extends _Label {
     override set value(s: string) {
         super.label = s;
         super.value = s;
+    }
+
+    override onClick(pfEvent: PlayfieldEvent) {
+        this.go();
     }
 }

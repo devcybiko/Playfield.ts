@@ -9,7 +9,8 @@ export class TreeLabel extends Label {
         super(name, parent, x, y, w, h, label);
         this._type += ".TreeLabel";
         this.options.fontStyle = "";
-        this.Logger("info", false);
+        this.Logger();
+        // this.Logger("info", false);
 
     }
     override draw(enable = true): Dimensions {

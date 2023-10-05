@@ -14,7 +14,8 @@ export class TestClass {
     right: ControllerTile;
     isEditMode = true;
     groupItem = null as any as Jed.Group;
-    logger = new Logger().Logger("info", false);
+    // logger = new Logger().Logger("info", false);
+    logger = new Logger().Logger();
     preferences : any;
     currentItem: Item;
 

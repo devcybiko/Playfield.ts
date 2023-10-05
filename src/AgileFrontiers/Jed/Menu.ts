@@ -50,7 +50,7 @@ export class Menu extends Group {
     override draw(enable = true): Dimensions {
         this.updateGparms(enable);
         this.updateRect();
-        console.log(this.w, this.h);
+        // console.log(this.w, this.h);
         this.drawChildren(enable);
         this.gfx.gparms.fillColor = "";
         if (this.isBoxed) this.gfx.rect(this.X, this.Y, this.W, this.H);

@@ -62,5 +62,9 @@ export class Radio extends _Radio {
         this._isChecked = value;
         this.isSelected = value;
     }
+    override get value(): string {
+        if (this.isSelected) return super.value;
+        else return "";
+    }
 
 }

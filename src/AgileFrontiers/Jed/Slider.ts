@@ -30,6 +30,8 @@ export class Slider extends _Slider {
 
     constructor(name: string, parent: Tile, x: number, y: number, w: number, h: number, value = "", label = "") {
         super(name, parent, x, y, w, h, value, label);
+        this._hslide = !this.label.includes("vert");
+        this._vslide = !this.label.includes("horiz");
         this._type += ".Slider";
         this._margins.Margins(4, 4, 4, 4); // top, right, bottom, left
         this.cursorSize(0.5, 0.5);
@@ -39,7 +41,6 @@ export class Slider extends _Slider {
     }
 
     onChange(rx: number, ry: number, pfEvent: PlayfieldEvent) {
-        // this is the overridable method for the user to capture the sliding events
     }
 
     cursorMove(rx?: number, ry?: number) {
@@ -126,6 +127,7 @@ export class Slider extends _Slider {
     override onSlideEnd(pfEvent: PlayfieldEvent): void {
         if (!this._isEnabled) return;
         super.onSlideEnd(pfEvent);
+        this.go();
     }
 
     override onSwipe(dx: number, dy: number, pfEvent: PlayfieldEvent): void {

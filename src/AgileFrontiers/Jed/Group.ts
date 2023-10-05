@@ -43,7 +43,7 @@ export class Group extends _Group {
     override onGrab(dx: number, dy: number, pfEvent: PlayfieldEvent): boolean {
     if (between(-2, dx, this.w) && between(-4, dy, 4) ||
         between(-2, dx, this.w) && between(this.h - 4, dy, this.h + 4)) {
-        console.log(dx, dy, this.labelBB);
+        // console.log(dx, dy, this.labelBB);
         super.onGrab(dx, dy, pfEvent);
         pfEvent.isActive = true;
         if (this.isBoxed && between(this.w - 10, dx, this.w + 10) && between(this.h - 10, dy, this.h + 10)) {

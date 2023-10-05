@@ -28,8 +28,8 @@ export class DispatchController {
             if (pfEvent.isActive && anyThis.isDraggable && controller.dragEvent) controller.dragEvent(pfEvent, this);
             if (pfEvent.isActive && anyThis._isSlideableInitialized && controller.slideEvent) controller.slideEvent(pfEvent, this);
             if (inBounds) {
-                if (!pfEvent.isMove) console.log(controller);
-                if (!pfEvent.isMove) console.log(anyThis);
+                // if (!pfEvent.isMove) console.log(controller);
+                // if (!pfEvent.isMove) console.log(anyThis);
                 if (pfEvent.isActive && anyThis._isSwipeableInitialized && controller.swipeEvent) controller.swipeEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isSelectableInitialized && controller.selectEvent) controller.selectEvent(pfEvent, this);
                 if (pfEvent.isActive && anyThis._isClickableInitialized && controller.clickEvent) controller.clickEvent(pfEvent, this);

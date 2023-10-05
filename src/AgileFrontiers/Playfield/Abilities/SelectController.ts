@@ -43,7 +43,7 @@ export class SelectController {
     _selectChild(pfEvent: PlayfieldEvent | null, child: Selectable) {
         for(let _immediateChild of this._asTile.children) {
             let immediateChild = _immediateChild as unknown as Selectable;
-            console.log("_unselectChild", this._asTile.fullName, _immediateChild.fullName, child.isSelected);
+            // console.log("_unselectChild", this._asTile.fullName, _immediateChild.fullName, child.isSelected);
             if (immediateChild.isSelected) this._unselectChild(pfEvent, immediateChild);
         }
         this._selectedObj = child;

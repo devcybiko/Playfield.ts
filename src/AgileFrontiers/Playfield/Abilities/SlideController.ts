@@ -52,7 +52,7 @@ export class SlideController {
                 this._slideY = pfEvent.y;
                 this._slideObj = child;
                 this._asTile.playfield.eventObject = child._asTile;
-                console.log("_slideStart", child._asTile.fullName);
+                // console.log("_slideStart", child._asTile.fullName);
             }
         }
     }
@@ -62,7 +62,7 @@ export class SlideController {
             this._slideObj.onSlideEnd(pfEvent);
             this._slideObj = null;
             this._asTile.playfield.eventObject = null;
-            console.log("_slideEnd", this._asTile.fullName);
+            // console.log("_slideEnd", this._asTile.fullName);
         }
     }
 

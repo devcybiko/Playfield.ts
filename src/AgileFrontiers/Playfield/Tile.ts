@@ -165,6 +165,14 @@ export class Tile extends _Tile {
         return obj;
     }
 
+    find(name: string): Tile {
+        for (let child of this.children) {
+            if (child.name === name) return child as unknown as Tile;
+            let found = (child as unknown as Tile).find(name);
+            if (found) return found;
+        }
+        return Tile.null;
+    }
     // --- OnActions --- //
 
     onTick(): void {
